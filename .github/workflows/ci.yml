@@ -22,10 +22,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
-
 jobs:
   # Trunk Dynamic CI (https://docs.trunk.io/ci/dynamic-ci): asks Trunk, from this repository's own
   # CI history, which of the expensive jobs below this pull request needs. Each gated job reads its
