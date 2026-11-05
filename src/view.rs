@@ -582,7 +582,7 @@ pub fn scene_with_pill(
             0.,
             false,
         );
-        let alpha = (start.elapsed().as_secs_f32() / state.background_fade).min(1.);
+        let alpha = (crate::clock::since(*start).as_secs_f32() / state.background_fade).min(1.);
         out.draw.push(Draw::TintedImage(
             assets.background(state, &state.preferences.background),
             Rect::new(0., 0., 1920., 1080.),
@@ -707,7 +707,11 @@ pub fn scene_with_pill(
         {
             // The lifted card stays opaque while the backdrop and popup fade.
             // Fading it over its dimmed parent copy causes a brightness dip.
-            out.fade(start, (opened.elapsed().as_secs_f32() / 0.12).min(1.), 1.);
+            out.fade(
+                start,
+                (crate::clock::since(opened).as_secs_f32() / 0.12).min(1.),
+                1.,
+            );
         }
         match overlay {
             Overlay::Options { id, .. } | Overlay::BackgroundOptions { id, .. } => {
@@ -727,7 +731,11 @@ pub fn scene_with_pill(
             Overlay::Options { .. } | Overlay::BackgroundOptions { .. }
         ) && let Some(opened) = state.panel_started
         {
-            out.fade(start, (opened.elapsed().as_secs_f32() / 0.12).min(1.), 1.);
+            out.fade(
+                start,
+                (crate::clock::since(opened).as_secs_f32() / 0.12).min(1.),
+                1.,
+            );
         }
     }
     if state.recents_open() || state.recents.visibility > 0. {
@@ -2237,7 +2245,11 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                 _ => unreachable!(),
             }
             if let Some(opened) = state.panel_started {
-                out.fade(start, (opened.elapsed().as_secs_f32() / 0.15).min(1.), 1.);
+                out.fade(
+                    start,
+                    (crate::clock::since(opened).as_secs_f32() / 0.15).min(1.),
+                    1.,
+                );
             }
             return;
         }
@@ -2344,7 +2356,11 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
             input_name_rows(out, state, assets, id, 164.8 + 3. * 102.7 + 16. - s);
         }
         if let Some(opened) = state.panel_started {
-            out.fade(start, (opened.elapsed().as_secs_f32() / 0.15).min(1.), 1.);
+            out.fade(
+                start,
+                (crate::clock::since(opened).as_secs_f32() / 0.15).min(1.),
+                1.,
+            );
         }
         return;
     }
@@ -3350,7 +3366,7 @@ fn options(out: &mut Scene, state: &State, assets: &Assets, id: &str, anchor: Op
     if let Some(opened) = state.panel_started {
         out.fade(
             panel_start,
-            (opened.elapsed().as_secs_f32() / 0.12).min(1.),
+            (crate::clock::since(opened).as_secs_f32() / 0.12).min(1.),
             1.,
         );
     }
@@ -3576,7 +3592,11 @@ fn toast(out: &mut Scene, state: &State, assets: &Assets, notice: &str) {
     if !state.preferences.reduced_motion
         && let Some((_, opened)) = &state.notice
     {
-        out.fade(start, (opened.elapsed().as_secs_f32() / 0.12).min(1.), 1.);
+        out.fade(
+            start,
+            (crate::clock::since(*opened).as_secs_f32() / 0.12).min(1.),
+            1.,
+        );
     }
 }
 

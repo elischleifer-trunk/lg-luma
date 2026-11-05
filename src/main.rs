@@ -5,6 +5,7 @@ mod app_artwork;
 #[path = "app-subscription.rs"]
 mod app_subscription;
 mod branding;
+mod clock;
 mod companion;
 mod damage;
 mod diagnostics;
@@ -956,7 +957,10 @@ fn run() -> Result<(), String> {
     let initial_nav = view::navigation(&assets, state.preferences.language);
     let mut pill = initial_nav.items[0].x;
     let mut pill_width = initial_nav.items[0].w;
-    let mut last_frame = Instant::now();
+    if options.frames.is_some() {
+        clock::use_fixed_step();
+    }
+    let mut last_frame = clock::now();
     let mut last_minute = None;
     let mut frame = 0u64;
     let mut visible = true;
@@ -1733,8 +1737,8 @@ fn run() -> Result<(), String> {
             }
             text_active = keyboard;
         }
-        let dt = last_frame.elapsed().as_secs_f32().min(0.1);
-        last_frame = Instant::now();
+        let dt = clock::since(last_frame).as_secs_f32().min(0.1);
+        last_frame = clock::now();
         let navigation = view::navigation(&assets, state.preferences.language);
         let target = navigation.items[state.page_index()].x;
         let target_width = navigation.items[state.page_index()].w;
@@ -1860,6 +1864,7 @@ fn run() -> Result<(), String> {
             state.dirty = false;
         }
         frame += 1;
+        clock::advance();
         if final_frame {
             running = false;
         }

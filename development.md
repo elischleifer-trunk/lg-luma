@@ -655,6 +655,10 @@ for Luma; bypassing the browser does not by itself reconfigure LG's graphics out
 `--profile-frames N` forces redraws and measures swap-to-swap intervals after ten warmup
 presentations. Hidden windows pause profiling. Capture stalls are excluded. CPU submission is
 not a GPU timestamp, and `--frames` counts event-loop iterations, not presentation rate.
+With `--frames`, animations run on a fixed 1/60 s step per event-loop iteration instead of wall
+time (`src/clock.rs`), so a smoke budget covers the same animation on any runner. Without VSync
+(Xvfb, llvmpipe) the loop free-runs while animating, and a faster machine would otherwise spend
+the budget before a transition finishes. `--profile-frames` keeps wall time.
 Inspect `window`, `drawable`, `drawable_is_4k`, `last_presented`, `capture` and `profile` in JSON.
 Do not infer 60 fps from a successful VSync request; measure actual TV pacing and transitions.
 `LUMA_PROFILE_SKIP=wallpaper,image,app,shape,gradient,shadow,text` (or `all`) leaves those draws

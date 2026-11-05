@@ -315,7 +315,7 @@ impl State {
     }
 
     pub fn notify(&mut self, text: impl Into<String>) {
-        self.notice = Some((text.into(), Instant::now()));
+        self.notice = Some((text.into(), crate::clock::now()));
         self.dirty = true;
     }
 
@@ -397,13 +397,14 @@ impl State {
                 recents_open,
                 self.preferences.reduced_motion,
                 self.pointer,
-                Instant::now(),
+                crate::clock::now(),
             );
         }
         if let Some(start) = self.panel_started {
             self.dirty = true;
             let duration = if self.overlay.is_some() { 120 } else { 150 };
-            if self.preferences.reduced_motion || start.elapsed() >= Duration::from_millis(duration)
+            if self.preferences.reduced_motion
+                || crate::clock::since(start) >= Duration::from_millis(duration)
             {
                 self.panel_started = None;
             }
@@ -411,7 +412,7 @@ impl State {
         if self
             .notice
             .as_ref()
-            .is_some_and(|(_, start)| start.elapsed() < Duration::from_millis(120))
+            .is_some_and(|(_, start)| crate::clock::since(*start) < Duration::from_millis(120))
             && !self.preferences.reduced_motion
         {
             self.dirty = true;
@@ -419,7 +420,7 @@ impl State {
         if let Some((_, start)) = &self.previous_background {
             self.dirty = true;
             if self.preferences.reduced_motion
-                || start.elapsed().as_secs_f32() >= self.background_fade
+                || crate::clock::since(*start).as_secs_f32() >= self.background_fade
             {
                 self.previous_background = None;
             }
@@ -427,7 +428,7 @@ impl State {
         if self
             .notice
             .as_ref()
-            .is_some_and(|(_, start)| start.elapsed() > Duration::from_secs(5))
+            .is_some_and(|(_, start)| crate::clock::since(*start) > Duration::from_secs(5))
         {
             self.notice = None;
             self.dirty = true;
@@ -449,10 +450,9 @@ impl State {
             || self.previous_background.is_some()
             || self.panel_started.is_some()
             || (!self.preferences.reduced_motion
-                && self
-                    .notice
-                    .as_ref()
-                    .is_some_and(|(_, start)| start.elapsed() < Duration::from_millis(120)))
+                && self.notice.as_ref().is_some_and(|(_, start)| {
+                    crate::clock::since(*start) < Duration::from_millis(120)
+                }))
     }
 
     /// Home's lifecycle relaunch returns directly to Home, even from an overlay.
@@ -935,7 +935,8 @@ impl State {
         if self.preferences.reduced_motion {
             self.previous_background = None;
         } else {
-            self.previous_background = Some((self.preferences.background.clone(), Instant::now()));
+            self.previous_background =
+                Some((self.preferences.background.clone(), crate::clock::now()));
             self.background_fade = CYCLE_FADE;
         }
         self.preferences.background = id;
@@ -1625,7 +1626,7 @@ impl State {
                 });
                 self.focus = Target::UseBackground;
                 if !self.preferences.reduced_motion {
-                    self.panel_started = Some(Instant::now());
+                    self.panel_started = Some(crate::clock::now());
                 }
                 self.dirty = true;
             }
@@ -1650,7 +1651,7 @@ impl State {
             });
             self.focus = Target::OpenApp;
             if !self.preferences.reduced_motion {
-                self.panel_started = Some(Instant::now());
+                self.panel_started = Some(crate::clock::now());
             }
             self.dirty = true;
         }
@@ -1957,7 +1958,7 @@ impl State {
         self.overlay = Some(Overlay::Keyboard);
         self.focus = Target::Key(0);
         if !self.preferences.reduced_motion {
-            self.panel_started = Some(Instant::now());
+            self.panel_started = Some(crate::clock::now());
         }
         self.dirty = true;
     }
@@ -1967,7 +1968,7 @@ impl State {
         self.focus = Target::WeatherQuery;
         self.scroll = 0.;
         if !self.preferences.reduced_motion {
-            self.panel_started = Some(Instant::now());
+            self.panel_started = Some(crate::clock::now());
         }
         self.dirty = true;
     }
@@ -2072,7 +2073,7 @@ impl State {
                     self.preferences.temperature_unit == Unit::Fahrenheit,
                 ));
                 if !self.preferences.reduced_motion {
-                    self.panel_started = Some(Instant::now());
+                    self.panel_started = Some(crate::clock::now());
                 }
             }
             Target::WeatherQuery => self.open_keyboard(TextField::Location),
@@ -2089,7 +2090,7 @@ impl State {
                 self.focus = Target::Choice(self.preferences.date_format.index());
                 self.scroll = 0.;
                 if !self.preferences.reduced_motion {
-                    self.panel_started = Some(Instant::now());
+                    self.panel_started = Some(crate::clock::now());
                 }
             }
             Target::GreetingName => self.open_keyboard(TextField::Name),
@@ -2120,7 +2121,7 @@ impl State {
                 }));
                 self.scroll = 0.;
                 if !self.preferences.reduced_motion {
-                    self.panel_started = Some(Instant::now());
+                    self.panel_started = Some(crate::clock::now());
                 }
             }
             Target::InputRename => self.open_keyboard(TextField::InputName),
@@ -2145,7 +2146,7 @@ impl State {
                 self.focus = focus;
                 self.scroll = 0.;
                 if !self.preferences.reduced_motion {
-                    self.panel_started = Some(Instant::now());
+                    self.panel_started = Some(crate::clock::now());
                 }
             }
             Target::InstallUpdate => {
@@ -2234,7 +2235,7 @@ impl State {
                         self.focus = Target::AppNamesHome;
                         self.scroll = 0.;
                         if !self.preferences.reduced_motion {
-                            self.panel_started = Some(Instant::now());
+                            self.panel_started = Some(crate::clock::now());
                         }
                         return vec![];
                     }
@@ -2242,7 +2243,7 @@ impl State {
                         self.subpage = Some(Subpage::Clock);
                         self.scroll = 0.;
                         if !self.preferences.reduced_motion {
-                            self.panel_started = Some(Instant::now());
+                            self.panel_started = Some(crate::clock::now());
                         }
                         self.focus = Target::ClockFormat;
                         return vec![];
@@ -2262,7 +2263,7 @@ impl State {
                         self.subpage = Some(Subpage::Language);
                         self.focus = Target::Choice(self.preferences.language.index());
                         if !self.preferences.reduced_motion {
-                            self.panel_started = Some(Instant::now());
+                            self.panel_started = Some(crate::clock::now());
                         }
                         return vec![];
                     }
@@ -2272,7 +2273,7 @@ impl State {
                         self.focus = Target::Choice(self.preferences.text_rendering.index());
                         self.scroll = 0.;
                         if !self.preferences.reduced_motion {
-                            self.panel_started = Some(Instant::now());
+                            self.panel_started = Some(crate::clock::now());
                         }
                         return vec![];
                     }
@@ -2304,7 +2305,7 @@ impl State {
                 }
                 if !self.preferences.reduced_motion && self.preferences.background != id {
                     self.previous_background =
-                        Some((self.preferences.background.clone(), Instant::now()));
+                        Some((self.preferences.background.clone(), crate::clock::now()));
                     self.background_fade = BACKGROUND_FADE;
                 }
                 self.preferences.splash_background = Some(if crate::wallpapers::valid_id(&id) {
@@ -2338,7 +2339,7 @@ impl State {
                     .unwrap_or_default();
                 self.subpage = Some(Subpage::Input(id));
                 if !self.preferences.reduced_motion {
-                    self.panel_started = Some(Instant::now());
+                    self.panel_started = Some(crate::clock::now());
                 }
                 self.focus = Target::Choice(match mode {
                     InputMode::On => 0,
@@ -2577,7 +2578,7 @@ impl State {
             }
             if matches!(overlay, Overlay::Recents { .. }) {
                 self.recents.closing_focus = Some(self.focus.clone());
-                self.recents.updated = Instant::now();
+                self.recents.updated = crate::clock::now();
                 self.pressed = None;
                 if self.preferences.reduced_motion {
                     self.recents.visibility = 0.;
