@@ -54,7 +54,6 @@ including `armv7-unknown-linux-gnueabi` for TV builds. No browser installation i
 | `pnpm test`               | Release-tooling and Rust workspace unit tests              |
 | `pnpm test:icons`         | Mocked runtime icon reads and bundled vector checks        |
 | `pnpm test:smoke`         | Desktop rendering, mocked weather and localization checks  |
-| `pnpm changeset`          | Add a release note and requested version bump to a PR      |
 | `pnpm version:check`      | Check synchronized app release versions                    |
 
 The TV target is ARMv7 **soft-float calling convention**, `gnueabi`, not `gnueabihf`. Codegen
@@ -998,8 +997,8 @@ pinned Linux SDK, inspects/normalizes the actual IPK and generates checksums/fee
 **Rust checks, rendering, and native package** check remains as an aggregate that requires every
 preparation, smoke and package job to succeed. It uploads release/rendering artifacts on PRs,
 manual runs and Release runs. CI does not run again after a merge: PRs are the gate. `pnpm check` also validates synchronized release versions,
-and `pnpm test:release` covers version synchronization, the R2 feed mirror and the real
-Changesets version command in an isolated fixture. Host CI cannot prove hardware compatibility,
+and `pnpm test:release` covers version synchronization, the minor/major release bump and the R2
+feed mirror in an isolated fixture. Host CI cannot prove hardware compatibility,
 small-text quality or presentation frame rate.
 
 ### PR test IPKs
@@ -1025,27 +1024,9 @@ run independently.
 
 ## Releases
 
-Add a changeset to feature/fix PRs that should be included in the next app release:
-
-```sh
-pnpm changeset
-```
-
-Select `lg-luma`, choose patch/minor/major and describe the change. Commit the generated file
-under `.changeset/` with the PR. Documentation-only and maintenance PRs that do not need a release
-can omit it. Keep the existing app version in ordinary PRs.
-
-`.github/workflows/changeset-status.yml` adds a Changesets status check and maintains one comment
-per PR, including fork PRs. It reports the requested release types or notes that a PR without a
-changeset will not request an app version bump. For code or behavior changes, add a changeset
-using semantic versioning: **patch** for backward-compatible fixes, **minor** for backward-compatible
-features, or **major** for breaking changes. The comment is informational, so documentation-only
-and maintenance PRs can still merge without a release changeset. It updates when a PR is opened,
-reopened, edited, marked ready or receives new commits. The workflow becomes active once it is merged into the PR's base branch. It uses
-`pull_request_target` with a read-only status job and a separate comment-writing job, without
-installing dependencies or running code from the PR.
-
-Merging never publishes. Changesets wait in `.changeset/` until the next release.
+Pull requests need no release bookkeeping: keep the existing app version and don't add version
+or changelog files. Merging never publishes. The **Release** workflow picks the version, and
+each GitHub release's notes are generated from the pull requests merged since the previous tag.
 
 ### Merge gate
 
@@ -1069,21 +1050,20 @@ accepts it. Any other push to `main` without that passing check is rejected.
 
 Run **Actions → Release → Run workflow** on `main` (`.github/workflows/release.yml`) and choose:
 
-- **bump**: `patch`, `minor` or `major` adds that bump (with the optional **notes** line as its
-  changelog entry) on top of any pending changesets; Changesets uses the highest requested bump.
-  `changesets` releases only the pending notes and fails if there are none.
+- **bump**: `auto` (the default) releases the next minor version, for example 2.19.0 → 2.20.0.
+  `major` releases the next major version, for example 2.19.0 → 3.0.0.
 
 The workflow then:
 
-1. **Bump version.** `pnpm version:release` consumes the changesets, updates `package.json` and
-   `CHANGELOG.md`, and synchronizes `appinfo.json`, the root `Cargo.toml`, the `luma` entry in
-   `Cargo.lock` and the versioned IPK examples in `readme.md`. The result is committed as
-   `Release vX.Y.Z` on a temporary `release/vX.Y.Z` branch. An existing tag stops the run.
+1. **Bump version.** `pnpm version:bump minor|major` updates `package.json` and synchronizes
+   `appinfo.json`, the root `Cargo.toml`, the `luma` entry in `Cargo.lock` and the versioned IPK
+   examples in `readme.md`. The result is committed as `Release vX.Y.Z` on a temporary
+   `release/vX.Y.Z` branch. An existing tag stops the run.
 2. **Validate.** Calls `ci.yml` on that commit: checks, unit tests, the four desktop smoke suites and
    the verified ARM IPK and Homebrew feed.
 3. **Publish GitHub release.** Fast-forwards `main` to the release commit (refusing if `main` moved
-   meanwhile), creates the `vX.Y.Z` GitHub release from that run's artifacts and deletes the
-   temporary branch.
+   meanwhile), creates the `vX.Y.Z` GitHub release from that run's artifacts, with notes generated
+   from the merged pull requests, and deletes the temporary branch.
 4. **Publish to Cloudflare R2.** See [Release hosting](#release-hosting-cloudflare-r2).
 
 If bumping or validation fails, `main`, tags and the published feed are untouched: fix the problem
@@ -1092,7 +1072,7 @@ manually with the tag. `ci.yml` on its own (PRs, manual dispatch) only validates
 No additional token is needed; the built-in token pushes the release commit.
 
 `pnpm version:check` checks synchronization without writing files. `pnpm version:sync` repairs
-metadata from the current `package.json` version without calculating a bump. `pnpm version:release`
+metadata from the current `package.json` version without calculating a bump. `pnpm version:bump`
 is reserved for the Release workflow.
 
 Homebrew Channel's details page reads `packages[].shortDescription` (or `fullDescriptionUrl`),

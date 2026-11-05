@@ -78,12 +78,40 @@ export async function syncVersions(directory = root, { check = false } = {}) {
   return { version, changed };
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const check = process.argv.includes('--check');
-  const { version, changed } = await syncVersions(root, { check });
-  console.log(
-    check
-      ? `Release versions match ${version}.`
-      : `Synchronized ${version}: ${changed.join(', ') || 'no changes'}.`,
+// Bumps package.json to the next minor (x.Y.0) or major (X.0.0) version and synchronizes the
+// other release metadata from it.
+export async function bumpVersion(directory = root, kind = 'minor') {
+  if (kind !== 'minor' && kind !== 'major') {
+    throw new Error(`Unknown version bump "${kind}". Use minor or major.`);
+  }
+  const filename = path.join(directory, 'package.json');
+  const source = await fs.readFile(filename, 'utf8');
+  const { version: previous } = JSON.parse(source);
+  const match = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(previous ?? '');
+  if (!match)
+    throw new Error('package.json must have a numeric major.minor.patch release version.');
+  const [major, minor] = [Number(match[1]), Number(match[2])];
+  const version = kind === 'major' ? `${major + 1}.0.0` : `${major}.${minor + 1}.0`;
+  await fs.writeFile(
+    filename,
+    replaceVersion(source, /("version"\s*:\s*")[^"\r\n]+(")/g, version, 'package.json'),
   );
+  await syncVersions(directory);
+  return { previous, version };
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const bump = process.argv.indexOf('--bump');
+  if (bump !== -1) {
+    const { previous, version } = await bumpVersion(root, process.argv[bump + 1] ?? 'minor');
+    console.log(`Bumped ${previous} → ${version}.`);
+  } else {
+    const check = process.argv.includes('--check');
+    const { version, changed } = await syncVersions(root, { check });
+    console.log(
+      check
+        ? `Release versions match ${version}.`
+        : `Synchronized ${version}: ${changed.join(', ') || 'no changes'}.`,
+    );
+  }
 }

@@ -38,13 +38,11 @@
     "sdk": "node tools/setup-webos-sdk.mjs",
     "test:weather": "node tests/weather-smoke.mjs",
     "test:translations": "node tests/translations-smoke.mjs",
-    "changeset": "changeset",
-    "version:release": "changeset version && pnpm version:sync && oxfmt --write CHANGELOG.md",
+    "version:bump": "node tools/sync-version.mjs --bump",
     "version:sync": "node tools/sync-version.mjs",
     "version:check": "node tools/sync-version.mjs --check"
   },
   "devDependencies": {
-    "@changesets/cli": "3.0.3",
     "@webos-tools/cli": "3.2.6",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",

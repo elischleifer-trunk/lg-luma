@@ -2,25 +2,20 @@ name: Release
 run-name: 'Release Luma (${{ inputs.bump }})'
 
 # The only way to publish Luma. Run it from Actions → Release → Run workflow on main:
-#   1. Bump the version (pending changesets and/or the chosen bump) on a release/vX.Y.Z branch.
+#   1. Bump the version (minor by default, or major) on a release/vX.Y.Z branch.
 #   2. Run the full CI validation (checks, smoke suites, verified ARM IPK) on that commit.
-#   3. Fast-forward main to the release commit, publish the GitHub release, mirror it to R2.
+#   3. Fast-forward main to the release commit, publish the GitHub release (notes generated from
+#      the merged pull requests), mirror it to R2.
 # If any step before 3 fails, main and the published feed are untouched.
 
 on:
   workflow_dispatch:
     inputs:
       bump:
-        description: >-
-          Version bump. "changesets" uses the pending .changeset notes; patch/minor/major add
-          that bump on top of any pending notes (the highest bump wins).
+        description: Version bump. "auto" releases the next minor version (x.Y.0); "major" releases X.0.0.
         type: choice
-        options: [changesets, patch, minor, major]
-        default: patch
-      notes:
-        description: Changelog line for a patch/minor/major release (optional)
-        type: string
-        required: false
+        options: [auto, major]
+        default: auto
 
 permissions:
   contents: read
@@ -43,31 +38,16 @@ jobs:
       base: ${{ steps.commit.outputs.base }}
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
       - name: Apply the version bump
         env:
           BUMP: ${{ inputs.bump }}
-          NOTES: ${{ inputs.notes }}
         run: |
-          pending="$(find .changeset -maxdepth 1 -name '*.md' ! -name README.md | wc -l)"
-          if [ "$BUMP" = changesets ]; then
-            if [ "$pending" -eq 0 ]; then
-              echo '::error::No pending changesets. Choose patch, minor or major instead.'
-              exit 1
-            fi
-          else
-            {
-              printf -- "---\n'lg-luma': %s\n---\n\n" "$BUMP"
-              printf '%s\n' "${NOTES:-Release.}"
-            } > ".changeset/release-$GITHUB_RUN_ID.md"
-          fi
-          pnpm version:release
-          pnpm version:check
+          if [ "$BUMP" = major ]; then kind=major; else kind=minor; fi
+          node tools/sync-version.mjs --bump "$kind"
+          node tools/sync-version.mjs --check
       - name: Commit to a release branch
         id: commit
         env:
