@@ -26,8 +26,35 @@ permissions:
   contents: read
 
 jobs:
+  # Trunk Dynamic CI (https://docs.trunk.io/ci/dynamic-ci): skips the test job on a pull request
+  # only when Trunk returns an explicit 'false' for it. Off pull requests (pushes to main), on fork
+  # PRs without the secret, or when Trunk is unreachable, there is no verdict and the job runs.
+  dynamic-ci:
+    name: Dynamic CI
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      test: ${{ steps.dynamic-ci.outputs.test }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          clean: false
+      - id: dynamic-ci
+        uses: trunk-io/dynamic-ci@v1
+        with:
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+          enable-annotation: true
+
   test:
     name: Lint and test custom_components/luma
+    needs: [dynamic-ci]
+    if: >-
+      !cancelled() &&
+      needs.dynamic-ci.outputs.test != 'false'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:

@@ -97,6 +97,9 @@ jobs:
     needs: version
     permissions:
       contents: read
+      # ci.yml's Trunk Dynamic CI job declares this. It only runs on pull requests, so a release
+      # always runs every validation job, but a called workflow may not request more than this grants.
+      pull-requests: read
     uses: ./.github/workflows/ci.yml
     with:
       ref: ${{ needs.version.outputs.sha }}
