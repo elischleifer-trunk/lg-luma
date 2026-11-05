@@ -1,0 +1,24 @@
+version: 1
+name: CI
+description: Toolchains, system packages, dependencies and warm Rust builds for the main CI workflow (.github/workflows/ci.yml)
+build:
+  # The build compiles the full Rust workspace twice (desktop and armv7 release), so use 8 vCPU.
+  size: large
+  timeout_minutes: 90
+env:
+  # Rust lives in system locations, so the build user and the job user (UID 1001) share it.
+  RUSTUP_HOME: /usr/local/rustup
+  CARGO_HOME: /usr/local/cargo
+  # One pnpm store path for the build and for each job. node_modules records its store path, and
+  # pnpm refuses node_modules that were installed from a different store.
+  npm_config_store_dir: /opt/pnpm-store
+steps:
+  # Keep the default path (/workspace/lg-luma) and the full history; Trunk hands this clone to
+  # actions/checkout at the start of each job.
+  - checkout:
+      repo: .
+      on: build
+  - script:
+      on: build
+      name: Install toolchains and dependencies and warm the Rust builds
+      run: ./ci.build.sh
