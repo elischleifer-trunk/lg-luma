@@ -2,9 +2,12 @@ name: CI
 run-name: "${{ github.event_name == 'workflow_dispatch' && format('Branch validation · {0}', github.ref_name) || github.event_name == 'merge_group' && 'Merge queue validation' || format('PR #{0} · {1}', github.event.pull_request.number, github.event.pull_request.title) }}"
 
 # Validation only, and the merge gate: require "Rust checks, rendering, and native package" in the
-# main branch ruleset so a PR cannot merge unless this passes. There is no post-merge run on main;
-# release.yml calls this workflow again on the exact commit it publishes. merge_group lets the same
-# check gate a merge queue if the repository moves to an organization (queues are org-only).
+# main branch ruleset so a PR cannot merge unless this passes. Trunk Dynamic CI may skip the smoke
+# and package jobs on a pull request, but merges go through Trunk Merge Queue, and Dynamic CI never
+# skips a job on its trunk-merge/* runs, so every commit that lands has passed the full suite. There
+# is no post-merge run on main; release.yml calls this workflow again on the exact commit it
+# publishes. merge_group lets the same check gate GitHub's native merge queue if the repository
+# moves to an organization (GitHub's queues are org-only).
 on:
   pull_request:
   merge_group:
@@ -19,11 +22,38 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
-
 jobs:
+  # Trunk Dynamic CI (https://docs.trunk.io/ci/dynamic-ci): asks Trunk, from this repository's own
+  # CI history, which of the expensive jobs below this pull request needs. Each gated job reads its
+  # verdict and is skipped only on an explicit 'false'. It fails open: off pull requests (merge
+  # queue, branch validation, the Release workflow's call), on fork PRs without the secret, or when
+  # Trunk is unreachable, there is no verdict and every job runs.
+  dynamic-ci:
+    name: Dynamic CI
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      # Lets the action read the PR's changed files when the checkout lacks the base commit.
+      pull-requests: read
+    # One output per gated job, named by its job key. The action sets them at runtime, so each one
+    # has to be re-exported here.
+    outputs:
+      smoke: ${{ steps.dynamic-ci.outputs.smoke }}
+      package: ${{ steps.dynamic-ci.outputs.package }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          clean: false
+      - id: dynamic-ci
+        uses: trunk-io/dynamic-ci@v1
+        with:
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+          enable-annotation: true
+
+  # Not gated: formatting, lint and unit tests always run, and the smoke and package jobs need its
+  # shared build outputs.
   prepare:
     name: Checks, unit tests, and shared desktop assets
     runs-on: ubuntu-24.04
@@ -73,7 +103,13 @@ jobs:
 
   smoke:
     name: Smoke / ${{ matrix.suite }}
-    needs: prepare
+    needs: [dynamic-ci, prepare]
+    # !cancelled() keeps the job running when dynamic-ci is skipped or fails; compare with
+    # != 'false' so that a missing verdict runs the job.
+    if: >-
+      !cancelled() &&
+      needs.prepare.result == 'success' &&
+      needs.dynamic-ci.outputs.smoke != 'false'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
@@ -130,7 +166,13 @@ jobs:
 
   package:
     name: Verified ARM IPK and Homebrew feed
-    needs: prepare
+    needs: [dynamic-ci, prepare]
+    # The Release workflow calls this workflow off a pull request, so dynamic-ci never runs there
+    # and the release package is always built.
+    if: >-
+      !cancelled() &&
+      needs.prepare.result == 'success' &&
+      needs.dynamic-ci.outputs.package != 'false'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
@@ -181,9 +223,10 @@ jobs:
             dist/description.html
             dist/app-icon-large.png
   build:
-    # Preserve the existing required-check name as the aggregate of all jobs.
+    # Preserve the existing required-check name as the aggregate of all jobs. Never gate this job
+    # with Dynamic CI: it is the fan-in that reports the required check.
     name: Rust checks, rendering, and native package
-    needs: [prepare, smoke, package]
+    needs: [dynamic-ci, prepare, smoke, package]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -191,19 +234,32 @@ jobs:
       - name: Require all validation jobs to pass
         env:
           RESULTS: ${{ toJSON(needs) }}
+          SMOKE_VERDICT: ${{ needs.dynamic-ci.outputs.smoke }}
+          PACKAGE_VERDICT: ${{ needs.dynamic-ci.outputs.package }}
         run: |
           node <<'NODE'
           const jobs = JSON.parse(process.env.RESULTS);
+          // A job may be skipped only when Dynamic CI said so. The dynamic-ci job itself is
+          // advisory: its failure or absence just means every job ran.
+          const skippable = {
+            smoke: process.env.SMOKE_VERDICT === 'false',
+            package: process.env.PACKAGE_VERDICT === 'false',
+          };
           for (const [name, job] of Object.entries(jobs)) {
-            console.log(`${name}: ${job.result}`);
-            if (job.result !== 'success') process.exitCode = 1;
+            if (name === 'dynamic-ci') {
+              console.log(`${name}: ${job.result} (advisory)`);
+              continue;
+            }
+            const skipped = job.result === 'skipped' && skippable[name];
+            console.log(`${name}: ${job.result}${skipped ? ' (skipped by Trunk Dynamic CI)' : ''}`);
+            if (job.result !== 'success' && !skipped) process.exitCode = 1;
           }
           NODE
 
   summary:
     name: Validation summary
     if: always()
-    needs: [prepare, smoke, package, build]
+    needs: [dynamic-ci, prepare, smoke, package, build]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
