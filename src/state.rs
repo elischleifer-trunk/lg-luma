@@ -1639,7 +1639,7 @@ impl State {
                 restore: self.focus.clone(),
             });
             self.focus = Target::TileTest(id.clone());
-            self.panel_started = (!self.preferences.reduced_motion).then(Instant::now);
+            self.panel_started = (!self.preferences.reduced_motion).then(crate::clock::now);
             self.dirty = true;
         } else if let Target::App(id) = &self.focus {
             if self.is_input(id) {
