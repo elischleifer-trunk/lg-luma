@@ -1,15 +1,14 @@
 name: CI
-run-name: "${{ github.event_name == 'workflow_dispatch' && format('Branch validation · {0}', github.ref_name) || github.event_name == 'merge_group' && 'Merge queue validation' || github.event_name == 'push' && format('Main validation · {0}', github.event.head_commit.message) || format('PR #{0} · {1}', github.event.pull_request.number, github.event.pull_request.title) }}"
+run-name: "${{ github.event_name == 'workflow_dispatch' && format('Branch validation · {0}', github.ref_name) || github.event_name == 'merge_group' && 'Merge queue validation' || format('PR #{0} · {1}', github.event.pull_request.number, github.event.pull_request.title) }}"
 
 # Validation only, and the merge gate: require "Rust checks, rendering, and native package" in the
-# main branch ruleset so a PR cannot merge unless this passes. On pull requests Trunk Dynamic CI may
-# skip the smoke and package jobs, so every push to main runs the full suite (Dynamic CI does not
-# run off pull requests) and a mispredicted skip is caught on the commit that introduced it.
-# release.yml calls this workflow again on the exact commit it publishes. merge_group lets the same
-# check gate a merge queue if the repository moves to an organization (queues are org-only).
+# main branch ruleset so a PR cannot merge unless this passes. Trunk Dynamic CI may skip the smoke
+# and package jobs on a pull request, but merges go through Trunk Merge Queue, and Dynamic CI never
+# skips a job on its trunk-merge/* runs, so every commit that lands has passed the full suite. There
+# is no post-merge run on main; release.yml calls this workflow again on the exact commit it
+# publishes. merge_group lets the same check gate GitHub's native merge queue if the repository
+# moves to an organization (GitHub's queues are org-only).
 on:
-  push:
-    branches: [main]
   pull_request:
   merge_group:
   workflow_dispatch:
