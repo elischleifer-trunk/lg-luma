@@ -156,7 +156,7 @@ impl Default for Recents {
             dismissals: vec![],
             visibility: 0.,
             closing_focus: None,
-            updated: Instant::now(),
+            updated: crate::clock::now(),
         }
     }
 }
@@ -265,7 +265,7 @@ impl State {
             self.recents.dismissals.clear();
             self.recents.closing_focus = None;
         }
-        self.recents.updated = Instant::now();
+        self.recents.updated = crate::clock::now();
         self.recents.pending = None;
         // An interrupted mutation is reconciled by the new history read. Return
         // its presentation card while reversing the overlay fade.

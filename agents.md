@@ -67,7 +67,8 @@ Vector icon/logo assets are standalone SVGs compiled to `.lvec` at build time. F
 are tessellated only as needed; text runs use bounded GPU caches, lazy CJK and no glyph bitmap
 atlas. Text AA prefers MSAA of intact outlines, with a narrow fringe fallback; keep physical
 origin/baseline snapping and logical 1920×1080 layout. `--resolution 4k` is experimental, not a
-shipping-default claim. Profiles count presentations; ordinary `--frames` is event-loop iterations.
+shipping-default claim. Profiles count presentations; ordinary `--frames` is event-loop iterations,
+each a fixed 1/60 s of animation time.
 
 Weather uses ureq/rustls, fixed Open-Meteo origins, bounded replies/timeouts, no proxy/redirects,
 separate workers/cache and generation IDs. Cache Celsius and convert units without replacing it.
