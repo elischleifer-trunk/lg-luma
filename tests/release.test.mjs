@@ -83,6 +83,20 @@ test('release bumps default to the next minor version and synchronize every file
   const before = await fs.readFile(path.join(directory, 'package.json'), 'utf8');
   await assert.rejects(bumpVersion(directory, 'patch'), /Unknown version bump/);
   assert.equal(await fs.readFile(path.join(directory, 'package.json'), 'utf8'), before);
+
+  const lockfile = path.join(directory, 'Cargo.lock');
+  await fs.writeFile(
+    lockfile,
+    (await fs.readFile(lockfile, 'utf8')).replace('name = "luma"', 'name = "other"'),
+  );
+  const metadataBefore = await readMetadata(directory);
+  await assert.rejects(bumpVersion(directory), /one luma package in Cargo.lock/);
+  assert.equal(
+    await fs.readFile(path.join(directory, 'package.json'), 'utf8'),
+    before,
+    'a failed bump must not leave package.json bumped',
+  );
+  assert.deepEqual(await readMetadata(directory), metadataBefore);
 });
 
 test("R2 mirror rewrites only this release's asset URLs", () => {
