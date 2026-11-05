@@ -19,6 +19,9 @@ concurrency:
 jobs:
   prepare:
     name: Checks, unit tests, and shared desktop assets (trunk runners)
+    # Trunk runners run only code from this repository: skip pull requests from forks.
+    # smoke and package need prepare, so they are skipped too.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: trunk=${{ github.run_id }}-${{ github.run_attempt }}..size=medium..memory=high..template=ci
     timeout-minutes: 60
     steps:
@@ -171,7 +174,7 @@ jobs:
     # Shadow of the required-check aggregate in ci.yml. This copy is not a required check.
     name: Rust checks, rendering, and native package (trunk runners)
     needs: [prepare, smoke, package]
-    if: always()
+    if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: trunk=${{ github.run_id }}-${{ github.run_attempt }}..size=medium..memory=high..template=ci
     timeout-minutes: 5
     steps:
@@ -189,7 +192,7 @@ jobs:
 
   summary:
     name: Validation summary (trunk runners)
-    if: always()
+    if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     needs: [prepare, smoke, package, build]
     runs-on: trunk=${{ github.run_id }}-${{ github.run_attempt }}..size=medium..memory=high..template=ci
     timeout-minutes: 5
