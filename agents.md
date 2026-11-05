@@ -28,15 +28,12 @@ builds or tests.
 desktop OpenGL and mock weather HTTP. Linux can use `xvfb-run -a pnpm test:smoke`. Tests must not
 contact real weather APIs or a TV. Respect any user instruction to use manual TV verification
 instead of running automated tests. Builds/lint may still be run. Do not claim hardware behavior
-from desktop checks. Add a `pnpm changeset` file for release-worthy changes and leave version
-bumps to the manual Release workflow. Its `pnpm version:release` command synchronizes
-`package.json`, `appinfo.json`, the root `Cargo.toml`, the `luma` entry in `Cargo.lock` and README
-IPK examples. Supporting Rust crates retain independent versions. `pnpm version:check` checks
-consistency without writing files. Code or behavior changes should use semantic versioning:
-patch for backward-compatible fixes, minor for backward-compatible features, and major for
-breaking changes. Translation updates and additional UI languages, including required font glyph
-coverage, are patch changes. Documentation-only or maintenance changes that do not need a release
-can omit a changeset.
+from desktop checks. Leave version bumps to the manual Release workflow,
+which releases the next minor version by default or a major version when chosen. Its
+`pnpm version:bump` command synchronizes `package.json`, `appinfo.json`, the root `Cargo.toml`,
+the `luma` entry in `Cargo.lock` and README IPK examples. Supporting Rust crates retain
+independent versions. `pnpm version:check` checks consistency without writing files. PRs need no
+changelog or version files: release notes are generated from merged pull requests.
 
 ## Build and identity
 
@@ -105,10 +102,8 @@ gallery to `.build/brands-gallery.png`; source restoration via `pnpm assets:bran
 `.github/workflows/ci.yml` is native-only: format/lint/workspace tests, asset generation and
 mocked desktop rendering, SDK setup, ARM cross-build, actual IPK verification/checksum/feed,
 and artifacts. It validates only; `.github/workflows/release.yml` calls it and publishes.
-`.github/workflows/changeset-status.yml` maintains an informational changeset status comment on
-PRs, including forks, with semantic-version guidance for code changes. Its `pull_request_target` jobs must not install dependencies or run code from the PR.
 `.github/workflows/release.yml` (manual dispatch on `main`) is the only publisher: it bumps the
-version on a `release/vX.Y.Z` branch, validates it with `ci.yml`, fast-forwards `main`, creates the
+version (minor by default, or major) on a `release/vX.Y.Z` branch, validates it with `ci.yml`, fast-forwards `main`, creates the
 GitHub release and mirrors it to Cloudflare R2. PRs and merges never publish. See `development.md#releases` for setup and retries.
 Only create commits or PRs when explicitly requested. For PR descriptions follow the global
 `commands/pr.md` format instructions.

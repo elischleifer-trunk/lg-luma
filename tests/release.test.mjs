@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import test from 'node:test';
-import { syncVersions } from '../tools/sync-version.mjs';
+import { bumpVersion, syncVersions } from '../tools/sync-version.mjs';
 import { mirrorFeed } from '../tools/mirror-feed.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
@@ -74,41 +73,30 @@ test('invalid release versions and missing packages fail before writing metadata
   assert.deepEqual(await readMetadata(directory), before);
 });
 
-test('the real release command combines changesets and synchronizes every file', async (t) => {
+test('release bumps default to the next minor version and synchronize every file', async (t) => {
   const directory = await fixture(t, '1.2.3');
   await syncVersions(directory);
-  await fs.mkdir(path.join(directory, 'tools'));
-  await fs.mkdir(path.join(directory, '.changeset'));
-  for (const filename of [
-    'tools/sync-version.mjs',
-    '.changeset/config.json',
-    'pnpm-workspace.yaml',
-    '.oxfmtrc.json',
-  ]) {
-    await fs.copyFile(path.join(root, filename), path.join(directory, filename));
-  }
-  await fs.symlink(path.join(root, 'node_modules'), path.join(directory, 'node_modules'), 'dir');
-  await fs.writeFile(
-    path.join(directory, '.changeset/fix.md'),
-    '---\n"lg-luma": patch\n---\n\nFix release behavior.\n',
-  );
-  await fs.writeFile(
-    path.join(directory, '.changeset/feature.md'),
-    '---\n"lg-luma": minor\n---\n\nAdd a release feature.\n',
-  );
-  const result = spawnSync('pnpm', ['version:release'], {
-    cwd: directory,
-    encoding: 'utf8',
-    timeout: 30000,
-    env: { ...process.env, CI: 'true' },
-  });
-  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.deepEqual(await bumpVersion(directory), { previous: '1.2.3', version: '1.3.0' });
   assert.equal((await syncVersions(directory, { check: true })).version, '1.3.0');
-  const changelog = await fs.readFile(path.join(directory, 'CHANGELOG.md'), 'utf8');
-  assert.match(changelog, /1\.3\.0/);
-  assert.match(changelog, /Fix release behavior/);
-  assert.match(changelog, /Add a release feature/);
-  assert.deepEqual(await fs.readdir(path.join(directory, '.changeset')), ['config.json']);
+  assert.deepEqual(await bumpVersion(directory, 'major'), { previous: '1.3.0', version: '2.0.0' });
+  assert.equal((await syncVersions(directory, { check: true })).version, '2.0.0');
+  const before = await fs.readFile(path.join(directory, 'package.json'), 'utf8');
+  await assert.rejects(bumpVersion(directory, 'patch'), /Unknown version bump/);
+  assert.equal(await fs.readFile(path.join(directory, 'package.json'), 'utf8'), before);
+
+  const lockfile = path.join(directory, 'Cargo.lock');
+  await fs.writeFile(
+    lockfile,
+    (await fs.readFile(lockfile, 'utf8')).replace('name = "luma"', 'name = "other"'),
+  );
+  const metadataBefore = await readMetadata(directory);
+  await assert.rejects(bumpVersion(directory), /one luma package in Cargo.lock/);
+  assert.equal(
+    await fs.readFile(path.join(directory, 'package.json'), 'utf8'),
+    before,
+    'a failed bump must not leave package.json bumped',
+  );
+  assert.deepEqual(await readMetadata(directory), metadataBefore);
 });
 
 test("R2 mirror rewrites only this release's asset URLs", () => {
