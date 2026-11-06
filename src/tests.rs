@@ -298,6 +298,70 @@ fn reordering_down_into_a_short_last_row_takes_its_last_slot() {
 }
 
 #[test]
+fn reordering_rows_count_the_input_cards_ahead_of_favorites() {
+    let mut state = ready();
+    let inputs: Vec<_> = state
+        .inventory
+        .inputs
+        .iter()
+        .map(|i| i.id.clone())
+        .collect();
+    for input in &inputs {
+        state
+            .preferences
+            .input_modes
+            .insert(input.clone(), InputMode::On);
+    }
+    let favorites: Vec<_> = state
+        .inventory
+        .apps
+        .iter()
+        .take(8)
+        .map(|app| app.id.clone())
+        .collect();
+    state.preferences.favorites = Some(favorites.clone());
+    let shown = state.apps().len() - favorites.len();
+    assert!(shown > 0 && shown < crate::state::HOME_COLUMNS);
+    let first_in_row_two = crate::state::HOME_COLUMNS - shown;
+    // Up from the second row's first card reaches the first row, above the inputs: it stops
+    // at the first favorite rather than taking an input's place.
+    state.focus = Target::App(favorites[first_in_row_two].clone());
+    state.hold();
+    assert_eq!(
+        state.direction(Direction::Up, &controls(&state)),
+        vec![Effect::Save]
+    );
+    assert_eq!(
+        state.preferences.favorites.clone().unwrap()[0],
+        favorites[first_in_row_two]
+    );
+    // A card on the last row stays put on Down rather than sliding along it.
+    state.moving = None;
+    state.preferences.favorites = Some(favorites.clone());
+    state.focus = Target::App(favorites[first_in_row_two].clone());
+    state.hold();
+    assert!(
+        state
+            .direction(Direction::Down, &controls(&state))
+            .is_empty()
+    );
+    assert_eq!(state.preferences.favorites.clone().unwrap(), favorites);
+    // Down from the first row lands in the same grid column on the row below.
+    state.moving = None;
+    state.focus = Target::App(favorites[0].clone());
+    state.hold();
+    assert_eq!(
+        state.direction(Direction::Down, &controls(&state)),
+        vec![Effect::Save]
+    );
+    let order = state.preferences.favorites.clone().unwrap();
+    assert_eq!(
+        order[(crate::state::HOME_COLUMNS).min(favorites.len() - 1)],
+        favorites[0]
+    );
+}
+
+#[test]
 fn home_rows_fit_long_input_names() {
     let mut state = ready();
     state.preferences.show_home_names = true;

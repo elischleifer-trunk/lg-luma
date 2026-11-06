@@ -1109,15 +1109,26 @@ impl State {
                 })
                 .collect();
             if let Some(index) = slots.iter().position(|slot| ids[*slot] == id) {
+                // Rows follow the drawn grid, where visible input cards come first. A card
+                // never takes an input's place: Up into the inputs stops at the first favorite.
+                let inputs = self
+                    .input_apps
+                    .iter()
+                    .filter(|app| self.input(&app.id).is_some())
+                    .count();
+                let grid = inputs + index;
+                let cells = inputs + slots.len();
                 let next = match direction {
                     Direction::Left => index.saturating_sub(1),
                     Direction::Right => (index + 1).min(slots.len() - 1),
-                    Direction::Up => index.checked_sub(HOME_COLUMNS).unwrap_or(index),
-                    // A short last row takes the card from the columns past its end.
-                    Direction::Down if (index / HOME_COLUMNS + 1) * HOME_COLUMNS < slots.len() => {
-                        (index + HOME_COLUMNS).min(slots.len() - 1)
+                    Direction::Up if grid >= HOME_COLUMNS => {
+                        (grid - HOME_COLUMNS).saturating_sub(inputs)
                     }
-                    Direction::Down => index,
+                    // A short last row takes the card from the columns past its end.
+                    Direction::Down if (grid / HOME_COLUMNS + 1) * HOME_COLUMNS < cells => {
+                        (grid + HOME_COLUMNS).min(cells - 1) - inputs
+                    }
+                    Direction::Up | Direction::Down => index,
                 };
                 if next != index {
                     // Up/Down carry the card across rows and the cards in between shift by
