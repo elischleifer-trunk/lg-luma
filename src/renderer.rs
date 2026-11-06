@@ -72,6 +72,8 @@ pub enum Draw {
     Clip(Option<Rect>),
     EdgeFade(Option<[f32; 4]>),
     /// Horizontal counterpart: [left fade-in start, end, right fade-out start, end].
+    /// Unused since Home favourites became a wrapping grid; kept for horizontal rows.
+    #[allow(dead_code)]
     EdgeFadeX(Option<[f32; 4]>),
 }
 

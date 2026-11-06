@@ -17,14 +17,10 @@ pub const APPS_COLUMNS: usize = 6;
 /// Automatic inventory retries before the error shows: with the 6.5 s Luna timeout about 50 s.
 pub const INVENTORY_RETRIES: u32 = 5;
 pub const INVENTORY_RETRY_DELAY: Duration = Duration::from_secs(2);
-pub const HOME_STRIP_LEFT: f32 = 84.;
-// Six favourites in full and the seventh cut off and fading out at the right (Apple TV rows):
-// the strip ends after the sixth tile, so a focused tile never sits in the fade.
-pub const HOME_STRIP_RIGHT: f32 = 1748.;
+/// Home favourites fill six columns, then wrap onto further rows.
+pub const HOME_COLUMNS: usize = 6;
 pub const HOME_TILE_WIDTH: f32 = 256.;
 pub const HOME_TILE_PITCH: f32 = 281.6;
-pub const HOME_FADE_LEFT: f32 = 8.;
-pub const HOME_FADE_RIGHT: f32 = 1910.;
 pub const BACKGROUND_FADE: f32 = 0.4;
 pub const CYCLE_FADE: f32 = 1.6;
 
@@ -219,7 +215,6 @@ pub struct State {
     pub section: usize,
     pub subpage: Option<Subpage>,
     pub scroll: f32,
-    pub home_scroll: f32,
     pub overlay: Option<Overlay>,
     pub moving: Option<String>,
     pub loading: bool,
@@ -270,7 +265,6 @@ impl State {
             section: 0,
             subpage: None,
             scroll: 0.,
-            home_scroll: 0.,
             overlay: None,
             moving: None,
             loading: false,
@@ -478,9 +472,6 @@ impl State {
         };
         self.focus = Target::Nav(self.page_index());
         self.scroll = 0.;
-        if self.page == Page::Home {
-            self.scroll_favorites(0.);
-        }
         self.query.clear();
         self.filter = 0;
         self.overlay = None;
@@ -602,16 +593,6 @@ impl State {
             }
     }
 
-    pub fn favorites_viewport(&self) -> Rect {
-        let content = self.content_viewport();
-        let left = if self.home_scroll > 0. {
-            HOME_FADE_LEFT
-        } else {
-            0.
-        };
-        Rect::new(left, content.y, HOME_FADE_RIGHT - left, content.h)
-    }
-
     pub fn apps_viewport(&self) -> Rect {
         let content = self.content_viewport();
         Rect::new(content.x, 244.8, content.w, content.y + content.h - 244.8)
@@ -627,27 +608,25 @@ impl State {
             .iter()
             .rev()
             .find(|control| {
-                let viewport =
-                    if self.page == Page::Home && matches!(control.target, Target::App(_)) {
-                        self.favorites_viewport()
-                    } else if matches!(control.target, Target::Background(_)) {
-                        self.backgrounds_viewport()
-                    } else if self.page == Page::Apps {
-                        self.apps_viewport()
-                    } else {
-                        self.content_viewport()
-                    };
+                let viewport = if matches!(control.target, Target::Background(_)) {
+                    self.backgrounds_viewport()
+                } else if self.page == Page::Apps {
+                    self.apps_viewport()
+                } else {
+                    self.content_viewport()
+                };
                 control.rect.contains(x, y) && (!control.scrollable || viewport.contains(x, y))
             })
             .map(|control| control.target.clone())
     }
 
-    /// Returns whether this wheel event scrolled favorites, so a pending card press is cancelled.
+    /// Returns whether this wheel event scrolled the Home favourites, so a pending card press
+    /// is cancelled rather than released on a different card.
     pub fn wheel_scroll(
         &mut self,
         controls: &[Control],
         position: Option<(f32, f32)>,
-        x: i32,
+        _x: i32,
         y: i32,
     ) -> bool {
         let backgrounds =
@@ -656,53 +635,43 @@ impl State {
         {
             return false;
         }
-        let over_favorites = self.page == Page::Home
-            && position.is_some_and(|(x, y)| {
-                self.favorites_viewport().contains(x, y)
-                    && controls.iter().any(|control| {
-                        matches!(control.target, Target::App(_)) && control.rect.contains(x, y)
-                    })
-            });
-        let favorites = self.page == Page::Home && (x != 0 || over_favorites);
-        if favorites {
-            self.scroll_favorites((if x != 0 { x } else { -y }) as f32 * HOME_TILE_PITCH);
-        } else {
-            let bottom = self.scroll_bottom();
-            let max = controls
-                .iter()
-                .filter(|c| {
-                    c.scrollable && (!backgrounds || matches!(c.target, Target::Background(_)))
-                })
-                .map(|c| c.rect.y + c.rect.h + self.scroll - bottom)
-                .fold(0., f32::max);
-            self.scroll = (self.scroll - y as f32 * 90.).clamp(0., max.max(0.));
-        }
+        let previous = self.scroll;
+        let bottom = self.scroll_bottom();
+        let max = controls
+            .iter()
+            .filter(|c| c.scrollable && (!backgrounds || matches!(c.target, Target::Background(_))))
+            .map(|c| c.rect.y + c.rect.h + self.scroll - bottom)
+            .fold(0., f32::max);
+        self.scroll = (self.scroll - y as f32 * 90.).clamp(0., max.max(0.));
         self.pointer = true;
         self.dirty = true;
-        favorites
+        self.page == Page::Home && self.scroll != previous
     }
 
-    pub fn scroll_favorites(&mut self, delta: f32) {
-        let count = self
-            .preferences
-            .favorites(&self.inventory.apps)
-            .iter()
-            .filter(|id| {
-                !self.preferences.hidden.contains(id)
-                    && self.inventory.apps.iter().any(|app| &app.id == *id)
-            })
-            .count();
-        let content = if count == 0 {
-            0.
-        } else {
-            (count - 1) as f32 * HOME_TILE_PITCH + HOME_TILE_WIDTH
-        };
-        let max = (content - (HOME_STRIP_RIGHT - HOME_STRIP_LEFT)).max(0.);
-        let next = (self.home_scroll + delta).clamp(0., max);
-        if next != self.home_scroll {
-            self.home_scroll = next;
-            self.dirty = true;
+    /// Moves a launched favourite to the front, so Home lists the most recently used first.
+    /// Returns whether the saved order changed.
+    pub fn mark_used(&mut self, id: &str) -> bool {
+        let mut ids = self.preferences.favorites(&self.inventory.apps);
+        match ids.iter().position(|item| item == id) {
+            Some(index) if index > 0 => {
+                let id = ids.remove(index);
+                ids.insert(0, id);
+                self.preferences.favorites = Some(ids);
+                self.dirty = true;
+                true
+            }
+            _ => false,
         }
+    }
+
+    /// A launch request, with the favourites reordered and saved when it was one of them.
+    fn launch(&mut self, id: String) -> Vec<Effect> {
+        let save = self.mark_used(&id);
+        let mut effects = vec![Effect::Launch(id)];
+        if save {
+            effects.push(Effect::Save);
+        }
+        effects
     }
 
     /// Returns whether a newly reported console changed the saved preferences.
@@ -792,9 +761,6 @@ impl State {
     }
 
     pub fn reconcile_focus(&mut self) {
-        if self.page == Page::Home {
-            self.scroll_favorites(0.);
-        }
         if let Target::App(id) = &self.focus
             && !self.apps().iter().any(|app| &app.id == id)
         {
@@ -806,7 +772,7 @@ impl State {
         match self.page {
             Page::Home => self
                 .apps()
-                .get(((self.home_scroll - 0.01).max(0.) / HOME_TILE_PITCH).ceil() as usize)
+                .first()
                 .map(|app| Target::App(app.id.clone()))
                 .unwrap_or(if self.error.is_some() {
                     Target::Retry
@@ -840,15 +806,7 @@ impl State {
     /// Pointer paths deliberately do not call this method.
     pub fn reveal_focus(&mut self, controls: &[Control]) -> bool {
         let previous = self.scroll;
-        let previous_home = self.home_scroll;
         if let Some(control) = controls.iter().find(|c| c.target == self.focus) {
-            if self.page == Page::Home && matches!(self.focus, Target::App(_)) {
-                if control.rect.x < HOME_STRIP_LEFT {
-                    self.home_scroll += control.rect.x - HOME_STRIP_LEFT;
-                } else if control.rect.x + control.rect.w > HOME_STRIP_RIGHT {
-                    self.home_scroll += control.rect.x + control.rect.w - HOME_STRIP_RIGHT;
-                }
-            }
             if matches!(
                 self.focus,
                 Target::Nav(_)
@@ -876,13 +834,10 @@ impl State {
                 }
             }
         }
-        if self.page == Page::Home {
-            self.scroll_favorites(0.);
-        }
-        if self.scroll != previous || self.home_scroll != previous_home {
+        if self.scroll != previous {
             self.dirty = true;
         }
-        self.scroll != previous || self.home_scroll != previous_home
+        self.scroll != previous
     }
 
     /// Hover and pointer-down must not move the control before pointer-up.
@@ -1141,10 +1096,19 @@ impl State {
                 let next = match direction {
                     Direction::Left => index.saturating_sub(1),
                     Direction::Right => (index + 1).min(slots.len() - 1),
-                    _ => index,
+                    Direction::Up => index.checked_sub(HOME_COLUMNS).unwrap_or(index),
+                    Direction::Down if index + HOME_COLUMNS < slots.len() => index + HOME_COLUMNS,
+                    Direction::Down => index,
                 };
                 if next != index {
-                    ids.swap(slots[index], slots[next]);
+                    // Up/Down carry the card across rows and the cards in between shift by
+                    // one; hidden and unavailable favorites keep their saved slots.
+                    let mut visible: Vec<_> = slots.iter().map(|slot| ids[*slot].clone()).collect();
+                    let moved = visible.remove(index);
+                    visible.insert(next, moved);
+                    for (slot, id) in slots.iter().zip(visible) {
+                        ids[*slot] = id;
+                    }
                     self.preferences.favorites = Some(ids);
                     self.dirty = true;
                     return vec![Effect::Save];
@@ -1168,7 +1132,20 @@ impl State {
                             let id = apps[next].id.clone();
                             self.focus(Target::App(id), controls);
                         }
-                        Direction::Up => self.focus(Target::Nav(0), controls),
+                        // Up/Down follow the six-column grid, including offscreen rows.
+                        Direction::Up if index < HOME_COLUMNS => {
+                            self.focus(Target::Nav(0), controls)
+                        }
+                        Direction::Up => {
+                            let id = apps[index - HOME_COLUMNS].id.clone();
+                            self.focus(Target::App(id), controls);
+                        }
+                        Direction::Down
+                            if (index / HOME_COLUMNS + 1) * HOME_COLUMNS < apps.len() =>
+                        {
+                            let id = apps[(index + HOME_COLUMNS).min(apps.len() - 1)].id.clone();
+                            self.focus(Target::App(id), controls);
+                        }
                         Direction::Down => {}
                     }
                     return vec![];
@@ -1563,12 +1540,6 @@ impl State {
         let next = controls
             .iter()
             .filter(|candidate| candidate.target != self.focus)
-            .filter(|candidate| {
-                self.page != Page::Home
-                    || !matches!(candidate.target, Target::App(_))
-                    || (candidate.rect.x >= HOME_STRIP_LEFT - 0.1
-                        && candidate.rect.x + candidate.rect.w <= HOME_STRIP_RIGHT + 0.1)
-            })
             .filter_map(|candidate| {
                 // Header controls never steal an Up route from the active tab.
                 if self.overlay.is_none()
@@ -2023,9 +1994,7 @@ impl State {
             }
             Target::TvSettings => return vec![Effect::Launch("com.palm.app.settings".into())],
             Target::App(_) if self.page == Page::Apps && !self.launching => self.options(),
-            Target::App(id) if !self.launching => {
-                return vec![Effect::Launch(id)];
-            }
+            Target::App(id) if !self.launching => return self.launch(id),
             Target::OpenApp if !self.launching => {
                 if let Some(Overlay::Options { id, .. }) = &self.overlay
                     && self.inventory.apps.iter().any(|app| &app.id == id)
@@ -2035,7 +2004,7 @@ impl State {
                     if let Some(tile) = self.preferences.custom_tile(&id).cloned() {
                         return self.send_tile(tile);
                     }
-                    return vec![Effect::Launch(id)];
+                    return self.launch(id);
                 }
             }
             Target::Filter(index) => {

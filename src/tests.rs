@@ -178,8 +178,7 @@ fn controls(state: &State) -> Vec<crate::state::Control> {
     scene(state).controls
 }
 
-#[test]
-fn favorites_edge_fragments_share_draw_hit_and_wheel_viewports() {
+fn nine_favorites() -> (State, Vec<String>) {
     let mut state = favorites_only();
     let favorites: Vec<_> = state
         .inventory
@@ -189,29 +188,86 @@ fn favorites_edge_fragments_share_draw_hit_and_wheel_viewports() {
         .map(|app| app.id.clone())
         .collect();
     state.preferences.favorites = Some(favorites.clone());
+    (state, favorites)
+}
+
+#[test]
+fn favorites_fill_six_columns_then_wrap_onto_rows() {
+    let (state, favorites) = nine_favorites();
+    let controls = controls(&state);
+    let rect = |id: &String| {
+        controls
+            .iter()
+            .find(|control| control.target == Target::App(id.clone()))
+            .unwrap()
+            .rect
+    };
+    for column in 1..6 {
+        assert_eq!(rect(&favorites[column]).y, rect(&favorites[0]).y);
+        assert!(rect(&favorites[column]).x > rect(&favorites[column - 1]).x);
+    }
+    // Nothing runs past the sixth column or off the right edge.
+    assert!(rect(&favorites[5]).x + rect(&favorites[5]).w <= 1920.);
+    assert_eq!(rect(&favorites[6]).x, rect(&favorites[0]).x);
+    assert!(rect(&favorites[6]).y > rect(&favorites[0]).y + rect(&favorites[0]).h);
+    assert_eq!(rect(&favorites[8]).y, rect(&favorites[6]).y);
+    assert!(state.hit_test(&controls, 1860., 600.).is_none());
+}
+
+#[test]
+fn home_up_down_follow_the_favorites_grid() {
+    let (mut state, favorites) = nine_favorites();
+    state.focus = Target::App(favorites[1].clone());
+    state.direction(Direction::Down, &controls(&state));
+    assert_eq!(state.focus, Target::App(favorites[7].clone()));
+    state.direction(Direction::Up, &controls(&state));
+    assert_eq!(state.focus, Target::App(favorites[1].clone()));
+    // A short last row takes Down from the columns past its end.
+    state.focus = Target::App(favorites[5].clone());
+    state.direction(Direction::Down, &controls(&state));
+    assert_eq!(state.focus, Target::App(favorites[8].clone()));
+    state.direction(Direction::Down, &controls(&state));
+    assert_eq!(state.focus, Target::App(favorites[8].clone()));
+    state.focus = Target::App(favorites[0].clone());
+    state.direction(Direction::Up, &controls(&state));
+    assert_eq!(state.focus, Target::Nav(0));
+}
+
+#[test]
+fn reordering_moves_a_favorite_between_rows() {
+    let (mut state, favorites) = nine_favorites();
+    state.focus = Target::App(favorites[2].clone());
+    state.hold();
     assert_eq!(
-        state.hit_test(&controls(&state), 1860., 600.),
-        Some(Target::App(favorites[6].clone()))
+        state.direction(Direction::Down, &controls(&state)),
+        vec![Effect::Save]
     );
-    assert!(state.wheel_scroll(&controls(&state), Some((1860., 600.)), 0, -1));
-    assert!((state.home_scroll - crate::state::HOME_TILE_PITCH).abs() < 0.01);
-    assert_eq!(state.scroll, 0.);
+    let order = state.preferences.favorites.clone().unwrap();
+    assert_eq!(order[8], favorites[2]);
+    assert_eq!(order[2], favorites[3]);
+    state.direction(Direction::Up, &controls(&state));
+    assert_eq!(state.preferences.favorites.clone().unwrap(), favorites);
+}
+
+#[test]
+fn launching_a_favorite_moves_it_to_the_front() {
+    let (mut state, favorites) = nine_favorites();
+    state.focus = Target::App(favorites[4].clone());
     assert_eq!(
-        state.hit_test(&controls(&state), 40., 600.),
-        Some(Target::App(favorites[0].clone()))
+        state.activate(),
+        vec![Effect::Launch(favorites[4].clone()), Effect::Save]
     );
-    let scroll = state.home_scroll;
-    state.pointer_focus(Target::App(favorites[0].clone()));
-    assert_eq!(state.home_scroll, scroll);
-    assert!(state.hit_test(&controls(&state), 4., 600.).is_none());
-    assert!(state.hit_test(&controls(&state), 1915., 600.).is_none());
-    assert!(state.hit_test(&controls(&state), 40., 1060.).is_none());
-    let scene = scene(&state);
-    let viewport = state.favorites_viewport();
-    assert!(scene.draw.iter().any(|draw| matches!(draw, crate::renderer::Draw::Clip(Some(rect)) if rect.x == viewport.x && rect.w == viewport.w)));
-    assert!(state.wheel_scroll(&scene.controls, Some((40., 600.)), 0, 1));
-    assert_eq!(state.home_scroll, 0.);
-    assert_eq!(state.scroll, 0.);
+    let order = state.preferences.favorites.clone().unwrap();
+    assert_eq!(order[0], favorites[4]);
+    assert_eq!(&order[1..5], &favorites[0..4]);
+    assert_eq!(&order[5..], &favorites[5..]);
+    // Already first: nothing to save.
+    state.launching = false;
+    assert_eq!(state.activate(), vec![Effect::Launch(favorites[4].clone())]);
+    // Apps that are not favorites are launched without joining Home.
+    state.preferences.favorites = Some(favorites[..3].to_vec());
+    assert!(!state.mark_used(&favorites[5]));
+    assert_eq!(state.preferences.favorites.clone().unwrap(), favorites[..3]);
 }
 
 #[test]
@@ -236,7 +292,6 @@ fn widening_favorites_does_not_widen_apps_or_unclip_offscreen_rows() {
         Some(Target::App("sample".into()))
     );
     assert!(!state.wheel_scroll(&controls, Some((1860., 600.)), 0, -1));
-    assert_eq!(state.home_scroll, 0.);
     let viewport = state.content_viewport();
     let scroll_limit = controls[0].rect.y + controls[0].rect.h - (viewport.y + viewport.h - 12.);
     assert_eq!(state.scroll, 90_f32.min(scroll_limit));

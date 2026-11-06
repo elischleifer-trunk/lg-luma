@@ -162,9 +162,12 @@ Back from Greeting restores its Widgets row; App names returns to General. Input
 also uses **Clear name**.
 Choice checkmarks identify saved values, while the bright row fill identifies only the current focus.
 
-Home favorites form one horizontal strip, never a second row. Left/Right follows saved order,
-including reorder mode, and reveals complete cards. Up returns to Home navigation. The strip position survives page changes. Wheel movement over
-favorites scrolls horizontally; elsewhere it scrolls vertically. Pointer hover/down never moves
+Home favorites fill six columns, then wrap onto further rows that scroll vertically into view.
+Left/Right follows saved order, Up/Down follows six-column grid indices (including offscreen rows),
+and Up from the first row returns to Home navigation. Reorder mode moves a card by one slot with
+Left/Right and by one row with Up/Down. Launching a favorite from Home, Apps or recents moves it to
+the front and saves the order, so Home lists the most recently used favorites first; apps that are
+not favorites are never added. Wheel movement scrolls vertically. Pointer hover/down never moves
 the clicked control. Apps Up/Down follows the six-column grid order, including offscreen rows,
 and only the first row's Up route reaches the category toolbar. Scrolling Apps content fades into
 the existing wallpaper at the header/footer, with one alpha mask for surfaces, shadows, rings,
@@ -185,7 +188,7 @@ unplugged or switched off takes no slot and the cards after it close the gap. A 
 signal cannot override an unplugged cable. Firmware without signal information falls back to the
 cable state. **On** keeps the card (with **No signal** in its corner) and **Off** hides it.
 
-Visible HDMI inputs are cards at the far left of the Home favorites strip, ordered by port, rather
+Visible HDMI inputs are the first cards of the Home favorites grid, ordered by port, rather
 than a separate row. They launch like apps but are not favorites: they cannot be reordered, hidden
 from Apps or opened in app options, and they do not appear on the Apps page. Visibility and names
 stay in **Settings → Widgets → Inputs**. Each card shows its port in the corner. A recognized console gives the card its name, brand mark and official
@@ -878,7 +881,7 @@ pnpm dev --test-extra-apps 120
 On the TV, add `--test-extra-apps 120` after the JSON argument in the jailed command above.
 This explicitly appends up to 300 labeled non-launchable cards to a successful real inventory,
 using its apps as artwork/category templates. It uses `scroll-preview-preferences.json`,
-initialized from normal choices once. Favoriting test cards exercises long Home strips without
+initialized from normal choices once. Favoriting test cards exercises long Home grids without
 changing normal favorites. Ctrl+C then a normal launch restores real inventory/preferences.
 The placeholder cards are never a fallback for an inventory failure.
 
