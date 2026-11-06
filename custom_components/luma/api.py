@@ -113,3 +113,7 @@ class LumaClient:
 
     async def notify(self, message: str) -> None:
         await self._request("POST", "/api/notify", {"message": message})
+
+    async def cameras(self, cameras: list[dict[str, Any]]) -> None:
+        """Replace the camera list shown by Luma's Cameras app."""
+        await self._request("POST", "/api/cameras", {"cameras": cameras})

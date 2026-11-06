@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 import pytest
 import voluptuous as vol
 from homeassistant import config_entries
@@ -9,7 +11,8 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from homeassistant.util import dt as dt_util
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 try:
@@ -273,6 +276,75 @@ async def test_dismiss_button_and_notify_entity_reach_the_tv(
     assert ("DELETE", "/api/overlay") in paths
     notify = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/notify")
     assert notify[2] == {"message": "Laundry: Done"}
+
+
+async def test_every_camera_is_sent_to_the_tv_and_again_when_tokens_rotate(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    hass.states.async_set("camera.yard", "idle", {"access_token": "y1", "friendly_name": "Yard"})
+    hass.states.async_set(
+        "camera.door", "streaming", {"access_token": "d1", "friendly_name": "Front door"}
+    )
+    hass.states.async_set("camera.attic", "unavailable", {"friendly_name": "Attic"})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 2})
+    await setup(hass, aioclient_mock)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    def pushes() -> list:
+        return [call for call in aioclient_mock.mock_calls if call[1].path == "/api/cameras"]
+
+    assert len(pushes()) == 1
+    assert pushes()[0][3]["Authorization"] == f"Bearer {TOKEN}"
+    assert pushes()[0][2] == {
+        "cameras": [
+            {
+                "id": "camera.door",
+                "name": "Front door",
+                "stream_url": "http://192.168.1.10:8123/api/camera_proxy_stream/camera.door?token=d1",
+                "snapshot_url": "http://192.168.1.10:8123/api/camera_proxy/camera.door?token=d1",
+            },
+            {
+                "id": "camera.yard",
+                "name": "Yard",
+                "stream_url": "http://192.168.1.10:8123/api/camera_proxy_stream/camera.yard?token=y1",
+                "snapshot_url": "http://192.168.1.10:8123/api/camera_proxy/camera.yard?token=y1",
+            },
+        ]
+    }
+
+    # A token rotation sends the whole list again; other entities do not.
+    hass.states.async_set("light.porch", "on")
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert len(pushes()) == 1
+    hass.states.async_set("camera.yard", "idle", {"access_token": "y2", "friendly_name": "Yard"})
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert len(pushes()) == 2
+    assert pushes()[1][2]["cameras"][1]["snapshot_url"].endswith("token=y2")
+
+
+async def test_a_restarted_tv_without_cameras_gets_the_list_again(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    hass.states.async_set("camera.door", "idle", {"access_token": "d1", "friendly_name": "Door"})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 1})
+    config = entry(hass)
+    aioclient_mock.get(
+        f"{TV}/api/status", json={"overlay": None, "overlay_ready": True, "cameras": 0}
+    )
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    def pushes() -> int:
+        return sum(call[1].path == "/api/cameras" for call in aioclient_mock.mock_calls)
+
+    assert pushes() == 1
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert pushes() == 2
 
 
 async def test_example_buttons_preview_the_camera_card_and_toast(

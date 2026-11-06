@@ -3,12 +3,18 @@
 Home Assistant calls the TV; the TV never needs Home Assistant credentials. For a camera entity,
 the service passes the TV Home Assistant's camera proxy URLs with the camera's short-lived access
 token, which the overlay app on the TV loads directly.
+
+Each paired TV also receives the list of every camera, again as signed proxy URLs, for Luma's
+Cameras app. The list is sent again whenever a camera changes, which includes every access token
+rotation, so the TV always holds working URLs.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -16,8 +22,8 @@ import voluptuous as vol
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PORT, Platform
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.const import CONF_HOST, CONF_PORT, EVENT_STATE_CHANGED, Platform
+from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import (
     ConfigEntryAuthFailed,
     HomeAssistantError,
@@ -25,6 +31,7 @@ from homeassistant.exceptions import (
 )
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 
@@ -50,6 +57,11 @@ ATTR_STREAM_URL = "stream_url"
 ATTR_SNAPSHOT_URL = "snapshot_url"
 ATTR_MODE = "mode"
 ATTR_BASE_URL = "base_url"
+# Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
+CAMERAS_PUSH_DELAY = 2.0
+MAX_CAMERAS = 32
+# Luma keeps cameras in memory only; this often, check whether a restarted TV needs the list.
+CAMERAS_CHECK_INTERVAL = timedelta(minutes=1)
 
 # A picture of a front door that the example camera card shows, so it works without a camera.
 EXAMPLE_IMAGE_URL = "/api/luma/example.jpg"
@@ -79,8 +91,80 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     except LumaError as err:
         _LOGGER.debug("Luma at %s is not reachable yet: %s", client.host, err)
     entry.runtime_data = LumaData(client)
+    _track_cameras(hass, entry, client)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
+
+def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
+    """Every available camera with signed proxy URLs, for Luma's Cameras app."""
+    try:
+        base_url = local_url(hass)
+    except ServiceValidationError:
+        return []
+    cameras = []
+    for state in sorted(hass.states.async_all("camera"), key=lambda state: state.name.casefold()):
+        token = state.attributes.get("access_token")
+        if not token or state.state == "unavailable":
+            continue
+        stream, snapshot = _proxy_urls(base_url, state.entity_id, token)
+        cameras.append(
+            {
+                "id": state.entity_id,
+                "name": state.name[:80],
+                "stream_url": stream,
+                "snapshot_url": snapshot,
+            }
+        )
+    return cameras[:MAX_CAMERAS]
+
+
+def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClient) -> None:
+    """Send the TV the camera list now and after camera changes, coalescing bursts."""
+    pending = False
+
+    async def push() -> None:
+        nonlocal pending
+        await asyncio.sleep(CAMERAS_PUSH_DELAY)
+        pending = False
+        try:
+            await client.cameras(camera_list(hass))
+        except LumaError as err:
+            # The TV may be off; the next camera change sends the list again.
+            _LOGGER.debug("Could not send cameras to %s: %s", client.host, err)
+
+    @callback
+    def schedule() -> None:
+        nonlocal pending
+        if pending:
+            return
+        pending = True
+        entry.async_create_background_task(hass, push(), f"{DOMAIN} cameras {entry.entry_id}")
+
+    @callback
+    def is_camera(event_data) -> bool:
+        return str(event_data.get("entity_id", "")).startswith("camera.")
+
+    @callback
+    def changed(_event) -> None:
+        schedule()
+
+    async def check(_now) -> None:
+        # After the TV or Luma restarts it reports no cameras; send the list again then.
+        if pending or not camera_list(hass):
+            return
+        try:
+            status = await client.status()
+        except LumaError:
+            return
+        if status.get("cameras") == 0:
+            schedule()
+
+    entry.async_on_unload(hass.bus.async_listen(EVENT_STATE_CHANGED, changed, is_camera))
+    entry.async_on_unload(
+        async_track_time_interval(hass, check, CAMERAS_CHECK_INTERVAL, cancel_on_shutdown=True)
+    )
+    schedule()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool:
@@ -173,7 +257,10 @@ def camera_urls(hass: HomeAssistant, entity_id: str, base_url: str | None) -> tu
     token = state.attributes.get("access_token")
     if not token:
         raise ServiceValidationError(f"{entity_id} is unavailable")
-    base_url = local_url(hass, base_url)
+    return _proxy_urls(local_url(hass, base_url), entity_id, token)
+
+
+def _proxy_urls(base_url: str, entity_id: str, token: str) -> tuple[str, str]:
     return (
         f"{base_url}/api/camera_proxy_stream/{entity_id}?token={token}",
         f"{base_url}/api/camera_proxy/{entity_id}?token={token}",
