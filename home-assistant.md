@@ -18,6 +18,8 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
 - **`luma.dismiss`** and a **Dismiss overlay** button: close the card from Home Assistant, for
   example when the door opens.
 - **`luma.notify`** and a **Toast** notify entity: a standard webOS toast over any app.
+- **A Cameras app** in Luma: every Home Assistant camera in a full-screen grid. Arrows choose a
+  camera, **OK** shows it full screen, **Back** returns to the grid and then closes it.
 
 ## Set up
 
@@ -69,6 +71,23 @@ The TV loads camera images itself, so the address must be reachable from the TV.
 
 The TV shows motion-JPEG and JPEG only. It does not decode RTSP/H.264, so the TV's video decoder
 stays with the show you are watching.
+
+## Cameras app
+
+While **Home Assistant** is on, Luma lists a **Cameras** app with your other apps. Favorite it to
+keep it on Home. Opening it shows every camera entity Home Assistant has (unavailable ones are
+skipped, at most 32) in a grid of snapshots that refresh every couple of seconds. Choose a camera
+and press **OK** to see it full screen as a live motion-JPEG stream; **Back** returns to the grid,
+and **Back** again closes it.
+
+Nothing needs setting up: the integration sends the TV its camera list when it starts and again
+whenever a camera changes, including every few minutes when Home Assistant rotates camera access
+tokens, so the URLs the TV holds keep working. Like camera overlays, the TV loads the images from
+Home Assistant's **local network URL**. After the TV restarts, the list arrives with the next
+camera change; until then the app says no cameras have been sent yet. Reloading the integration
+sends it straight away.
+
+A doorbell `luma.show_camera` call while the grid is open replaces it with the doorbell card.
 
 ## Doorbell example
 
@@ -145,16 +164,17 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
 Home Assistant uses this API. You can script it too: send JSON bodies, with
 `Authorization: Bearer TOKEN` on every endpoint except `info` and the two pairing steps.
 
-| Endpoint                 | Body                              | Reply                             |
-| ------------------------ | --------------------------------- | --------------------------------- |
-| `GET /api/info`          |                                   | `id`, `name`, `version`, `api`    |
-| `POST /api/pair`         | `name`                            | `pairing_id`; the TV shows a code |
-| `POST /api/pair/confirm` | `pairing_id`, `code`              | `token`, `id`                     |
-| `DELETE /api/pair`       |                                   | Unpairs this token                |
-| `GET /api/status`        |                                   | `overlay`, `overlay_ready`        |
-| `POST /api/overlay`      | As `luma.show_camera`, using URLs | `session`, `paused`               |
-| `DELETE /api/overlay`    |                                   | Closes the card, resumes playback |
-| `POST /api/notify`       | `message` (up to 300 characters)  | Shows a webOS toast               |
+| Endpoint                 | Body                                                  | Reply                                 |
+| ------------------------ | ----------------------------------------------------- | ------------------------------------- |
+| `GET /api/info`          |                                                       | `id`, `name`, `version`, `api`        |
+| `POST /api/pair`         | `name`                                                | `pairing_id`; the TV shows a code     |
+| `POST /api/pair/confirm` | `pairing_id`, `code`                                  | `token`, `id`                         |
+| `DELETE /api/pair`       |                                                       | Unpairs this token                    |
+| `GET /api/status`        |                                                       | `overlay`, `overlay_ready`, `cameras` |
+| `POST /api/overlay`      | As `luma.show_camera`, using URLs                     | `session`, `paused`                   |
+| `DELETE /api/overlay`    |                                                       | Closes the card, resumes playback     |
+| `POST /api/notify`       | `message` (up to 300 characters)                      | Shows a webOS toast                   |
+| `POST /api/cameras`      | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list       |
 
 ## Troubleshooting
 

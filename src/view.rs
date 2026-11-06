@@ -1122,7 +1122,7 @@ fn brand_mark(out: &mut Scene, assets: &Assets, app: &App, rect: Rect, language:
                 "browser" => ("globe", language.t("browser")),
                 "moonlight" => ("moonlight", "Moonlight"),
                 "gaming" => ("gaming", app.title.as_str()),
-                "custom" => (app.mark, app.title.as_str()),
+                "custom" | "cameras" => (app.mark, app.title.as_str()),
                 brand if brand.starts_with("input") => (app.mark, app.title.as_str()),
                 _ => ("generic", app.title.as_str()),
             };

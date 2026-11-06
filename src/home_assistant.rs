@@ -9,6 +9,10 @@
 //! transparent `overlay` window type keeps the foreground app playing underneath it. Luma installs
 //! it from its own package, launches it with the camera details and, when asked, pauses the
 //! foreground media first and resumes it once the overlay closes.
+//!
+//! Home Assistant also pushes its camera list (`POST /api/cameras`) whenever a camera's signed
+//! proxy URLs rotate. Luma's built-in Cameras app opens the same overlay app as a full-screen
+//! gallery of those cameras, relaunching it with fresh URLs while it stays open.
 use crate::companion;
 use ring::digest;
 use serde::{Deserialize, Serialize};
@@ -32,7 +36,9 @@ pub const PORT: u16 = 5862;
 pub const HACS_LINK: &str = "https://my.home-assistant.io/redirect/hacs_repository/?owner=EliSchleifer&repository=lg-luma&category=integration";
 pub const OVERLAY_ID: &str = luma_tv_helper::overlay::OVERLAY;
 const API_VERSION: u32 = 1;
-const MAX_BODY: usize = 16 * 1024;
+const MAX_BODY: usize = 32 * 1024;
+/// Cameras kept from Home Assistant's list; more are dropped.
+pub const MAX_CAMERAS: usize = 32;
 const MAX_CLIENTS: usize = 8;
 const MAX_URL: usize = 4096;
 const PAIRING_TTL: Duration = Duration::from_secs(120);
@@ -40,6 +46,8 @@ const PAIRING_ATTEMPTS: u8 = 5;
 const PAIRING_COOLDOWN: Duration = Duration::from_secs(3);
 /// The overlay dismisses itself; this margin covers launch time before Luma resumes playback.
 const SESSION_GRACE: Duration = Duration::from_secs(5);
+/// A gallery left open stops refreshing its URLs after this long; the page closes itself sooner.
+const GALLERY_TTL: Duration = Duration::from_secs(60 * 60);
 
 /// What the TV does for the API. `Live` calls webOS; tests substitute a recorder.
 pub trait Tv: Send + Sync + 'static {
@@ -105,6 +113,17 @@ pub enum Event {
     PairingCode(String),
     Paired(String),
     Failed(String),
+    /// A translation key to show as a Luma notice.
+    Notice(&'static str),
+}
+
+/// One Home Assistant camera, with URLs the TV can load directly.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct Camera {
+    pub id: String,
+    pub name: String,
+    pub stream: Option<String>,
+    pub snapshot: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -136,6 +155,8 @@ struct Session {
     nonce: String,
     media: Option<String>,
     ends: Instant,
+    /// The Cameras gallery rather than a doorbell card; refreshed when new URLs arrive.
+    gallery: bool,
 }
 
 pub struct Request<'a> {
@@ -269,6 +290,7 @@ pub struct Api<T: Tv> {
     pairing: Option<Pairing>,
     last_pairing: Option<Instant>,
     session: Option<Session>,
+    cameras: Vec<Camera>,
     overlay_ready: Arc<AtomicBool>,
     preparing: Arc<AtomicBool>,
 }
@@ -293,6 +315,7 @@ impl<T: Tv> Api<T> {
             pairing: None,
             last_pairing: None,
             session: None,
+            cameras: Vec::new(),
             overlay_ready: Arc::new(AtomicBool::new(false)),
             preparing: Arc::new(AtomicBool::new(false)),
         };
@@ -327,6 +350,7 @@ impl<T: Tv> Api<T> {
             self.end_session();
         }
         self.pairing = None;
+        self.cameras.clear();
         if !self.store.clients.is_empty() {
             self.store.clients.clear();
             self.save();
@@ -444,6 +468,9 @@ impl<T: Tv> Api<T> {
                 match (method, path) {
                     ("DELETE", "/api/pair") => {
                         self.store.clients.remove(client);
+                        if self.store.clients.is_empty() {
+                            self.cameras.clear();
+                        }
                         self.save();
                         reply(200, json!({"paired": false}))
                     }
@@ -452,8 +479,10 @@ impl<T: Tv> Api<T> {
                         json!({
                             "overlay": self.session.as_ref().map(|s| s.id.as_str()),
                             "overlay_ready": self.overlay_ready.load(Ordering::Acquire),
+                            "cameras": self.cameras.len(),
                         }),
                     ),
+                    ("POST", "/api/cameras") => self.set_cameras(&body),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         if self.session.is_some() {
@@ -629,12 +658,111 @@ impl<T: Tv> Api<T> {
             nonce,
             media,
             ends: now + Duration::from_secs_f64(duration) + SESSION_GRACE,
+            gallery: false,
         });
         if let Err(e) = self.tv.launch_overlay(&params) {
             self.end_session();
             return error(502, &format!("The TV did not open the overlay: {e}"));
         }
         reply(200, json!({"session": id, "paused": paused}))
+    }
+
+    /// Replaces the camera list. Home Assistant sends every camera each time a camera's access
+    /// token rotates, so an open gallery is relaunched with the fresh URLs.
+    fn set_cameras(&mut self, body: &Value) -> Reply {
+        let Some(list) = body.get("cameras").and_then(Value::as_array) else {
+            return error(400, "cameras must be a list");
+        };
+        let mut cameras = Vec::new();
+        for entry in list.iter().take(MAX_CAMERAS) {
+            if !entry.is_object() {
+                return error(400, "Each camera must be an object");
+            }
+            let parsed = (|| {
+                let id = text(entry, "id", 255)?.ok_or_else(|| error(400, "id is required"))?;
+                let stream = camera_url(entry, "stream_url")?;
+                let snapshot = camera_url(entry, "snapshot_url")?;
+                if stream.is_none() && snapshot.is_none() {
+                    return Err(error(400, "stream_url or snapshot_url is required"));
+                }
+                let name = text(entry, "name", 80)?.unwrap_or_else(|| id.clone());
+                Ok(Camera {
+                    id,
+                    name,
+                    stream,
+                    snapshot,
+                })
+            })();
+            match parsed {
+                Ok(camera) => cameras.push(camera),
+                Err(reply) => return reply,
+            }
+        }
+        let changed = cameras != self.cameras;
+        self.cameras = cameras;
+        if changed && self.session.as_ref().is_some_and(|session| session.gallery) {
+            if self.cameras.is_empty() {
+                let _ = self.tv.close_overlay();
+                self.end_session();
+            } else if let Err(e) = self.launch_gallery() {
+                eprintln!("Luma Home Assistant cameras refresh: {e}");
+            }
+        }
+        reply(200, json!({"cameras": self.cameras.len()}))
+    }
+
+    fn gallery_params(&self, session: &Session) -> Value {
+        json!({
+            "mode": "cameras",
+            "session": session.id,
+            "nonce": session.nonce,
+            "port": PORT,
+            "cameras": self.cameras,
+        })
+    }
+
+    fn launch_gallery(&self) -> Result<(), String> {
+        let Some(session) = self.session.as_ref().filter(|session| session.gallery) else {
+            return Ok(());
+        };
+        self.tv.launch_overlay(&self.gallery_params(session))
+    }
+
+    /// Opens the full-screen Cameras gallery, Luma's built-in Cameras app.
+    pub fn show_cameras(&mut self, now: Instant) {
+        if self.store.clients.is_empty() {
+            let _ = self.events.send(Event::Notice("camerasNotPaired"));
+            return;
+        }
+        if self.cameras.is_empty() {
+            let _ = self.events.send(Event::Notice("camerasNone"));
+            return;
+        }
+        if !self.overlay_ready.load(Ordering::Acquire) {
+            self.prepare();
+            let _ = self.events.send(Event::Notice("camerasInstalling"));
+            return;
+        }
+        // A doorbell card that paused playback keeps its paused media for the gallery.
+        let media = self.session.take().and_then(|session| session.media);
+        let (id, nonce) = match (random_hex(8), random_hex(16)) {
+            (Ok(id), Ok(nonce)) => (id, nonce),
+            (Err(e), _) | (_, Err(e)) => {
+                let _ = self.events.send(Event::Failed(e));
+                return;
+            }
+        };
+        self.session = Some(Session {
+            id,
+            nonce,
+            media,
+            ends: now + GALLERY_TTL,
+            gallery: true,
+        });
+        if let Err(e) = self.launch_gallery() {
+            self.end_session();
+            let _ = self.events.send(Event::Failed(e));
+        }
     }
 }
 
@@ -660,6 +788,7 @@ fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
 enum Command {
     Enable,
     Disable,
+    ShowCameras,
 }
 
 /// Owns the listener thread. Enabling binds the port; disabling closes it and forgets pairings.
@@ -682,6 +811,13 @@ impl Service {
             commands,
             events,
             enabled: false,
+        }
+    }
+
+    /// Opens the Cameras gallery; problems come back as [`Event::Notice`].
+    pub fn show_cameras(&self) {
+        if self.enabled {
+            let _ = self.commands.send(Command::ShowCameras);
         }
     }
 
@@ -745,6 +881,7 @@ fn run<T: Tv>(
                 listener = None;
                 api.forget();
             }
+            Some(Command::ShowCameras) => api.show_cameras(Instant::now()),
             _ => {}
         }
         api.tick(Instant::now());

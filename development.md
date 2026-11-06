@@ -97,8 +97,10 @@ It does not execute the test suites. A desktop display is required; on headless 
 Backspace deletes while editing. Native Back uses SDL's webOS-specific keycode. Back dismisses
 the keyboard first; Weather Location then returns to its parent Location row, HDMI choices to
 that HDMI row, and the Background gallery to Background in the sidebar. Back from the sidebar
-focuses the Settings tab, then returns Home. **System** in the sidebar groups **Refresh apps & inputs**
-and the vector power-icon **Quit app** action separately from General preferences.
+focuses the Settings tab, then returns Home. The Home header holds only Home, Apps and Settings.
+**System** in the sidebar groups the update card, **TV settings** (`Target::TvSettings`, which
+launches `com.palm.app.settings`), **Refresh apps & inputs** and the vector power-icon **Quit app**
+action separately from General preferences.
 On Apps, OK or a normal pointer click on an app opens its side popup, with **Open** first and focused by
 default, followed by favorite, hide/show and **Delete app** actions. A second OK launches the app.
 Home favorites, Inputs and Recent apps launch directly. Hold OK on Home still reorders favorites.
@@ -384,7 +386,7 @@ Verify scanning, editing and a test request against a real webhook on TV hardwar
 listener on port 5862 (`src/home_assistant.rs`), unlike the short-lived companion sessions. It binds
 every interface, because the TV's address can change, and answers only loopback, private and
 link-local peers. Requests are small and handled in turn on the service's own thread, with a
-three-second deadline and a 16 KiB body limit, reusing `companion::request`.
+three-second deadline and a 32 KiB body limit, reusing `companion::request`.
 
 Pairing: `POST /api/pair` shows a six-digit code as a system toast (and a Luma notice when Luma is
 in front). `POST /api/pair/confirm` trades it for a 256-bit token. Codes expire after two minutes,
@@ -418,6 +420,22 @@ keeps only those where `GET /api/info` answers as Luma, suggests hosts and names
 `webostv` entries, pairs in its config flow, and starts reauth when the TV answers 401. For a
 camera entity it sends Home Assistant's `camera_proxy_stream`/`camera_proxy` URLs signed with the
 camera's access token, from the internal URL unless `base_url` is given.
+
+**Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
+camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds
+after any `camera.*` state change, which includes every access-token rotation, coalescing bursts.
+Luma keeps the list in memory only. While Home Assistant is on, `State::sync_custom_tiles` adds the
+built-in `luma.cameras` app (`model::CAMERAS_APP`, brand `cameras`, `camera` mark) to the inventory,
+so it can be favorited, hidden and searched; `model::is_builtin` keeps it out of uninstall and
+inventory-failure checks. Launching it sets `State::show_cameras`, and the main loop asks the
+service's thread to launch the overlay app with `mode: "cameras"`, the camera list and a session
+nonce; a missing pairing, empty list or uninstalled overlay becomes an `Event::Notice` instead.
+The page shows a full-screen grid that polls snapshots (every 2 s, or 4 s above nine cameras,
+so it never holds more than one connection per camera) and enlarges the selected camera with its
+motion-JPEG stream, falling back to snapshots. A new list while the gallery is open relaunches
+it with the same session; the page keeps its tiles and selection and only swaps URLs. Back closes
+an enlarged camera, then the gallery, which reports closing like the doorbell card. A gallery is
+closed after an hour, and a `show_camera` call replaces it.
 
 Rust tests drive the API without sockets through a recording `Tv` (pairing, lockout, validation,
 pause/resume, timeouts, persistence) plus one loopback HTTP round trip; helper tests use the

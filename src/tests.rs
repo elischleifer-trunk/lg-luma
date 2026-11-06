@@ -3334,3 +3334,38 @@ fn turning_on_home_assistant_opens_the_hacs_qr_dialog_and_adds_a_reopen_row() {
     assert!(state.overlay.is_none());
     assert_eq!(rows(&state), 1);
 }
+
+#[test]
+fn cameras_app_is_listed_only_while_home_assistant_is_on_and_opens_the_gallery() {
+    use crate::model::CAMERAS_APP;
+    let mut state = ready();
+    let listed = |state: &State| state.inventory.apps.iter().any(|app| app.id == CAMERAS_APP);
+    assert!(!listed(&state));
+    state.preferences.home_assistant = true;
+    state.sync_custom_tiles();
+    assert!(listed(&state));
+    // A refreshed inventory keeps it once, and it is never offered for uninstall.
+    state.set_inventory(demo_inventory(), None);
+    assert_eq!(
+        state
+            .inventory
+            .apps
+            .iter()
+            .filter(|app| app.id == CAMERAS_APP)
+            .count(),
+        1
+    );
+    assert!(!crate::platform::can_uninstall(CAMERAS_APP));
+    let app = state
+        .inventory
+        .apps
+        .iter()
+        .find(|app| app.id == CAMERAS_APP)
+        .unwrap();
+    assert_eq!((app.title.as_str(), app.mark), ("Cameras", "camera"));
+    state.focus = Target::App(CAMERAS_APP.into());
+    assert_eq!(state.activate(), vec![Effect::Launch(CAMERAS_APP.into())]);
+    state.preferences.home_assistant = false;
+    state.sync_custom_tiles();
+    assert!(!listed(&state));
+}

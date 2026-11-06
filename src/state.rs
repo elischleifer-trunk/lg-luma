@@ -1,7 +1,7 @@
 use crate::i18n::Language;
 use crate::model::{
-    App, BACKGROUNDS, CATEGORIES, CUSTOM_TILE_PREFIX, CustomTile, INPUT_NAME_LIMIT, InputMode,
-    Inventory, Preferences, clean_input_name,
+    App, BACKGROUNDS, CAMERAS_APP, CATEGORIES, CustomTile, INPUT_NAME_LIMIT, InputMode, Inventory,
+    Preferences, clean_input_name,
 };
 use crate::text_rendering::TextRendering;
 use crate::weather::{self, Unit};
@@ -226,6 +226,8 @@ pub struct State {
     /// Set by Refresh apps: the next inventory also reloads every app icon.
     pub reload_artwork: bool,
     pub launching: bool,
+    /// The Cameras app was opened; the main loop asks the Home Assistant service.
+    pub show_cameras: bool,
     pub uninstalling: Option<String>,
     pub notice: Option<(String, Instant)>,
     pub error: Option<String>,
@@ -276,6 +278,7 @@ impl State {
             loading: false,
             reload_artwork: false,
             launching: false,
+            show_cameras: false,
             uninstalling: None,
             notice: None,
             error: None,
@@ -769,7 +772,7 @@ impl State {
             .inventory
             .apps
             .iter()
-            .all(|app| app.id.starts_with(CUSTOM_TILE_PREFIX));
+            .all(|app| crate::model::is_builtin(&app.id));
         if no_tv_apps && self.inventory_failures < INVENTORY_RETRIES {
             self.inventory_failures += 1;
             return Some(INVENTORY_RETRY_DELAY);
@@ -780,14 +783,24 @@ impl State {
         None
     }
 
-    /// Custom webhook tiles are never read from the TV. They are merged into
-    /// the inventory on every refresh and edit, so favoriting, hiding and
-    /// search treat them like any other app.
+    /// Custom webhook tiles and the Cameras app are never read from the TV. They are merged
+    /// into the inventory on every refresh and edit, so favoriting, hiding and search treat
+    /// them like any other app. Cameras is listed only while Home Assistant is on.
     pub fn sync_custom_tiles(&mut self) {
         self.inventory
             .apps
-            .retain(|app| !app.id.starts_with(CUSTOM_TILE_PREFIX));
+            .retain(|app| !crate::model::is_builtin(&app.id));
         self.inventory.apps.extend(self.preferences.custom_apps());
+        if self.preferences.home_assistant {
+            self.inventory.apps.push(App {
+                id: CAMERAS_APP.into(),
+                title: self.preferences.language.t("cameras").into(),
+                brand: "cameras".into(),
+                category: "Utilities".into(),
+                icon: None,
+                mark: "camera",
+            });
+        }
         self.dirty = true;
     }
 
@@ -2248,6 +2261,8 @@ impl State {
                     2 => self.preferences.reduced_motion = !self.preferences.reduced_motion,
                     8 => {
                         self.preferences.home_assistant = !self.preferences.home_assistant;
+                        self.sync_custom_tiles();
+                        self.reconcile_focus();
                         if self.preferences.home_assistant {
                             self.open_home_assistant_setup();
                         }
@@ -2368,6 +2383,8 @@ impl State {
                         self.preferences.language =
                             Language::ALL[index.min(Language::ALL.len() - 1)];
                         self.weather.cancel_search();
+                        // The Cameras app's title is translated.
+                        self.sync_custom_tiles();
                     }
                     Some(Subpage::TextRendering) => {
                         let mode = TextRendering::ALL[index.min(TextRendering::ALL.len() - 1)];

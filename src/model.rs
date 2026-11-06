@@ -230,6 +230,14 @@ pub const TILE_ICONS: [(&str, &str); 15] = [
 ];
 
 pub const CUSTOM_TILE_PREFIX: &str = "custom.";
+/// Luma's built-in Cameras app: Home Assistant's cameras in the overlay app's gallery. It is
+/// listed while Home Assistant is on and never sent to the TV as a launch request.
+pub const CAMERAS_APP: &str = "luma.cameras";
+
+/// Apps Luma adds itself (shortcut tiles and Cameras); the TV never reports them.
+pub fn is_builtin(id: &str) -> bool {
+    id.starts_with(CUSTOM_TILE_PREFIX) || id == CAMERAS_APP
+}
 pub const TILE_LIMIT: usize = 64;
 pub const TILE_URL_LIMIT: usize = 512;
 
