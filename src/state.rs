@@ -1538,10 +1538,7 @@ impl State {
             }
             if self.page == Page::Settings
                 && matches!(direction, Direction::Left)
-                && !matches!(
-                    self.focus,
-                    Target::Nav(_) | Target::Sidebar(_) | Target::TvSettings
-                )
+                && !matches!(self.focus, Target::Nav(_) | Target::Sidebar(_))
             {
                 if let Target::Background(index) = self.focus {
                     if index % 3 != 0 { /* left follows gallery order */
