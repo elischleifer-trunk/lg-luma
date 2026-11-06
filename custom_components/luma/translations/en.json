@@ -36,7 +36,11 @@
     }
   },
   "entity": {
-    "button": { "dismiss_overlay": { "name": "Dismiss overlay" } },
+    "button": {
+      "dismiss_overlay": { "name": "Dismiss overlay" },
+      "example_camera": { "name": "Show example camera card" },
+      "example_toast": { "name": "Show example toast" }
+    },
     "notify": { "toast": { "name": "Toast" } }
   },
   "selector": {
