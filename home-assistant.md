@@ -18,6 +18,9 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
 - **`luma.dismiss`** and a **Dismiss overlay** button: close the card from Home Assistant, for
   example when the door opens.
 - **`luma.notify`** and a **Toast** notify entity: a standard webOS toast over any app.
+- **Show example camera card** and **Show example toast** buttons: press them on the TV's device
+  page to see what each popup looks like, before writing any automation. The example card shows a
+  picture of a front door that comes with the integration, so it works without a camera.
 
 ## Set up
 
@@ -45,6 +48,10 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
    address and name are suggested.
 4. The TV shows a **six-digit pairing code**. Type it into Home Assistant. Codes expire after two
    minutes, and five wrong codes cancel the request.
+
+5. To check it works, open the TV under **Settings → Devices & services → Luma for LG webOS** and
+   press **Show example camera card** and **Show example toast**. The card closes after 15
+   seconds, or press **Back** on the remote.
 
 Turning **Home Assistant** off in Luma closes the port and forgets every paired server. Home
 Assistant then asks you to pair again the next time it is needed. Removing the integration in Home

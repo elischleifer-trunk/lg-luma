@@ -10,8 +10,9 @@ A native launcher for rooted LG webOS TVs, inspired by Apple TV.
 >
 > The integration needs a TV that already runs Luma with **Settings → General → Home Assistant**
 > turned on. After downloading it in HACS, restart Home Assistant, add **Luma for LG webOS** (it
-> is usually discovered on its own) and type the code shown on the TV. Setup, actions and
-> automation examples are in the
+> is usually discovered on its own) and type the code shown on the TV.
+> To see what the popups look like, press **Show example camera card** or **Show example toast**
+> on the TV's device page. Setup, actions and automation examples are in the
 > [Home Assistant guide](https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md).
 > The rest of this page is about the TV app.
 

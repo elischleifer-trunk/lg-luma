@@ -1,7 +1,7 @@
 {
   "domain": "luma",
   "name": "Luma for LG webOS",
-  "after_dependencies": ["camera", "webostv"],
+  "after_dependencies": ["camera", "http", "webostv"],
   "codeowners": [],
   "config_flow": true,
   "documentation": "https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md",
