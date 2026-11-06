@@ -29,7 +29,7 @@ use std::{
 /// "LUMA" on a phone keypad.
 pub const PORT: u16 = 5862;
 /// Opens HACS on the owner's Home Assistant with this repository's integration ready to install.
-pub const HACS_LINK: &str = "https://my.home-assistant.io/redirect/hacs_repository/?owner=EliSchleifer&repository=lg-luma&category=integration";
+pub const HACS_LINK: &str = "https://my.home-assistant.io/redirect/hacs_repository/?owner=elischleifer-trunk&repository=lg-luma&category=integration";
 pub const OVERLAY_ID: &str = luma_tv_helper::overlay::OVERLAY;
 const API_VERSION: u32 = 1;
 const MAX_BODY: usize = 16 * 1024;

@@ -4,10 +4,10 @@
   "after_dependencies": ["camera", "webostv"],
   "codeowners": [],
   "config_flow": true,
-  "documentation": "https://github.com/EliSchleifer/lg-luma/blob/main/home-assistant.md",
+  "documentation": "https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md",
   "integration_type": "device",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/EliSchleifer/lg-luma/issues",
+  "issue_tracker": "https://github.com/elischleifer-trunk/lg-luma/issues",
   "requirements": [],
   "ssdp": [{ "st": "urn:lge-com:service:webos-second-screen:1" }],
   "version": "0.1.0"

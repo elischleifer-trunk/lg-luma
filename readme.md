@@ -2,6 +2,19 @@
 
 A native launcher for rooted LG webOS TVs, inspired by Apple TV.
 
+> [!NOTE]
+> **Here from HACS?** This repository holds two things: Luma, the TV launcher this page
+> describes, and **Luma for LG webOS**, its Home Assistant integration. HACS installs only the
+> integration (`custom_components/luma`). It lets Home Assistant show a camera, such as a
+> doorbell, in a corner of the TV over whatever is playing, and send notification toasts.
+>
+> The integration needs a TV that already runs Luma with **Settings → General → Home Assistant**
+> turned on. After downloading it in HACS, restart Home Assistant, add **Luma for LG webOS** (it
+> is usually discovered on its own) and type the code shown on the TV. Setup, actions and
+> automation examples are in the
+> [Home Assistant guide](https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md).
+> The rest of this page is about the TV app.
+
 https://github.com/user-attachments/assets/3d3564d9-5942-4aef-a726-0323f5e86a07
 
 <details>

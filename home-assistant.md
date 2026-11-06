@@ -30,9 +30,9 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
    - **From the QR code:** scan it with your phone. It opens HACS on your Home Assistant with
      **Luma for LG webOS** ready to download, through the
      [My Home Assistant](https://my.home-assistant.io) link
-     `https://my.home-assistant.io/redirect/hacs_repository/?owner=EliSchleifer&repository=lg-luma&category=integration`.
+     `https://my.home-assistant.io/redirect/hacs_repository/?owner=elischleifer-trunk&repository=lg-luma&category=integration`.
      The first time, My Home Assistant asks for your Home Assistant's address.
-   - **By hand in HACS:** add `https://github.com/EliSchleifer/lg-luma` as a custom repository of
+   - **By hand in HACS:** add `https://github.com/elischleifer-trunk/lg-luma` as a custom repository of
      type _Integration_, then download **Luma for LG webOS**.
    - **Without HACS:** copy `custom_components/luma` from this repository into your Home Assistant
      `config/custom_components/` folder.
