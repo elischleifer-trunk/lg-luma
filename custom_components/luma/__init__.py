@@ -236,6 +236,7 @@ class ExampleImageView(HomeAssistantView):
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     if hass.http is not None:
         hass.http.register_view(ExampleImageView())
+
     async def show_camera(call: ServiceCall) -> None:
         payload = overlay_payload(hass, dict(call.data))
         await _each(hass, _targets(hass, call), lambda client: client.show(payload))
