@@ -387,8 +387,12 @@ impl State {
                         .map(|e| Target::Recent(e.app.id.clone()))
                         .unwrap_or(Target::RecentEmpty);
                 }
-                Command::Launch(_) => {
-                    return self.back();
+                Command::Launch(id) => {
+                    let mut effects = self.back();
+                    if self.mark_used(&id) {
+                        effects.push(Effect::Save);
+                    }
+                    return effects;
                 }
                 Command::Close(id) => {
                     let removed = self

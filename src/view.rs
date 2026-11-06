@@ -4,9 +4,8 @@ use crate::{
     model::{App, BACKGROUNDS, CATEGORIES, Console, Input, InputMode},
     renderer::{Color, Draw, TextStyle, WHITE},
     state::{
-        APPS_COLUMNS, Control, HOME_FADE_LEFT, HOME_FADE_RIGHT, HOME_STRIP_LEFT, HOME_STRIP_RIGHT,
-        HOME_TILE_PITCH, HOME_TILE_WIDTH, KEYS, Overlay, Page, Rect, SYSTEM_SECTION, State,
-        Subpage, Target, TextField, WIDGETS_SECTION,
+        APPS_COLUMNS, Control, HOME_COLUMNS, HOME_TILE_PITCH, HOME_TILE_WIDTH, KEYS, Overlay, Page,
+        Rect, SYSTEM_SECTION, State, Subpage, Target, TextField, WIDGETS_SECTION,
     },
     weather::{self, Unit},
 };
@@ -878,11 +877,7 @@ fn tile(
         Rect::new(rect.x, rect.y, rect.w, rect.h + label_height),
         true,
     );
-    let viewport = if state.page == Page::Home {
-        state.favorites_viewport()
-    } else {
-        state.content_viewport()
-    };
+    let viewport = state.content_viewport();
     let top = if state.page == Page::Apps {
         0.
     } else {
@@ -1302,40 +1297,45 @@ fn home(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
             },
         );
     }
-    // Like Apple TV's rows, the favourites run to the screen edge: the next tile shows cut off
-    // at the right (and a scrolled-away one at the left), so it is clear the row continues.
-    out.draw.push(Draw::Clip(Some(state.favorites_viewport())));
-    // Soft edges: out to the right from the end of the sixth tile, and in from the left once
-    // the row has scrolled.
-    let left = if state.home_scroll > 0. {
-        [HOME_FADE_LEFT, HOME_STRIP_LEFT]
-    } else {
-        [0., 0.]
-    };
-    out.draw.push(Draw::EdgeFadeX(Some([
-        left[0],
-        left[1],
-        HOME_STRIP_RIGHT,
-        HOME_FADE_RIGHT,
-    ])));
-    for (index, app) in apps.iter().enumerate() {
-        tile(
-            out,
-            state,
-            assets,
-            app,
-            Rect::new(
-                84. + index as f32 * HOME_TILE_PITCH - state.home_scroll,
-                544.8 - s,
-                HOME_TILE_WIDTH,
-                FACE_HEIGHT,
-            ),
-            names,
-            false,
-        );
+    // Six favourites per row; further favourites wrap onto rows below, which scroll into view.
+    // The clip runs to the screen edges so first-column focus shadows are not cut at the margin.
+    let content = state.content_viewport();
+    out.draw
+        .push(Draw::Clip(Some(Rect::new(0., content.y, 1920., content.h))));
+    let mut y = 544.8;
+    for row in apps.chunks(HOME_COLUMNS) {
+        let row_height = FACE_HEIGHT
+            + if names {
+                18.4 + row
+                    .iter()
+                    .map(|app| {
+                        // Measure what the card draws: an input shows its custom or console name.
+                        let face = state.input_app(&app.id);
+                        caption_height(state, assets, face.as_ref().unwrap_or(app), HOME_TILE_WIDTH)
+                    })
+                    .fold(0., f32::max)
+            } else {
+                0.
+            };
+        for (column, app) in row.iter().enumerate() {
+            tile(
+                out,
+                state,
+                assets,
+                app,
+                Rect::new(
+                    84. + column as f32 * HOME_TILE_PITCH,
+                    y - s,
+                    HOME_TILE_WIDTH,
+                    FACE_HEIGHT,
+                ),
+                names,
+                false,
+            );
+        }
+        y += row_height + 38.4;
     }
-    out.draw.push(Draw::EdgeFadeX(None));
-    out.draw.push(Draw::Clip(Some(state.content_viewport())));
+    out.draw.push(Draw::Clip(Some(content)));
 }
 
 struct WeatherSummary {
