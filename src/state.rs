@@ -795,7 +795,8 @@ impl State {
             self.inventory.apps.push(App {
                 id: CAMERAS_APP.into(),
                 title: self.preferences.language.t("cameras").into(),
-                brand: "cameras".into(),
+                // The shortcut tiles' surface; `mark` draws the camera icon.
+                brand: "custom".into(),
                 category: "Utilities".into(),
                 icon: None,
                 mark: "camera",

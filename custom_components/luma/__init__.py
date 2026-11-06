@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import Any
 
 import voluptuous as vol
@@ -27,6 +28,7 @@ from homeassistant.exceptions import (
 )
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 
@@ -55,6 +57,8 @@ ATTR_BASE_URL = "base_url"
 # Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
 CAMERAS_PUSH_DELAY = 2.0
 MAX_CAMERAS = 32
+# Luma keeps cameras in memory only; this often, check whether a restarted TV needs the list.
+CAMERAS_CHECK_INTERVAL = timedelta(minutes=1)
 
 
 @dataclass
@@ -138,7 +142,21 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
     def changed(_event) -> None:
         schedule()
 
+    async def check(_now) -> None:
+        # After the TV or Luma restarts it reports no cameras; send the list again then.
+        if pending or not camera_list(hass):
+            return
+        try:
+            status = await client.status()
+        except LumaError:
+            return
+        if status.get("cameras") == 0:
+            schedule()
+
     entry.async_on_unload(hass.bus.async_listen(EVENT_STATE_CHANGED, changed, is_camera))
+    entry.async_on_unload(
+        async_track_time_interval(hass, check, CAMERAS_CHECK_INTERVAL, cancel_on_shutdown=True)
+    )
     schedule()
 
 

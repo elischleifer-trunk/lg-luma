@@ -83,9 +83,9 @@ and **Back** again closes it.
 Nothing needs setting up: the integration sends the TV its camera list when it starts and again
 whenever a camera changes, including every few minutes when Home Assistant rotates camera access
 tokens, so the URLs the TV holds keep working. Like camera overlays, the TV loads the images from
-Home Assistant's **local network URL**. After the TV restarts, the list arrives with the next
-camera change; until then the app says no cameras have been sent yet. Reloading the integration
-sends it straight away.
+Home Assistant's **local network URL**. The TV keeps the list in memory only; after it restarts,
+Home Assistant notices within a minute and sends the list again. With several Home Assistant
+servers paired, the app shows all of their cameras.
 
 A doorbell `luma.show_camera` call while the grid is open replaces it with the doorbell card.
 

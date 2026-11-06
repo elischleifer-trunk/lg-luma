@@ -282,7 +282,8 @@
     }
     gallery.hidden = false;
     highlight();
-    startPolling();
+    // An enlarged camera keeps its own refresh, which reads the new URLs from `enlarged`.
+    if (!enlarged) startPolling();
   }
 
   function enlarge() {
@@ -393,6 +394,19 @@
       highlight();
     }
   });
+  // Home, another app or webOS can take the gallery away without Back. Report it closed so
+  // Luma stops relaunching it with fresh camera URLs. The doorbell card keeps its own timer.
+  function leftGallery() {
+    if (!gallery.hidden) dismiss();
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') leftGallery();
+  });
+  window.addEventListener('pagehide', function () {
+    if (gallery.hidden) report(current);
+    else leftGallery();
+  });
+
   document.addEventListener('webOSRelaunch', function (event) {
     apply((event && event.detail) || launchParams());
   });

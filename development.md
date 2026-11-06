@@ -424,8 +424,10 @@ camera's access token, from the internal URL unless `base_url` is given.
 **Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
 camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds
 after any `camera.*` state change, which includes every access-token rotation, coalescing bursts.
-Luma keeps the list in memory only. While Home Assistant is on, `State::sync_custom_tiles` adds the
-built-in `luma.cameras` app (`model::CAMERAS_APP`, brand `cameras`, `camera` mark) to the inventory,
+Every minute it also reads `GET /api/status` and resends when the TV reports no cameras, since
+Luma keeps lists in memory only, one per paired server (keyed by token digest, merged in pairing
+order; unpairing drops that server's list). While Home Assistant is on, `State::sync_custom_tiles` adds the
+built-in `luma.cameras` app (`model::CAMERAS_APP`, the shortcut tiles' `custom` surface, `camera` mark) to the inventory,
 so it can be favorited, hidden and searched; `model::is_builtin` keeps it out of uninstall and
 inventory-failure checks. Launching it sets `State::show_cameras`, and the main loop asks the
 service's thread to launch the overlay app with `mode: "cameras"`, the camera list and a session
@@ -434,8 +436,9 @@ The page shows a full-screen grid that polls snapshots (every 2 s, or 4 s above 
 so it never holds more than one connection per camera) and enlarges the selected camera with its
 motion-JPEG stream, falling back to snapshots. A new list while the gallery is open relaunches
 it with the same session; the page keeps its tiles and selection and only swaps URLs. Back closes
-an enlarged camera, then the gallery, which reports closing like the doorbell card. A gallery is
-closed after an hour, and a `show_camera` call replaces it.
+an enlarged camera, then the gallery, which reports closing like the doorbell card; so does the
+page becoming hidden or unloaded, so a gallery left with Home or another app is not relaunched.
+A gallery is closed after an hour, and a `show_camera` call replaces it.
 
 Rust tests drive the API without sockets through a recording `Tv` (pairing, lockout, validation,
 pause/resume, timeouts, persistence) plus one loopback HTTP round trip; helper tests use the

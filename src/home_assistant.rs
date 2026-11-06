@@ -290,7 +290,8 @@ pub struct Api<T: Tv> {
     pairing: Option<Pairing>,
     last_pairing: Option<Instant>,
     session: Option<Session>,
-    cameras: Vec<Camera>,
+    /// Each paired server's cameras, keyed by its token digest; the gallery shows them merged.
+    cameras: Vec<(String, Vec<Camera>)>,
     overlay_ready: Arc<AtomicBool>,
     preparing: Arc<AtomicBool>,
 }
@@ -467,10 +468,8 @@ impl<T: Tv> Api<T> {
                 };
                 match (method, path) {
                     ("DELETE", "/api/pair") => {
-                        self.store.clients.remove(client);
-                        if self.store.clients.is_empty() {
-                            self.cameras.clear();
-                        }
+                        let removed = self.store.clients.remove(client);
+                        self.cameras.retain(|(owner, _)| *owner != removed.token);
                         self.save();
                         reply(200, json!({"paired": false}))
                     }
@@ -479,10 +478,10 @@ impl<T: Tv> Api<T> {
                         json!({
                             "overlay": self.session.as_ref().map(|s| s.id.as_str()),
                             "overlay_ready": self.overlay_ready.load(Ordering::Acquire),
-                            "cameras": self.cameras.len(),
+                            "cameras": self.all_cameras().len(),
                         }),
                     ),
-                    ("POST", "/api/cameras") => self.set_cameras(&body),
+                    ("POST", "/api/cameras") => self.set_cameras(client, &body),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         if self.session.is_some() {
@@ -669,7 +668,16 @@ impl<T: Tv> Api<T> {
 
     /// Replaces the camera list. Home Assistant sends every camera each time a camera's access
     /// token rotates, so an open gallery is relaunched with the fresh URLs.
-    fn set_cameras(&mut self, body: &Value) -> Reply {
+    /// Every paired server's cameras in pairing order, up to [`MAX_CAMERAS`].
+    fn all_cameras(&self) -> Vec<&Camera> {
+        self.cameras
+            .iter()
+            .flat_map(|(_, cameras)| cameras)
+            .take(MAX_CAMERAS)
+            .collect()
+    }
+
+    fn set_cameras(&mut self, client: usize, body: &Value) -> Reply {
         let Some(list) = body.get("cameras").and_then(Value::as_array) else {
             return error(400, "cameras must be a list");
         };
@@ -698,17 +706,27 @@ impl<T: Tv> Api<T> {
                 Err(reply) => return reply,
             }
         }
-        let changed = cameras != self.cameras;
-        self.cameras = cameras;
+        let before: Vec<Camera> = self.all_cameras().into_iter().cloned().collect();
+        let owner = self.store.clients[client].token.clone();
+        self.cameras.retain(|(key, _)| *key != owner);
+        if !cameras.is_empty() {
+            self.cameras.push((owner, cameras));
+            // Keep servers in pairing order so the gallery does not reshuffle between pushes.
+            let clients = &self.store.clients;
+            self.cameras
+                .sort_by_key(|(key, _)| clients.iter().position(|client| client.token == *key));
+        }
+        let total = self.all_cameras().len();
+        let changed = before.iter().ne(self.all_cameras());
         if changed && self.session.as_ref().is_some_and(|session| session.gallery) {
-            if self.cameras.is_empty() {
+            if total == 0 {
                 let _ = self.tv.close_overlay();
                 self.end_session();
             } else if let Err(e) = self.launch_gallery() {
                 eprintln!("Luma Home Assistant cameras refresh: {e}");
             }
         }
-        reply(200, json!({"cameras": self.cameras.len()}))
+        reply(200, json!({"cameras": total}))
     }
 
     fn gallery_params(&self, session: &Session) -> Value {
@@ -717,7 +735,7 @@ impl<T: Tv> Api<T> {
             "session": session.id,
             "nonce": session.nonce,
             "port": PORT,
-            "cameras": self.cameras,
+            "cameras": self.all_cameras(),
         })
     }
 
@@ -734,7 +752,7 @@ impl<T: Tv> Api<T> {
             let _ = self.events.send(Event::Notice("camerasNotPaired"));
             return;
         }
-        if self.cameras.is_empty() {
+        if self.all_cameras().is_empty() {
             let _ = self.events.send(Event::Notice("camerasNone"));
             return;
         }

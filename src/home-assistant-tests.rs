@@ -507,6 +507,42 @@ fn cameras_are_validated_and_open_as_a_gallery_refreshed_with_new_urls() {
 }
 
 #[test]
+fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
+    let mut h = Harness::new();
+    let first = h.pair();
+    h.now += PAIRING_COOLDOWN;
+    let second = h.pair();
+    let camera = |id: &str| json!({"id": id, "snapshot_url": format!("http://ha/{id}")});
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&second),
+        json!({"cameras": [camera("camera.b1"), camera("camera.b2")]}),
+    );
+    let both = h.call(
+        "POST",
+        "/api/cameras",
+        Some(&first),
+        json!({"cameras": [camera("camera.a1")]}),
+    );
+    assert_eq!(both.body, json!({"cameras": 3}));
+    // Pairing order, whichever server pushed last.
+    let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(ids, ["camera.a1", "camera.b1", "camera.b2"]);
+    // A second push from one server replaces only its own list.
+    let again = h.call(
+        "POST",
+        "/api/cameras",
+        Some(&second),
+        json!({"cameras": [camera("camera.b3")]}),
+    );
+    assert_eq!(again.body, json!({"cameras": 2}));
+    h.call("DELETE", "/api/pair", Some(&first), json!({}));
+    let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(ids, ["camera.b3"]);
+}
+
+#[test]
 fn an_uninstalled_overlay_is_prepared_instead_of_launched() {
     let mut h = Harness::new();
     let token = h.pair();
