@@ -1298,13 +1298,21 @@ fn home(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
         );
     }
     // Six favourites per row; further favourites wrap onto rows below, which scroll into view.
+    // The clip runs to the screen edges so first-column focus shadows are not cut at the margin.
+    let content = state.content_viewport();
+    out.draw
+        .push(Draw::Clip(Some(Rect::new(0., content.y, 1920., content.h))));
     let mut y = 544.8;
     for row in apps.chunks(HOME_COLUMNS) {
         let row_height = FACE_HEIGHT
             + if names {
                 18.4 + row
                     .iter()
-                    .map(|app| caption_height(state, assets, app, HOME_TILE_WIDTH))
+                    .map(|app| {
+                        // Measure what the card draws: an input shows its custom or console name.
+                        let face = state.input_app(&app.id);
+                        caption_height(state, assets, face.as_ref().unwrap_or(app), HOME_TILE_WIDTH)
+                    })
                     .fold(0., f32::max)
             } else {
                 0.
@@ -1327,6 +1335,7 @@ fn home(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
         }
         y += row_height + 38.4;
     }
+    out.draw.push(Draw::Clip(Some(content)));
 }
 
 struct WeatherSummary {

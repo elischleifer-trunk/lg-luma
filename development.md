@@ -165,8 +165,8 @@ Choice checkmarks identify saved values, while the bright row fill identifies on
 Home favorites fill six columns, then wrap onto further rows that scroll vertically into view.
 Left/Right follows saved order, Up/Down follows six-column grid indices (including offscreen rows),
 and Up from the first row returns to Home navigation. Reorder mode moves a card by one slot with
-Left/Right and by one row with Up/Down. Launching a favorite from Home, Apps or recents moves it to
-the front and saves the order, so Home lists the most recently used favorites first; apps that are
+Left/Right and by one row with Up/Down. A favorite launched from Home, Apps or recents moves to the
+front once it opens and the order is saved (a failed launch changes nothing), so Home lists the most recently used favorites first; apps that are
 not favorites are never added. Wheel movement scrolls vertically. Pointer hover/down never moves
 the clicked control. Apps Up/Down follows the six-column grid order, including offscreen rows,
 and only the first row's Up route reaches the category toolbar. Scrolling Apps content fades into

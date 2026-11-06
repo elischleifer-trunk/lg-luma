@@ -221,6 +221,8 @@ pub struct State {
     /// Set by Refresh apps: the next inventory also reloads every app icon.
     pub reload_artwork: bool,
     pub launching: bool,
+    /// The app of the launch in flight; it moves to the front of favorites once it opens.
+    pub launch_requested: Option<String>,
     pub uninstalling: Option<String>,
     pub notice: Option<(String, Instant)>,
     pub error: Option<String>,
@@ -270,6 +272,7 @@ impl State {
             loading: false,
             reload_artwork: false,
             launching: false,
+            launch_requested: None,
             uninstalling: None,
             notice: None,
             error: None,
@@ -664,14 +667,27 @@ impl State {
         }
     }
 
-    /// A launch request, with the favourites reordered and saved when it was one of them.
-    fn launch(&mut self, id: String) -> Vec<Effect> {
-        let save = self.mark_used(&id);
-        let mut effects = vec![Effect::Launch(id)];
-        if save {
-            effects.push(Effect::Save);
+    /// The result of a launch request. Only an app that opened moves to the front of
+    /// favorites, so a failed launch leaves the saved order as it was.
+    pub fn launch_response(&mut self, result: Result<(), String>) -> Vec<Effect> {
+        self.launching = false;
+        let id = self.launch_requested.take();
+        match result {
+            Err(error) => {
+                eprintln!("{error}");
+                self.notify(self.preferences.language.t("appOpenError"));
+                vec![]
+            }
+            Ok(()) => {
+                self.notice = None;
+                self.dirty = true;
+                if id.is_some_and(|id| self.mark_used(&id)) {
+                    vec![Effect::Save]
+                } else {
+                    vec![]
+                }
+            }
         }
-        effects
     }
 
     /// Returns whether a newly reported console changed the saved preferences.
@@ -1097,7 +1113,10 @@ impl State {
                     Direction::Left => index.saturating_sub(1),
                     Direction::Right => (index + 1).min(slots.len() - 1),
                     Direction::Up => index.checked_sub(HOME_COLUMNS).unwrap_or(index),
-                    Direction::Down if index + HOME_COLUMNS < slots.len() => index + HOME_COLUMNS,
+                    // A short last row takes the card from the columns past its end.
+                    Direction::Down if (index / HOME_COLUMNS + 1) * HOME_COLUMNS < slots.len() => {
+                        (index + HOME_COLUMNS).min(slots.len() - 1)
+                    }
                     Direction::Down => index,
                 };
                 if next != index {
@@ -1994,7 +2013,9 @@ impl State {
             }
             Target::TvSettings => return vec![Effect::Launch("com.palm.app.settings".into())],
             Target::App(_) if self.page == Page::Apps && !self.launching => self.options(),
-            Target::App(id) if !self.launching => return self.launch(id),
+            Target::App(id) if !self.launching => {
+                return vec![Effect::Launch(id)];
+            }
             Target::OpenApp if !self.launching => {
                 if let Some(Overlay::Options { id, .. }) = &self.overlay
                     && self.inventory.apps.iter().any(|app| &app.id == id)
@@ -2004,7 +2025,7 @@ impl State {
                     if let Some(tile) = self.preferences.custom_tile(&id).cloned() {
                         return self.send_tile(tile);
                     }
-                    return self.launch(id);
+                    return vec![Effect::Launch(id)];
                 }
             }
             Target::Filter(index) => {

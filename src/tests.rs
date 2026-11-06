@@ -250,24 +250,89 @@ fn reordering_moves_a_favorite_between_rows() {
 }
 
 #[test]
-fn launching_a_favorite_moves_it_to_the_front() {
+fn launching_a_favorite_moves_it_to_the_front_once_it_opens() {
     let (mut state, favorites) = nine_favorites();
     state.focus = Target::App(favorites[4].clone());
-    assert_eq!(
-        state.activate(),
-        vec![Effect::Launch(favorites[4].clone()), Effect::Save]
-    );
+    assert_eq!(state.activate(), vec![Effect::Launch(favorites[4].clone())]);
+    // The platform loop records the request; a failed launch keeps the saved order.
+    state.launching = true;
+    state.launch_requested = Some(favorites[4].clone());
+    assert!(state.launch_response(Err("boom".into())).is_empty());
+    assert!(!state.launching);
+    assert_eq!(state.preferences.favorites.clone().unwrap(), favorites);
+    state.launch_requested = Some(favorites[4].clone());
+    assert_eq!(state.launch_response(Ok(())), vec![Effect::Save]);
+    assert!(state.launch_requested.is_none());
     let order = state.preferences.favorites.clone().unwrap();
     assert_eq!(order[0], favorites[4]);
     assert_eq!(&order[1..5], &favorites[0..4]);
     assert_eq!(&order[5..], &favorites[5..]);
     // Already first: nothing to save.
-    state.launching = false;
-    assert_eq!(state.activate(), vec![Effect::Launch(favorites[4].clone())]);
+    state.launch_requested = Some(favorites[4].clone());
+    assert!(state.launch_response(Ok(())).is_empty());
     // Apps that are not favorites are launched without joining Home.
     state.preferences.favorites = Some(favorites[..3].to_vec());
     assert!(!state.mark_used(&favorites[5]));
     assert_eq!(state.preferences.favorites.clone().unwrap(), favorites[..3]);
+}
+
+#[test]
+fn reordering_down_into_a_short_last_row_takes_its_last_slot() {
+    let (mut state, favorites) = nine_favorites();
+    state.focus = Target::App(favorites[5].clone());
+    state.hold();
+    assert_eq!(
+        state.direction(Direction::Down, &controls(&state)),
+        vec![Effect::Save]
+    );
+    assert_eq!(
+        state.preferences.favorites.clone().unwrap()[8],
+        favorites[5]
+    );
+    // Already in the last row: Down stays put.
+    assert!(
+        state
+            .direction(Direction::Down, &controls(&state))
+            .is_empty()
+    );
+}
+
+#[test]
+fn home_rows_fit_long_input_names() {
+    let mut state = ready();
+    state.preferences.show_home_names = true;
+    let input = state.inventory.inputs[0].id.clone();
+    state
+        .preferences
+        .input_modes
+        .insert(input.clone(), InputMode::On);
+    state.preferences.input_names.insert(
+        input.clone(),
+        "A very long custom input name that wraps onto several caption lines, more lines \
+         than any app title in the same row of the Home favorites grid"
+            .into(),
+    );
+    let favorites: Vec<_> = state
+        .inventory
+        .apps
+        .iter()
+        .take(9)
+        .map(|app| app.id.clone())
+        .collect();
+    state.preferences.favorites = Some(favorites);
+    let apps: Vec<_> = state.apps().iter().map(|app| app.id.clone()).collect();
+    assert!(apps.len() > crate::state::HOME_COLUMNS);
+    let controls = controls(&state);
+    let rect = |id: &String| {
+        controls
+            .iter()
+            .find(|control| control.target == Target::App(id.clone()))
+            .unwrap()
+            .rect
+    };
+    let card = rect(&input);
+    let below = rect(&apps[crate::state::HOME_COLUMNS]);
+    assert!(below.y >= card.y + card.h, "{card:?} overlaps {below:?}");
 }
 
 #[test]

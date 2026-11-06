@@ -329,6 +329,7 @@ fn effects(
                 if !state.launching {
                     if platform.webos {
                         state.launching = true;
+                        state.launch_requested = Some(id.clone());
                         state.notify(state.preferences.language.t("opening"));
                         platform.send(Request::Launch(id));
                     } else {
@@ -1155,17 +1156,17 @@ fn run() -> Result<(), String> {
                     }
                 }
                 Response::Launched(result) => {
-                    state.launching = false;
-                    match result {
-                        Err(error) => {
-                            eprintln!("{error}");
-                            state.notify(state.preferences.language.t("appOpenError"));
-                        }
-                        Ok(()) => {
-                            state.notice = None;
-                            state.dirty = true;
-                        }
-                    }
+                    let pending = state.launch_response(result);
+                    running &= effects(
+                        pending,
+                        &mut state,
+                        &platform,
+                        &preferences_path,
+                        &weather_service,
+                        &wallpaper_service,
+                        &webhook_service,
+                        &updates,
+                    );
                 }
                 Response::Uninstalled { id, result } => {
                     let pending = state.uninstall_response(id, result);
