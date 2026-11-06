@@ -478,7 +478,11 @@ impl<T: Tv> Api<T> {
                         json!({
                             "overlay": self.session.as_ref().map(|s| s.id.as_str()),
                             "overlay_ready": self.overlay_ready.load(Ordering::Acquire),
-                            "cameras": self.all_cameras().len(),
+                            // This server's own cameras, so each one notices a TV that
+                            // restarted and lost its list.
+                            "cameras": self.cameras.iter()
+                                .find(|(owner, _)| *owner == self.store.clients[client].token)
+                                .map_or(0, |(_, cameras)| cameras.len()),
                         }),
                     ),
                     ("POST", "/api/cameras") => self.set_cameras(client, &body),

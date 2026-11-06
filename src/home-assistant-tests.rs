@@ -526,6 +526,11 @@ fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
         json!({"cameras": [camera("camera.a1")]}),
     );
     assert_eq!(both.body, json!({"cameras": 3}));
+    // Status counts only the asking server's cameras.
+    assert_eq!(
+        h.call("GET", "/api/status", Some(&first), json!({})).body["cameras"],
+        1
+    );
     // Pairing order, whichever server pushed last.
     let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
     assert_eq!(ids, ["camera.a1", "camera.b1", "camera.b2"]);

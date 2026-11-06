@@ -17,6 +17,7 @@
   var timers = [];
   var galleryTimers = [];
   var closing = false;
+  var closeTimer = null;
   // Gallery state: one entry per camera tile, the selected index, and the enlarged camera.
   var tiles = [];
   var selected = 0;
@@ -84,9 +85,15 @@
     card.hidden = true;
     closeGallery();
     report(current);
-    setTimeout(function () {
+    closeTimer = setTimeout(function () {
       window.close();
     }, 150);
+  }
+
+  // A page suspended while hidden may resume through a relaunch before its close fires.
+  function cancelClose() {
+    clearTimeout(closeTimer);
+    closeTimer = null;
   }
 
   function snapshots(settings) {
@@ -111,6 +118,7 @@
   }
 
   function show(settings) {
+    cancelClose();
     clearTimers();
     closeGallery();
     closing = false;
@@ -244,6 +252,7 @@
   }
 
   function showGallery(settings) {
+    cancelClose();
     clearTimers();
     feed.removeAttribute('src');
     card.hidden = true;

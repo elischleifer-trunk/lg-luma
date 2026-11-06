@@ -424,7 +424,7 @@ camera's access token, from the internal URL unless `base_url` is given.
 **Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
 camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds
 after any `camera.*` state change, which includes every access-token rotation, coalescing bursts.
-Every minute it also reads `GET /api/status` and resends when the TV reports no cameras, since
+Every minute it also reads `GET /api/status`, whose `cameras` counts only the asking server's list, and resends when it is 0, since
 Luma keeps lists in memory only, one per paired server (keyed by token digest, merged in pairing
 order; unpairing drops that server's list). While Home Assistant is on, `State::sync_custom_tiles` adds the
 built-in `luma.cameras` app (`model::CAMERAS_APP`, the shortcut tiles' `custom` surface, `camera` mark) to the inventory,
