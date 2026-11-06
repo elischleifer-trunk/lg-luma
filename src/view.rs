@@ -687,8 +687,14 @@ pub fn scene_with_pill(
                     } else {
                         state.preferences.show_app_names
                     };
+                    let face = state.input_app(id);
                     if names
-                        && let Some(app) = state.inventory.apps.iter().find(|app| &app.id == id)
+                        && let Some(app) = state
+                            .inventory
+                            .apps
+                            .iter()
+                            .find(|app| &app.id == id)
+                            .or(face.as_ref())
                     {
                         rect.h -= 18.4 + caption_height(state, assets, app, rect.w);
                     }
@@ -862,9 +868,7 @@ fn tile(
     names: bool,
     pinned: bool,
 ) {
-    let input_face = (state.page == Page::Home)
-        .then(|| state.input_app(&app.id))
-        .flatten();
+    let input_face = state.input_app(&app.id);
     let app = input_face.as_ref().unwrap_or(app);
     let caption_height = if names {
         caption_height(state, assets, app, rect.w)
@@ -1645,7 +1649,12 @@ fn library_grid(out: &mut Scene, state: &State, assets: &Assets) {
             + if names {
                 18.4 + row
                     .iter()
-                    .map(|app| caption_height(state, assets, app, 270.))
+                    .map(|app| {
+                        // Input cards caption their face title (custom or console name), not
+                        // the port, as `tile` draws them.
+                        let face = state.input_app(&app.id);
+                        caption_height(state, assets, face.as_ref().unwrap_or(app), 270.)
+                    })
                     .fold(58.24, f32::max)
             } else {
                 0.
@@ -2295,6 +2304,11 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                         Some(language.t("inputWhenConnected")),
                         current == InputMode::Auto,
                     ),
+                    (
+                        language.t("stateAppsOnly"),
+                        Some(language.t("inputAppsOnly")),
+                        current == InputMode::Apps,
+                    ),
                 ]
             }
             Subpage::Temperature => vec![
@@ -2353,7 +2367,7 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
             );
         }
         if let Subpage::Input(id) = subpage {
-            input_name_rows(out, state, assets, id, 164.8 + 3. * 102.7 + 16. - s);
+            input_name_rows(out, state, assets, id, 164.8 + 4. * 102.7 + 16. - s);
         }
         if let Some(opened) = state.panel_started {
             out.fade(
@@ -2702,6 +2716,7 @@ fn inputs_settings(out: &mut Scene, state: &State, assets: &Assets) {
                     InputMode::On => "stateOn",
                     InputMode::Off => "stateOff",
                     InputMode::Auto => "stateAuto",
+                    InputMode::Apps => "stateAppsOnly",
                 })),
                 description: Some(&input_status(
                     input,
@@ -3209,18 +3224,31 @@ fn options(out: &mut Scene, state: &State, assets: &Assets, id: &str, anchor: Op
         })
     );
     let background = matches!(state.overlay, Some(Overlay::BackgroundOptions { .. }));
-    let app = state.inventory.apps.iter().find(|app| app.id == id);
-    let favorite = state
-        .preferences
-        .favorites(&state.inventory.apps)
+    let input = state.is_input(id);
+    let input_face = state.input_app(id);
+    let app = state
+        .inventory
+        .apps
         .iter()
-        .any(|item| item == id);
-    let deletable = if background {
+        .find(|app| app.id == id)
+        .or(input_face.as_ref());
+    let favorite = if input {
+        state.input_favorite(id)
+    } else {
+        state
+            .preferences
+            .favorites(&state.inventory.apps)
+            .iter()
+            .any(|item| item == id)
+    };
+    let deletable = if input {
+        false
+    } else if background {
         state.can_delete_background(id) && state.deleting_wallpaper.is_none()
     } else {
         crate::platform::can_uninstall(id)
     };
-    let height = if shortcut {
+    let height = if shortcut || input {
         176.
     } else if background {
         if deletable { 176. } else { 99.2 }
@@ -3276,6 +3304,19 @@ fn options(out: &mut Scene, state: &State, assets: &Assets, id: &str, anchor: Op
             actions.push((Target::DeleteBackground, language.t("deleteBackground")));
         }
         actions
+    } else if input {
+        // Inputs are not installed apps: no hide or delete, only Home membership.
+        vec![
+            (Target::OpenApp, language.t("open")),
+            (
+                Target::Option(0),
+                language.t(if favorite {
+                    "removeFavorite"
+                } else {
+                    "addFavorite"
+                }),
+            ),
+        ]
     } else {
         vec![
             (Target::OpenApp, language.t("open")),

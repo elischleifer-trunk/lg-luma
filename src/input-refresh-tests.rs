@@ -426,18 +426,162 @@ fn inputs_lead_the_home_strip_and_follow_the_console_on_a_shared_port() {
 }
 
 #[test]
-fn input_cards_launch_but_cannot_be_reordered_or_opened_as_apps() {
+fn holding_an_input_card_opens_options_to_remove_it_from_favorites() {
+    use crate::state::Effect;
     let mut state = ready();
     let id = state.inventory.inputs[0].id.clone();
+    let next = state.inventory.inputs[1].id.clone();
     state.focus = Target::App(id.clone());
+    // OK still opens the input; holding opens options instead of reordering.
+    assert_eq!(state.activate(), vec![Effect::Launch(id.clone())]);
     state.hold();
     assert!(state.moving.is_none());
-    state.options();
+    assert!(matches!(&state.overlay, Some(Overlay::Options { id: current, .. }) if current == &id));
+    assert_eq!(state.focus, Target::OpenApp);
+    // Inputs offer Open and the favorites toggle only: no hide or delete.
+    let targets: Vec<_> = controls(&state).into_iter().map(|c| c.target).collect();
+    assert!(targets.contains(&Target::OpenApp) && targets.contains(&Target::Option(0)));
+    assert!(!targets.contains(&Target::Option(1)) && !targets.contains(&Target::Option(2)));
+    state.focus = Target::Option(1);
+    assert!(state.activate().is_empty(), "hide does nothing for inputs");
+    state.focus = Target::Option(0);
+    assert_eq!(state.activate(), vec![Effect::Save]);
+    assert_eq!(state.preferences.input_modes[&id], InputMode::Apps);
     assert!(state.overlay.is_none());
-    assert_eq!(
-        state.activate(),
-        vec![crate::state::Effect::Launch(id.clone())]
-    );
-    state.open(1);
     assert!(!state.apps().iter().any(|app| app.id == id));
+    assert_eq!(
+        state.focus,
+        Target::App(next),
+        "focus moves to the card that took its slot"
+    );
+
+    // On the Apps page it opens options like any app, and can be added back.
+    state.open(1);
+    assert_eq!(state.apps()[0].id, id);
+    state.focus = Target::App(id.clone());
+    state.activate();
+    assert_eq!(state.focus, Target::OpenApp);
+    state.focus = Target::Option(0);
+    assert_eq!(state.activate(), vec![Effect::Save]);
+    assert_eq!(state.preferences.input_modes[&id], InputMode::Auto);
+    assert!(!state.apps().iter().any(|app| app.id == id));
+    state.open(0);
+    assert_eq!(
+        state.apps()[0].id,
+        id,
+        "back at the front of the Home strip"
+    );
+    // Open from the options launches the input.
+    state.focus = Target::App(id.clone());
+    state.options();
+    assert_eq!(state.activate(), vec![Effect::Launch(id)]);
+}
+
+#[test]
+fn apps_only_inputs_skip_home_and_list_on_the_apps_page_while_live() {
+    let mut state = ready();
+    // HDMI 2 is a soundbar: keep it off Home, but reachable from Apps.
+    let id = state.inventory.inputs[1].id.clone();
+    state.open(2);
+    state.section = WIDGETS_SECTION;
+    state.subpage = Some(Subpage::Inputs);
+    state.focus = Target::InputMode(id.clone());
+    state.activate();
+    assert_eq!(state.subpage, Some(Subpage::Input(id.clone())));
+    // "Apps only" is the fourth choice, after On, Off and Auto.
+    state.focus = Target::Choice(3);
+    state.activate();
+    assert_eq!(state.preferences.input_modes[&id], InputMode::Apps);
+
+    state.open(0);
+    assert!(!state.apps().iter().any(|app| app.id == id));
+    assert_eq!(
+        state.apps()[0].id,
+        state.inventory.inputs[0].id,
+        "other cards keep their slots"
+    );
+
+    state.open(1);
+    assert_eq!(
+        state.apps()[0].id,
+        id,
+        "live Apps-only inputs lead the All tab"
+    );
+    // Category tabs list apps only; search matches the card title.
+    state.filter = 1;
+    assert!(!state.apps().iter().any(|app| app.id == id));
+    state.filter = 0;
+    state.query = "nothing like it".into();
+    assert!(!state.apps().iter().any(|app| app.id == id));
+    for query in ["hdmi 2", "apple"] {
+        state.query = query.into();
+        assert!(state.apps().iter().any(|app| app.id == id), "{query}");
+    }
+    state.query.clear();
+
+    // Switched off: it leaves the Apps page too.
+    let mut inputs = state.inventory.inputs.clone();
+    inputs[1].signal = Some(false);
+    state.set_inputs(inputs);
+    assert!(!state.apps().iter().any(|app| app.id == id));
+
+    // The mode survives a save/load round trip.
+    let saved = serde_json::to_string(&state.preferences).unwrap();
+    let loaded: Preferences = serde_json::from_str(&saved).unwrap();
+    assert_eq!(loaded.input_modes[&id], InputMode::Apps);
+
+    // Builds before Apps only parse input_modes as Auto, On or Off and refuse the whole file
+    // otherwise. They must still read it, and keep the input off the Home strip.
+    #[derive(Debug, serde::Deserialize, PartialEq)]
+    enum OlderMode {
+        Auto,
+        On,
+        Off,
+    }
+    #[derive(serde::Deserialize)]
+    struct OlderPreferences {
+        input_modes: std::collections::BTreeMap<String, OlderMode>,
+    }
+    let older: OlderPreferences = serde_json::from_str(&saved).expect("older builds read it");
+    assert_eq!(older.input_modes[&id], OlderMode::Off);
+}
+
+#[test]
+fn input_modes_read_older_newer_and_unknown_values() {
+    let preferences: Preferences = serde_json::from_value(serde_json::json!({
+        "input_modes": {
+            "com.webos.app.hdmi1": "On",
+            // Written by builds that stored Apps only inline.
+            "com.webos.app.hdmi2": "Apps",
+            "com.webos.app.hdmi3": "Off",
+            "com.webos.app.hdmi4": "SomethingNewer",
+        },
+        "apps_only_inputs": ["com.webos.app.hdmi3", "com.webos.app.hdmi1"],
+        "show_home_names": true,
+    }))
+    .unwrap();
+    assert_eq!(
+        preferences.input_modes["com.webos.app.hdmi1"],
+        InputMode::On
+    );
+    assert_eq!(
+        preferences.input_modes["com.webos.app.hdmi2"],
+        InputMode::Apps
+    );
+    assert_eq!(
+        preferences.input_modes["com.webos.app.hdmi3"],
+        InputMode::Apps
+    );
+    assert!(!preferences.input_modes.contains_key("com.webos.app.hdmi4"));
+    assert!(preferences.show_home_names, "other fields still load");
+
+    let saved = serde_json::to_value(&preferences).unwrap();
+    assert_eq!(saved["input_modes"]["com.webos.app.hdmi2"], "Off");
+    assert_eq!(
+        saved["apps_only_inputs"],
+        serde_json::json!(["com.webos.app.hdmi2", "com.webos.app.hdmi3"])
+    );
+    let empty = serde_json::to_value(Preferences::default()).unwrap();
+    assert_eq!(empty["input_modes"], serde_json::json!({}));
+    assert!(empty.get("apps_only_inputs").is_none());
 }

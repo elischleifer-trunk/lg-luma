@@ -2144,7 +2144,12 @@ fn remote_renames_and_resets_an_input_from_its_settings_page() {
     state.activate();
     assert_eq!(state.focus, Target::Choice(2));
     state.direction(Direction::Down, &controls(&state));
+    assert_eq!(state.focus, Target::Choice(3), "Apps only follows Auto");
+    state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::InputRename);
+    state.direction(Direction::Up, &controls(&state));
+    assert_eq!(state.focus, Target::Choice(3));
+    state.direction(Direction::Down, &controls(&state));
     assert!(
         !controls(&state)
             .iter()
@@ -2171,7 +2176,7 @@ fn remote_renames_and_resets_an_input_from_its_settings_page() {
     assert!(state.preferences.input_names.is_empty());
     assert_eq!(state.focus, Target::InputRename);
     state.direction(Direction::Up, &controls(&state));
-    assert_eq!(state.focus, Target::Choice(2));
+    assert_eq!(state.focus, Target::Choice(3));
     state.focus = Target::InputRename;
     state.direction(Direction::Left, &controls(&state));
     assert_eq!(state.focus, Target::InputMode(id));

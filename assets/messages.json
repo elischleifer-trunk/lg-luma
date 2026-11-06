@@ -794,6 +794,36 @@
     "nl": "Alleen tonen als verbonden",
     "sv": "Visa endast när ansluten"
   },
+  "stateAppsOnly": {
+    "zh-tw": "僅限應用程式",
+    "en": "Apps only",
+    "de": "Nur Apps",
+    "es": "Solo en Apps",
+    "zh": "仅限应用",
+    "pt": "Só em Apps",
+    "it": "Solo in App",
+    "ru": "Только в приложениях",
+    "pl": "Tylko w aplikacjach",
+    "fr": "Applications uniquement",
+    "vi": "Chỉ trong Ứng dụng",
+    "nl": "Alleen in Apps",
+    "sv": "Endast i Appar"
+  },
+  "inputAppsOnly": {
+    "zh-tw": "不在主畫面顯示，連線時列於應用程式",
+    "en": "Not on Home; listed in Apps when connected",
+    "de": "Nicht auf Home; bei Verbindung unter Apps",
+    "es": "No en Inicio; en Apps cuando esté conectada",
+    "zh": "不在主屏幕显示，连接时列在应用中",
+    "pt": "Fora do Início; em Apps quando conectada",
+    "it": "Non in Home; in App quando connesso",
+    "ru": "Не на главном экране; в приложениях при подключении",
+    "pl": "Nie na ekranie głównym; w aplikacjach po podłączeniu",
+    "fr": "Pas sur l’accueil ; dans Applications si connecté",
+    "vi": "Không ở Màn hình chính; hiện trong Ứng dụng khi kết nối",
+    "nl": "Niet op Home; in Apps als verbonden",
+    "sv": "Inte på Hem; i Appar när ansluten"
+  },
   "renameInput": {
     "zh-tw": "重新命名",
     "en": "Rename",

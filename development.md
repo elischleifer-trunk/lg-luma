@@ -187,10 +187,17 @@ the cable is present and the TV does not report `hdmiSignalExist: false`, so a c
 unplugged or switched off takes no slot and the cards after it close the gap. A stale positive
 signal cannot override an unplugged cable. Firmware without signal information falls back to the
 cable state. **On** keeps the card (with **No signal** in its corner) and **Off** hides it.
+**Apps only** keeps the input off the Home strip and instead lists it at the front of the Apps
+page's All tab, under the same connected-with-signal test as Auto. It is meant for sources such as
+a soundbar that rarely need their own card. There it opens the input on OK and is found by search
+under its card title or port; it never appears in category tabs or Hidden.
 
 Visible HDMI inputs are the first cards of the Home favorites grid, ordered by port, rather
-than a separate row. They launch like apps but are not favorites: they cannot be reordered, hidden
-from Apps or opened in app options, and they do not appear on the Apps page. Visibility and names
+than a separate row. They launch like apps and cannot be reordered, hidden or deleted. Holding OK on
+an input card (or pressing the options key) opens its options: **Open** and **Remove from
+favorites**, which switches the input to **Apps only**. On the Apps page an Apps-only input opens
+the same options with **Add to favorites**, which returns it to **Auto**. Only **Apps only**
+inputs appear on the Apps page. Visibility and names
 stay in **Settings → Widgets → Inputs**. Each card shows its port in the corner. A recognized console gives the card its name, brand mark and official
 colour: Xbox (#107C10), Nintendo Switch (#E60012) or PlayStation (#003791). Recognition reads what the source reports
 about itself in `getAllInputStatus`: the HDMI SPD InfoFrame vendor/product and CEC OSD name fields
