@@ -419,7 +419,9 @@ The Home Assistant integration lives in `custom_components/luma` (installable th
 keeps only those where `GET /api/info` answers as Luma, suggests hosts and names from existing
 `webostv` entries, pairs in its config flow, and starts reauth when the TV answers 401. For a
 camera entity it sends Home Assistant's `camera_proxy_stream`/`camera_proxy` URLs signed with the
-camera's access token, from the internal URL unless `base_url` is given.
+camera's access token, from the internal URL unless `base_url` is given. The **Show example camera card**
+button sends a snapshot-only overlay of `custom_components/luma/example.jpg`, served without auth at
+`/api/luma/example.jpg`, so owners can preview the card without a camera.
 
 **Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
 camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds

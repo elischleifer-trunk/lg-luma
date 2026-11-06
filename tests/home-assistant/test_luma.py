@@ -345,3 +345,23 @@ async def test_a_restarted_tv_without_cameras_gets_the_list_again(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert pushes() == 2
+
+
+async def test_example_buttons_preview_the_camera_card_and_toast(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    await setup(hass, aioclient_mock)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    aioclient_mock.post(f"{TV}/api/overlay", json={"session": "s1", "paused": False})
+    aioclient_mock.post(f"{TV}/api/notify", json={"shown": True})
+    for button in ("show_example_camera_card", "show_example_toast"):
+        await hass.services.async_call(
+            "button", "press", {"entity_id": f"button.living_room_tv_{button}"}, blocking=True
+        )
+    overlay = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/overlay")
+    assert overlay[2]["snapshot_url"] == "http://192.168.1.10:8123/api/luma/example.jpg"
+    assert overlay[2]["title"] == "Front door"
+    assert "stream_url" not in overlay[2]
+    assert overlay[2]["pause"] is False
+    notify = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/notify")
+    assert notify[2] == {"message": "Example from Home Assistant: the washer is done"}

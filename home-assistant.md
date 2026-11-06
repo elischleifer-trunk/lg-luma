@@ -20,6 +20,9 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
 - **`luma.notify`** and a **Toast** notify entity: a standard webOS toast over any app.
 - **A Cameras app** in Luma: every Home Assistant camera in a full-screen grid. Arrows choose a
   camera, **OK** shows it full screen, **Back** returns to the grid and then closes it.
+- **Show example camera card** and **Show example toast** buttons: press them on the TV's device
+  page to see what each popup looks like, before writing any automation. The example card shows a
+  picture of a front door that comes with the integration, so it works without a camera.
 
 ## Set up
 
@@ -32,9 +35,9 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
    - **From the QR code:** scan it with your phone. It opens HACS on your Home Assistant with
      **Luma for LG webOS** ready to download, through the
      [My Home Assistant](https://my.home-assistant.io) link
-     `https://my.home-assistant.io/redirect/hacs_repository/?owner=EliSchleifer&repository=lg-luma&category=integration`.
+     `https://my.home-assistant.io/redirect/hacs_repository/?owner=elischleifer-trunk&repository=lg-luma&category=integration`.
      The first time, My Home Assistant asks for your Home Assistant's address.
-   - **By hand in HACS:** add `https://github.com/EliSchleifer/lg-luma` as a custom repository of
+   - **By hand in HACS:** add `https://github.com/elischleifer-trunk/lg-luma` as a custom repository of
      type _Integration_, then download **Luma for LG webOS**.
    - **Without HACS:** copy `custom_components/luma` from this repository into your Home Assistant
      `config/custom_components/` folder.
@@ -47,6 +50,10 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
    address and name are suggested.
 4. The TV shows a **six-digit pairing code**. Type it into Home Assistant. Codes expire after two
    minutes, and five wrong codes cancel the request.
+
+5. To check it works, open the TV under **Settings → Devices & services → Luma for LG webOS** and
+   press **Show example camera card** and **Show example toast**. The card closes after 15
+   seconds, or press **Back** on the remote.
 
 Turning **Home Assistant** off in Luma closes the port and forgets every paired server. Home
 Assistant then asks you to pair again the next time it is needed. Removing the integration in Home

@@ -15,9 +15,12 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
 
 import voluptuous as vol
+from aiohttp import web
+from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import CONF_HOST, CONF_PORT, EVENT_STATE_CHANGED, Platform
 from homeassistant.core import HomeAssistant, ServiceCall, callback
@@ -60,6 +63,10 @@ MAX_CAMERAS = 32
 # Luma keeps cameras in memory only; this often, check whether a restarted TV needs the list.
 CAMERAS_CHECK_INTERVAL = timedelta(minutes=1)
 
+# A picture of a front door that the example camera card shows, so it works without a camera.
+EXAMPLE_IMAGE_URL = "/api/luma/example.jpg"
+EXAMPLE_IMAGE = Path(__file__).parent / "example.jpg"
+
 
 @dataclass
 class LumaData:
@@ -92,7 +99,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
 def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
     """Every available camera with signed proxy URLs, for Luma's Cameras app."""
     try:
-        base_url = _local_url(hass, None)
+        base_url = local_url(hass)
     except ServiceValidationError:
         return []
     cameras = []
@@ -224,6 +231,19 @@ def _targets(hass: HomeAssistant, call: ServiceCall) -> list[LumaConfigEntry]:
     return entries
 
 
+def local_url(hass: HomeAssistant, base_url: str | None = None) -> str:
+    """How the TV reaches Home Assistant: base_url, or Home Assistant's local network URL."""
+    if base_url is None:
+        try:
+            # The TV is on the local network: prefer the internal address, allowing a bare IP.
+            base_url = get_url(hass, allow_external=False, allow_cloud=False, allow_ip=True)
+        except NoURLAvailableError as err:
+            raise ServiceValidationError(
+                "Set Home Assistant's local network URL, or pass base_url"
+            ) from err
+    return base_url.rstrip("/")
+
+
 def camera_urls(hass: HomeAssistant, entity_id: str, base_url: str | None) -> tuple[str, str]:
     """Home Assistant's MJPEG and snapshot proxy URLs for a camera, signed with its token.
 
@@ -237,19 +257,7 @@ def camera_urls(hass: HomeAssistant, entity_id: str, base_url: str | None) -> tu
     token = state.attributes.get("access_token")
     if not token:
         raise ServiceValidationError(f"{entity_id} is unavailable")
-    return _proxy_urls(_local_url(hass, base_url), entity_id, token)
-
-
-def _local_url(hass: HomeAssistant, base_url: str | None) -> str:
-    if base_url is None:
-        try:
-            # The TV is on the local network: prefer the internal address, allowing a bare IP.
-            base_url = get_url(hass, allow_external=False, allow_cloud=False, allow_ip=True)
-        except NoURLAvailableError as err:
-            raise ServiceValidationError(
-                "Set Home Assistant's local network URL, or pass base_url"
-            ) from err
-    return base_url.rstrip("/")
+    return _proxy_urls(local_url(hass, base_url), entity_id, token)
 
 
 def _proxy_urls(base_url: str, entity_id: str, token: str) -> tuple[str, str]:
@@ -301,7 +309,21 @@ async def _each(hass: HomeAssistant, entries: list[LumaConfigEntry], action) -> 
         raise HomeAssistantError("; ".join(failures))
 
 
+class ExampleImageView(HomeAssistantView):
+    """Serves the example camera card's picture. The TV loads it without credentials."""
+
+    url = EXAMPLE_IMAGE_URL
+    name = "api:luma:example"
+    requires_auth = False
+
+    async def get(self, request: web.Request) -> web.FileResponse:
+        return web.FileResponse(EXAMPLE_IMAGE, headers={"Cache-Control": "max-age=86400"})
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    if hass.http is not None:
+        hass.http.register_view(ExampleImageView())
+
     async def show_camera(call: ServiceCall) -> None:
         payload = overlay_payload(hass, dict(call.data))
         await _each(hass, _targets(hass, call), lambda client: client.show(payload))
