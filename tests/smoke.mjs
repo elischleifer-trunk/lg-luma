@@ -479,8 +479,8 @@ try {
   const tileEditorClosed = await scenario('tile-editor-closed', `${tileEditorOpen},back`);
   assert.equal(tileEditorClosed.modal, false);
   assert.equal(tileEditorClosed.focus, 'TileEditor');
-  // The exposed card fragments are real pointer targets, including after remote scrolling.
-  const edgeFavorites = [
+  // Favorites fill six columns, then wrap; Down reaches the second row by grid index.
+  const gridFavorites = [
     'netflix',
     'youtube.leanback.v4',
     'com.apple.appletv',
@@ -493,25 +493,17 @@ try {
   ];
   await fs.writeFile(
     preferences,
-    // Inputs off: this checks favorites-strip geometry from the first slot.
+    // Inputs off: this checks favorites-grid geometry from the first slot.
     JSON.stringify({
-      favorites: edgeFavorites,
+      favorites: gridFavorites,
       show_weather: false,
       input_modes: { 'com.webos.app.hdmi1': 'Off', 'com.webos.app.hdmi2': 'Off' },
     }),
   );
-  const edgeRight = await scenario('favorites-edge-right', 'home,click:1860:600');
-  assert.deepEqual(edgeRight.focus, { App: edgeFavorites[6] });
-  assert.equal(edgeRight.home_scroll, 0, 'Clicking the fragment must not move it');
-  const edgeLeft = await scenario(
-    'favorites-edge-left',
-    `home,down,${Array(6).fill('right').join(',')},click:40:600`,
-  );
-  assert.deepEqual(edgeLeft.focus, { App: edgeFavorites[0] });
-  assert.ok(
-    Math.abs(edgeLeft.home_scroll - 281.6) < 0.01,
-    'Pointer focus preserves strip position',
-  );
+  const gridDown = await scenario('favorites-grid-down', 'home,down,right,down');
+  assert.deepEqual(gridDown.focus, { App: gridFavorites[7] });
+  const gridUp = await scenario('favorites-grid-up', 'home,down,right,down,up');
+  assert.deepEqual(gridUp.focus, { App: gridFavorites[1] });
   await fs.writeFile(preferences, JSON.stringify({ show_weather: false }));
   const gradientDisabled = await scenario(
     'wallpaper-gradient-disabled',
