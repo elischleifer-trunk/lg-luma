@@ -226,8 +226,6 @@ pub struct State {
     /// Set by Refresh apps: the next inventory also reloads every app icon.
     pub reload_artwork: bool,
     pub launching: bool,
-    /// The Cameras app was opened; the main loop asks the Home Assistant service.
-    pub show_cameras: bool,
     pub uninstalling: Option<String>,
     pub notice: Option<(String, Instant)>,
     pub error: Option<String>,
@@ -249,6 +247,8 @@ pub struct State {
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
     pub home_assistant_address: Option<String>,
+    /// The Cameras app was opened; the main loop asks the Home Assistant service.
+    pub show_cameras: bool,
     /// Luma update (Settings → System), driven by the update worker.
     pub update: crate::update::InstallStatus,
     pub panel_started: Option<Instant>,
@@ -278,7 +278,6 @@ impl State {
             loading: false,
             reload_artwork: false,
             launching: false,
-            show_cameras: false,
             uninstalling: None,
             notice: None,
             error: None,
@@ -297,6 +296,7 @@ impl State {
             tile_editor: None,
             home_assistant_qr: None,
             home_assistant_address: None,
+            show_cameras: false,
             update: crate::update::InstallStatus::default(),
             panel_started: None,
             weather: weather::Weather::default(),
