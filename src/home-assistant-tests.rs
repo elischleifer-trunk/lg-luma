@@ -447,6 +447,7 @@ fn cameras_are_validated_and_open_as_a_gallery_refreshed_with_new_urls() {
     assert_eq!(params["mode"], "cameras");
     assert_eq!(params["port"], PORT);
     assert_eq!(params["cameras"][0]["name"], "Front door");
+    assert_eq!(params["cameras"][0]["id"], "0/camera.door");
     assert_eq!(params["cameras"][1]["name"], "camera.yard");
     assert_eq!(params["cameras"][1]["stream"], Value::Null);
     let session = params["session"].as_str().unwrap().to_owned();
@@ -534,6 +535,23 @@ fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
     // Pairing order, whichever server pushed last.
     let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
     assert_eq!(ids, ["camera.a1", "camera.b1", "camera.b2"]);
+    // The gallery tells servers' cameras apart even when they share an entity ID.
+    let session = Session {
+        id: "s".into(),
+        nonce: "n".into(),
+        media: None,
+        ends: h.now,
+        gallery: true,
+    };
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&second),
+        json!({"cameras": [camera("camera.a1")]}),
+    );
+    let params = h.api.gallery_params(&session);
+    assert_eq!(params["cameras"][0]["id"], "0/camera.a1");
+    assert_eq!(params["cameras"][1]["id"], "1/camera.a1");
     // A second push from one server replaces only its own list.
     let again = h.call(
         "POST",

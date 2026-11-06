@@ -734,12 +734,26 @@ impl<T: Tv> Api<T> {
     }
 
     fn gallery_params(&self, session: &Session) -> Value {
+        // Two servers can share an entity ID; the page tells cameras apart by ID, so prefix
+        // each with its server's position, which stays stable while the servers stay paired.
+        let cameras: Vec<Camera> = self
+            .cameras
+            .iter()
+            .enumerate()
+            .flat_map(|(server, (_, cameras))| {
+                cameras.iter().map(move |camera| Camera {
+                    id: format!("{server}/{}", camera.id),
+                    ..camera.clone()
+                })
+            })
+            .take(MAX_CAMERAS)
+            .collect();
         json!({
             "mode": "cameras",
             "session": session.id,
             "nonce": session.nonce,
             "port": PORT,
-            "cameras": self.all_cameras(),
+            "cameras": cameras,
         })
     }
 
