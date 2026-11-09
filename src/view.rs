@@ -826,31 +826,6 @@ fn header(
         );
         out.control(Target::Nav(index), rect, false);
     }
-    let button_size = 60.;
-    let rect = Rect::new(
-        1836. - button_size,
-        nav.y + (nav.h - button_size) / 2.,
-        button_size,
-        button_size,
-    );
-    let focused = state.focus == Target::TvSettings;
-    out.pill(rect, focused, false);
-    out.icon(
-        assets,
-        "settings",
-        Rect::new(
-            rect.x + (rect.w - 23.2) / 2.,
-            rect.y + (rect.h - 23.2) / 2.,
-            23.2,
-            23.2,
-        ),
-        if focused {
-            c(0x2c2c2c, 1.)
-        } else {
-            c(0xeeeeee, 0.73)
-        },
-    );
-    out.control(Target::TvSettings, rect, false);
 }
 
 fn tile(
@@ -2627,6 +2602,21 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                     chevron: false,
                 },
             );
+            row(
+                out,
+                state,
+                assets,
+                Row {
+                    target: Target::TvSettings,
+                    rect: Rect::new(640., 408.8 - s, 1120., 72.),
+                    title: language.t("tvSettings"),
+                    icon: Some("settings"),
+                    value: None,
+                    description: None,
+                    selected: false,
+                    chevron: true,
+                },
+            );
             for (position, (index, title, icon, value, chevron)) in [
                 (
                     3,
@@ -2657,7 +2647,7 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                     assets,
                     Row {
                         target: Target::Setting(index),
-                        rect: Rect::new(640., 408.8 + position as f32 * 84. - s, 1120., 72.),
+                        rect: Rect::new(640., 492.8 + position as f32 * 84. - s, 1120., 72.),
                         title,
                         icon: Some(icon),
                         value,

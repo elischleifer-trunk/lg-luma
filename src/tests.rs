@@ -1126,6 +1126,8 @@ fn system_category_owns_refresh_and_quit_and_restores_sidebar_focus() {
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::CheckUpdates);
     state.direction(Direction::Down, &controls(&state));
+    assert_eq!(state.focus, Target::TvSettings);
+    state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Setting(3));
     assert_eq!(state.activate(), vec![Effect::Reload]);
     state.direction(Direction::Down, &controls(&state));
@@ -3000,21 +3002,28 @@ fn clock_and_date_use_larger_text() {
 }
 
 #[test]
-fn tv_settings_button_is_centered_alongside_navigation() {
-    let rendered = scene(&ready());
-    let button = rendered
+fn tv_settings_lives_in_system_settings_instead_of_the_header() {
+    let home = scene(&ready());
+    assert!(!home.controls.iter().any(|c| c.target == Target::TvSettings));
+    let mut state = ready();
+    state.open(2);
+    state.section = crate::state::SYSTEM_SECTION;
+    state.panel_started = None;
+    let rendered = scene(&state);
+    let row = rendered
         .controls
         .iter()
         .find(|control| control.target == Target::TvSettings)
         .unwrap();
-    assert!((button.rect.y + button.rect.h / 2. - (42.5 + 68.6 / 2.)).abs() < 0.01);
-    assert_eq!(button.rect.h, 60.);
-    assert_eq!(button.rect.w, button.rect.h);
-    assert_eq!(button.rect.x + button.rect.w, 1836.);
-    let (x, y) = button.rect.center();
+    let (x, y) = row.rect.center();
     assert_eq!(
-        ready().hit_test(&rendered.controls, x, y),
+        state.hit_test(&rendered.controls, x, y),
         Some(Target::TvSettings)
+    );
+    state.focus = Target::TvSettings;
+    assert_eq!(
+        state.activate(),
+        vec![Effect::Launch("com.palm.app.settings".into())]
     );
 }
 
@@ -3213,7 +3222,7 @@ fn update_card_shows_both_versions_and_explicitly_starts_installation() {
             Some(Target::InstallUpdate)
         );
         state.direction(Direction::Down, &rendered.controls);
-        assert_eq!(state.focus, Target::Setting(3));
+        assert_eq!(state.focus, Target::TvSettings);
         state.focus = Target::InstallUpdate;
         state.direction(Direction::Left, &rendered.controls);
         assert_eq!(state.focus, Target::Sidebar(crate::state::SYSTEM_SECTION));
@@ -3508,4 +3517,39 @@ fn turning_on_home_assistant_opens_the_hacs_qr_dialog_and_adds_a_reopen_row() {
     assert!(!state.preferences.home_assistant);
     assert!(state.overlay.is_none());
     assert_eq!(rows(&state), 1);
+}
+
+#[test]
+fn cameras_app_is_listed_only_while_home_assistant_is_on_and_opens_the_gallery() {
+    use crate::model::CAMERAS_APP;
+    let mut state = ready();
+    let listed = |state: &State| state.inventory.apps.iter().any(|app| app.id == CAMERAS_APP);
+    assert!(!listed(&state));
+    state.preferences.home_assistant = true;
+    state.sync_custom_tiles();
+    assert!(listed(&state));
+    // A refreshed inventory keeps it once, and it is never offered for uninstall.
+    state.set_inventory(demo_inventory(), None);
+    assert_eq!(
+        state
+            .inventory
+            .apps
+            .iter()
+            .filter(|app| app.id == CAMERAS_APP)
+            .count(),
+        1
+    );
+    assert!(!crate::platform::can_uninstall(CAMERAS_APP));
+    let app = state
+        .inventory
+        .apps
+        .iter()
+        .find(|app| app.id == CAMERAS_APP)
+        .unwrap();
+    assert_eq!((app.title.as_str(), app.mark), ("Cameras", "camera"));
+    state.focus = Target::App(CAMERAS_APP.into());
+    assert_eq!(state.activate(), vec![Effect::Launch(CAMERAS_APP.into())]);
+    state.preferences.home_assistant = false;
+    state.sync_custom_tiles();
+    assert!(!listed(&state));
 }

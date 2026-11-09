@@ -321,6 +321,9 @@ fn effects(
                     platform.send(Request::Refresh);
                 }
             }
+            Effect::Launch(id) if id == model::CAMERAS_APP => {
+                state.show_cameras = true;
+            }
             Effect::Launch(id) => {
                 if scroll_preview::is_placeholder(&id) {
                     state.notify(state.preferences.language.t("scrollTestOnly"));
@@ -1209,6 +1212,9 @@ fn run() -> Result<(), String> {
             }
         }
         home_assistant.set_enabled(state.preferences.home_assistant);
+        if std::mem::take(&mut state.show_cameras) {
+            home_assistant.show_cameras();
+        }
         while let Ok(event) = home_assistant.events.try_recv() {
             let language = state.preferences.language;
             let notice = match event {
@@ -1228,6 +1234,7 @@ fn run() -> Result<(), String> {
                     eprintln!("Luma Home Assistant: {error}");
                     language.t("homeAssistantFailed").to_owned()
                 }
+                home_assistant::Event::Notice(key) => language.t(key).to_owned(),
             };
             state.notify(notice);
         }

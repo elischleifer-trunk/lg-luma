@@ -393,6 +393,179 @@ fn dismiss_closes_and_resumes_and_notify_sends_a_toast() {
 }
 
 #[test]
+fn cameras_are_validated_and_open_as_a_gallery_refreshed_with_new_urls() {
+    let mut h = Harness::new();
+    // Before pairing, the Cameras app explains what is missing instead of launching anything.
+    h.api.show_cameras(h.now);
+    assert_eq!(h.events.try_recv(), Ok(Event::Notice("camerasNotPaired")));
+    let token = h.pair();
+    let _ = h.events.try_iter().count();
+    h.api.show_cameras(h.now);
+    assert_eq!(h.events.try_recv(), Ok(Event::Notice("camerasNone")));
+
+    for bad in [
+        json!({}),
+        json!({"cameras": "camera.door"}),
+        json!({"cameras": [{"name": "No ID", "stream_url": "http://ha/x"}]}),
+        json!({"cameras": [{"id": "camera.door"}]}),
+        json!({"cameras": [{"id": "camera.door", "stream_url": "file:///etc/passwd"}]}),
+    ] {
+        assert_eq!(
+            h.call("POST", "/api/cameras", Some(&token), bad).status,
+            400
+        );
+    }
+    assert_eq!(
+        h.call("POST", "/api/cameras", None, json!({"cameras": []}))
+            .status,
+        401
+    );
+    let list = |token: &str| {
+        json!({"cameras": [
+            {"id": "camera.door", "name": "Front door",
+             "stream_url": format!("http://ha:8123/api/camera_proxy_stream/camera.door?token={token}"),
+             "snapshot_url": format!("http://ha:8123/api/camera_proxy/camera.door?token={token}")},
+            {"id": "camera.yard", "snapshot_url": format!("http://ha:8123/api/camera_proxy/camera.yard?token={token}")},
+        ]})
+    };
+    let stored = h.call("POST", "/api/cameras", Some(&token), list("a"));
+    assert_eq!(stored.body, json!({"cameras": 2}));
+    assert_eq!(
+        h.call("GET", "/api/status", Some(&token), json!({})).body["cameras"],
+        2
+    );
+    assert!(h.tv.calls().iter().all(|call| !call.starts_with("launch")));
+
+    h.api.show_cameras(h.now);
+    let launches: Vec<_> =
+        h.tv.calls()
+            .into_iter()
+            .filter(|call| call.starts_with("launch "))
+            .collect();
+    assert_eq!(launches.len(), 1);
+    let params: Value = serde_json::from_str(&launches[0]["launch ".len()..]).unwrap();
+    assert_eq!(params["mode"], "cameras");
+    assert_eq!(params["port"], PORT);
+    assert_eq!(params["cameras"][0]["name"], "Front door");
+    assert_eq!(params["cameras"][0]["id"], "0/camera.door");
+    assert_eq!(params["cameras"][1]["name"], "camera.yard");
+    assert_eq!(params["cameras"][1]["stream"], Value::Null);
+    let session = params["session"].as_str().unwrap().to_owned();
+
+    // Rotated tokens relaunch the open gallery with the same session; an unchanged list does not.
+    h.call("POST", "/api/cameras", Some(&token), list("a"));
+    h.call("POST", "/api/cameras", Some(&token), list("b"));
+    let launches: Vec<_> =
+        h.tv.calls()
+            .into_iter()
+            .filter(|call| call.starts_with("launch "))
+            .collect();
+    assert_eq!(launches.len(), 2);
+    let params: Value = serde_json::from_str(&launches[1]["launch ".len()..]).unwrap();
+    assert_eq!(params["session"], session.as_str());
+    assert!(
+        params["cameras"][0]["snapshot"]
+            .as_str()
+            .unwrap()
+            .ends_with("token=b")
+    );
+
+    // Once the page reports closing, new lists no longer relaunch it.
+    let nonce = params["nonce"].as_str().unwrap().to_owned();
+    let body = json!({"session": session, "nonce": nonce}).to_string();
+    let mut closed = h.api.handle(
+        &Request {
+            method: "POST",
+            path: "/api/overlay/closed",
+            authorization: None,
+            origin: Some("null"),
+            peer: LOOPBACK,
+            body: body.as_bytes(),
+        },
+        h.now,
+    );
+    assert_eq!(closed.body, json!({"ended": true}));
+    h.call("POST", "/api/cameras", Some(&token), list("c"));
+    assert_eq!(
+        h.tv.calls()
+            .iter()
+            .filter(|call| call.starts_with("launch "))
+            .count(),
+        2
+    );
+
+    // Only the first cameras are kept.
+    let many: Vec<_> = (0..40)
+        .map(|i| json!({"id": format!("camera.c{i}"), "snapshot_url": "http://ha/s"}))
+        .collect();
+    closed = h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": many}),
+    );
+    assert_eq!(closed.body, json!({"cameras": MAX_CAMERAS}));
+}
+
+#[test]
+fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
+    let mut h = Harness::new();
+    let first = h.pair();
+    h.now += PAIRING_COOLDOWN;
+    let second = h.pair();
+    let camera = |id: &str| json!({"id": id, "snapshot_url": format!("http://ha/{id}")});
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&second),
+        json!({"cameras": [camera("camera.b1"), camera("camera.b2")]}),
+    );
+    let both = h.call(
+        "POST",
+        "/api/cameras",
+        Some(&first),
+        json!({"cameras": [camera("camera.a1")]}),
+    );
+    assert_eq!(both.body, json!({"cameras": 3}));
+    // Status counts only the asking server's cameras.
+    assert_eq!(
+        h.call("GET", "/api/status", Some(&first), json!({})).body["cameras"],
+        1
+    );
+    // Pairing order, whichever server pushed last.
+    let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(ids, ["camera.a1", "camera.b1", "camera.b2"]);
+    // The gallery tells servers' cameras apart even when they share an entity ID.
+    let session = Session {
+        id: "s".into(),
+        nonce: "n".into(),
+        media: None,
+        ends: h.now,
+        gallery: true,
+    };
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&second),
+        json!({"cameras": [camera("camera.a1")]}),
+    );
+    let params = h.api.gallery_params(&session);
+    assert_eq!(params["cameras"][0]["id"], "0/camera.a1");
+    assert_eq!(params["cameras"][1]["id"], "1/camera.a1");
+    // A second push from one server replaces only its own list.
+    let again = h.call(
+        "POST",
+        "/api/cameras",
+        Some(&second),
+        json!({"cameras": [camera("camera.b3")]}),
+    );
+    assert_eq!(again.body, json!({"cameras": 2}));
+    h.call("DELETE", "/api/pair", Some(&first), json!({}));
+    let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(ids, ["camera.b3"]);
+}
+
+#[test]
 fn an_uninstalled_overlay_is_prepared_instead_of_launched() {
     let mut h = Harness::new();
     let token = h.pair();
