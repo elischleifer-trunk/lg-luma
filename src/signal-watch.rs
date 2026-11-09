@@ -5,10 +5,28 @@
 //! seconds, so mode switches and HDCP renegotiation, which drop the signal briefly, do not
 //! close the input.
 use crate::model::Input;
+use serde_json::Value;
 use std::time::{Duration, Instant};
 
 /// What the TV reported in one poll: the foreground app and the HDMI inputs.
 pub type Snapshot = (Option<String>, Vec<Input>);
+
+/// Whether `id` is an HDMI input app (`com.webos.app.hdmiN`).
+pub fn is_input(id: &str) -> bool {
+    id.strip_prefix("com.webos.app.hdmi")
+        .is_some_and(|n| !n.is_empty() && n.len() <= 2 && n.bytes().all(|b| b.is_ascii_digit()))
+}
+
+/// Whether tvpower's getPowerState reply says the screen is on and staying on. Standby, screen
+/// off and a pending power change all count as off: a console following the TV off over CEC
+/// must not send the TV Home.
+pub fn powered_on(reply: &Value) -> bool {
+    reply.get("state").and_then(Value::as_str) == Some("Active")
+        && reply
+            .get("processing")
+            .and_then(Value::as_str)
+            .is_none_or(str::is_empty)
+}
 
 #[derive(Default)]
 pub struct Watch {
@@ -22,6 +40,8 @@ pub struct Watch {
 
 impl Watch {
     const INTERVAL: Duration = Duration::from_secs(2);
+    /// While no HDMI input is in front, only the foreground app is read, and less often.
+    const IDLE: Duration = Duration::from_secs(5);
     const RETRY: Duration = Duration::from_secs(30);
     pub const GRACE: Duration = Duration::from_secs(5);
 
@@ -54,7 +74,13 @@ impl Watch {
                 return Err(error);
             }
         };
-        self.next = Some(now + Self::INTERVAL);
+        self.next = Some(
+            now + if foreground.is_some() {
+                Self::INTERVAL
+            } else {
+                Self::IDLE
+            },
+        );
         let input = foreground
             .as_deref()
             .and_then(|id| inputs.iter().find(|input| input.id == id));
@@ -260,6 +286,58 @@ mod tests {
             HDMI,
             vec![input(HDMI, Some(true), Some(false))]
         ));
+    }
+
+    #[test]
+    fn standby_or_another_app_disarms_and_slows_polling() {
+        let mut watch = Watch::default();
+        let start = Instant::now();
+        assert!(!poll(
+            &mut watch,
+            start,
+            HDMI,
+            vec![input(HDMI, Some(true), Some(true))]
+        ));
+        // The TV went to standby (the worker reports no input in front).
+        watch.in_flight = true;
+        assert!(
+            !watch
+                .completed(start + Duration::from_secs(2), Ok((None, vec![])))
+                .unwrap()
+        );
+        assert!(!watch.due(start + Duration::from_secs(4), true));
+        assert!(watch.due(start + Duration::from_secs(2) + Watch::IDLE, true));
+        // Back on, the console now off: never seen with a signal again, so it stays.
+        assert!(!poll(
+            &mut watch,
+            start + Duration::from_secs(20),
+            HDMI,
+            vec![input(HDMI, Some(true), Some(false))]
+        ));
+        assert!(!poll(
+            &mut watch,
+            start + Duration::from_secs(30),
+            HDMI,
+            vec![input(HDMI, Some(true), Some(false))]
+        ));
+    }
+
+    #[test]
+    fn input_ids_and_power_states() {
+        assert!(is_input("com.webos.app.hdmi1"));
+        assert!(is_input("com.webos.app.hdmi12"));
+        assert!(!is_input("com.webos.app.hdmi"));
+        assert!(!is_input("com.webos.app.hdmi1a"));
+        assert!(!is_input("com.webos.app.livetv"));
+        assert!(powered_on(
+            &serde_json::json!({"returnValue":true,"state":"Active"})
+        ));
+        assert!(!powered_on(
+            &serde_json::json!({"state":"Active","processing":"Request Power Off"})
+        ));
+        assert!(!powered_on(&serde_json::json!({"state":"Active Standby"})));
+        assert!(!powered_on(&serde_json::json!({"state":"Screen Off"})));
+        assert!(!powered_on(&serde_json::json!({})));
     }
 
     #[test]

@@ -264,7 +264,7 @@ impl Platform {
                         Ok(desktop_inventory.inputs.clone())
                     }),
                     Request::WatchSignal => Response::Signal(if webos {
-                        foreground_app().and_then(|app| Ok((app, input_inventory()?)))
+                        signal_snapshot()
                     } else {
                         Err("No TV inputs on the desktop".into())
                     }),
@@ -663,14 +663,23 @@ fn checked_response(value: Value) -> Result<Value, String> {
 }
 
 fn inventory_read(uri: &str, field: &str) -> Result<Value, String> {
+    service_read(uri, field)?
+        .get(field)
+        .cloned()
+        .ok_or_else(|| format!("{uri}: Missing TV inventory field: {field}"))
+}
+
+/// The reply to a sam/EIM/tvpower read that Luma's own role may not be allowed to make. A
+/// direct reply without `field` falls back to the elevated read.
+fn service_read(uri: &str, field: &str) -> Result<Value, String> {
     // In place of LG's Home, Luma holds LG Home's LS2 role and asks sam/EIM itself: an early
     // root integration can bring this Home up long before Homebrew's service starts (~21 s vs
     // ~51 s into a cold boot). A refused call answers at once and falls back below.
     if runs_as_lg_home()
         && let Ok(response) = call(uri, json!({}))
-        && let Some(value) = response.get(field)
+        && response.get(field).is_some()
     {
-        return Ok(value.clone());
+        return Ok(response);
     }
     // Fixed inventory commands use Homebrew's elevated service.
     // Use the same one-reply invocation as the web launcher, without guessing
@@ -682,7 +691,7 @@ fn inventory_read(uri: &str, field: &str) -> Result<Value, String> {
         "luna://org.webosbrew.hbchannel.service/exec",
         json!({"command": command}),
     )?;
-    inventory_payload(&envelope, field).map_err(|error| {
+    command_reply(&envelope).map_err(|error| {
         let error = format!("{uri}: {error}");
         eprintln!("Luma TV inventory: {error}");
         error
@@ -842,18 +851,29 @@ fn inventory() -> Result<(Inventory, Option<String>), String> {
     }
 }
 
-/// The app in front; `None` when sam reports none.
-fn foreground_app() -> Result<Option<String>, String> {
-    let reply = raw_call(
+/// The HDMI input in front with every input's status, for `signal_watch`. Inputs are read only
+/// while an HDMI input is in front of a TV that is on, so polls during other apps (or standby,
+/// where a console follows the TV off over CEC) cost one read and never go Home.
+fn signal_snapshot() -> Result<crate::signal_watch::Snapshot, String> {
+    let foreground = service_read(
         "luna://com.webos.applicationManager/getForegroundAppInfo",
-        &json!({}),
-    )
-    .and_then(checked_response)?;
-    Ok(reply
+        "appId",
+    )?;
+    let Some(app) = foreground
         .get("appId")
         .and_then(Value::as_str)
-        .filter(|id| !id.is_empty())
-        .map(str::to_owned))
+        .filter(|id| crate::signal_watch::is_input(id))
+    else {
+        return Ok((None, vec![]));
+    };
+    let power = service_read(
+        "luna://com.webos.service.tvpower/power/getPowerState",
+        "state",
+    )?;
+    if !crate::signal_watch::powered_on(&power) {
+        return Ok((None, vec![]));
+    }
+    Ok((Some(app.to_owned()), input_inventory()?))
 }
 
 fn input_inventory() -> Result<Vec<Input>, String> {

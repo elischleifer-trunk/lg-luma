@@ -1720,8 +1720,12 @@ fn run() -> Result<(), String> {
         if input_refresh.due(Instant::now(), inputs_active) {
             platform.send(Request::RefreshInputs);
         }
-        // Another app is in front: watch for its HDMI source switching off.
-        if signal_watch.due(Instant::now(), webos && !(focused && visible)) {
+        // Another app is in front of Luma as Home: watch for its HDMI source switching off.
+        // As a plain app, Home would be LG's own, so leave the input alone there.
+        if signal_watch.due(
+            Instant::now(),
+            webos && options.webos_home && !(focused && visible),
+        ) {
             platform.send(Request::WatchSignal);
         }
         weather_tick(&mut state, &weather_service, visible);

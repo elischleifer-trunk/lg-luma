@@ -188,12 +188,16 @@ unplugged or switched off takes no slot and the cards after it close the gap. A 
 signal cannot override an unplugged cable. Firmware without signal information falls back to the
 cable state. **On** keeps the card (with **No signal** in its corner) and **Off** hides it.
 
-While another app is in front, Luma checks every two seconds (on the platform worker) which app
-that is and, when it is an HDMI input, that input's status. An input that was seen with a signal
-and then reports `hdmiSignalExist: false` or an unplugged cable for five seconds sends the TV
-back to Home, so switching a console off returns to Luma instead of a **No signal** screen. An
-input opened while its source is still off is left alone, and brief drops (mode switches, HDCP)
-do not count. A failed foreground or input read is logged and retried after thirty seconds.
+When Luma runs as Home and another app is in front, the platform worker reads the foreground
+app every five seconds through the same direct-or-Homebrew path as other sam/EIM reads. While an
+HDMI input is in front it reads every two seconds, and also reads tvpower's power state and then
+the inputs only while the TV is `Active` with no pending power change. An input that was seen with
+a signal and then reports `hdmiSignalExist: false` or an unplugged cable for five seconds sends
+the TV back to Home, so switching a console off returns to Luma instead of a **No signal**
+screen. An input opened while its source is still off is left alone, brief drops (mode switches,
+HDCP) do not count, and standby disarms the watch so a console following the TV off over CEC
+never launches Home. A failed read is logged and retried after thirty seconds. Luma run as a plain
+app does not watch inputs, since Home would then be LG's own.
 
 Visible HDMI inputs are the first cards of the Home favorites grid, ordered by port, rather
 than a separate row. They launch like apps but are not favorites: they cannot be reordered, hidden
