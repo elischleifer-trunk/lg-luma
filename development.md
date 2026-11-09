@@ -194,6 +194,17 @@ page's All tab, under the same connected-with-signal test as Auto. It is meant f
 a soundbar that rarely need their own card. There it opens the input on OK and is found by search
 under its card title or port; it never appears in category tabs or Hidden.
 
+When Luma runs as Home and another app is in front, the platform worker reads the foreground
+app every five seconds through the same direct-or-Homebrew path as other sam/EIM reads. While an
+HDMI input is in front it reads every two seconds, and also reads tvpower's power state and then
+the inputs only while the TV is `Active` with no pending power change. An input that was seen with
+a signal and then reports `hdmiSignalExist: false` or an unplugged cable for five seconds sends
+the TV back to Home, so switching a console off returns to Luma instead of a **No signal**
+screen. An input opened while its source is still off is left alone, brief drops (mode switches,
+HDCP) do not count, and standby disarms the watch so a console following the TV off over CEC
+never launches Home. A failed read is logged and retried after thirty seconds. Luma run as a plain
+app does not watch inputs, since Home would then be LG's own.
+
 Visible HDMI inputs are the first cards of the Home favorites grid, ordered by port, rather
 than a separate row. They launch like apps and cannot be reordered, hidden or deleted. Holding OK on
 an input card (or pressing the options key) opens its options: **Open** and **Remove from

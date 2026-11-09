@@ -25,6 +25,8 @@ mod renderer;
 #[path = "scroll-preview.rs"]
 mod scroll_preview;
 mod sdl_events;
+#[path = "signal-watch.rs"]
+mod signal_watch;
 mod state;
 mod storage;
 mod text_rendering;
@@ -978,6 +980,7 @@ fn run() -> Result<(), String> {
     // When to ask for the inventory again after a failed load (State::inventory_failed).
     let mut inventory_retry: Option<Instant> = None;
     let mut input_refresh = input_refresh::Refresh::default();
+    let mut signal_watch = signal_watch::Watch::default();
     let scripted_input = !options.script.is_empty();
     let mut scene = compose(
         &mut state,
@@ -1158,6 +1161,14 @@ fn run() -> Result<(), String> {
                         eprintln!("Luma HDMI refresh: {error}");
                     }
                 }
+                Response::Signal(result) => match signal_watch.completed(Instant::now(), result) {
+                    Ok(true) => {
+                        eprintln!("Luma: the HDMI source in front lost its signal; going Home");
+                        platform.send(Request::GoHome);
+                    }
+                    Ok(false) => {}
+                    Err(error) => eprintln!("Luma HDMI signal watch: {error}"),
+                },
                 Response::Launched(result) => {
                     let pending = state.launch_response(result);
                     running &= effects(
@@ -1715,6 +1726,14 @@ fn run() -> Result<(), String> {
         }
         if input_refresh.due(Instant::now(), inputs_active) {
             platform.send(Request::RefreshInputs);
+        }
+        // Another app is in front of Luma as Home: watch for its HDMI source switching off.
+        // As a plain app, Home would be LG's own, so leave the input alone there.
+        if signal_watch.due(
+            Instant::now(),
+            webos && options.webos_home && !(focused && visible),
+        ) {
+            platform.send(Request::WatchSignal);
         }
         weather_tick(&mut state, &weather_service, visible);
         // SDL-webOS disables text input when its own panel is dismissed, even

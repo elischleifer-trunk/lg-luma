@@ -175,6 +175,10 @@ pub fn redirect_to_home() -> Result<bool, String> {
 pub enum Request {
     Refresh,
     RefreshInputs,
+    /// The foreground app and HDMI inputs, for `signal_watch`.
+    WatchSignal,
+    /// Bring Home to the front.
+    GoHome,
     Launch(String),
     Uninstall(String),
     SyncSplash(String),
@@ -186,6 +190,7 @@ pub enum Request {
 pub enum Response {
     Inventory(Result<(Inventory, Option<String>), String>),
     Inputs(Result<Vec<Input>, String>),
+    Signal(Result<crate::signal_watch::Snapshot, String>),
     Launched(Result<(), String>),
     Uninstalled {
         id: String,
@@ -258,6 +263,20 @@ impl Platform {
                     } else {
                         Ok(desktop_inventory.inputs.clone())
                     }),
+                    Request::WatchSignal => Response::Signal(if webos {
+                        signal_snapshot()
+                    } else {
+                        Err("No TV inputs on the desktop".into())
+                    }),
+                    Request::GoHome => {
+                        if webos {
+                            let _ = call(
+                                "luna://com.webos.applicationManager/launch",
+                                json!({"id": home_id()}),
+                            );
+                        }
+                        continue;
+                    }
                     Request::Uninstall(id) => {
                         // Validate again at the worker boundary, not just in the UI.
                         let result = uninstall_request(&id).and_then(|(_, _)| {
@@ -644,14 +663,23 @@ fn checked_response(value: Value) -> Result<Value, String> {
 }
 
 fn inventory_read(uri: &str, field: &str) -> Result<Value, String> {
+    service_read(uri, field)?
+        .get(field)
+        .cloned()
+        .ok_or_else(|| format!("{uri}: Missing TV inventory field: {field}"))
+}
+
+/// The reply to a sam/EIM/tvpower read that Luma's own role may not be allowed to make. A
+/// direct reply without `field` falls back to the elevated read.
+fn service_read(uri: &str, field: &str) -> Result<Value, String> {
     // In place of LG's Home, Luma holds LG Home's LS2 role and asks sam/EIM itself: an early
     // root integration can bring this Home up long before Homebrew's service starts (~21 s vs
     // ~51 s into a cold boot). A refused call answers at once and falls back below.
     if runs_as_lg_home()
         && let Ok(response) = call(uri, json!({}))
-        && let Some(value) = response.get(field)
+        && response.get(field).is_some()
     {
-        return Ok(value.clone());
+        return Ok(response);
     }
     // Fixed inventory commands use Homebrew's elevated service.
     // Use the same one-reply invocation as the web launcher, without guessing
@@ -663,7 +691,7 @@ fn inventory_read(uri: &str, field: &str) -> Result<Value, String> {
         "luna://org.webosbrew.hbchannel.service/exec",
         json!({"command": command}),
     )?;
-    inventory_payload(&envelope, field).map_err(|error| {
+    command_reply(&envelope).map_err(|error| {
         let error = format!("{uri}: {error}");
         eprintln!("Luma TV inventory: {error}");
         error
@@ -821,6 +849,31 @@ fn inventory() -> Result<(Inventory, Option<String>), String> {
             Some(format!("Inputs could not be refreshed: {error}")),
         )),
     }
+}
+
+/// The HDMI input in front with every input's status, for `signal_watch`. Inputs are read only
+/// while an HDMI input is in front of a TV that is on, so polls during other apps (or standby,
+/// where a console follows the TV off over CEC) cost one read and never go Home.
+fn signal_snapshot() -> Result<crate::signal_watch::Snapshot, String> {
+    let foreground = service_read(
+        "luna://com.webos.applicationManager/getForegroundAppInfo",
+        "appId",
+    )?;
+    let Some(app) = foreground
+        .get("appId")
+        .and_then(Value::as_str)
+        .filter(|id| crate::signal_watch::is_input(id))
+    else {
+        return Ok((None, vec![]));
+    };
+    let power = service_read(
+        "luna://com.webos.service.tvpower/power/getPowerState",
+        "state",
+    )?;
+    if !crate::signal_watch::powered_on(&power) {
+        return Ok((None, vec![]));
+    }
+    Ok((Some(app.to_owned()), input_inventory()?))
 }
 
 fn input_inventory() -> Result<Vec<Input>, String> {
