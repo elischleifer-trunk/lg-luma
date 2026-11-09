@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
-import { bumpVersion, syncVersions } from '../tools/sync-version.mjs';
+import { bumpVersion, setVersion, syncVersions } from '../tools/sync-version.mjs';
 import { mirrorFeed } from '../tools/mirror-feed.mjs';
+import { buildPrompt, composeNotes, pullNumbers } from '../tools/release-notes.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const metadata = ['appinfo.json', 'Cargo.toml', 'Cargo.lock', 'readme.md'];
@@ -131,4 +132,65 @@ test("R2 mirror rewrites only this release's asset URLs", () => {
   const foreign = structuredClone(feed);
   foreign.packages[0].manifest.ipkUrl = 'https://example.com/x_arm.ipk';
   assert.throws(() => mirrorFeed(foreign, 'v2.16.2', 'https://luma.elischleifer.com'));
+});
+
+test('nightly builds set an exact version and synchronize every file', async (t) => {
+  const directory = await fixture(t, '2.20.0');
+  await syncVersions(directory);
+  assert.deepEqual(await setVersion(directory, '2.20.7'), {
+    previous: '2.20.0',
+    version: '2.20.7',
+  });
+  assert.equal((await syncVersions(directory, { check: true })).version, '2.20.7');
+  const before = await readMetadata(directory);
+  for (const version of ['2.20', '2.20.7-nightly', '02.20.7', undefined]) {
+    await assert.rejects(setVersion(directory, version), /numeric major.minor.patch/);
+  }
+  assert.deepEqual(await readMetadata(directory), before, 'a rejected version must not write');
+});
+
+test('release notes find each linked pull request once, in order', () => {
+  const generated = [
+    "## What's Changed",
+    '* Add a Cameras app by @a in https://github.com/o/lg-luma/pull/14',
+    '* Six-column grid by @a in https://github.com/o/lg-luma/pull/16',
+    '* Follow-up by @a in https://github.com/o/lg-luma/pull/14',
+    '* Elsewhere https://github.com/o/lg-lumaX/pull/99 and https://github.com/x/lg-luma/pull/98',
+    '**Full Changelog**: https://github.com/o/lg-luma/compare/v2.20.0...v2.21.0',
+  ].join('\n');
+  assert.deepEqual(pullNumbers(generated, 'o/lg-luma'), [14, 16]);
+});
+
+test('release notes put the summary above the generated list', () => {
+  const generated = "## What's Changed\n* Thing by @a in https://github.com/o/r/pull/1\n";
+  const release = composeNotes({ summary: '- Better.\n', generated, previous: 'v2.20.0' });
+  assert.equal(release, `## What's new\n\n- Better.\n\n${generated}`);
+  assert.equal(composeNotes({ summary: '', generated }), generated, 'no summary, list only');
+  const nightly = composeNotes({
+    summary: '- Better.',
+    generated,
+    nightly: true,
+    target: 'abc123',
+    previous: 'v2.20.0',
+  });
+  assert.match(nightly, /^> \[!WARNING\]\n> Nightly build of `main` at abc123/);
+  assert.match(nightly, /everything merged since v2\.20\.0/);
+  assert.ok(nightly.indexOf("## What's new") < nightly.indexOf("## What's Changed"));
+});
+
+test('release note prompts carry each pull request as data', () => {
+  const prompt = buildPrompt(
+    [
+      { number: 14, title: 'Add Cameras', labels: ['feature'], body: 'Adds an app.' },
+      { number: 15, title: 'CI', labels: [], body: null },
+    ],
+    { tag: 'v2.21.0', previous: 'v2.20.0' },
+  );
+  assert.match(prompt, /^Changes from v2\.20\.0 to v2\.21\.0:/);
+  assert.match(
+    prompt,
+    /<pull_request number="14">\nTitle: Add Cameras\nLabels: feature\n\nAdds an app\./,
+  );
+  assert.match(prompt, /<pull_request number="15">\nTitle: CI\nLabels: none\n\n\(no description\)/);
+  assert.match(buildPrompt([], { tag: 'v1.0.0', previous: '' }), /^Changes from the first commit/);
 });
