@@ -175,6 +175,10 @@ pub fn redirect_to_home() -> Result<bool, String> {
 pub enum Request {
     Refresh,
     RefreshInputs,
+    /// The foreground app and HDMI inputs, for `signal_watch`.
+    WatchSignal,
+    /// Bring Home to the front.
+    GoHome,
     Launch(String),
     Uninstall(String),
     SyncSplash(String),
@@ -186,6 +190,7 @@ pub enum Request {
 pub enum Response {
     Inventory(Result<(Inventory, Option<String>), String>),
     Inputs(Result<Vec<Input>, String>),
+    Signal(Result<crate::signal_watch::Snapshot, String>),
     Launched(Result<(), String>),
     Uninstalled {
         id: String,
@@ -258,6 +263,20 @@ impl Platform {
                     } else {
                         Ok(desktop_inventory.inputs.clone())
                     }),
+                    Request::WatchSignal => Response::Signal(if webos {
+                        foreground_app().and_then(|app| Ok((app, input_inventory()?)))
+                    } else {
+                        Err("No TV inputs on the desktop".into())
+                    }),
+                    Request::GoHome => {
+                        if webos {
+                            let _ = call(
+                                "luna://com.webos.applicationManager/launch",
+                                json!({"id": home_id()}),
+                            );
+                        }
+                        continue;
+                    }
                     Request::Uninstall(id) => {
                         // Validate again at the worker boundary, not just in the UI.
                         let result = uninstall_request(&id).and_then(|(_, _)| {
@@ -821,6 +840,20 @@ fn inventory() -> Result<(Inventory, Option<String>), String> {
             Some(format!("Inputs could not be refreshed: {error}")),
         )),
     }
+}
+
+/// The app in front; `None` when sam reports none.
+fn foreground_app() -> Result<Option<String>, String> {
+    let reply = raw_call(
+        "luna://com.webos.applicationManager/getForegroundAppInfo",
+        &json!({}),
+    )
+    .and_then(checked_response)?;
+    Ok(reply
+        .get("appId")
+        .and_then(Value::as_str)
+        .filter(|id| !id.is_empty())
+        .map(str::to_owned))
 }
 
 fn input_inventory() -> Result<Vec<Input>, String> {

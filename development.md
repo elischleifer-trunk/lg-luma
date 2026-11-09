@@ -194,6 +194,13 @@ page's All tab, under the same connected-with-signal test as Auto. It is meant f
 a soundbar that rarely need their own card. There it opens the input on OK and is found by search
 under its card title or port; it never appears in category tabs or Hidden.
 
+While another app is in front, Luma checks every two seconds (on the platform worker) which app
+that is and, when it is an HDMI input, that input's status. An input that was seen with a signal
+and then reports `hdmiSignalExist: false` or an unplugged cable for five seconds sends the TV
+back to Home, so switching a console off returns to Luma instead of a **No signal** screen. An
+input opened while its source is still off is left alone, and brief drops (mode switches, HDCP)
+do not count. A failed foreground or input read is logged and retried after thirty seconds.
+
 Visible HDMI inputs are the first cards of the Home favorites grid, ordered by port, rather
 than a separate row. They launch like apps and cannot be reordered, hidden or deleted. Holding OK on
 an input card (or pressing the options key) opens its options: **Open** and **Remove from
