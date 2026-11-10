@@ -4,9 +4,9 @@ run-name: 'Release Luma (${{ inputs.bump }})'
 # The only way to publish Luma. Run it from Actions → Release → Run workflow on main:
 #   1. Bump the version (minor by default, or major) on a release/vX.Y.Z branch.
 #   2. Run the full CI validation (checks, smoke suites, verified ARM IPK) on that commit.
-#   3. Fast-forward main to the release commit, publish the GitHub release (a Claude-written
-#      "What's new" summary over the list of merged pull requests; tools/release-notes.mjs), mirror
-#      it to R2.
+#   3. Fast-forward main to the release commit, publish the GitHub release (a "What's new"
+#      section from the merged pull requests' summaries over the list of them;
+#      tools/release-notes.mjs), mirror it to R2.
 # If any step before 3 fails, main and the published feed are untouched.
 
 on:
@@ -96,25 +96,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # Cone mode also checks out the root files (package.json, pnpm-lock.yaml).
           sparse-checkout: tools
-      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@v8
         with:
           name: luma-release
           path: release
       # Written before main moves, so a GitHub API failure here leaves nothing half-published.
-      # Claude's summary is best effort: without ANTHROPIC_API_KEY the notes are the PR list.
       - name: Write release notes
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TAG: ${{ needs.version.outputs.tag }}
           SHA: ${{ needs.version.outputs.sha }}
         run: |

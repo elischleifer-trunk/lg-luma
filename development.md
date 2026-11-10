@@ -1124,14 +1124,19 @@ workflow.
 ### Release notes
 
 `tools/release-notes.mjs` writes the notes for releases and nightlies. It asks GitHub for the list
-of pull requests merged since the previous stable release, reads each one's title, labels and
-description, and has Claude (`claude-opus-5-5`) write a short user-facing **What's new** section
-above that list, with CI, build and docs changes folded into one "Behind the scenes" line.
+of pull requests merged since the previous stable release and puts a **What's new** section above
+that list. Each pull request is grouped by the files it changed:
 
-It needs the repository secret `ANTHROPIC_API_KEY`. Without it, or if the Claude API call fails or
-declines, the notes are GitHub's pull request list alone and the run continues; only a GitHub API
-failure stops it, before anything is published. Edit `SYSTEM_PROMPT` in the script to change the
-tone or rules.
+- **On the TV**: the app (`src/`, `tv/`, `tv-helper/src/`, `assets/`, `overlay/`,
+  `vector-geometry/`, `appinfo.json`; test files don't count).
+- **Home Assistant**: `custom_components/`, `hacs.json`.
+- **Behind the scenes**: everything else (CI, tooling, tests, docs), title only.
+
+The first two carry the pull request's own summary: the first paragraph, or the top-level bullets
+(at most six), of the description's `## Summary` section, or of the text before its first heading.
+So the PR title and summary are what users read; write them for someone holding the remote. No
+external service or secret is involved; a GitHub API failure stops the run before anything is
+published.
 
 ### Nightly builds
 
@@ -1286,7 +1291,6 @@ Settings → Secrets and variables → Actions:
 | Secret (optional)   | `CLOUDFLARE_PURGE_TOKEN` | zone cache-purge token                  |
 | Variable (optional) | `CLOUDFLARE_ZONE_ID`     | `elischleifer.com` zone ID              |
 | Variable (optional) | `LUMA_PUBLIC_URL`        | default `https://luma.elischleifer.com` |
-| Secret (optional)   | `ANTHROPIC_API_KEY`      | Claude API key for release summaries    |
 
 Then run **Publish to Cloudflare R2** once with an empty tag to mirror the current release, and check
 `curl -sI https://luma.elischleifer.com/repo.json`.

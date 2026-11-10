@@ -4,7 +4,13 @@ import path from 'node:path';
 import test from 'node:test';
 import { bumpVersion, setVersion, syncVersions } from '../tools/sync-version.mjs';
 import { mirrorFeed } from '../tools/mirror-feed.mjs';
-import { buildPrompt, composeNotes, pullNumbers } from '../tools/release-notes.mjs';
+import {
+  classify,
+  composeNotes,
+  pullNumbers,
+  summaryOf,
+  whatsNew,
+} from '../tools/release-notes.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const metadata = ['appinfo.json', 'Cargo.toml', 'Cargo.lock', 'readme.md'];
@@ -178,19 +184,71 @@ test('release notes put the summary above the generated list', () => {
   assert.ok(nightly.indexOf("## What's new") < nightly.indexOf("## What's Changed"));
 });
 
-test('release note prompts carry each pull request as data', () => {
-  const prompt = buildPrompt(
+test('release notes group pull requests by the files they change', () => {
+  assert.equal(classify(['src/signal-watch.rs', 'src/main.rs']), 'app');
+  assert.equal(classify(['tv/home.sh']), 'app');
+  assert.equal(classify(['development.md', 'appinfo.json']), 'app');
+  assert.equal(classify(['custom_components/luma/light.py', 'hacs.json']), 'homeAssistant');
+  assert.equal(classify(['src/app-artwork-tests.rs', 'src/tests.rs']), 'internal', 'tests only');
+  assert.equal(classify(['tv-helper/src/tests.rs', 'tests/smoke.mjs']), 'internal');
+  assert.equal(classify(['.github/workflows/ci.yml', 'tools/package.mjs']), 'internal');
+  assert.equal(classify(['custom_components/luma/x.py', 'src/view.rs']), 'app', 'app wins');
+  assert.equal(classify([]), 'internal');
+});
+
+test("release notes take each pull request's own summary", () => {
+  // Shapes of real descriptions: a Summary paragraph, Summary bullets, and no headings.
+  const paragraph =
+    '## Summary\nAdd automatic return-to-Home when an HDMI input\nloses its signal.\n\n' +
+    'More detail.\n\n## Key Changes\n- **New module**: x';
+  assert.deepEqual(summaryOf(paragraph), [
+    'Add automatic return-to-Home when an HDMI input loses its signal.',
+  ]);
+  const bullets =
+    '## Summary\n\n- **Six-column grid:** Favorites wrap.\n  - nested detail\n' +
+    '* **Most recent first:** Opened apps move.\n\n## Testing\n- `cargo test`';
+  assert.deepEqual(summaryOf(bullets), [
+    '- **Six-column grid:** Favorites wrap.',
+    '- **Most recent first:** Opened apps move.',
+  ]);
+  assert.deepEqual(summaryOf('Fixes the clock.\r\n\r\nhttps://claude.ai/code/x'), [
+    'Fixes the clock.',
+  ]);
+  assert.deepEqual(summaryOf('<!-- template -->\n## Testing\n- ran it'), []);
+  assert.deepEqual(
+    summaryOf('🤖 Generated with [Claude Code](https://claude.com/claude-code)'),
+    [],
+  );
+  assert.deepEqual(summaryOf(null), []);
+  const many = `## Summary\n${Array.from({ length: 8 }, (_, i) => `- item ${i}`).join('\n')}`;
+  assert.deepEqual(summaryOf(many).slice(-2), ['- item 5', '- …and 2 more']);
+});
+
+test("release notes list what's new by group, app first", () => {
+  const notes = whatsNew([
+    { title: 'Run CI on Trunk runners', body: '## Summary\n- runners', group: 'internal' },
+    { title: 'Auto-return to Home', body: '## Summary\nReturns Home.', group: 'app' },
+    { title: 'Six-column grid', body: '## Summary\n- Wraps.\n- Recent first.', group: 'app' },
+    { title: 'Example popup buttons', body: '', group: 'homeAssistant' },
+  ]);
+  assert.equal(
+    notes,
     [
-      { number: 14, title: 'Add Cameras', labels: ['feature'], body: 'Adds an app.' },
-      { number: 15, title: 'CI', labels: [], body: null },
-    ],
-    { tag: 'v2.21.0', previous: 'v2.20.0' },
+      '### On the TV',
+      '',
+      '- **Auto-return to Home.** Returns Home.',
+      '- **Six-column grid**',
+      '  - Wraps.',
+      '  - Recent first.',
+      '',
+      '### Home Assistant',
+      '',
+      '- **Example popup buttons**',
+      '',
+      '### Behind the scenes',
+      '',
+      '- Run CI on Trunk runners',
+    ].join('\n'),
   );
-  assert.match(prompt, /^Changes from v2\.20\.0 to v2\.21\.0:/);
-  assert.match(
-    prompt,
-    /<pull_request number="14">\nTitle: Add Cameras\nLabels: feature\n\nAdds an app\./,
-  );
-  assert.match(prompt, /<pull_request number="15">\nTitle: CI\nLabels: none\n\n\(no description\)/);
-  assert.match(buildPrompt([], { tag: 'v1.0.0', previous: '' }), /^Changes from the first commit/);
+  assert.equal(whatsNew([]), '');
 });

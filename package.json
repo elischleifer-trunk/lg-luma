@@ -43,7 +43,6 @@
     "version:check": "node tools/sync-version.mjs --check"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "1.6.0",
     "@webos-tools/cli": "3.2.6",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
