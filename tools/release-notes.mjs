@@ -62,11 +62,30 @@ export function classify(files) {
 // The pull request's own summary as Markdown lines: the first paragraph, or the top-level
 // bullets, of its "Summary" section (or of the text before its first heading). Empty when the
 // description has none.
+// Drops HTML comments (PR templates use them for hints), and everything from an unclosed `<!--`
+// on. Repeats until nothing changes, so no opener survives by forming across a removed comment.
+export function stripComments(text) {
+  for (;;) {
+    let result = '';
+    let rest = text;
+    for (;;) {
+      const open = rest.indexOf('<!--');
+      if (open === -1) {
+        result += rest;
+        break;
+      }
+      result += rest.slice(0, open);
+      const close = rest.indexOf('-->', open + 4);
+      if (close === -1) break;
+      rest = rest.slice(close + 3);
+    }
+    if (result === text) return result;
+    text = result;
+  }
+}
+
 export function summaryOf(body) {
-  const lines = (body ?? '')
-    .replace(/\r\n/g, '\n')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .split('\n');
+  const lines = stripComments((body ?? '').replace(/\r\n/g, '\n')).split('\n');
   const headings = lines.flatMap((line, index) => (/^#{1,6}\s/.test(line) ? [index] : []));
   const named = headings.find((index) => /^#{1,6}\s+(summary|what|why)\b/i.test(lines[index]));
   const start = named === undefined ? 0 : named + 1;

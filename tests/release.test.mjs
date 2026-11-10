@@ -8,6 +8,7 @@ import {
   classify,
   composeNotes,
   pullNumbers,
+  stripComments,
   summaryOf,
   whatsNew,
 } from '../tools/release-notes.mjs';
@@ -222,6 +223,14 @@ test("release notes take each pull request's own summary", () => {
   assert.deepEqual(summaryOf(null), []);
   const many = `## Summary\n${Array.from({ length: 8 }, (_, i) => `- item ${i}`).join('\n')}`;
   assert.deepEqual(summaryOf(many).slice(-2), ['- item 5', '- …and 2 more']);
+});
+
+test('release notes drop HTML comments without leaving an opener behind', () => {
+  assert.equal(stripComments('a<!-- hint -->b<!--x-->c'), 'abc');
+  assert.equal(stripComments('<!<!---->--'), '', 'an opener formed by a removal is dropped too');
+  assert.equal(stripComments('x <!<!-- a -->-- b --> y'), 'x  y');
+  assert.equal(stripComments('keep <!-- unclosed hint'), 'keep ');
+  assert.equal(stripComments('no comments --> here'), 'no comments --> here');
 });
 
 test("release notes list what's new by group, app first", () => {
