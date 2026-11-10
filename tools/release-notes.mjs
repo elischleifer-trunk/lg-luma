@@ -17,6 +17,13 @@ import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
 
 const MAX_BULLETS = 6;
+// Longest summary paragraph or bullet kept; longer ones end at a word with an ellipsis.
+const MAX_ITEM = 500;
+// GitHub rejects release bodies over 125,000 characters. Above this the summaries are dropped
+// (titles only); a body that still doesn't fit fails before the release workflow moves main.
+const MAX_BODY = 120_000;
+// Concurrent GitHub API requests (GitHub's secondary limit is 100).
+const CONCURRENCY = 8;
 
 const GROUPS = [
   {
@@ -96,32 +103,53 @@ export function summaryOf(body) {
   if (content === -1) return [];
   const bullet = /^[-*+]\s+/;
   if (bullet.test(section[content])) {
-    const bullets = section
-      .slice(content)
-      .filter((line) => bullet.test(line))
-      .map((line) => `- ${line.replace(bullet, '').trim()}`);
-    return bullets.length > MAX_BULLETS
-      ? [...bullets.slice(0, MAX_BULLETS), `- …and ${bullets.length - MAX_BULLETS} more`]
-      : bullets;
+    // Top-level bullets, each with its wrapped (indented) continuation lines. Nested bullets
+    // and their continuations are dropped; the list ends at unindented text.
+    const bullets = [];
+    let nested = false;
+    for (const line of section.slice(content)) {
+      if (bullet.test(line)) {
+        bullets.push(line.replace(bullet, '').trim());
+        nested = false;
+      } else if (/^\s+[-*+]\s+/.test(line)) {
+        nested = true;
+      } else if (/^\s+\S/.test(line)) {
+        if (!nested && bullets.length) bullets[bullets.length - 1] += ` ${line.trim()}`;
+      } else if (line.trim() !== '') {
+        break;
+      }
+    }
+    const items = bullets.map((text) => `- ${clip(text)}`);
+    return items.length > MAX_BULLETS
+      ? [...items.slice(0, MAX_BULLETS), `- …and ${items.length - MAX_BULLETS} more`]
+      : items;
   }
   const end = section.findIndex((line, index) => index > content && line.trim() === '');
   const paragraph = section
     .slice(content, end === -1 ? section.length : end)
     .map((line) => line.trim())
     .join(' ');
-  return /^(https?:\/\/\S+|🤖.*)$/u.test(paragraph) ? [] : [paragraph];
+  return /^(https?:\/\/\S+|🤖.*)$/u.test(paragraph) ? [] : [clip(paragraph)];
 }
 
-export function whatsNew(pulls) {
+export function clip(text, limit = MAX_ITEM) {
+  if (text.length <= limit) return text;
+  const cut = text.slice(0, limit);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > limit / 2 ? cut.slice(0, space) : cut).trimEnd()}…`;
+}
+
+export function whatsNew(pulls, { summaries = true } = {}) {
   const sections = [];
   for (const group of GROUPS) {
     const entries = pulls.filter((pull) => pull.group === group.key);
     if (!entries.length) continue;
     const items = entries.map((pull) => {
-      const summary = summaryOf(pull.body);
+      const summary = summaries ? summaryOf(pull.body) : [];
       if (summary.length === 1 && !summary[0].startsWith('- ')) {
         return `- **${pull.title}.** ${summary[0]}`;
       }
+      if (!summary.length) return `- ${pull.title}`;
       return [`- **${pull.title}**`, ...summary.map((line) => `  ${line}`)].join('\n');
     });
     sections.push(`### ${group.heading}\n\n${items.join('\n')}`);
@@ -148,23 +176,69 @@ export function composeNotes({ summary, generated, nightly, target, previous }) 
   return `${parts.join('\n\n')}\n`;
 }
 
+// The notes with every summary, or titles only when that would be too long for GitHub.
+export function fittedNotes({ pulls, ...context }, limit = MAX_BODY) {
+  const full = composeNotes({ ...context, summary: whatsNew(pulls) });
+  if (full.length <= limit) return full;
+  console.warn(`::warning::Release notes are ${full.length} characters; listing titles only.`);
+  const short = composeNotes({ ...context, summary: whatsNew(pulls, { summaries: false }) });
+  if (short.length <= limit) return short;
+  throw new Error(`Release notes are ${short.length} characters, over GitHub's limit.`);
+}
+
+// Runs fn over items with at most `limit` calls in flight, keeping the results in order.
+export async function mapLimit(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await fn(items[index]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Seconds to wait before retrying a rate-limited response, or null when it isn't one.
+export function retryDelay(status, headers) {
+  const after = Number(headers.get('retry-after'));
+  if (
+    status === 429 ||
+    (status === 403 && (after || headers.get('x-ratelimit-remaining') === '0'))
+  ) {
+    if (after) return Math.min(after, 120);
+    const reset = Number(headers.get('x-ratelimit-reset'));
+    return reset ? Math.min(Math.max(reset - Date.now() / 1000, 1), 120) : 60;
+  }
+  return null;
+}
+
 async function github(path, { method = 'GET', body } = {}) {
   const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
   if (!token) throw new Error('GH_TOKEN or GITHUB_TOKEN is required.');
-  const response = await fetch(`https://api.github.com${path}`, {
-    method,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!response.ok) {
+  for (let attempt = 1; ; attempt++) {
+    const response = await fetch(`https://api.github.com${path}`, {
+      method,
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (response.ok) return response.json();
+    const delay = retryDelay(response.status, response.headers);
+    if (delay !== null && attempt < 4) {
+      console.warn(`GitHub rate limit on ${path}; retrying in ${Math.round(delay)} s.`);
+      await sleep(delay * 1000);
+      continue;
+    }
     throw new Error(`GitHub ${method} ${path}: ${response.status} ${await response.text()}`);
   }
-  return response.json();
 }
 
 async function changedFiles(repository, number) {
@@ -188,16 +262,12 @@ export async function releaseNotes({ repository, tag, previous, target, nightly 
       ...(previous ? { previous_tag_name: previous } : {}),
     },
   });
-  const pulls = await Promise.all(
-    pullNumbers(generated, repository).map(async (number) => {
-      const [pull, files] = await Promise.all([
-        github(`/repos/${repository}/pulls/${number}`),
-        changedFiles(repository, number),
-      ]);
-      return { number, title: pull.title, body: pull.body, group: classify(files) };
-    }),
-  );
-  return composeNotes({ summary: whatsNew(pulls), generated, nightly, target, previous });
+  const pulls = await mapLimit(pullNumbers(generated, repository), CONCURRENCY, async (number) => {
+    const pull = await github(`/repos/${repository}/pulls/${number}`);
+    const files = await changedFiles(repository, number);
+    return { number, title: pull.title, body: pull.body, group: classify(files) };
+  });
+  return fittedNotes({ pulls, generated, nightly, target, previous });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

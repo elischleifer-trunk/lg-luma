@@ -1134,7 +1134,10 @@ that list. Each pull request is grouped by the files it changed:
 
 The first two carry the pull request's own summary: the first paragraph, or the top-level bullets
 (at most six), of the description's `## Summary` section, or of the text before its first heading.
-So the PR title and summary are what users read; write them for someone holding the remote. No
+Wrapped bullet lines are kept, nested bullets dropped, and any paragraph or bullet longer than
+500 characters is cut at a word. If the notes would go over GitHub's 125,000-character limit, the
+summaries are left out (titles only). So the PR title and summary are what users read; write
+them for someone holding the remote. No
 external service or secret is involved; a GitHub API failure stops the run before anything is
 published.
 
@@ -1255,7 +1258,8 @@ releases/vX.Y.Z/repo.json  that release's mirrored feed
 ```
 
 Nightlies (`vX.Y.N`, `N > 0`) use the same `releases/` folders. When the nightly workflow mirrors
-with `channel: nightly`, it updates `nightly/repo.json` instead of the root feed, and deletes any
+with `channel: nightly`, it updates `nightly/repo.json` instead of the root feed (only for the
+newest nightly prerelease, so re-mirroring an older one never rolls TVs back), and deletes any
 patch-version folder that is no longer a GitHub release, which removes pruned nightlies but never
 a stable release.
 

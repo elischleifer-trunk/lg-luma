@@ -114,8 +114,13 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           # Only the latest GitHub release may replace the root feed, and only the stable channel.
           if [ "$CHANNEL" = nightly ]; then
+            # Only the newest nightly may replace the nightly feed, so re-mirroring an older one
+            # (a manual run, or re-running an earlier failed mirror job) never rolls TVs back.
+            newest="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" \
+              --jq '.[] | select(.prerelease) | [.created_at, .tag_name] | @tsv' \
+              | sort | tail -n 1 | cut -f 2)"
             echo "feed=nightly/repo.json" >> "$GITHUB_OUTPUT"
-            echo "latest=true" >> "$GITHUB_OUTPUT"
+            echo "latest=$([ "$TAG" = "$newest" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           else
             echo "feed=repo.json" >> "$GITHUB_OUTPUT"
             echo "latest=$([ "$TAG" = "$latest" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
@@ -150,7 +155,7 @@ jobs:
           # Nightlies are X.Y.N with N > 0; stable releases are X.Y.0. A folder is deleted only when
           # it is a patch version that GitHub no longer has as a release (the nightly workflow
           # prunes old nightly prereleases), so stable releases, patch ones included, are kept.
-          keep="$(gh release list --limit 200 --json tagName --jq '.[].tagName')"
+          keep="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" --jq '.[].tag_name')"
           aws s3 ls --endpoint-url "$ENDPOINT" "s3://$BUCKET/releases/" \
             | awk '$1 == "PRE" { sub("/$", "", $2); print $2 }' \
             | while read -r folder; do

@@ -6,8 +6,12 @@ import { bumpVersion, setVersion, syncVersions } from '../tools/sync-version.mjs
 import { mirrorFeed } from '../tools/mirror-feed.mjs';
 import {
   classify,
+  clip,
   composeNotes,
+  fittedNotes,
+  mapLimit,
   pullNumbers,
+  retryDelay,
   stripComments,
   summaryOf,
   whatsNew,
@@ -225,6 +229,68 @@ test("release notes take each pull request's own summary", () => {
   assert.deepEqual(summaryOf(many).slice(-2), ['- item 5', '- …and 2 more']);
 });
 
+test('release notes keep wrapped bullet lines and drop nested bullets', () => {
+  const body =
+    '## Summary\n- **Nightly builds**: runs daily and\n  builds only when main changed.\n' +
+    '  - nested detail\n    nested continuation\n- Second\n\n- After a blank line\n' +
+    'Trailing text ends the list\n- not this one';
+  assert.deepEqual(summaryOf(body), [
+    '- **Nightly builds**: runs daily and builds only when main changed.',
+    '- Second',
+    '- After a blank line',
+  ]);
+});
+
+test('release notes clip long summaries and fall back to titles to fit GitHub', () => {
+  const long = 'word '.repeat(200).trim();
+  const clipped = clip(long);
+  assert.ok(clipped.length <= 501 && clipped.endsWith('word…'), clipped.slice(-10));
+  assert.equal(clip('short'), 'short');
+  assert.equal(summaryOf(`## Summary\n${long}`)[0], clipped);
+
+  const pulls = Array.from({ length: 3 }, (_, i) => ({
+    title: `Change ${i}`,
+    body: `## Summary\n${long}`,
+    group: 'app',
+  }));
+  const context = { pulls, generated: 'LIST', previous: 'v1.0.0' };
+  assert.match(fittedNotes(context), /\*\*Change 0\.\*\* word/);
+  const titlesOnly = fittedNotes(context, 200);
+  assert.match(titlesOnly, /^## What's new\n\n### On the TV\n\n- Change 0\n- Change 1\n/);
+  assert.doesNotMatch(titlesOnly, /word/);
+  assert.throws(() => fittedNotes(context, 20), /over GitHub's limit/);
+});
+
+test('release notes limit concurrent GitHub requests and keep their order', async () => {
+  let active = 0;
+  let peak = 0;
+  const results = await mapLimit([5, 1, 4, 2, 3, 0, 6], 3, async (n) => {
+    peak = Math.max(peak, ++active);
+    await new Promise((resolve) => setTimeout(resolve, n));
+    active--;
+    return n * 10;
+  });
+  assert.deepEqual(results, [50, 10, 40, 20, 30, 0, 60]);
+  assert.equal(peak, 3);
+  assert.deepEqual(await mapLimit([], 3, async () => 1), []);
+});
+
+test('release notes retry only rate-limited GitHub responses', () => {
+  const headers = (values) => new Headers(values);
+  assert.equal(retryDelay(429, headers({ 'retry-after': '7' })), 7);
+  assert.equal(retryDelay(403, headers({ 'retry-after': '500' })), 120);
+  assert.equal(retryDelay(429, headers({})), 60);
+  const reset = String(Math.floor(Date.now() / 1000) + 30);
+  const wait = retryDelay(
+    403,
+    headers({ 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': reset }),
+  );
+  assert.ok(wait > 25 && wait <= 30, String(wait));
+  assert.equal(retryDelay(403, headers({ 'x-ratelimit-remaining': '12' })), null, 'forbidden');
+  assert.equal(retryDelay(404, headers({})), null);
+  assert.equal(retryDelay(422, headers({ 'retry-after': '5' })), null);
+});
+
 test('release notes drop HTML comments without leaving an opener behind', () => {
   assert.equal(stripComments('a<!-- hint -->b<!--x-->c'), 'abc');
   assert.equal(stripComments('<!<!---->--'), '', 'an opener formed by a removal is dropped too');
@@ -252,7 +318,7 @@ test("release notes list what's new by group, app first", () => {
       '',
       '### Home Assistant',
       '',
-      '- **Example popup buttons**',
+      '- Example popup buttons',
       '',
       '### Behind the scenes',
       '',
