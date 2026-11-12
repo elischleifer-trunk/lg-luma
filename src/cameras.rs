@@ -704,9 +704,13 @@ impl State {
         let already_open = self.cameras_open();
         let gallery = &mut self.cameras;
         if open {
-            gallery
-                .frames
-                .retain(|id, _| cameras.iter().any(|c| &c.id == id));
+            if already_open {
+                gallery
+                    .frames
+                    .retain(|id, _| cameras.iter().any(|c| &c.id == id));
+            } else {
+                gallery.frames.clear();
+            }
             gallery.cameras = cameras;
             gallery.live = live;
             gallery.unavailable.clear();
@@ -803,6 +807,10 @@ impl State {
     }
 
     pub fn camera_update(&mut self, update: Update) {
+        // Frames still queued when the gallery closed must not come back with it.
+        if !self.cameras_open() {
+            return;
+        }
         let gallery = &mut self.cameras;
         match update {
             Update::Frame(frame) => {

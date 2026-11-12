@@ -829,12 +829,18 @@ impl<T: Tv> Api<T> {
     fn gallery(&self) -> Vec<crate::cameras::Camera> {
         let arranged = &self.store.gallery;
         // Two servers can share an entity ID; the gallery tells cameras apart by ID, so prefix
-        // each with its server's position, which stays stable while the servers stay paired.
+        // each with its server's place in pairing order. That stays the same whichever servers
+        // have sent cameras since Luma started, while the servers stay paired.
+        let clients = &self.store.clients;
         let mut cameras: Vec<(&Camera, String)> = self
             .cameras
             .iter()
             .enumerate()
-            .flat_map(|(server, (_, cameras))| {
+            .flat_map(|(index, (owner, cameras))| {
+                let server = clients
+                    .iter()
+                    .position(|client| client.token == *owner)
+                    .unwrap_or(index);
                 cameras
                     .iter()
                     .map(move |camera| (camera, format!("{server}/{}", camera.id)))

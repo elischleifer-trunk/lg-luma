@@ -1509,7 +1509,10 @@ fn run() -> Result<(), String> {
                             let length = state.editing_text().len() as i32;
                             state.delete_surrounding_text(-length, length);
                         }
-                        Keycode::M | Keycode::Menu if !repeat && state.overlay.is_none() => {
+                        // The Cameras gallery is an overlay too; Menu opens a camera's options.
+                        Keycode::M | Keycode::Menu
+                            if !repeat && (state.overlay.is_none() || state.cameras_open()) =>
+                        {
                             press = None;
                             state.options();
                         }

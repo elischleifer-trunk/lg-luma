@@ -309,3 +309,27 @@ fn the_service_keeps_a_worker_while_a_camera_is_watched_the_same_way() {
     service.sync(&[]);
     assert!(service.watched().is_empty());
 }
+
+#[test]
+fn frames_from_a_closed_gallery_never_reappear() {
+    let mut state = open(&["a"]);
+    let frame = |live| {
+        Update::Frame(Arc::new(Frame::new(
+            "0/camera.a",
+            RgbaImage::new(1, 1),
+            live,
+        )))
+    };
+    state.camera_update(frame(true));
+    assert_eq!(state.cameras.frames.len(), 1);
+    state.back();
+    assert!(!state.cameras_open());
+    // A frame queued before the workers stopped arrives after the gallery closed.
+    state.camera_update(frame(true));
+    state.camera_update(Update::Unavailable("0/camera.a".into()));
+    assert!(state.cameras.frames.is_empty());
+    assert!(state.cameras.unavailable.is_empty());
+    // Reopening starts without any earlier picture.
+    state.camera_list(vec![camera("a")], true, true);
+    assert!(state.cameras.frames.is_empty());
+}

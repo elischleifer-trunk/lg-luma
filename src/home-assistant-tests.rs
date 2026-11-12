@@ -725,8 +725,11 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
     h.now += PAIRING_COOLDOWN;
     let second = h.pair();
     let door = json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/door"}]});
-    h.call("POST", "/api/cameras", Some(&first), door.clone());
-    h.call("POST", "/api/cameras", Some(&second), door);
+    // Only the second server has sent cameras (say, just after Luma restarted): its cameras
+    // still carry its place in pairing order, so saved choices stay with them.
+    h.call("POST", "/api/cameras", Some(&second), door.clone());
+    assert_eq!(h.api.gallery()[0].id, "1/camera.door");
+    h.call("POST", "/api/cameras", Some(&first), door);
     h.api.arrange(&json!({
         "order": ["1/camera.door", "0/camera.door"],
         "hidden": ["1/camera.door"],
