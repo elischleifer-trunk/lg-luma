@@ -85,9 +85,16 @@ stays with the show you are watching.
 While **Home Assistant** is on, Luma lists a **Cameras** app with your other apps. Favorite it to
 keep it on Home. Opening it shows every camera entity Home Assistant has (unavailable ones are
 skipped, at most 32) in a grid of snapshots that refresh every couple of seconds. Choose a camera
-and press **OK** to see it full screen as live video (Home Assistant's motion-JPEG stream); **Back**
-returns to the grid, and **Back** again closes it. A badge in the corner says **Live** or
-**Snapshots**: if the stream fails or freezes, Luma switches to snapshots, several a second.
+and press **OK** to see it full screen as live video; **Back** returns to the grid, and **Back**
+again closes it.
+
+Full screen, a camera that can stream (most RTSP cameras: Generic, ONVIF, Reolink, UniFi Protect
+and others) plays Home Assistant's HLS stream: the camera's own video at its full frame rate,
+decoded by the TV, a second or two behind real time. This needs Home Assistant's **Stream**
+integration, which `default_config` includes. Other cameras, and any camera while its stream is
+starting or if it cannot play, show Home Assistant's motion-JPEG stream, which for most camera
+types is only about two pictures a second. Its badge says **Live** or **Snapshots**: if that
+stream fails or freezes, Luma switches to snapshots, several a second.
 
 To arrange the grid, hold **OK** on a camera: **Move** lets you move it with the arrows (**OK**
 when done), **Hide camera** takes it off the grid, and **Camera settings** opens settings, which

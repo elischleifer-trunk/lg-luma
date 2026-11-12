@@ -13,7 +13,9 @@
 //! Home Assistant also pushes its camera list (`POST /api/cameras`) whenever a camera's signed
 //! proxy URLs rotate. Luma's built-in Cameras app shows them natively (see `cameras`): this
 //! thread sends the list, with the owner's saved arrangement applied, as [`Event::Cameras`], and
-//! stores the arrangement the gallery sends back.
+//! stores the arrangement the gallery sends back. For an enlarged camera with Home Assistant's
+//! HLS stream, it opens the same overlay app as a full-screen video player and reports back
+//! ([`Event::VideoClosed`]) when that closes.
 use crate::companion;
 use ring::digest;
 use serde::{Deserialize, Serialize};
@@ -47,6 +49,8 @@ const MAX_URL: usize = 4096;
 const PAIRING_TTL: Duration = Duration::from_secs(120);
 const PAIRING_ATTEMPTS: u8 = 5;
 const PAIRING_COOLDOWN: Duration = Duration::from_secs(3);
+/// A camera video left playing is closed after this long.
+const VIDEO_TTL: Duration = Duration::from_secs(60 * 60);
 /// The overlay dismisses itself; this margin covers launch time before Luma resumes playback.
 const SESSION_GRACE: Duration = Duration::from_secs(5);
 
@@ -123,6 +127,11 @@ pub enum Event {
         live: bool,
         open: bool,
     },
+    /// The camera video closed: Back, a doorbell card replacing it, or (`failed`) the stream
+    /// could not be played, so the gallery keeps showing the motion-JPEG stream.
+    VideoClosed {
+        failed: bool,
+    },
 }
 
 /// One Home Assistant camera, with URLs the TV can load directly.
@@ -132,6 +141,8 @@ pub struct Camera {
     pub name: String,
     pub stream: Option<String>,
     pub snapshot: Option<String>,
+    /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
+    pub hls: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -200,6 +211,8 @@ struct Session {
     nonce: String,
     media: Option<String>,
     ends: Instant,
+    /// A camera video from the Cameras app rather than a doorbell card.
+    video: bool,
 }
 
 pub struct Request<'a> {
@@ -469,8 +482,18 @@ impl<T: Tv> Api<T> {
 
     /// Resumes paused media and clears the session once the overlay is gone.
     fn end_session(&mut self) {
-        if let Some(session) = self.session.take()
-            && let Some(media) = session.media
+        self.finish_session(false);
+    }
+
+    /// Ends the session; a camera video tells the gallery whether it `failed` to play.
+    fn finish_session(&mut self, failed: bool) {
+        let Some(session) = self.session.take() else {
+            return;
+        };
+        if session.video {
+            let _ = self.events.send(Event::VideoClosed { failed });
+        }
+        if let Some(media) = session.media
             && let Err(error) = self.tv.resume_media(&media)
         {
             eprintln!("Luma Home Assistant resume: {error}");
@@ -531,7 +554,7 @@ impl<T: Tv> Api<T> {
                         && body["nonce"] == session.nonce.as_str()
                 });
                 if matches {
-                    self.end_session();
+                    self.finish_session(body["failed"] == true);
                 }
                 reply(200, json!({"ended": matches}))
             }
@@ -705,8 +728,13 @@ impl<T: Tv> Api<T> {
                 "The overlay app is still being installed; try again shortly",
             );
         }
-        // A new ring while an overlay is up replaces it; keep the media it paused.
-        let mut media = self.session.take().and_then(|session| session.media);
+        // A new ring while an overlay is up replaces it; keep the media it paused. A camera video
+        // it replaces is over, so the gallery leaves its enlarged camera.
+        let replaced = self.session.take();
+        if replaced.as_ref().is_some_and(|session| session.video) {
+            let _ = self.events.send(Event::VideoClosed { failed: false });
+        }
+        let mut media = replaced.and_then(|session| session.media);
         if pause && media.is_none() {
             media = self.tv.pause_media().unwrap_or_else(|error| {
                 eprintln!("Luma Home Assistant pause: {error}");
@@ -736,6 +764,7 @@ impl<T: Tv> Api<T> {
             nonce,
             media,
             ends: now + Duration::from_secs_f64(duration) + SESSION_GRACE,
+            video: false,
         });
         if let Err(e) = self.tv.launch_overlay(&params) {
             self.end_session();
@@ -768,6 +797,7 @@ impl<T: Tv> Api<T> {
                 let id = text(entry, "id", 255)?.ok_or_else(|| error(400, "id is required"))?;
                 let stream = camera_url(entry, "stream_url")?;
                 let snapshot = camera_url(entry, "snapshot_url")?;
+                let hls = camera_url(entry, "hls_url")?;
                 if stream.is_none() && snapshot.is_none() {
                     return Err(error(400, "stream_url or snapshot_url is required"));
                 }
@@ -777,6 +807,7 @@ impl<T: Tv> Api<T> {
                     name,
                     stream,
                     snapshot,
+                    hls,
                 })
             })();
             match parsed {
@@ -890,6 +921,7 @@ impl<T: Tv> Api<T> {
                 name: camera.name.clone(),
                 stream: camera.stream.clone(),
                 snapshot: camera.snapshot.clone(),
+                hls: camera.hls.clone(),
             })
             .collect()
     }
@@ -900,6 +932,52 @@ impl<T: Tv> Api<T> {
             live: !self.store.gallery.snapshots,
             open,
         });
+    }
+
+    /// Plays a camera's HLS stream full screen in the overlay app, above the Cameras gallery.
+    /// Whatever happens, the gallery hears back through [`Event::VideoClosed`].
+    pub fn show_video(&mut self, url: &str, title: &str, now: Instant) {
+        let failed = |api: &mut Self| {
+            let _ = api.events.send(Event::VideoClosed { failed: true });
+        };
+        if !self.overlay_ready.load(Ordering::Acquire) {
+            self.prepare();
+            failed(self);
+            return;
+        }
+        let (id, nonce) = match (random_hex(8), random_hex(16)) {
+            (Ok(id), Ok(nonce)) => (id, nonce),
+            _ => return failed(self),
+        };
+        // A doorbell card still up is replaced; keep the media it paused.
+        let media = self.session.take().and_then(|session| session.media);
+        let params = json!({
+            "mode": "video",
+            "session": id,
+            "nonce": nonce,
+            "port": PORT,
+            "url": url,
+            "title": title,
+        });
+        self.session = Some(Session {
+            id,
+            nonce,
+            media,
+            ends: now + VIDEO_TTL,
+            video: true,
+        });
+        if let Err(error) = self.tv.launch_overlay(&params) {
+            eprintln!("Luma Home Assistant video: {error}");
+            self.finish_session(true);
+        }
+    }
+
+    /// Closes the camera video when the gallery leaves the camera some other way.
+    pub fn close_video(&mut self) {
+        if self.session.as_ref().is_some_and(|session| session.video) {
+            let _ = self.tv.close_overlay();
+            self.session = None;
+        }
     }
 
     /// Opens the Cameras gallery, Luma's built-in Cameras app.
@@ -938,6 +1016,8 @@ enum Command {
     Disable,
     ShowCameras,
     Arrange(Value),
+    Video { url: String, title: String },
+    CloseVideo,
 }
 
 /// Owns the listener thread. Enabling binds the port; disabling closes it and forgets pairings.
@@ -968,6 +1048,19 @@ impl Service {
     pub fn show_cameras(&self) {
         if self.enabled {
             let _ = self.commands.send(Command::ShowCameras);
+        }
+    }
+
+    /// Plays a camera's HLS stream in the overlay app; the result is [`Event::VideoClosed`].
+    pub fn show_video(&self, url: String, title: String) {
+        if self.enabled {
+            let _ = self.commands.send(Command::Video { url, title });
+        }
+    }
+
+    pub fn close_video(&self) {
+        if self.enabled {
+            let _ = self.commands.send(Command::CloseVideo);
         }
     }
 
@@ -1039,6 +1132,8 @@ fn run<T: Tv>(
                 api.forget();
             }
             Some(Command::ShowCameras) => api.show_cameras(),
+            Some(Command::Video { url, title }) => api.show_video(&url, &title, Instant::now()),
+            Some(Command::CloseVideo) => api.close_video(),
             Some(Command::Arrange(arrangement)) => {
                 let saved = api.arrange(&arrangement);
                 if saved.status != 200 {

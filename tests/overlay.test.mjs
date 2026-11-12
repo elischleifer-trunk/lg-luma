@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const source = await readFile(new URL('../overlay/logic.js', import.meta.url), 'utf8');
 const context = { window: {} };
 vm.runInNewContext(source, context);
-const { settings, frameUrl, closedUrl } = context.window.LumaOverlay;
+const { settings, video, frameUrl, closedUrl } = context.window.LumaOverlay;
 // Values built inside the VM have its own Object prototype; compare them as plain JSON.
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -69,4 +69,29 @@ test('the overlay app keeps the foreground app playing and stays out of app list
   assert.equal(info.visible, false);
   assert.equal(info.handlesRelaunch, true);
   assert.equal(info.disableBackHistoryAPI, true);
+});
+
+test('a camera video needs an http(s) playlist and keeps its session for reporting back', () => {
+  assert.deepEqual(
+    plain(
+      video({
+        mode: 'video',
+        url: 'http://ha:8123/api/hls/x/master_playlist.m3u8',
+        title: 'Front door',
+        session: 's',
+        nonce: 'n',
+        port: 5862,
+      }),
+    ),
+    {
+      session: 's',
+      nonce: 'n',
+      port: 5862,
+      url: 'http://ha:8123/api/hls/x/master_playlist.m3u8',
+      title: 'Front door',
+    },
+  );
+  assert.equal(video({ mode: 'video', url: 'javascript:alert(1)' }), null);
+  assert.equal(video({ url: 'http://ha/x.m3u8' }), null);
+  assert.equal(video(null), null);
 });

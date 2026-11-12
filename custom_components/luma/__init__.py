@@ -6,7 +6,9 @@ token, which the overlay app on the TV loads directly.
 
 Each paired TV also receives the list of every camera, again as signed proxy URLs, for Luma's
 Cameras app. The list is sent again whenever a camera changes, which includes every access token
-rotation, so the TV always holds working URLs.
+rotation, so the TV always holds working URLs. Cameras that can stream also get an `hls_url`: the
+TV asks it, with the same camera token, to start Home Assistant's HLS stream (the camera's own
+H.264 video at full frame rate, which the TV decodes in hardware) and receives its address.
 """
 
 from __future__ import annotations
@@ -57,6 +59,9 @@ ATTR_STREAM_URL = "stream_url"
 ATTR_SNAPSHOT_URL = "snapshot_url"
 ATTR_MODE = "mode"
 ATTR_BASE_URL = "base_url"
+HLS_VIEW_URL = "/api/luma/stream/{entity_id}"
+# CameraEntityFeature.STREAM; the camera component is imported only when a stream is requested.
+CAMERA_STREAM = 2
 # Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
 CAMERAS_PUSH_DELAY = 2.0
 MAX_CAMERAS = 32
@@ -102,20 +107,25 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
         base_url = local_url(hass)
     except ServiceValidationError:
         return []
+    # HLS needs Home Assistant's stream integration (part of default_config).
+    streams = "stream" in hass.config.components
     cameras = []
     for state in sorted(hass.states.async_all("camera"), key=lambda state: state.name.casefold()):
         token = state.attributes.get("access_token")
         if not token or state.state == "unavailable":
             continue
         stream, snapshot = _proxy_urls(base_url, state.entity_id, token)
-        cameras.append(
-            {
-                "id": state.entity_id,
-                "name": state.name[:80],
-                "stream_url": stream,
-                "snapshot_url": snapshot,
-            }
-        )
+        camera = {
+            "id": state.entity_id,
+            "name": state.name[:80],
+            "stream_url": stream,
+            "snapshot_url": snapshot,
+        }
+        features = int(state.attributes.get("supported_features", 0))
+        if streams and features & CAMERA_STREAM:
+            path = HLS_VIEW_URL.format(entity_id=state.entity_id)
+            camera["hls_url"] = f"{base_url}{path}?token={token}"
+        cameras.append(camera)
     return cameras[:MAX_CAMERAS]
 
 
@@ -320,9 +330,59 @@ class ExampleImageView(HomeAssistantView):
         return web.FileResponse(EXAMPLE_IMAGE, headers={"Cache-Control": "max-age=86400"})
 
 
+def _camera(hass: HomeAssistant, entity_id: str):
+    """The camera entity, or None when it is missing or off."""
+    try:
+        from homeassistant.components.camera.helper import get_camera_from_entity_id
+    except ImportError:  # pragma: no cover - older Home Assistant
+        from homeassistant.components.camera import (
+            _get_camera_from_entity_id as get_camera_from_entity_id,
+        )
+    try:
+        return get_camera_from_entity_id(hass, entity_id)
+    except HomeAssistantError:
+        return None
+
+
+async def _request_stream(hass: HomeAssistant, entity_id: str) -> str:
+    """Starts the camera's HLS stream and returns its path."""
+    from homeassistant.components.camera import async_request_stream
+
+    return await async_request_stream(hass, entity_id, "hls")
+
+
+class StreamView(HomeAssistantView):
+    """Starts a camera's HLS stream for the TV and answers with its address.
+
+    The TV holds no Home Assistant credentials, so this view checks the camera's own short-lived
+    access token, exactly as Home Assistant's camera proxy does. The HLS address it returns carries
+    the stream's own token, and the stream stops by itself once the TV stops loading it.
+    """
+
+    url = HLS_VIEW_URL
+    name = "api:luma:stream"
+    requires_auth = False
+
+    def __init__(self, hass: HomeAssistant) -> None:
+        self.hass = hass
+
+    async def get(self, request: web.Request, entity_id: str) -> web.Response:
+        camera = _camera(self.hass, entity_id) if entity_id.startswith("camera.") else None
+        if camera is None:
+            return self.json_message("Camera not found", 404)
+        if request.query.get("token") not in camera.access_tokens:
+            return self.json_message("Invalid camera token", 403)
+        try:
+            url = await _request_stream(self.hass, entity_id)
+        except HomeAssistantError as err:
+            return self.json_message(str(err), 404)
+        return self.json({"url": url})
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     if hass.http is not None:
         hass.http.register_view(ExampleImageView())
+        hass.http.register_view(StreamView(hass))
 
     async def show_camera(call: ServiceCall) -> None:
         payload = overlay_payload(hass, dict(call.data))

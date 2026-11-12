@@ -94,6 +94,7 @@ fn camera(id: &str) -> Camera {
         name: id.into(),
         stream: Some(format!("http://ha/stream/{id}")),
         snapshot: Some(format!("http://ha/snap/{id}")),
+        hls: None,
         hidden: false,
     }
 }
@@ -332,4 +333,146 @@ fn frames_from_a_closed_gallery_never_reappear() {
     // Reopening starts without any earlier picture.
     state.camera_list(vec![camera("a")], true, true);
     assert!(state.cameras.frames.is_empty());
+}
+
+fn streaming(ids: &[&str]) -> State {
+    let mut state = State::new(Preferences::default());
+    state.preferences.home_assistant = true;
+    state.sync_custom_tiles();
+    let cameras = ids
+        .iter()
+        .map(|id| Camera {
+            hls: Some(format!(
+                "http://ha:8123/api/luma/stream/camera.{id}?token=t"
+            )),
+            ..camera(id)
+        })
+        .collect();
+    state.camera_list(cameras, true, true);
+    state
+}
+
+#[test]
+fn an_enlarged_camera_plays_home_assistants_hls_video_over_the_mjpeg_stream() {
+    let mut state = streaming(&["a", "b"]);
+    state.activate();
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
+    let (id, endpoint) = state.cameras.resolve.take().unwrap();
+    assert_eq!(endpoint, "http://ha:8123/api/luma/stream/camera.a?token=t");
+    // While Home Assistant starts the stream, the motion-JPEG stream shows.
+    assert!(matches!(
+        state.camera_watches(true)[0].source,
+        Source::Stream { .. }
+    ));
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha:8123/api/hls/x/master_playlist.m3u8".into()),
+    });
+    assert_eq!(state.cameras.video, Video::Playing("0/camera.a".into()));
+    assert_eq!(
+        state.cameras.play.take(),
+        Some((
+            "http://ha:8123/api/hls/x/master_playlist.m3u8".into(),
+            "a".into()
+        ))
+    );
+    // The overlay plays it: the stream underneath pauses.
+    assert!(state.camera_watches(true).is_empty());
+    // Back in the overlay app leaves the enlarged camera too.
+    state.camera_video_closed(false);
+    assert_eq!(state.cameras.enlarged, None);
+    assert_eq!(state.cameras.video, Video::Off);
+    assert!(!state.cameras.stop_video);
+
+    // Leaving the camera in Luma (here: the list dropped it) closes the video.
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/x.m3u8".into()),
+    });
+    state.camera_list(
+        vec![streaming(&["b"]).cameras.cameras[0].clone()],
+        true,
+        false,
+    );
+    assert_eq!(state.cameras.enlarged, None);
+    assert!(state.cameras.stop_video);
+}
+
+#[test]
+fn a_camera_whose_video_fails_stays_on_the_mjpeg_stream() {
+    let mut state = streaming(&["a"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id: id.clone(),
+        result: Ok("http://ha/x.m3u8".into()),
+    });
+    // The overlay app could not play it: the enlarged camera stays, on the motion-JPEG stream.
+    state.camera_video_closed(true);
+    assert_eq!(state.cameras.enlarged.as_deref(), Some(id.as_str()));
+    assert!(matches!(
+        state.camera_watches(true)[0].source,
+        Source::Stream { .. }
+    ));
+    // Enlarging it again does not try the video again during this visit.
+    state.back();
+    state.activate();
+    assert!(state.cameras.resolve.is_none());
+    assert_eq!(state.cameras.video, Video::Off);
+    // A stream Home Assistant cannot start counts the same; so does a late answer.
+    let mut other = streaming(&["b"]);
+    other.activate();
+    let (id, _) = other.cameras.resolve.take().unwrap();
+    other.camera_update(Update::Video {
+        id: id.clone(),
+        result: Err("does not support play stream service".into()),
+    });
+    assert_eq!(other.cameras.video_failed, std::slice::from_ref(&id));
+    other.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/late.m3u8".into()),
+    });
+    assert!(other.cameras.play.is_none());
+    // Without live video, an enlarged camera never asks for it.
+    let mut still = streaming(&["c"]);
+    still.cameras.live = false;
+    still.activate();
+    assert!(still.cameras.resolve.is_none());
+}
+
+#[test]
+fn the_hls_endpoint_answers_with_a_playlist_on_the_same_server() {
+    use std::io::Write;
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let port = listener.local_addr().unwrap().port();
+    let server = thread::spawn(move || {
+        for body in [
+            r#"{"url": "/api/hls/abc/master_playlist.m3u8"}"#,
+            r#"{"url": "//evil.example/x.m3u8"}"#,
+        ] {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut request = [0; 1024];
+            let _ = stream.read(&mut request);
+            write!(
+                stream,
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                body.len()
+            )
+            .unwrap();
+        }
+    });
+    let endpoint = format!("http://127.0.0.1:{port}/api/luma/stream/camera.a?token=t");
+    assert_eq!(
+        hls_address(&agent(), &endpoint).unwrap(),
+        format!("http://127.0.0.1:{port}/api/hls/abc/master_playlist.m3u8")
+    );
+    // Only a path on the same server is accepted.
+    assert!(hls_address(&agent(), &endpoint).is_err());
+    server.join().unwrap();
+    assert_eq!(
+        origin("https://ha.local:8123/a/b?c"),
+        "https://ha.local:8123"
+    );
 }
