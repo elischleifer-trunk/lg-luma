@@ -931,9 +931,12 @@ impl State {
     /// could not play leaves the motion-JPEG stream on screen for the rest of this visit.
     pub fn camera_video_closed(&mut self, failed: bool) {
         let gallery = &mut self.cameras;
-        let Video::Playing(id) = std::mem::take(&mut gallery.video) else {
+        // Only a video being played can close; a camera whose stream is still starting is not
+        // affected by a late report about an earlier one.
+        let Video::Playing(id) = gallery.video.clone() else {
             return;
         };
+        gallery.video = Video::Off;
         if failed {
             gallery.video_failed.push(id);
         } else if gallery.enlarged.as_deref() == Some(id.as_str()) {

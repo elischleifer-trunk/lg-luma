@@ -479,3 +479,24 @@ fn the_hls_endpoint_answers_with_a_playlist_on_the_same_server() {
         "https://ha.local:8123"
     );
 }
+
+#[test]
+fn a_late_close_report_leaves_the_next_cameras_video_alone() {
+    let mut state = streaming(&["a", "b"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/a.m3u8".into()),
+    });
+    // Leave camera a and enlarge camera b while its stream starts.
+    state.back();
+    assert!(state.cameras.stop_video);
+    state.direction(Direction::Right, &[]);
+    state.activate();
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.b".into()));
+    // A report about a's video arriving now changes nothing.
+    state.camera_video_closed(false);
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.b".into()));
+    assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.b"));
+}

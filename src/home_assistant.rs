@@ -976,11 +976,18 @@ impl<T: Tv> Api<T> {
 
     /// Closes the camera video when the gallery leaves the camera some other way.
     pub fn close_video(&mut self) {
-        if self.session.as_ref().is_some_and(|session| session.video) {
+        if self.session.as_ref().is_some_and(|session| session.video)
+            && let Some(session) = self.session.take()
+        {
             let _ = self.tv.close_overlay();
-            // Resumes media a doorbell card had paused before the video replaced it. The
-            // gallery has already left the camera, so its VideoClosed changes nothing.
-            self.finish_session(false);
+            // Resume media a doorbell card had paused before the video replaced it. No
+            // VideoClosed: the gallery left this camera itself, and may already be starting
+            // another camera's video that a late event would cancel.
+            if let Some(media) = session.media
+                && let Err(error) = self.tv.resume_media(&media)
+            {
+                eprintln!("Luma Home Assistant resume: {error}");
+            }
         }
     }
 

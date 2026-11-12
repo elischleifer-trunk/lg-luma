@@ -863,9 +863,12 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     paused["pause"] = json!(true);
     h.call("POST", "/api/overlay", Some(&token), paused);
     h.api.show_video("http://ha/x.m3u8", "Door", h.now);
+    let _ = h.events.try_iter().count();
     h.api.close_video();
     let calls = h.tv.calls();
     assert_eq!(&calls[calls.len() - 2..], ["close", "resume _media7"]);
+    // The gallery left the camera itself; a report now could cancel its next video.
+    assert!(h.events.try_recv().is_err());
 
     let _ = h.events.try_iter().count();
     // Without the overlay app installed yet, the gallery hears at once that it failed.
