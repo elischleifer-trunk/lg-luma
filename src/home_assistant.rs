@@ -143,8 +143,9 @@ pub struct Store {
     pub gallery: Gallery,
 }
 
-/// How the owner arranged the Cameras gallery, by Home Assistant entity ID, so it survives
-/// token rotation, restarts and pairing again.
+/// How the owner arranged the Cameras gallery, by gallery camera ID: the server's position in
+/// pairing order and the entity ID (`0/camera.door`). Two servers' cameras that share an entity
+/// ID are arranged separately; the arrangement survives token rotation and restarts.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 #[serde(default)]
 pub struct Gallery {
@@ -279,9 +280,8 @@ fn camera_url(body: &Value, key: &str) -> Result<Option<String>, Reply> {
     Ok(Some(url))
 }
 
-/// A list of gallery camera IDs from the page, as Home Assistant entity IDs: the page's IDs
-/// carry a server prefix ("0/camera.door") that is not stored.
-fn entity_ids(body: &Value, key: &str) -> Result<Option<Vec<String>>, Reply> {
+/// A list of gallery camera IDs (`0/camera.door`), without duplicates.
+fn camera_ids(body: &Value, key: &str) -> Result<Option<Vec<String>>, Reply> {
     let list = match body.get(key) {
         None | Some(Value::Null) => return Ok(None),
         Some(Value::Array(list)) if list.len() <= MAX_ARRANGED => list,
@@ -297,10 +297,6 @@ fn entity_ids(body: &Value, key: &str) -> Result<Option<Vec<String>>, Reply> {
         let id = match value.as_str() {
             Some(id) if id.len() <= 300 && !id.chars().any(char::is_control) => id,
             _ => return Err(error(400, &format!("{key} must hold camera IDs"))),
-        };
-        let id = match id.split_once('/') {
-            Some((server, rest)) if server.bytes().all(|b| b.is_ascii_digit()) => rest,
-            _ => id,
         };
         if !id.is_empty() && !ids.iter().any(|known| known == id) {
             ids.push(id.to_owned());
@@ -778,33 +774,35 @@ impl<T: Tv> Api<T> {
         reply(200, json!({"cameras": total}))
     }
 
-    /// Saves the gallery's arrangement. The gallery knows only the cameras it was sent, so
-    /// entries for cameras absent right now are kept, after the ones it reported.
+    /// Saves the gallery's arrangement. `order` lists every camera the gallery knows, hidden
+    /// ones included; saved entries for any other camera (absent now, or not yet sent to the
+    /// gallery) are kept after the ones it reported.
     pub fn arrange(&mut self, body: &Value) -> Reply {
-        let present: Vec<String> = self
-            .all_cameras()
-            .iter()
-            .map(|camera| camera.id.clone())
-            .collect();
+        let order = match camera_ids(body, "order") {
+            Ok(order) => order,
+            Err(reply) => return reply,
+        };
+        let hidden = match camera_ids(body, "hidden") {
+            Ok(hidden) => hidden,
+            Err(reply) => return reply,
+        };
+        let known: Vec<String> = order
+            .clone()
+            .unwrap_or_else(|| self.gallery().into_iter().map(|camera| camera.id).collect());
         let merge = |given: Option<Vec<String>>, old: &[String]| {
-            given.map(|given| {
-                let mut list: Vec<String> = given
-                    .into_iter()
-                    .filter(|id| present.contains(id))
-                    .collect();
-                list.extend(old.iter().filter(|id| !present.contains(id)).cloned());
+            given.map(|mut list| {
+                list.extend(
+                    old.iter()
+                        .filter(|id| !known.contains(id) && !list.contains(id))
+                        .cloned()
+                        .collect::<Vec<_>>(),
+                );
                 list.truncate(MAX_ARRANGED);
                 list
             })
         };
-        let order = match entity_ids(body, "order") {
-            Ok(order) => merge(order, &self.store.gallery.order),
-            Err(reply) => return reply,
-        };
-        let hidden = match entity_ids(body, "hidden") {
-            Ok(hidden) => merge(hidden, &self.store.gallery.hidden),
-            Err(reply) => return reply,
-        };
+        let order = merge(order, &self.store.gallery.order);
+        let hidden = merge(hidden, &self.store.gallery.hidden);
         let snapshots = match body.get("live") {
             None | Some(Value::Null) => None,
             Some(Value::Bool(live)) => Some(!live),
@@ -844,21 +842,21 @@ impl<T: Tv> Api<T> {
             .take(MAX_CAMERAS)
             .collect();
         // The owner's order first; cameras never placed keep Home Assistant's order after them.
-        cameras.sort_by_key(|(camera, _)| {
+        cameras.sort_by_key(|(_, id)| {
             arranged
                 .order
                 .iter()
-                .position(|id| *id == camera.id)
+                .position(|item| item == id)
                 .unwrap_or(usize::MAX)
         });
         cameras
             .into_iter()
             .map(|(camera, id)| crate::cameras::Camera {
+                hidden: arranged.hidden.contains(&id),
                 id,
                 name: camera.name.clone(),
                 stream: camera.stream.clone(),
                 snapshot: camera.snapshot.clone(),
-                hidden: arranged.hidden.contains(&camera.id),
             })
             .collect()
     }

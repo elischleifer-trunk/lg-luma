@@ -727,16 +727,28 @@ impl State {
         if !already_open {
             return;
         }
-        let mut fresh = cameras;
-        let mut merged = Vec::new();
-        for camera in &gallery.cameras {
-            if let Some(index) = fresh.iter().position(|c| c.id == camera.id) {
-                let mut next = fresh.remove(index);
+        // Known cameras keep the order and visibility shown; a new or returning camera goes
+        // after the camera Home Assistant's (arranged) list puts before it.
+        let mut merged: Vec<Camera> = gallery
+            .cameras
+            .iter()
+            .filter_map(|camera| {
+                let mut next = cameras.iter().find(|c| c.id == camera.id)?.clone();
                 next.hidden = camera.hidden;
-                merged.push(next);
+                Some(next)
+            })
+            .collect();
+        for (index, camera) in cameras.iter().enumerate() {
+            if merged.iter().any(|c| c.id == camera.id) {
+                continue;
             }
+            let at = cameras[..index]
+                .iter()
+                .rev()
+                .find_map(|before| merged.iter().position(|c| c.id == before.id))
+                .map_or(0, |position| position + 1);
+            merged.insert(at, camera.clone());
         }
-        merged.extend(fresh);
         if merged.is_empty() {
             self.close_cameras();
             return;

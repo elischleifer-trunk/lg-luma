@@ -230,11 +230,14 @@ fn fresh_urls_keep_the_arrangement_and_a_lone_camera_cannot_move() {
     state.direction(Direction::Down, &[]);
     state.activate();
     assert_eq!(order(&state), ["a*", "b"]);
-    // Home Assistant rotates tokens and adds a camera; the open gallery keeps its order.
+    // Home Assistant rotates tokens and adds a camera: the open gallery keeps its own order and
+    // puts the new camera where Home Assistant's arranged list does (here first, then after b).
     let mut fresh = vec![camera("c"), camera("b"), camera("a")];
     fresh[1].snapshot = Some("http://ha/snap/b?token=new".into());
+    let fresh_b = fresh[1].clone();
     state.camera_list(fresh, true, false);
-    assert_eq!(order(&state), ["a*", "b", "c"]);
+    assert_eq!(order(&state), ["c", "a*", "b"]);
+
     assert_eq!(
         state
             .cameras
@@ -244,6 +247,12 @@ fn fresh_urls_keep_the_arrangement_and_a_lone_camera_cannot_move() {
             .as_deref(),
         Some("http://ha/snap/b?token=new")
     );
+    state.camera_list(
+        vec![camera("c"), camera("a"), fresh_b.clone(), camera("d")],
+        true,
+        false,
+    );
+    assert_eq!(order(&state), ["c", "a*", "b", "d"]);
     // Frames for unknown cameras are ignored; known ones are kept.
     state.camera_update(Update::Frame(Arc::new(Frame::new(
         "0/camera.x",

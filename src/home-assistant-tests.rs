@@ -653,14 +653,14 @@ fn the_gallery_arrangement_is_saved_and_applied_to_later_lists() {
     ] {
         assert_eq!(h.api.arrange(&bad).status, 400);
     }
-    // The gallery's IDs carry a server prefix; the store keeps entity IDs.
+    // Cameras are stored by gallery ID: the server's position and the entity ID.
     let saved = h.api.arrange(
         &json!({"order": ["0/camera.c", "0/camera.a"], "hidden": ["0/camera.b"], "live": false}),
     );
     assert_eq!(saved.status, 200, "{:?}", saved.body);
     let gallery = &h.api.store().gallery;
-    assert_eq!(gallery.order, ["camera.c", "camera.a"]);
-    assert_eq!(gallery.hidden, ["camera.b"]);
+    assert_eq!(gallery.order, ["0/camera.c", "0/camera.a"]);
+    assert_eq!(gallery.hidden, ["0/camera.b"]);
     assert!(gallery.snapshots);
 
     // Later lists apply it; unplaced cameras follow in Home Assistant's order.
@@ -699,8 +699,49 @@ fn the_gallery_arrangement_is_saved_and_applied_to_later_lists() {
         200
     );
     let gallery = &h.api.store().gallery;
-    assert_eq!(gallery.order, ["camera.a", "camera.c"]);
-    assert_eq!(gallery.hidden, ["camera.b"]);
+    assert_eq!(gallery.order, ["0/camera.a", "0/camera.c"]);
+    assert_eq!(gallery.hidden, ["0/camera.b"]);
     // Leaving `live` out keeps the earlier choice.
     assert!(gallery.snapshots);
+
+    // A camera the gallery did not report (it came back in between) keeps its entries too.
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.b"), camera("camera.c")]}),
+    );
+    h.api
+        .arrange(&json!({"order": ["0/camera.c", "0/camera.a"], "hidden": []}));
+    let gallery = &h.api.store().gallery;
+    assert_eq!(gallery.order, ["0/camera.c", "0/camera.a"]);
+    assert_eq!(gallery.hidden, ["0/camera.b"]);
+}
+
+#[test]
+fn two_servers_sharing_an_entity_id_are_arranged_separately() {
+    let mut h = Harness::new();
+    let first = h.pair();
+    h.now += PAIRING_COOLDOWN;
+    let second = h.pair();
+    let door = json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/door"}]});
+    h.call("POST", "/api/cameras", Some(&first), door.clone());
+    h.call("POST", "/api/cameras", Some(&second), door);
+    h.api.arrange(&json!({
+        "order": ["1/camera.door", "0/camera.door"],
+        "hidden": ["1/camera.door"],
+    }));
+    let gallery: Vec<_> = h
+        .api
+        .gallery()
+        .into_iter()
+        .map(|camera| (camera.id, camera.hidden))
+        .collect();
+    assert_eq!(
+        gallery,
+        [
+            ("1/camera.door".to_owned(), true),
+            ("0/camera.door".to_owned(), false)
+        ]
+    );
 }
