@@ -2,8 +2,20 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
-import { bumpVersion, syncVersions } from '../tools/sync-version.mjs';
+import { bumpVersion, setVersion, syncVersions } from '../tools/sync-version.mjs';
 import { mirrorFeed } from '../tools/mirror-feed.mjs';
+import {
+  classify,
+  clip,
+  composeNotes,
+  fittedNotes,
+  mapLimit,
+  pullNumbers,
+  retryDelay,
+  stripComments,
+  summaryOf,
+  whatsNew,
+} from '../tools/release-notes.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const metadata = ['appinfo.json', 'Cargo.toml', 'Cargo.lock', 'readme.md'];
@@ -131,4 +143,187 @@ test("R2 mirror rewrites only this release's asset URLs", () => {
   const foreign = structuredClone(feed);
   foreign.packages[0].manifest.ipkUrl = 'https://example.com/x_arm.ipk';
   assert.throws(() => mirrorFeed(foreign, 'v2.16.2', 'https://luma.elischleifer.com'));
+});
+
+test('nightly builds set an exact version and synchronize every file', async (t) => {
+  const directory = await fixture(t, '2.20.0');
+  await syncVersions(directory);
+  assert.deepEqual(await setVersion(directory, '2.20.7'), {
+    previous: '2.20.0',
+    version: '2.20.7',
+  });
+  assert.equal((await syncVersions(directory, { check: true })).version, '2.20.7');
+  const before = await readMetadata(directory);
+  for (const version of ['2.20', '2.20.7-nightly', '02.20.7', undefined]) {
+    await assert.rejects(setVersion(directory, version), /numeric major.minor.patch/);
+  }
+  assert.deepEqual(await readMetadata(directory), before, 'a rejected version must not write');
+});
+
+test('release notes find each linked pull request once, in order', () => {
+  const generated = [
+    "## What's Changed",
+    '* Add a Cameras app by @a in https://github.com/o/lg-luma/pull/14',
+    '* Six-column grid by @a in https://github.com/o/lg-luma/pull/16',
+    '* Follow-up by @a in https://github.com/o/lg-luma/pull/14',
+    '* Elsewhere https://github.com/o/lg-lumaX/pull/99 and https://github.com/x/lg-luma/pull/98',
+    '**Full Changelog**: https://github.com/o/lg-luma/compare/v2.20.0...v2.21.0',
+  ].join('\n');
+  assert.deepEqual(pullNumbers(generated, 'o/lg-luma'), [14, 16]);
+});
+
+test('release notes put the summary above the generated list', () => {
+  const generated = "## What's Changed\n* Thing by @a in https://github.com/o/r/pull/1\n";
+  const release = composeNotes({ summary: '- Better.\n', generated, previous: 'v2.20.0' });
+  assert.equal(release, `## What's new\n\n- Better.\n\n${generated}`);
+  assert.equal(composeNotes({ summary: '', generated }), generated, 'no summary, list only');
+  const nightly = composeNotes({
+    summary: '- Better.',
+    generated,
+    nightly: true,
+    target: 'abc123',
+    previous: 'v2.20.0',
+  });
+  assert.match(nightly, /^> \[!WARNING\]\n> Nightly build of `main` at abc123/);
+  assert.match(nightly, /everything merged since v2\.20\.0/);
+  assert.ok(nightly.indexOf("## What's new") < nightly.indexOf("## What's Changed"));
+});
+
+test('release notes group pull requests by the files they change', () => {
+  assert.equal(classify(['src/signal-watch.rs', 'src/main.rs']), 'app');
+  assert.equal(classify(['tv/home.sh']), 'app');
+  assert.equal(classify(['development.md', 'appinfo.json']), 'app');
+  assert.equal(classify(['custom_components/luma/light.py', 'hacs.json']), 'homeAssistant');
+  assert.equal(classify(['src/app-artwork-tests.rs', 'src/tests.rs']), 'internal', 'tests only');
+  assert.equal(classify(['tv-helper/src/tests.rs', 'tests/smoke.mjs']), 'internal');
+  assert.equal(classify(['.github/workflows/ci.yml', 'tools/package.mjs']), 'internal');
+  assert.equal(classify(['custom_components/luma/x.py', 'src/view.rs']), 'app', 'app wins');
+  assert.equal(classify([]), 'internal');
+});
+
+test("release notes take each pull request's own summary", () => {
+  // Shapes of real descriptions: a Summary paragraph, Summary bullets, and no headings.
+  const paragraph =
+    '## Summary\nAdd automatic return-to-Home when an HDMI input\nloses its signal.\n\n' +
+    'More detail.\n\n## Key Changes\n- **New module**: x';
+  assert.deepEqual(summaryOf(paragraph), [
+    'Add automatic return-to-Home when an HDMI input loses its signal.',
+  ]);
+  const bullets =
+    '## Summary\n\n- **Six-column grid:** Favorites wrap.\n  - nested detail\n' +
+    '* **Most recent first:** Opened apps move.\n\n## Testing\n- `cargo test`';
+  assert.deepEqual(summaryOf(bullets), [
+    '- **Six-column grid:** Favorites wrap.',
+    '- **Most recent first:** Opened apps move.',
+  ]);
+  assert.deepEqual(summaryOf('Fixes the clock.\r\n\r\nhttps://claude.ai/code/x'), [
+    'Fixes the clock.',
+  ]);
+  assert.deepEqual(summaryOf('<!-- template -->\n## Testing\n- ran it'), []);
+  assert.deepEqual(
+    summaryOf('🤖 Generated with [Claude Code](https://claude.com/claude-code)'),
+    [],
+  );
+  assert.deepEqual(summaryOf(null), []);
+  const many = `## Summary\n${Array.from({ length: 8 }, (_, i) => `- item ${i}`).join('\n')}`;
+  assert.deepEqual(summaryOf(many).slice(-2), ['- item 5', '- …and 2 more']);
+});
+
+test('release notes keep wrapped bullet lines and drop nested bullets', () => {
+  const body =
+    '## Summary\n- **Nightly builds**: runs daily and\n  builds only when main changed.\n' +
+    '  - nested detail\n    nested continuation\n- Second\n\n- After a blank line\n' +
+    'Trailing text ends the list\n- not this one';
+  assert.deepEqual(summaryOf(body), [
+    '- **Nightly builds**: runs daily and builds only when main changed.',
+    '- Second',
+    '- After a blank line',
+  ]);
+});
+
+test('release notes clip long summaries and fall back to titles to fit GitHub', () => {
+  const long = 'word '.repeat(200).trim();
+  const clipped = clip(long);
+  assert.ok(clipped.length <= 501 && clipped.endsWith('word…'), clipped.slice(-10));
+  assert.equal(clip('short'), 'short');
+  assert.equal(summaryOf(`## Summary\n${long}`)[0], clipped);
+
+  const pulls = Array.from({ length: 3 }, (_, i) => ({
+    title: `Change ${i}`,
+    body: `## Summary\n${long}`,
+    group: 'app',
+  }));
+  const context = { pulls, generated: 'LIST', previous: 'v1.0.0' };
+  assert.match(fittedNotes(context), /\*\*Change 0\.\*\* word/);
+  const titlesOnly = fittedNotes(context, 200);
+  assert.match(titlesOnly, /^## What's new\n\n### On the TV\n\n- Change 0\n- Change 1\n/);
+  assert.doesNotMatch(titlesOnly, /word/);
+  assert.throws(() => fittedNotes(context, 20), /over GitHub's limit/);
+});
+
+test('release notes limit concurrent GitHub requests and keep their order', async () => {
+  let active = 0;
+  let peak = 0;
+  const results = await mapLimit([5, 1, 4, 2, 3, 0, 6], 3, async (n) => {
+    peak = Math.max(peak, ++active);
+    await new Promise((resolve) => setTimeout(resolve, n));
+    active--;
+    return n * 10;
+  });
+  assert.deepEqual(results, [50, 10, 40, 20, 30, 0, 60]);
+  assert.equal(peak, 3);
+  assert.deepEqual(await mapLimit([], 3, async () => 1), []);
+});
+
+test('release notes retry only rate-limited GitHub responses', () => {
+  const headers = (values) => new Headers(values);
+  assert.equal(retryDelay(429, headers({ 'retry-after': '7' })), 7);
+  assert.equal(retryDelay(403, headers({ 'retry-after': '500' })), 120);
+  assert.equal(retryDelay(429, headers({})), 60);
+  const reset = String(Math.floor(Date.now() / 1000) + 30);
+  const wait = retryDelay(
+    403,
+    headers({ 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': reset }),
+  );
+  assert.ok(wait > 25 && wait <= 30, String(wait));
+  assert.equal(retryDelay(403, headers({ 'x-ratelimit-remaining': '12' })), null, 'forbidden');
+  assert.equal(retryDelay(404, headers({})), null);
+  assert.equal(retryDelay(422, headers({ 'retry-after': '5' })), null);
+});
+
+test('release notes drop HTML comments without leaving an opener behind', () => {
+  assert.equal(stripComments('a<!-- hint -->b<!--x-->c'), 'abc');
+  assert.equal(stripComments('<!<!---->--'), '', 'an opener formed by a removal is dropped too');
+  assert.equal(stripComments('x <!<!-- a -->-- b --> y'), 'x  y');
+  assert.equal(stripComments('keep <!-- unclosed hint'), 'keep ');
+  assert.equal(stripComments('no comments --> here'), 'no comments --> here');
+});
+
+test("release notes list what's new by group, app first", () => {
+  const notes = whatsNew([
+    { title: 'Run CI on Trunk runners', body: '## Summary\n- runners', group: 'internal' },
+    { title: 'Auto-return to Home', body: '## Summary\nReturns Home.', group: 'app' },
+    { title: 'Six-column grid', body: '## Summary\n- Wraps.\n- Recent first.', group: 'app' },
+    { title: 'Example popup buttons', body: '', group: 'homeAssistant' },
+  ]);
+  assert.equal(
+    notes,
+    [
+      '### On the TV',
+      '',
+      '- **Auto-return to Home.** Returns Home.',
+      '- **Six-column grid**',
+      '  - Wraps.',
+      '  - Recent first.',
+      '',
+      '### Home Assistant',
+      '',
+      '- Example popup buttons',
+      '',
+      '### Behind the scenes',
+      '',
+      '- Run CI on Trunk runners',
+    ].join('\n'),
+  );
+  assert.equal(whatsNew([]), '');
 });

@@ -4,8 +4,9 @@ run-name: 'Release Luma (${{ inputs.bump }})'
 # The only way to publish Luma. Run it from Actions → Release → Run workflow on main:
 #   1. Bump the version (minor by default, or major) on a release/vX.Y.Z branch.
 #   2. Run the full CI validation (checks, smoke suites, verified ARM IPK) on that commit.
-#   3. Fast-forward main to the release commit, publish the GitHub release (notes generated from
-#      the merged pull requests), mirror it to R2.
+#   3. Fast-forward main to the release commit, publish the GitHub release (a "What's new"
+#      section from the merged pull requests' summaries over the list of them;
+#      tools/release-notes.mjs), mirror it to R2.
 # If any step before 3 fails, main and the published feed are untouched.
 
 on:
@@ -93,10 +94,29 @@ jobs:
       contents: write
       statuses: write
     steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: tools
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
       - uses: actions/download-artifact@v8
         with:
           name: luma-release
           path: release
+      # Written before main moves, so a GitHub API failure here leaves nothing half-published.
+      - name: Write release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.version.outputs.tag }}
+          SHA: ${{ needs.version.outputs.sha }}
+        run: |
+          # The latest stable release; nightly prereleases are never "latest".
+          previous="$(gh release view --json tagName --jq .tagName 2>/dev/null || true)"
+          node tools/release-notes.mjs --tag "$TAG" --previous "$previous" --target "$SHA" \
+            --out "$RUNNER_TEMP/notes.md"
+          cat "$RUNNER_TEMP/notes.md" >> "$GITHUB_STEP_SUMMARY"
       - name: Fast-forward main and publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -125,7 +145,7 @@ jobs:
           gh api -X PATCH "repos/$GH_REPO/git/refs/heads/main" -f sha="$SHA" -F force=false > /dev/null
           gh release create "$TAG" release/*.ipk release/sha256sums release/repo.json \
             release/description.html release/app-icon-large.png \
-            --target "$SHA" --generate-notes --title "Luma ${TAG#v}"
+            --target "$SHA" --notes-file "$RUNNER_TEMP/notes.md" --title "Luma ${TAG#v}"
           gh api -X DELETE "repos/$GH_REPO/git/refs/heads/release/$TAG" || true
           echo "### Published [$TAG]($GITHUB_SERVER_URL/$GH_REPO/releases/tag/$TAG)" >> "$GITHUB_STEP_SUMMARY"
 
