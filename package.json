@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@webos-tools/cli": "3.2.6",
+    "acorn": "8.18.0",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
     "sharp": "0.35.5"

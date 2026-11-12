@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { parse } from 'acorn';
 
 const source = await readFile(new URL('../overlay/logic.js', import.meta.url), 'utf8');
 const context = { window: {} };
@@ -94,4 +95,12 @@ test('a camera video needs an http(s) playlist and keeps its session for reporti
   assert.equal(video({ mode: 'video', url: 'javascript:alert(1)' }), null);
   assert.equal(video({ url: 'http://ha/x.m3u8' }), null);
   assert.equal(video(null), null);
+});
+
+test("the overlay's scripts parse in webOS 4's Chromium 53, which knows ES2016 at most", async () => {
+  // Call-argument trailing commas (ES2017) and the like would stop every overlay from showing.
+  for (const file of ['overlay/app.js', 'overlay/logic.js', 'overlay/vendor/hls.light.min.js']) {
+    const source = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
+    assert.doesNotThrow(() => parse(source, { ecmaVersion: 2016, sourceType: 'script' }), file);
+  }
 });

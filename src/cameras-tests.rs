@@ -376,8 +376,11 @@ fn an_enlarged_camera_plays_home_assistants_hls_video_over_the_mjpeg_stream() {
             "a".into()
         ))
     );
-    // The overlay plays it: the stream underneath pauses.
-    assert!(state.camera_watches(true).is_empty());
+    // The stream keeps running underneath: it shows until the overlay's video plays.
+    assert!(matches!(
+        state.camera_watches(true)[0].source,
+        Source::Stream { .. }
+    ));
     // Back in the overlay app leaves the enlarged camera too.
     state.camera_video_closed(false);
     assert_eq!(state.cameras.enlarged, None);

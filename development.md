@@ -483,7 +483,8 @@ checks the camera's access tokens like Home Assistant's camera proxy) starts Hom
 HLS stream and answers `{"url": "/api/hls/<stream token>/master_playlist.m3u8"}`. Enlarging a
 camera with **Live video** on sets `cameras::Video::Resolving`; `cameras::Service::resolve` asks
 that endpoint off the SDL thread, and the answer makes the Home Assistant thread launch the
-overlay app with `mode: "video"` (`Api::show_video`), pausing the motion-JPEG worker underneath.
+overlay app with `mode: "video"` (`Api::show_video`); the motion-JPEG worker keeps running
+underneath. `luma.dismiss` (`DELETE /api/overlay`) closes only a doorbell card, never a camera video.
 The page plays the playlist in a `<video>` with the TV's own HLS support, or with the bundled
 hls.js light build (1.5.20, ES5, Apache-2.0, `overlay/vendor/`) through Media Source
 Extensions; HLS views allow any origin, so the `file://` page may fetch them. It stays

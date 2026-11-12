@@ -586,7 +586,9 @@ impl<T: Tv> Api<T> {
                     ("POST", "/api/cameras") => self.set_cameras(client, &body),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
-                        if self.session.is_some() {
+                        // Dismissing closes a doorbell card, never a camera the owner is
+                        // watching full screen in the Cameras app.
+                        if self.session.as_ref().is_some_and(|session| !session.video) {
                             if let Err(error) = self.tv.close_overlay() {
                                 eprintln!("Luma Home Assistant close: {error}");
                             }
@@ -976,7 +978,9 @@ impl<T: Tv> Api<T> {
     pub fn close_video(&mut self) {
         if self.session.as_ref().is_some_and(|session| session.video) {
             let _ = self.tv.close_overlay();
-            self.session = None;
+            // Resumes media a doorbell card had paused before the video replaced it. The
+            // gallery has already left the camera, so its VideoClosed changes nothing.
+            self.finish_session(false);
         }
     }
 

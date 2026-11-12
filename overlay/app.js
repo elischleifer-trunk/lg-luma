@@ -200,7 +200,7 @@
     timers.push(
       setTimeout(function () {
         if (!playing) dismiss(true);
-      }, VIDEO_WAIT_MS),
+      }, VIDEO_WAIT_MS)
     );
     // The TV's own player first, where it says it plays HLS; hls.js otherwise or if it fails.
     var native = player.canPlayType && player.canPlayType('application/vnd.apple.mpegurl');

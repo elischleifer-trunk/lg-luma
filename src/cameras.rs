@@ -12,8 +12,8 @@
 //! Home Assistant's motion-JPEG stream is made of snapshots for most cameras, about two a
 //! second. A camera that can stream also has an HLS endpoint: an enlarged camera with live video
 //! asks it for the address of Home Assistant's HLS stream (the camera's own H.264 video) and the
-//! overlay app plays that full screen with the TV's hardware decoder. Until it plays, and if it
-//! cannot, the motion-JPEG stream stays on screen.
+//! overlay app plays that full screen with the TV's hardware decoder. The motion-JPEG stream
+//! keeps running underneath: it shows until the video plays, and stays if it cannot.
 use crate::state::{Direction, Effect, Overlay, Rect, State, Target};
 use image::{ImageReader, Limits, RgbaImage};
 use serde_json::{Value, json};
@@ -133,7 +133,8 @@ pub enum Video {
     Off,
     /// Asking the integration to start the stream.
     Resolving(String),
-    /// The overlay app plays it; the motion-JPEG stream pauses underneath.
+    /// Handed to the overlay app, which shows it once it plays; until then, and if it cannot,
+    /// the motion-JPEG stream shows from underneath.
     Playing(String),
 }
 
@@ -713,10 +714,6 @@ impl Gallery {
 
     pub fn watches(&self) -> Vec<Watch> {
         if let Some(camera) = self.enlarged.as_deref().and_then(|id| self.camera(id)) {
-            // The overlay app plays this camera's video; the stream would only compete with it.
-            if self.video == Video::Playing(camera.id.clone()) {
-                return vec![];
-            }
             let live = camera
                 .stream
                 .as_ref()

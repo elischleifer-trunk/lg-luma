@@ -832,6 +832,13 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     assert_eq!(closed(&mut h, &params, true).body, json!({"ended": true}));
     assert_eq!(h.events.try_recv(), Ok(Event::VideoClosed { failed: true }));
 
+    // Home Assistant's dismiss closes doorbell cards, never a camera being watched.
+    h.api.show_video("http://ha/x.m3u8", "Door", h.now);
+    let calls = h.tv.calls().len();
+    h.call("DELETE", "/api/overlay", Some(&token), json!({}));
+    assert_eq!(h.tv.calls().len(), calls);
+    assert!(h.events.try_recv().is_err());
+
     // Back in the player.
     h.api.show_video("http://ha/x.m3u8", "Door", h.now);
     let params = launched(&h);
@@ -849,14 +856,18 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
         Ok(Event::VideoClosed { failed: false })
     );
 
-    // The gallery closing the video closes the overlay without reporting back.
-    let _ = h.events.try_iter().count();
+    // The gallery closing the video closes the overlay and resumes what the card had paused.
     h.call("DELETE", "/api/overlay", Some(&token), json!({}));
+    *h.tv.playing.lock().unwrap() = Some("_media7".into());
+    let mut paused = camera();
+    paused["pause"] = json!(true);
+    h.call("POST", "/api/overlay", Some(&token), paused);
     h.api.show_video("http://ha/x.m3u8", "Door", h.now);
     h.api.close_video();
-    assert_eq!(h.tv.calls().last().unwrap(), "close");
-    assert!(h.events.try_recv().is_err());
+    let calls = h.tv.calls();
+    assert_eq!(&calls[calls.len() - 2..], ["close", "resume _media7"]);
 
+    let _ = h.events.try_iter().count();
     // Without the overlay app installed yet, the gallery hears at once that it failed.
     h.api.overlay_ready.store(false, Ordering::Release);
     h.api.show_video("http://ha/x.m3u8", "Door", h.now);

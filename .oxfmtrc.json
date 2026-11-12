@@ -4,7 +4,10 @@
   "printWidth": 100,
   "trailingComma": "all",
   "sortPackageJson": false,
-  "overrides": [{ "files": ["tv/*.cjs"], "options": { "trailingComma": "none" } }],
+  "overrides": [
+    { "files": ["tv/*.cjs"], "options": { "trailingComma": "none" } },
+    { "files": ["overlay/*.js"], "options": { "trailingComma": "es5" } }
+  ],
   "ignorePatterns": [
     ".agents/skills/**",
     "node_modules/**",
