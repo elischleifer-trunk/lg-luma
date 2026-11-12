@@ -8,6 +8,12 @@
 //!
 //! Reading the stream itself (rather than leaving it to a browser) tells Luma exactly when
 //! frames arrive, so a stream that stalls or fails switches to back-to-back snapshots.
+//!
+//! Home Assistant's motion-JPEG stream is made of snapshots for most cameras, about two a
+//! second. A camera that can stream also has an HLS endpoint: an enlarged camera with live video
+//! asks it for the address of Home Assistant's HLS stream (the camera's own H.264 video) and the
+//! overlay app plays that full screen with the TV's hardware decoder. The motion-JPEG stream
+//! keeps running underneath: it shows until the video plays, and stays if it cannot.
 use crate::state::{Direction, Effect, Overlay, Rect, State, Target};
 use image::{ImageReader, Limits, RgbaImage};
 use serde_json::{Value, json};
@@ -47,6 +53,8 @@ pub struct Camera {
     pub name: String,
     pub stream: Option<String>,
     pub snapshot: Option<String>,
+    /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
+    pub hls: Option<String>,
     pub hidden: bool,
 }
 
@@ -111,6 +119,31 @@ pub enum Update {
     Frame(Arc<Frame>),
     /// The camera could not be loaded; its last frame, if any, stays on screen.
     Unavailable(String),
+    /// The address of a camera's HLS stream, or why there is none.
+    Video {
+        id: String,
+        result: Result<String, String>,
+    },
+}
+
+/// Home Assistant's HLS video for the enlarged camera.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub enum Video {
+    #[default]
+    Off,
+    /// Asking the integration to start the stream.
+    Resolving(String),
+    /// Handed to the overlay app, which shows it once it plays; until then, and if it cannot,
+    /// the motion-JPEG stream shows from underneath.
+    Playing(String),
+}
+
+/// `http://host:port` of a URL.
+fn origin(url: &str) -> &str {
+    let start = url.find("://").map_or(0, |at| at + 3);
+    url[start..]
+        .find('/')
+        .map_or(url, |end| &url[..start + end])
 }
 
 /// Limits concurrent decodes.
@@ -165,6 +198,21 @@ fn same_kind(a: &Watch, b: &Watch) -> bool {
 }
 
 impl Service {
+    /// Asks the integration's HLS endpoint to start a camera's stream, answering with
+    /// [`Update::Video`].
+    pub fn resolve(&self, id: String, endpoint: String) {
+        let sender = self.sender.clone();
+        let spawned = thread::Builder::new()
+            .name("camera-video".into())
+            .spawn(move || {
+                let result = hls_address(&agent(), &endpoint);
+                let _ = sender.send(Update::Video { id, result });
+            });
+        if let Err(error) = spawned {
+            eprintln!("Luma cameras: {error}");
+        }
+    }
+
     /// Watches exactly these cameras. A camera already watched the same way keeps its worker
     /// (and a connected stream) and only takes new URLs; the others stop.
     pub fn sync(&mut self, watches: &[Watch]) {
@@ -231,6 +279,17 @@ impl Drop for Service {
             worker.stop.store(true, Ordering::Release);
         }
     }
+}
+
+/// The absolute address of the HLS playlist the integration's endpoint started.
+fn hls_address(agent: &ureq::Agent, endpoint: &str) -> Result<String, String> {
+    let bytes = fetch(agent, endpoint)?;
+    let reply: Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    let path = reply["url"]
+        .as_str()
+        .filter(|path| path.starts_with('/') && !path.starts_with("//"))
+        .ok_or("Home Assistant did not return a stream address")?;
+    Ok(format!("{}{path}", origin(endpoint)))
 }
 
 fn agent() -> ureq::Agent {
@@ -563,6 +622,15 @@ pub struct Gallery {
     pub sheet_first: usize,
     /// The arrangement to save, taken by the main loop for the Home Assistant service.
     pub save: Option<Value>,
+    pub video: Video,
+    /// Cameras whose HLS video could not be played: they stay on the motion-JPEG stream.
+    pub video_failed: Vec<String>,
+    /// For the main loop: start this camera's HLS stream (id, endpoint).
+    pub resolve: Option<(String, String)>,
+    /// For the main loop: play this HLS address full screen (url, title).
+    pub play: Option<(String, String)>,
+    /// For the main loop: close the video the overlay app is playing.
+    pub stop_video: bool,
 }
 
 impl Gallery {
@@ -635,6 +703,15 @@ impl Gallery {
     }
 
     /// What the gallery shows now: the enlarged camera, or every visible tile.
+    /// Leaves the enlarged camera, closing its video.
+    fn shrink(&mut self) {
+        self.enlarged = None;
+        if matches!(std::mem::take(&mut self.video), Video::Playing(_)) {
+            self.stop_video = true;
+        }
+        self.resolve = None;
+    }
+
     pub fn watches(&self) -> Vec<Watch> {
         if let Some(camera) = self.enlarged.as_deref().and_then(|id| self.camera(id)) {
             let live = camera
@@ -714,7 +791,8 @@ impl State {
             gallery.cameras = cameras;
             gallery.live = live;
             gallery.unavailable.clear();
-            gallery.enlarged = None;
+            gallery.video_failed.clear();
+            gallery.shrink();
             gallery.sheet = None;
             gallery.moving = false;
             gallery.first_row = 0;
@@ -766,7 +844,7 @@ impl State {
             .as_deref()
             .is_some_and(|id| gallery.index(id).is_none())
         {
-            gallery.enlarged = None;
+            gallery.shrink();
         }
         if let Some(Sheet::Options(id)) = &gallery.sheet
             && gallery.index(id).is_none()
@@ -825,6 +903,44 @@ impl State {
                     gallery.unavailable.push(id);
                 }
             }
+            Update::Video { id, result } => {
+                // Only for the camera still enlarged and waiting for it.
+                if gallery.video != Video::Resolving(id.clone()) {
+                    return;
+                }
+                match result {
+                    Ok(url) => {
+                        let title = gallery
+                            .camera(&id)
+                            .map_or_else(String::new, |c| c.name.clone());
+                        gallery.video = Video::Playing(id);
+                        gallery.play = Some((url, title));
+                    }
+                    Err(error) => {
+                        eprintln!("Luma cameras {id}: no HLS stream: {error}");
+                        gallery.video = Video::Off;
+                        gallery.video_failed.push(id);
+                    }
+                }
+            }
+        }
+        self.dirty = true;
+    }
+
+    /// The overlay app's video closed. Back there also leaves the enlarged camera; a video that
+    /// could not play leaves the motion-JPEG stream on screen for the rest of this visit.
+    pub fn camera_video_closed(&mut self, failed: bool) {
+        let gallery = &mut self.cameras;
+        // Only a video being played can close; a camera whose stream is still starting is not
+        // affected by a late report about an earlier one.
+        let Video::Playing(id) = gallery.video.clone() else {
+            return;
+        };
+        gallery.video = Video::Off;
+        if failed {
+            gallery.video_failed.push(id);
+        } else if gallery.enlarged.as_deref() == Some(id.as_str()) {
+            gallery.enlarged = None;
         }
         self.dirty = true;
     }
@@ -861,7 +977,7 @@ impl State {
             self.reconcile_focus();
         }
         let gallery = &mut self.cameras;
-        gallery.enlarged = None;
+        gallery.shrink();
         gallery.sheet = None;
         gallery.moving = false;
         // Frames are large; a reopened gallery fetches fresh ones.
@@ -951,7 +1067,8 @@ impl State {
     pub fn camera_activate(&mut self) -> Vec<Effect> {
         self.dirty = true;
         let gallery = &mut self.cameras;
-        if gallery.enlarged.take().is_some() {
+        if gallery.enlarged.is_some() {
+            gallery.shrink();
             return vec![];
         }
         if std::mem::take(&mut gallery.moving) {
@@ -959,6 +1076,15 @@ impl State {
         }
         match self.focus.clone() {
             Target::Camera(id) if gallery.sheet.is_none() => {
+                // With live video, ask for Home Assistant's HLS stream; the motion-JPEG stream
+                // shows meanwhile, and instead when there is none.
+                if gallery.live
+                    && !gallery.video_failed.contains(&id)
+                    && let Some(endpoint) = gallery.camera(&id).and_then(|c| c.hls.clone())
+                {
+                    gallery.video = Video::Resolving(id.clone());
+                    gallery.resolve = Some((id.clone(), endpoint));
+                }
                 gallery.enlarged = Some(id);
             }
             Target::CameraGear => self.open_camera_settings(),
@@ -1023,7 +1149,11 @@ impl State {
     pub fn camera_back(&mut self) -> Vec<Effect> {
         self.dirty = true;
         let gallery = &mut self.cameras;
-        if std::mem::take(&mut gallery.moving) || gallery.enlarged.take().is_some() {
+        if std::mem::take(&mut gallery.moving) {
+            return vec![];
+        }
+        if gallery.enlarged.is_some() {
+            gallery.shrink();
             return vec![];
         }
         if let Some(sheet) = gallery.sheet.take() {

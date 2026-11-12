@@ -36,6 +36,20 @@
     };
   }
 
+  // A camera video from the Cameras app: Home Assistant's HLS playlist, played full screen.
+  function video(params) {
+    params = params && typeof params === 'object' ? params : {};
+    var url = http(params.url);
+    if (params.mode !== 'video' || !url) return null;
+    return {
+      session: typeof params.session === 'string' ? params.session : '',
+      nonce: typeof params.nonce === 'string' ? params.nonce : '',
+      port: clamp(params.port, 1, 65535, 5862),
+      url: url,
+      title: typeof params.title === 'string' ? params.title.slice(0, 80) : '',
+    };
+  }
+
   // A fresh snapshot URL each refresh, so neither the browser nor a proxy serves a cached frame.
   function frameUrl(url, now) {
     return url + (url.indexOf('?') >= 0 ? '&' : '?') + '_luma=' + now;
@@ -45,7 +59,7 @@
     return 'http://127.0.0.1:' + port + '/api/overlay/closed';
   }
 
-  var api = { settings: settings, frameUrl: frameUrl, closedUrl: closedUrl };
+  var api = { settings: settings, video: video, frameUrl: frameUrl, closedUrl: closedUrl };
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.LumaOverlay = api;
 })(typeof window === 'object' ? window : globalThis);

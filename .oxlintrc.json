@@ -10,5 +10,12 @@
       { "argsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }
     ]
   },
-  "ignorePatterns": [".agents/skills/**", "node_modules/**", "dist/**", ".build/**", "target/**"]
+  "ignorePatterns": [
+    ".agents/skills/**",
+    "node_modules/**",
+    "dist/**",
+    ".build/**",
+    "target/**",
+    "overlay/vendor/**"
+  ]
 }
