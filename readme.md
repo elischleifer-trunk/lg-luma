@@ -13,7 +13,7 @@ A native launcher for rooted LG webOS TVs, inspired by Apple TV.
 > is usually discovered on its own) and type the code shown on the TV.
 > To see what the popups look like, press **Show example camera card** or **Show example toast**
 > on the TV's device page. Setup, actions and automation examples are in the
-> [Home Assistant guide](https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md).
+> [Home Assistant guide](home-assistant.md).
 > The rest of this page is about the TV app.
 
 https://github.com/user-attachments/assets/3d3564d9-5942-4aef-a726-0323f5e86a07
