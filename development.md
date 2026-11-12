@@ -1070,7 +1070,8 @@ run independently.
 
 Pull requests need no release bookkeeping: keep the existing app version and don't add version
 or changelog files. Merging never publishes. The **Release** workflow picks the version, and
-each GitHub release's notes are generated from the pull requests merged since the previous tag.
+each GitHub release's notes are generated from the pull requests merged since the previous release
+(see [Release notes](#release-notes)), so a clear PR title and description are what end up in them.
 
 ### Merge gate
 
@@ -1105,9 +1106,9 @@ The workflow then:
    `release/vX.Y.Z` branch. An existing tag stops the run.
 2. **Validate.** Calls `ci.yml` on that commit: checks, unit tests, the four desktop smoke suites and
    the verified ARM IPK and Homebrew feed.
-3. **Publish GitHub release.** Fast-forwards `main` to the release commit (refusing if `main` moved
-   meanwhile), creates the `vX.Y.Z` GitHub release from that run's artifacts, with notes generated
-   from the merged pull requests, and deletes the temporary branch.
+3. **Publish GitHub release.** Writes the [release notes](#release-notes), fast-forwards `main` to
+   the release commit (refusing if `main` moved meanwhile), creates the `vX.Y.Z` GitHub release from
+   that run's artifacts and deletes the temporary branch.
 4. **Publish to Cloudflare R2.** See [Release hosting](#release-hosting-cloudflare-r2).
 
 If bumping or validation fails, `main`, tags and the published feed are untouched: fix the problem
@@ -1117,7 +1118,51 @@ No additional token is needed; the built-in token pushes the release commit.
 
 `pnpm version:check` checks synchronization without writing files. `pnpm version:sync` repairs
 metadata from the current `package.json` version without calculating a bump. `pnpm version:bump`
-is reserved for the Release workflow.
+is reserved for the Release workflow, and `node tools/sync-version.mjs --set X.Y.Z` for the Nightly
+workflow.
+
+### Release notes
+
+`tools/release-notes.mjs` writes the notes for releases and nightlies. It asks GitHub for the list
+of pull requests merged since the previous stable release and puts a **What's new** section above
+that list. Each pull request is grouped by the files it changed:
+
+- **On the TV**: the app (`src/`, `tv/`, `tv-helper/src/`, `assets/`, `overlay/`,
+  `vector-geometry/`, `appinfo.json`; test files don't count).
+- **Home Assistant**: `custom_components/`, `hacs.json`.
+- **Behind the scenes**: everything else (CI, tooling, tests, docs), title only.
+
+The first two carry the pull request's own summary: the first paragraph, or the top-level bullets
+(at most six), of the description's `## Summary` section, or of the text before its first heading.
+Wrapped bullet lines are kept, nested bullets dropped, and any paragraph or bullet longer than
+500 characters is cut at a word. If the notes would go over GitHub's 125,000-character limit, the
+summaries are left out (titles only). So the PR title and summary are what users read; write
+them for someone holding the remote. No
+external service or secret is involved; a GitHub API failure stops the run before anything is
+published.
+
+### Nightly builds
+
+**Actions → Nightly** (`.github/workflows/nightly.yml`) runs every day at 09:37 UTC, and can be run
+by hand on `main`. It builds only when `main` has commits since the last release and there is no
+nightly for them yet; otherwise it stops after a few seconds.
+
+A nightly is versioned `X.Y.N`: `X.Y.0` is the last release (the version in `main`'s
+`package.json`) and `N` is the number of commits on `main` since it. Releases are always `X.Y.0`,
+so a nightly sorts after the release it builds on and before the next one; a TV on a nightly
+upgrades to the next release like any other. The workflow:
+
+1. Commits the nightly version on a temporary `nightly/vX.Y.N` branch (`main` is never changed).
+2. Runs the full `ci.yml` validation on that commit, like a release.
+3. Publishes a `vX.Y.N` GitHub **prerelease** titled "Luma X.Y.N (nightly)", with release notes
+   covering everything since the last release, then deletes all but the newest five nightly
+   prereleases and their tags.
+4. Mirrors it to R2 and updates `https://luma.elischleifer.com/nightly/repo.json`, deleting the R2
+   folders of pruned nightlies. The stable `/repo.json` is never touched.
+
+To follow nightlies on a TV, add `https://luma.elischleifer.com/nightly/repo.json` as a repository
+in Homebrew Channel. Luma's own updater keeps reading the stable feed, so it offers the next release
+and never a nightly. A failed nightly changes nothing; the next night retries if `main` hasn't moved.
 
 Homebrew Channel's details page reads `packages[].shortDescription` (or `fullDescriptionUrl`),
 not `manifest.appDescription`. The feed generator writes the root app metadata description into
@@ -1207,9 +1252,16 @@ Bucket layout:
 
 ```text
 repo.json                  latest feed, asset URLs rewritten to luma.elischleifer.com (60 s cache)
+nightly/repo.json          latest nightly feed (60 s cache)
 releases/vX.Y.Z/*.ipk      immutable release assets, sha256sums, description, icon
 releases/vX.Y.Z/repo.json  that release's mirrored feed
 ```
+
+Nightlies (`vX.Y.N`, `N > 0`) use the same `releases/` folders. When the nightly workflow mirrors
+with `channel: nightly`, it updates `nightly/repo.json` instead of the root feed (only for the
+newest nightly prerelease, so re-mirroring an older one never rolls TVs back), and deletes any
+patch-version folder that is no longer a GitHub release, which removes pruned nightlies but never
+a stable release.
 
 After the Release workflow publishes a GitHub release, its `mirror` job calls
 `.github/workflows/publish-r2.yml`. It downloads the release assets, verifies `sha256sums`, rewrites

@@ -1,0 +1,168 @@
+name: Nightly
+run-name: "${{ github.event_name == 'schedule' && 'Nightly build' || 'Nightly build (manual)' }}"
+
+# Publishes a nightly build of main as a GitHub prerelease and mirrors it to
+# https://luma.elischleifer.com/nightly/repo.json (add that URL in Homebrew Channel to follow
+# nightlies). It builds only when main has commits since the last release and no nightly exists for
+# them yet, so a quiet night does nothing.
+#
+# A nightly is versioned X.Y.N: X.Y.0 is the last release (main's package.json) and N counts the
+# commits on main since it. Releases are always X.Y.0, so a nightly sorts after the release it
+# builds on and before the next one, and TVs on a nightly move to the next release by themselves.
+#
+#   1. Stamp X.Y.N on a nightly/vX.Y.N branch (main is never changed).
+#   2. Run the full CI validation (checks, smoke suites, verified ARM IPK) on that commit.
+#   3. Publish the prerelease with notes (tools/release-notes.mjs), keep the newest five nightlies,
+#      and mirror to R2, which also deletes pruned nightlies from the bucket.
+
+on:
+  schedule:
+    # 09:37 UTC: the middle of the night in the Americas, off the top of the hour.
+    - cron: '37 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Decide and stamp the nightly version
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      build: ${{ steps.plan.outputs.build }}
+      sha: ${{ steps.stamp.outputs.sha }}
+      tag: ${{ steps.plan.outputs.tag }}
+      base: ${{ steps.plan.outputs.base }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Check for changes since the last release and nightly
+        id: plan
+        run: |
+          released="$(node -p 'require("./package.json").version')"
+          base="v$released"
+          if ! git rev-parse --verify --quiet "refs/tags/$base^{commit}" > /dev/null; then
+            echo "::error::main's package.json is $released, but there is no $base tag."
+            exit 1
+          fi
+          count="$(git rev-list --count "$base..HEAD")"
+          IFS=. read -r major minor patch <<< "$released"
+          version="$major.$minor.$((patch + count))"
+          tag="v$version"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ "$count" -eq 0 ]; then
+            echo "Nothing merged since $base; no nightly." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          elif git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+            echo "$tag already covers main ($(git rev-parse --short HEAD)); no nightly." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "### Nightly $tag: $count commit(s) since $base" >> "$GITHUB_STEP_SUMMARY"
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit the nightly version to a branch
+        id: stamp
+        if: steps.plan.outputs.build == 'true'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          node tools/sync-version.mjs --set "${TAG#v}"
+          node tools/sync-version.mjs --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "Nightly $TAG"
+          git push --force origin "HEAD:refs/heads/nightly/$TAG"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  validate:
+    name: Validate
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
+    permissions:
+      contents: read
+      # See release.yml: ci.yml's Dynamic CI job declares it; off pull requests every job runs.
+      pull-requests: read
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.plan.outputs.sha }}
+
+  publish:
+    name: Publish nightly prerelease
+    needs: [plan, validate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: tools
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v8
+        with:
+          name: luma-release
+          path: release
+      - name: Write release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.plan.outputs.tag }}
+          SHA: ${{ needs.plan.outputs.sha }}
+          BASE: ${{ needs.plan.outputs.base }}
+        run: |
+          node tools/release-notes.mjs --nightly --tag "$TAG" --previous "$BASE" --target "$SHA" \
+            --out "$RUNNER_TEMP/notes.md"
+          cat "$RUNNER_TEMP/notes.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish and prune old nightlies
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.plan.outputs.tag }}
+          SHA: ${{ needs.plan.outputs.sha }}
+        run: |
+          packaged="$(basename release/*_arm.ipk)"
+          if [[ "$packaged" != *"_${TAG#v}_arm.ipk" ]]; then
+            printf 'Packaged %s does not match %s\n' "$packaged" "$TAG" >&2
+            exit 1
+          fi
+          gh release create "$TAG" release/*.ipk release/sha256sums release/repo.json \
+            release/description.html release/app-icon-large.png \
+            --target "$SHA" --prerelease --latest=false --notes-file "$RUNNER_TEMP/notes.md" \
+            --title "Luma ${TAG#v} (nightly)"
+          gh api -X DELETE "repos/$GH_REPO/git/refs/heads/nightly/$TAG" || true
+          # Keep the newest five nightly prereleases. Stable releases are never prereleases.
+          gh release list --limit 200 --json tagName,isPrerelease,createdAt \
+            --jq '[.[] | select(.isPrerelease and (.tagName | test("^v[0-9]+\\.[0-9]+\\.[1-9][0-9]*$")))]
+                  | sort_by(.createdAt) | reverse | .[5:] | .[].tagName' \
+            | while read -r old; do
+                echo "Pruning nightly $old"
+                gh release delete "$old" --yes --cleanup-tag
+              done
+          echo "### Published [$TAG]($GITHUB_SERVER_URL/$GH_REPO/releases/tag/$TAG)" >> "$GITHUB_STEP_SUMMARY"
+
+  mirror:
+    name: Publish to Cloudflare R2
+    needs: [plan, publish]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/publish-r2.yml
+    secrets: inherit
+    with:
+      tag: ${{ needs.plan.outputs.tag }}
+      channel: nightly

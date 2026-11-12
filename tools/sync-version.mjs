@@ -39,7 +39,8 @@ const releaseVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
 // Reads and validates every release file, then computes its updated text. Nothing is written, so
 // a failed check leaves the checkout untouched. With `bump`, package.json itself moves to the next
-// minor (x.Y.0) or major (X.0.0) version and is updated along with the rest.
+// minor (x.Y.0) or major (X.0.0) version, or to an exact `{ set: 'X.Y.Z' }` version, and is
+// updated along with the rest.
 async function planVersions(directory, bump) {
   const read = (filename) => fs.readFile(path.join(directory, filename), 'utf8');
   const project = await read('package.json');
@@ -51,7 +52,12 @@ async function planVersions(directory, bump) {
   let version = previous;
   if (bump === 'major') version = `${Number(match[1]) + 1}.0.0`;
   else if (bump === 'minor') version = `${match[1]}.${Number(match[2]) + 1}.0`;
-  else if (bump !== undefined) {
+  else if (typeof bump === 'object' && bump !== null) {
+    if (typeof bump.set !== 'string' || !releaseVersion.test(bump.set)) {
+      throw new Error(`Version "${bump.set}" must be a numeric major.minor.patch version.`);
+    }
+    version = bump.set;
+  } else if (bump !== undefined) {
     throw new Error(`Unknown version bump "${bump}". Use minor or major.`);
   }
 
@@ -131,9 +137,21 @@ export async function bumpVersion(directory = root, kind = 'minor') {
   return { previous, version };
 }
 
+// Sets package.json to an exact version (nightly builds use X.Y.N) and synchronizes the other
+// release metadata from it. Every file is validated before any is written.
+export async function setVersion(directory = root, version) {
+  const { previous, files } = await planVersions(directory, { set: version });
+  await writeChanged(directory, files);
+  return { previous, version };
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const bump = process.argv.indexOf('--bump');
-  if (bump !== -1) {
+  const set = process.argv.indexOf('--set');
+  if (set !== -1) {
+    const { previous, version } = await setVersion(root, process.argv[set + 1]);
+    console.log(`Set ${previous} → ${version}.`);
+  } else if (bump !== -1) {
     const { previous, version } = await bumpVersion(root, process.argv[bump + 1] ?? 'minor');
     console.log(`Bumped ${previous} → ${version}.`);
   } else {

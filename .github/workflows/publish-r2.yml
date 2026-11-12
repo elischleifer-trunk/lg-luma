@@ -7,7 +7,9 @@ run-name: "Publish ${{ inputs.tag || 'latest release' }} to Cloudflare R2"
 #
 # Layout in the bucket:
 #   repo.json                     latest feed (asset URLs rewritten to the public origin)
-#   releases/<tag>/*              immutable release assets + that release's feed
+#   nightly/repo.json             latest nightly feed (.github/workflows/nightly.yml)
+#   releases/<tag>/*              immutable release assets + that release's feed; nightly folders
+#                                 are deleted once their GitHub prerelease is pruned
 #
 # Secrets:   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, CLOUDFLARE_PURGE_TOKEN (optional)
 # Variables: CLOUDFLARE_ACCOUNT_ID, R2_BUCKET, CLOUDFLARE_ZONE_ID (optional),
@@ -20,12 +22,21 @@ on:
         description: Release tag to mirror (vX.Y.Z)
         type: string
         required: true
+      channel:
+        description: stable updates /repo.json; nightly updates /nightly/repo.json
+        type: string
+        default: stable
   workflow_dispatch:
     inputs:
       tag:
         description: Release tag to mirror (vX.Y.Z). Empty mirrors the latest release.
         type: string
         required: false
+      channel:
+        description: stable updates /repo.json; nightly updates /nightly/repo.json
+        type: choice
+        options: [stable, nightly]
+        default: stable
 
 permissions:
   contents: read
@@ -51,6 +62,7 @@ jobs:
       AWS_DEFAULT_REGION: auto
       AWS_REQUEST_CHECKSUM_CALCULATION: when_required
       AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+      CHANNEL: ${{ inputs.channel || 'stable' }}
     steps:
       - name: Require R2 configuration
         run: |
@@ -77,7 +89,15 @@ jobs:
           GH_REPO: ${{ github.repository }}
           TAG: ${{ inputs.tag }}
         run: |
+          if [ "$CHANNEL" != stable ] && [ "$CHANNEL" != nightly ]; then
+            printf 'Unknown channel: %s\n' "$CHANNEL" >&2
+            exit 1
+          fi
           latest="$(gh release view --json tagName --jq .tagName)"
+          if [ "$CHANNEL" = nightly ] && [ -z "$TAG" ]; then
+            echo 'A nightly mirror needs an explicit tag.' >&2
+            exit 1
+          fi
           TAG="${TAG:-$latest}"
           if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             printf 'Invalid release tag: %s\n' "$TAG" >&2
@@ -92,12 +112,24 @@ jobs:
             > site/repo.json
           cp site/repo.json "site/releases/$TAG/repo.json"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          # Only the latest GitHub release may replace the root feed.
-          echo "latest=$([ "$TAG" = "$latest" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          # Only the latest GitHub release may replace the root feed, and only the stable channel.
+          if [ "$CHANNEL" = nightly ]; then
+            # Only the newest nightly may replace the nightly feed, so re-mirroring an older one
+            # (a manual run, or re-running an earlier failed mirror job) never rolls TVs back.
+            newest="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" \
+              --jq '.[] | select(.prerelease) | [.created_at, .tag_name] | @tsv' \
+              | sort | tail -n 1 | cut -f 2)"
+            echo "feed=nightly/repo.json" >> "$GITHUB_OUTPUT"
+            echo "latest=$([ "$TAG" = "$newest" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          else
+            echo "feed=repo.json" >> "$GITHUB_OUTPUT"
+            echo "latest=$([ "$TAG" = "$latest" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          fi
       - name: Upload to R2
         env:
           TAG: ${{ steps.release.outputs.tag }}
           LATEST: ${{ steps.release.outputs.latest }}
+          FEED: ${{ steps.release.outputs.feed }}
         run: |
           s3() { aws s3 --endpoint-url "$ENDPOINT" "$@"; }
           dir="site/releases/$TAG"
@@ -107,20 +139,47 @@ jobs:
           s3 cp "$dir/repo.json" "s3://$BUCKET/releases/$TAG/repo.json" \
             --content-type application/json --cache-control 'public, max-age=300'
           if [ "$LATEST" != true ]; then
-            printf '%s is not the latest release; leaving /repo.json unchanged.\n' "$TAG"
+            printf '%s is not the latest release; leaving /%s unchanged.\n' "$TAG" "$FEED"
             exit 0
           fi
           # The latest feed is uploaded last so it never references missing assets.
-          s3 cp site/repo.json "s3://$BUCKET/repo.json" \
+          s3 cp site/repo.json "s3://$BUCKET/$FEED" \
             --content-type application/json --cache-control 'public, max-age=60'
+      - name: Delete pruned nightly builds from R2
+        if: env.CHANNEL == 'nightly'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          # Nightlies are X.Y.N with N > 0; stable releases are X.Y.0. A folder is deleted only when
+          # it is a patch version that GitHub no longer has as a release (the nightly workflow
+          # prunes old nightly prereleases), so stable releases, patch ones included, are kept.
+          keep="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" --jq '.[].tag_name')"
+          aws s3 ls --endpoint-url "$ENDPOINT" "s3://$BUCKET/releases/" \
+            | awk '$1 == "PRE" { sub("/$", "", $2); print $2 }' \
+            | while read -r folder; do
+                [[ "$folder" =~ ^v[0-9]+\.[0-9]+\.[1-9][0-9]*$ ]] || continue
+                [ "$folder" = "$TAG" ] && continue
+                grep -qxF "$folder" <<< "$keep" && continue
+                echo "Deleting pruned nightly $folder"
+                aws s3 rm --endpoint-url "$ENDPOINT" "s3://$BUCKET/releases/$folder/" --recursive
+              done
       - name: Purge the latest feed from Cloudflare's cache
         if: steps.release.outputs.latest == 'true'
         env:
           ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
           PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          FEED: ${{ steps.release.outputs.feed }}
         run: |
           if [ -z "$ZONE_ID" ] || [ -z "$PURGE_TOKEN" ]; then
-            echo 'No purge token configured; /repo.json refreshes within its 60 s cache lifetime.'
+            echo "No purge token configured; /$FEED refreshes within its 60 s cache lifetime."
+            exit 0
+          fi
+          if [ "$FEED" != repo.json ]; then
+            curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
+              -H "Authorization: Bearer $PURGE_TOKEN" -H 'Content-Type: application/json' \
+              --data "{\"files\":[\"$PUBLIC_URL/$FEED\"]}" > /dev/null
             exit 0
           fi
           curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
@@ -130,21 +189,23 @@ jobs:
         if: steps.release.outputs.latest == 'true'
         env:
           TAG: ${{ steps.release.outputs.tag }}
+          FEED: ${{ steps.release.outputs.feed }}
         run: |
           # Best effort: without a purge, an older feed may be served for up to a minute.
           for attempt in 1 2 3 4 5 6; do
-            version="$(curl -fsS "$PUBLIC_URL/repo.json?v=$GITHUB_RUN_ID" \
+            version="$(curl -fsS "$PUBLIC_URL/$FEED?v=$GITHUB_RUN_ID" \
               | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).packages[0].manifest.version))' || true)"
             [ "v$version" = "$TAG" ] && { echo "Serving $TAG"; exit 0; }
             sleep 15
           done
-          echo "::warning::$PUBLIC_URL/repo.json does not report $TAG yet (got '${version:-nothing}')."
+          echo "::warning::$PUBLIC_URL/$FEED does not report $TAG yet (got '${version:-nothing}')."
       - name: Summarize
         env:
           TAG: ${{ steps.release.outputs.tag }}
+          FEED: ${{ steps.release.outputs.feed }}
         run: |
           {
-            echo "### Mirrored $TAG to Cloudflare R2"
+            echo "### Mirrored $TAG to Cloudflare R2 ($CHANNEL)"
             echo
-            echo "Homebrew Channel repository: $PUBLIC_URL/repo.json"
+            echo "Homebrew Channel repository: $PUBLIC_URL/$FEED"
           } >> "$GITHUB_STEP_SUMMARY"
