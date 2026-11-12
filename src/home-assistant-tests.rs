@@ -634,3 +634,121 @@ fn the_listener_answers_info_over_http() {
     assert_eq!(body["api"], API_VERSION);
     assert_eq!(body["id"], h.api.store().device_id.as_str());
 }
+
+#[test]
+fn the_gallery_page_saves_order_hidden_cameras_and_live_video_for_later_launches() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let camera = |id: &str| json!({"id": id, "snapshot_url": format!("http://ha/{id}")});
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.b"), camera("camera.c")]}),
+    );
+    let page = |h: &mut Harness, origin: Option<&str>, peer: IpAddr, body: Value| {
+        let body = body.to_string();
+        h.api.handle(
+            &Request {
+                method: "POST",
+                path: "/api/overlay/cameras",
+                authorization: None,
+                origin,
+                peer,
+                body: body.as_bytes(),
+            },
+            h.now,
+        )
+    };
+    let arrangement =
+        json!({"order": ["0/camera.c", "0/camera.a"], "hidden": ["0/camera.b"], "live": false});
+    // Nothing is saved without an open gallery, or from anywhere but the TV itself.
+    assert_eq!(
+        page(&mut h, Some("null"), LOOPBACK, arrangement.clone()).status,
+        409
+    );
+    h.api.show_cameras(h.now);
+    let launched = |h: &Harness| -> Value {
+        let calls = h.tv.calls();
+        let last = calls
+            .iter()
+            .rev()
+            .find(|call| call.starts_with("launch "))
+            .unwrap();
+        serde_json::from_str(&last["launch ".len()..]).unwrap()
+    };
+    let params = launched(&h);
+    assert_eq!(params["live"], true);
+    assert_eq!(params["cameras"][1]["hidden"], false);
+    let mut body = arrangement.clone();
+    body["session"] = params["session"].clone();
+    body["nonce"] = params["nonce"].clone();
+    assert_eq!(page(&mut h, Some("null"), LAN, body.clone()).status, 403);
+    let mut wrong = body.clone();
+    wrong["nonce"] = json!("guess");
+    assert_eq!(page(&mut h, Some("null"), LOOPBACK, wrong).status, 409);
+    for bad in [
+        json!({"order": "camera.a"}),
+        json!({"hidden": [3]}),
+        json!({"live": "no"}),
+    ] {
+        let mut bad_body = body.clone();
+        for (key, value) in bad.as_object().unwrap() {
+            bad_body[key] = value.clone();
+        }
+        assert_eq!(page(&mut h, Some("null"), LOOPBACK, bad_body).status, 400);
+    }
+    let saved = page(&mut h, Some("null"), LOOPBACK, body.clone());
+    assert_eq!(saved.status, 200, "{:?}", saved.body);
+    let gallery = &h.api.store().gallery;
+    assert_eq!(gallery.order, ["camera.c", "camera.a"]);
+    assert_eq!(gallery.hidden, ["camera.b"]);
+    assert!(gallery.snapshots);
+
+    // The next launch (here a token rotation) applies it; unplaced cameras follow in HA's order.
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.b"), camera("camera.c"), camera("camera.d")]}),
+    );
+    let params = launched(&h);
+    let ids: Vec<_> = params["cameras"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|camera| {
+            (
+                camera["id"].as_str().unwrap(),
+                camera["hidden"].as_bool().unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        ids,
+        [
+            ("0/camera.c", false),
+            ("0/camera.a", false),
+            ("0/camera.b", true),
+            ("0/camera.d", false)
+        ]
+    );
+    assert_eq!(params["live"], false);
+
+    // A camera Home Assistant stopped sending keeps its place and stays hidden for when it returns.
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.c")]}),
+    );
+    let mut body = json!({"order": ["0/camera.a", "0/camera.c"], "hidden": []});
+    body["session"] = params["session"].clone();
+    body["nonce"] = params["nonce"].clone();
+    assert_eq!(page(&mut h, Some("null"), LOOPBACK, body).status, 200);
+    let gallery = &h.api.store().gallery;
+    assert_eq!(gallery.order, ["camera.a", "camera.c"]);
+    assert_eq!(gallery.hidden, ["camera.b"]);
+    // Leaving `live` out keeps the earlier choice.
+    assert!(gallery.snapshots);
+}

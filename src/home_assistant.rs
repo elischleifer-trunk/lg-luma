@@ -12,7 +12,9 @@
 //!
 //! Home Assistant also pushes its camera list (`POST /api/cameras`) whenever a camera's signed
 //! proxy URLs rotate. Luma's built-in Cameras app opens the same overlay app as a full-screen
-//! gallery of those cameras, relaunching it with fresh URLs while it stays open.
+//! gallery of those cameras, relaunching it with fresh URLs while it stays open. The page
+//! saves how the owner arranged it (order, hidden cameras, live video or snapshots) through
+//! `POST /api/overlay/cameras`, and Luma applies that to every launch.
 use crate::companion;
 use ring::digest;
 use serde::{Deserialize, Serialize};
@@ -39,6 +41,8 @@ const API_VERSION: u32 = 1;
 const MAX_BODY: usize = 32 * 1024;
 /// Cameras kept from Home Assistant's list; more are dropped.
 pub const MAX_CAMERAS: usize = 32;
+/// Remembered entries in the gallery's order and hidden lists, including absent cameras.
+const MAX_ARRANGED: usize = 64;
 const MAX_CLIENTS: usize = 8;
 const MAX_URL: usize = 4096;
 const PAIRING_TTL: Duration = Duration::from_secs(120);
@@ -132,6 +136,18 @@ pub struct Store {
     /// Stable per installation, so Home Assistant recognises a TV whose address changed.
     pub device_id: String,
     pub clients: Vec<Client>,
+    pub gallery: Gallery,
+}
+
+/// How the owner arranged the Cameras gallery, by Home Assistant entity ID, so it survives
+/// token rotation, restarts and pairing again.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+#[serde(default)]
+pub struct Gallery {
+    pub order: Vec<String>,
+    pub hidden: Vec<String>,
+    /// Enlarged cameras poll snapshots instead of opening the motion-JPEG stream.
+    pub snapshots: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -259,6 +275,36 @@ fn camera_url(body: &Value, key: &str) -> Result<Option<String>, Reply> {
         return Err(error(400, &format!("{key} must be an http or https URL")));
     }
     Ok(Some(url))
+}
+
+/// A list of gallery camera IDs from the page, as Home Assistant entity IDs: the page's IDs
+/// carry a server prefix ("0/camera.door") that is not stored.
+fn entity_ids(body: &Value, key: &str) -> Result<Option<Vec<String>>, Reply> {
+    let list = match body.get(key) {
+        None | Some(Value::Null) => return Ok(None),
+        Some(Value::Array(list)) if list.len() <= MAX_ARRANGED => list,
+        Some(_) => {
+            return Err(error(
+                400,
+                &format!("{key} must be a list of at most {MAX_ARRANGED} camera IDs"),
+            ));
+        }
+    };
+    let mut ids: Vec<String> = Vec::new();
+    for value in list {
+        let id = match value.as_str() {
+            Some(id) if id.len() <= 300 && !id.chars().any(char::is_control) => id,
+            _ => return Err(error(400, &format!("{key} must hold camera IDs"))),
+        };
+        let id = match id.split_once('/') {
+            Some((server, rest)) if server.bytes().all(|b| b.is_ascii_digit()) => rest,
+            _ => id,
+        };
+        if !id.is_empty() && !ids.iter().any(|known| known == id) {
+            ids.push(id.to_owned());
+        }
+    }
+    Ok(Some(ids))
 }
 
 fn number(body: &Value, key: &str, default: f64, min: f64, max: f64) -> Result<f64, Reply> {
@@ -423,10 +469,10 @@ impl<T: Tv> Api<T> {
         if !companion::local_peer(request.peer) {
             return error(403, "Only devices on the TV's local network may connect");
         }
-        let closed = request.path == "/api/overlay/closed";
+        let from_page = matches!(request.path, "/api/overlay/closed" | "/api/overlay/cameras");
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
-        if request.origin.is_some() && !(closed && request.peer.is_loopback()) {
+        if request.origin.is_some() && !(from_page && request.peer.is_loopback()) {
             return error(403, "Browser requests are not accepted");
         }
         let body = if request.body.is_empty() {
@@ -461,6 +507,20 @@ impl<T: Tv> Api<T> {
                     self.end_session();
                 }
                 reply(200, json!({"ended": matches}))
+            }
+            ("POST", "/api/overlay/cameras") => {
+                if !request.peer.is_loopback() {
+                    return error(403, "Only the overlay app arranges cameras");
+                }
+                let open = self.session.as_ref().is_some_and(|session| {
+                    session.gallery
+                        && body["session"] == session.id.as_str()
+                        && body["nonce"] == session.nonce.as_str()
+                });
+                if !open {
+                    return error(409, "The Cameras gallery is not open");
+                }
+                self.arrange(&body)
             }
             (method, path) => {
                 let Some(client) = self.authorized(request) else {
@@ -733,26 +793,96 @@ impl<T: Tv> Api<T> {
         reply(200, json!({"cameras": total}))
     }
 
+    /// Saves the page's arrangement. The page knows only the cameras it was sent, so entries
+    /// for cameras absent right now are kept, after the ones it reported.
+    fn arrange(&mut self, body: &Value) -> Reply {
+        let present: Vec<String> = self
+            .all_cameras()
+            .iter()
+            .map(|camera| camera.id.clone())
+            .collect();
+        let merge = |given: Option<Vec<String>>, old: &[String]| {
+            given.map(|given| {
+                let mut list: Vec<String> = given
+                    .into_iter()
+                    .filter(|id| present.contains(id))
+                    .collect();
+                list.extend(old.iter().filter(|id| !present.contains(id)).cloned());
+                list.truncate(MAX_ARRANGED);
+                list
+            })
+        };
+        let order = match entity_ids(body, "order") {
+            Ok(order) => merge(order, &self.store.gallery.order),
+            Err(reply) => return reply,
+        };
+        let hidden = match entity_ids(body, "hidden") {
+            Ok(hidden) => merge(hidden, &self.store.gallery.hidden),
+            Err(reply) => return reply,
+        };
+        let snapshots = match body.get("live") {
+            None | Some(Value::Null) => None,
+            Some(Value::Bool(live)) => Some(!live),
+            Some(_) => return error(400, "live must be true or false"),
+        };
+        let gallery = &mut self.store.gallery;
+        let before = gallery.clone();
+        if let Some(order) = order {
+            gallery.order = order;
+        }
+        if let Some(hidden) = hidden {
+            gallery.hidden = hidden;
+        }
+        if let Some(snapshots) = snapshots {
+            gallery.snapshots = snapshots;
+        }
+        if *gallery != before {
+            self.save();
+        }
+        reply(200, json!({"saved": true}))
+    }
+
     fn gallery_params(&self, session: &Session) -> Value {
+        let arranged = &self.store.gallery;
         // Two servers can share an entity ID; the page tells cameras apart by ID, so prefix
         // each with its server's position, which stays stable while the servers stay paired.
-        let cameras: Vec<Camera> = self
+        let mut cameras: Vec<(&Camera, String)> = self
             .cameras
             .iter()
             .enumerate()
             .flat_map(|(server, (_, cameras))| {
-                cameras.iter().map(move |camera| Camera {
-                    id: format!("{server}/{}", camera.id),
-                    ..camera.clone()
-                })
+                cameras
+                    .iter()
+                    .map(move |camera| (camera, format!("{server}/{}", camera.id)))
             })
             .take(MAX_CAMERAS)
+            .collect();
+        // The owner's order first; cameras never placed keep Home Assistant's order after them.
+        cameras.sort_by_key(|(camera, _)| {
+            arranged
+                .order
+                .iter()
+                .position(|id| *id == camera.id)
+                .unwrap_or(usize::MAX)
+        });
+        let cameras: Vec<Value> = cameras
+            .into_iter()
+            .map(|(camera, id)| {
+                json!({
+                    "id": id,
+                    "name": camera.name,
+                    "stream": camera.stream,
+                    "snapshot": camera.snapshot,
+                    "hidden": arranged.hidden.contains(&camera.id),
+                })
+            })
             .collect();
         json!({
             "mode": "cameras",
             "session": session.id,
             "nonce": session.nonce,
             "port": PORT,
+            "live": !arranged.snapshots,
             "cameras": cameras,
         })
     }

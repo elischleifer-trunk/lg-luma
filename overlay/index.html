@@ -24,13 +24,45 @@
     <section id="gallery" class="gallery" hidden>
       <header class="gallery-header">
         <h2>Cameras</h2>
-        <span class="hint">OK to enlarge · BACK to close</span>
+        <span id="gallery-hint" class="hint"
+          >OK to enlarge · Hold OK for options · BACK to close</span
+        >
+        <button id="gear" class="gear" type="button" aria-label="Camera settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <g fill="currentColor">
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(45 12 12)" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(90 12 12)" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(135 12 12)" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(180 12 12)" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(225 12 12)" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(270 12 12)" />
+              <rect x="10.4" y="1" width="3.2" height="5" rx="1" transform="rotate(315 12 12)" />
+              <path
+                fill-rule="evenodd"
+                d="M12 4.6a7.4 7.4 0 1 0 0 14.8a7.4 7.4 0 1 0 0-14.8zm0 4.4a3 3 0 1 1 0 6a3 3 0 1 1 0-6z"
+              />
+            </g>
+          </svg>
+        </button>
       </header>
       <div id="grid" class="grid"></div>
+      <p id="empty" class="empty" hidden>
+        Every camera is hidden. Open settings at the top right to show them again.
+      </p>
       <div id="single" class="single" hidden>
         <img id="single-feed" alt="" />
         <p id="single-status" class="status" hidden>Connecting to camera…</p>
         <p id="single-name" class="single-name"></p>
+        <p id="single-mode" class="single-mode" hidden></p>
+      </div>
+      <div id="menu" class="sheet menu" hidden>
+        <h3 id="menu-title"></h3>
+        <ul id="menu-list"></ul>
+      </div>
+      <div id="settings" class="sheet settings" hidden>
+        <h3>Camera settings</h3>
+        <ul id="settings-list"></ul>
       </div>
     </section>
     <script src="logic.js"></script>

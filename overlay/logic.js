@@ -45,12 +45,27 @@
     return 'http://127.0.0.1:' + port + '/api/overlay/closed';
   }
 
+  // Where the gallery saves the owner's order, hidden cameras and live-video choice.
+  function arrangeUrl(port) {
+    return 'http://127.0.0.1:' + port + '/api/overlay/cameras';
+  }
+
+  // A copy of the list with one item moved from one index to another.
+  function reorder(list, from, to) {
+    var next = list.slice();
+    if (from < 0 || from >= next.length || to < 0 || to >= next.length) return next;
+    var item = next.splice(from, 1)[0];
+    next.splice(to, 0, item);
+    return next;
+  }
+
   function text(value, max) {
     return typeof value === 'string' ? value.slice(0, max) : '';
   }
 
-  // The Cameras gallery: every camera Home Assistant shared, in its order. Cameras without a
-  // loadable URL are skipped; null means there is nothing to show.
+  // The Cameras gallery: every camera Home Assistant shared, in the owner's order, hidden ones
+  // included so settings can show them again. Cameras without a loadable URL are skipped;
+  // null means there is nothing to show.
   function gallery(params) {
     params = params && typeof params === 'object' ? params : {};
     if (params.mode !== 'cameras' || !Array.isArray(params.cameras)) return null;
@@ -66,6 +81,7 @@
         name: text(camera.name, 80) || id,
         stream: stream,
         snapshot: snapshot,
+        hidden: camera.hidden === true,
       });
     });
     if (!cameras.length) return null;
@@ -73,6 +89,8 @@
       session: typeof params.session === 'string' ? params.session : '',
       nonce: typeof params.nonce === 'string' ? params.nonce : '',
       port: clamp(params.port, 1, 65535, 5862),
+      // Enlarged cameras open the live stream unless the owner chose snapshots.
+      live: params.live !== false,
       cameras: cameras,
     };
   }
@@ -109,6 +127,8 @@
     move: move,
     frameUrl: frameUrl,
     closedUrl: closedUrl,
+    arrangeUrl: arrangeUrl,
+    reorder: reorder,
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.LumaOverlay = api;

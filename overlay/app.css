@@ -20,7 +20,10 @@ body {
 
 .card[hidden],
 .gallery[hidden],
-.single[hidden] {
+.single[hidden],
+.sheet[hidden],
+.empty[hidden],
+.single-mode[hidden] {
   display: none;
 }
 
@@ -164,7 +167,9 @@ h1 {
 
 .gallery-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  /* Header and grid fill the 1080px screen inside its 54px safe margins. */
+  height: 48px;
   padding: 0 0 24px;
 }
 
@@ -255,4 +260,162 @@ h1 {
   background: rgba(23, 28, 32, 0.72);
   font-size: 26px;
   font-weight: 600;
+}
+
+/* Settings button at the top right of the gallery; Up from the first row focuses it. */
+.gear {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  margin: -6px 0 -6px 24px;
+  padding: 13px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(245, 245, 245, 0.8);
+  cursor: pointer;
+}
+
+.gear svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gear.focused {
+  background: #fafafa;
+  color: #0d1013;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.tile.moving .frame {
+  border-color: #64b5ff;
+  box-shadow: 0 0 0 6px rgba(100, 181, 255, 0.3);
+}
+
+.empty {
+  position: absolute;
+  top: 50%;
+  left: 96px;
+  right: 96px;
+  margin: 0;
+  text-align: center;
+  font-size: 28px;
+  color: rgba(245, 245, 245, 0.72);
+}
+
+/* The grid's last frame stays behind an enlarged camera until its own picture arrives. */
+.single {
+  background-color: #000;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.single-mode {
+  position: absolute;
+  top: 54px;
+  right: 96px;
+  margin: 0;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: rgba(23, 28, 32, 0.72);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.single-mode.live::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #ff453a;
+  vertical-align: 1px;
+}
+
+/* Option and settings sheets slide in from the right, like Luma's own popups. */
+.sheet {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 560px;
+  padding: 54px 96px 54px 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background: #171c20;
+  box-shadow: -18px 0 60px rgba(0, 0, 0, 0.5);
+}
+
+.sheet h3 {
+  margin: 10px 0 28px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.sheet ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sheet li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  font-size: 24px;
+  color: rgba(245, 245, 245, 0.86);
+  cursor: pointer;
+}
+
+.sheet li.selected {
+  background: #fafafa;
+  color: #0d1013;
+}
+
+.sheet li.section {
+  margin: 24px 0 4px;
+  padding: 0 20px;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 245, 245, 0.5);
+  cursor: default;
+}
+
+.sheet .label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sheet .value {
+  flex: none;
+  margin-left: 16px;
+  padding: 4px 14px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sheet .value.on {
+  background: #2f8f4e;
+  color: #fff;
+}
+
+.sheet li.dim .label {
+  opacity: 0.5;
 }

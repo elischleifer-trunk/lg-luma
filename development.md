@@ -457,9 +457,19 @@ service's thread to launch the overlay app with `mode: "cameras"`, the camera li
 nonce; a missing pairing, empty list or uninstalled overlay becomes an `Event::Notice` instead.
 The page shows a full-screen grid that polls snapshots (every 2 s, or 4 s above nine cameras,
 so it never holds more than one connection per camera) and enlarges the selected camera with its
-motion-JPEG stream, falling back to snapshots. A new list while the gallery is open relaunches
-it with the same session; the page keeps its tiles and selection and only swaps URLs. Back closes
-an enlarged camera, then the gallery, which reports closing like the doorbell card; so does the
+motion-JPEG stream. Browsers report only a stream's first frame, so a stream that fails or shows
+nothing within 6 s switches to back-to-back snapshots (at most four a second); a **Live** or
+**Snapshots** badge says which is playing, and the grid's last frame shows underneath meanwhile.
+Holding OK (or a long pointer press) on a tile opens **Move** (arrows move it, OK ends),
+**Hide** and **Camera settings**; the gear at the top right, reached with Up from the first row,
+opens the same settings: **Live video** (off makes enlarged cameras use snapshots) and a
+shown/hidden toggle per camera. The page posts its arrangement to loopback-only
+`POST /api/overlay/cameras` with the session nonce; Luma stores it by entity ID in
+`Store::gallery` (keeping entries for cameras absent right now), sends cameras in that order
+with `hidden` flags and `live`, and new cameras follow in Home Assistant's order. A new list
+while the gallery is open relaunches it with the same session; the page keeps its arrangement,
+tiles and selection and only swaps URLs. Back closes a sheet, an enlarged camera, then the
+gallery, which reports closing like the doorbell card; so does the
 page becoming hidden or unloaded, so a gallery left with Home or another app is not relaunched.
 A gallery is closed after an hour, and a `show_camera` call replaces it.
 

@@ -6,7 +6,8 @@ import vm from 'node:vm';
 const source = await readFile(new URL('../overlay/logic.js', import.meta.url), 'utf8');
 const context = { window: {} };
 vm.runInNewContext(source, context);
-const { settings, gallery, columns, move, frameUrl, closedUrl } = context.window.LumaOverlay;
+const { settings, gallery, columns, move, frameUrl, closedUrl, arrangeUrl, reorder } =
+  context.window.LumaOverlay;
 // Values built inside the VM have its own Object prototype; compare them as plain JSON.
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -79,7 +80,7 @@ test('the Cameras gallery keeps only loadable cameras and needs at least one', (
     port: 5862,
     cameras: [
       { id: 'camera.front', name: 'Front', stream: 'http://ha/stream', snapshot: 'http://ha/s' },
-      { id: 'camera.back', snapshot: 'https://ha/b' },
+      { id: 'camera.back', snapshot: 'https://ha/b', hidden: true },
       { id: 'camera.bad', stream: 'javascript:alert(1)' },
       { name: 'No ID', stream: 'http://ha/x' },
       'nonsense',
@@ -89,11 +90,28 @@ test('the Cameras gallery keeps only loadable cameras and needs at least one', (
     session: 's',
     nonce: 'n',
     port: 5862,
+    live: true,
     cameras: [
-      { id: 'camera.front', name: 'Front', stream: 'http://ha/stream', snapshot: 'http://ha/s' },
-      { id: 'camera.back', name: 'camera.back', stream: null, snapshot: 'https://ha/b' },
+      {
+        id: 'camera.front',
+        name: 'Front',
+        stream: 'http://ha/stream',
+        snapshot: 'http://ha/s',
+        hidden: false,
+      },
+      {
+        id: 'camera.back',
+        name: 'camera.back',
+        stream: null,
+        snapshot: 'https://ha/b',
+        hidden: true,
+      },
     ],
   });
+  assert.equal(
+    gallery({ mode: 'cameras', live: false, cameras: [{ id: 'a', snapshot: 'http://ha/a' }] }).live,
+    false,
+  );
   assert.equal(gallery({ mode: 'cameras', cameras: [] }), null);
   assert.equal(gallery({ cameras: [{ id: 'a', stream: 'http://ha/a' }] }), null);
   assert.equal(gallery(null), null);
@@ -111,4 +129,11 @@ test('gallery columns grow with the camera count and arrows stay inside the grid
   assert.equal(move(5, 40, 7, 3), 6);
   assert.equal(move(6, 40, 7, 3), 6);
   assert.equal(move(6, 38, 7, 3), 3);
+});
+
+test('the gallery saves its arrangement to Luma on the TV and moves cameras in place', () => {
+  assert.equal(arrangeUrl(5862), 'http://127.0.0.1:5862/api/overlay/cameras');
+  assert.deepEqual(plain(reorder(['a', 'b', 'c', 'd'], 0, 2)), ['b', 'c', 'a', 'd']);
+  assert.deepEqual(plain(reorder(['a', 'b', 'c', 'd'], 3, 1)), ['a', 'd', 'b', 'c']);
+  assert.deepEqual(plain(reorder(['a', 'b'], 0, 5)), ['a', 'b']);
 });
