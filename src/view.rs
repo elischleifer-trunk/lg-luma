@@ -20,6 +20,8 @@ const FACE_HEIGHT: f32 = 154.4;
 const GRID_PITCH: f32 = 296.4;
 const RECENTS_BACKDROP_OPACITY: f32 = 0.86;
 
+#[path = "cameras-view.rs"]
+mod cameras_view;
 #[path = "recents-view.rs"]
 mod recents_view;
 
@@ -255,7 +257,8 @@ impl Scene {
                 | Draw::Shadow(_, _, _, color)
                 | Draw::Text(_, _, _, color, _)
                 | Draw::TintedImage(_, _, _, _, color)
-                | Draw::AppImage(_, _, _, color) => apply(color),
+                | Draw::AppImage(_, _, _, color)
+                | Draw::Camera(_, _, _, _, color) => apply(color),
                 Draw::RoundedGradient(_, _, a, b) => {
                     apply(a);
                     apply(b);
@@ -598,6 +601,14 @@ pub fn scene_with_pill(
         );
     }
     let content_start = out.draw.len();
+    // The Cameras gallery is opaque and full screen: the page underneath is not drawn.
+    if state.cameras_open() {
+        cameras_view::render(&mut out, state, assets);
+        if let Some((notice, _)) = &state.notice {
+            toast(&mut out, state, assets, notice);
+        }
+        return out;
+    }
     if recents_replaces_page(state) {
         out.shape(
             Rect::new(0., 0., 1920., 1080.),
@@ -729,7 +740,7 @@ pub fn scene_with_pill(
             Overlay::WallpaperUpload => wallpaper_upload(&mut out, state, assets),
             Overlay::TileEditor => tile_editor(&mut out, state, assets),
             Overlay::HomeAssistantSetup => home_assistant_setup(&mut out, state, assets),
-            Overlay::SystemKeyboard | Overlay::Recents { .. } => {}
+            Overlay::SystemKeyboard | Overlay::Recents { .. } | Overlay::Cameras { .. } => {}
         }
         if !matches!(
             overlay,

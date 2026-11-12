@@ -69,6 +69,8 @@ pub enum Draw {
     TintedImage(String, Rect, f32, bool, Color),
     /// Installed icon and its backdrop, composited before opacity and edge fading.
     AppImage(Arc<crate::app_artwork::Artwork>, Rect, f32, Color),
+    /// A camera frame: filling the rect (cropped) or, when `contain`, fitted inside it.
+    Camera(Arc<crate::cameras::Frame>, Rect, f32, bool, Color),
     Clip(Option<Rect>),
     EdgeFade(Option<[f32; 4]>),
     /// Horizontal counterpart: [left fade-in start, end, right fade-out start, end].
@@ -295,7 +297,7 @@ fn profile_skip(command: &Draw) -> bool {
             "wallpaper"
         }
         Draw::Image(..) | Draw::TintedImage(..) => "image",
-        Draw::AppImage(..) => "app",
+        Draw::AppImage(..) | Draw::Camera(..) => "app",
         Draw::Shape(..) => "shape",
         Draw::RoundedGradient(..) => "gradient",
         Draw::Shadow(..) => "shadow",
@@ -340,6 +342,8 @@ pub struct Renderer {
     glyphs: HashMap<(char, u16), Glyph>,
     text_runs: HashMap<TextKey, TextRun>,
     textures: HashMap<String, Option<Texture>>,
+    /// One texture per camera, replaced in place whenever a newer frame arrives.
+    camera_textures: HashMap<String, (u64, Texture)>,
     vectors: HashMap<String, Option<vector::Mesh>>,
     artwork_variants: HashMap<String, String>,
     vertices: Vec<f32>,
@@ -461,6 +465,7 @@ impl Renderer {
             glyphs: HashMap::new(),
             text_runs: HashMap::new(),
             textures: HashMap::new(),
+            camera_textures: HashMap::new(),
             vectors: HashMap::new(),
             artwork_variants: HashMap::new(),
             vertices: Vec::with_capacity(65536),
@@ -1274,11 +1279,89 @@ impl Renderer {
                 Draw::AppImage(image, rect, radius, tint) => {
                     self.app_image(image, *rect, *radius, *tint)
                 }
+                Draw::Camera(frame, rect, radius, contain, tint) => {
+                    self.camera_image(frame, *rect, *radius, *contain, *tint)
+                }
                 Draw::Clip(clip) => self.clip = *clip,
                 Draw::EdgeFade(fade) => self.set_fade(0, *fade),
                 Draw::EdgeFadeX(fade) => self.set_fade(4, *fade),
             }
         }
+        // A full scene shows every camera on screen: free the textures of the others.
+        if area.is_none() {
+            let frame = self.frame;
+            self.camera_textures
+                .retain(|_, (_, texture)| texture.frame == frame);
+        }
+    }
+
+    fn camera_image(
+        &mut self,
+        frame: &crate::cameras::Frame,
+        mut rect: Rect,
+        radius: f32,
+        contain: bool,
+        tint: Color,
+    ) {
+        let (width, height) = frame.pixels.dimensions();
+        if width == 0 || height == 0 || rect.w <= 0. || rect.h <= 0. {
+            return;
+        }
+        let entry = self
+            .camera_textures
+            .entry(frame.key.clone())
+            .or_insert_with(|| (0, texture(width, height, &[])));
+        if entry.0 != frame.serial {
+            let started = Instant::now();
+            let texture = &mut entry.1;
+            unsafe {
+                gl::BindTexture(gl::TEXTURE_2D, texture.id);
+                if texture.width == width && texture.height == height {
+                    gl::TexSubImage2D(
+                        gl::TEXTURE_2D,
+                        0,
+                        0,
+                        0,
+                        width as i32,
+                        height as i32,
+                        gl::RGBA,
+                        gl::UNSIGNED_BYTE,
+                        frame.pixels.as_raw().as_ptr().cast(),
+                    );
+                } else {
+                    *texture = self::texture(width, height, frame.pixels.as_raw());
+                }
+            }
+            entry.0 = frame.serial;
+            self.stats.image_load_ms += started.elapsed().as_secs_f64() * 1000.;
+        }
+        let texture = &mut entry.1;
+        texture.frame = self.frame;
+        let id = texture.id;
+        let (w, h) = (width as f32, height as f32);
+        let uv = if contain {
+            let scale = (rect.w / w).min(rect.h / h);
+            rect = Rect::new(
+                rect.x + (rect.w - w * scale) / 2.,
+                rect.y + (rect.h - h * scale) / 2.,
+                w * scale,
+                h * scale,
+            );
+            [0., 0., 1., 1.]
+        } else {
+            // Cover: crop the frame's longer side to the rect's shape.
+            let (sx, sy) = (
+                (rect.w / w) / (rect.w / w).max(rect.h / h),
+                (rect.h / h) / (rect.w / w).max(rect.h / h),
+            );
+            [
+                (1. - sx) / 2.,
+                (1. - sy) / 2.,
+                (1. + sx) / 2.,
+                (1. + sy) / 2.,
+            ]
+        };
+        self.quad(rect, uv, plain_radius(radius), 0., tint, id);
     }
 
     /// Draws the scene. With `damage` (drawable pixels from `damage_pixels`), only those pixels

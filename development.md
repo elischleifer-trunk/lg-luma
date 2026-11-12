@@ -452,26 +452,36 @@ Luma keeps lists in memory only, one per paired server (keyed by token digest, m
 order; unpairing drops that server's list). While Home Assistant is on, `State::sync_custom_tiles` adds the
 built-in `luma.cameras` app (`model::CAMERAS_APP`, the shortcut tiles' `custom` surface, `camera` mark) to the inventory,
 so it can be favorited, hidden and searched; `model::is_builtin` keeps it out of uninstall and
-inventory-failure checks. Launching it sets `State::show_cameras`, and the main loop asks the
-service's thread to launch the overlay app with `mode: "cameras"`, the camera list and a session
-nonce; a missing pairing, empty list or uninstalled overlay becomes an `Event::Notice` instead.
-The page shows a full-screen grid that polls snapshots (every 2 s, or 4 s above nine cameras,
-so it never holds more than one connection per camera) and enlarges the selected camera with its
-motion-JPEG stream. Browsers report only a stream's first frame, so a stream that fails or shows
-nothing within 6 s switches to back-to-back snapshots (at most four a second); a **Live** or
-**Snapshots** badge says which is playing, and the grid's last frame shows underneath meanwhile.
-Holding OK (or a long pointer press) on a tile opens **Move** (arrows move it, OK ends),
-**Hide** and **Camera settings**; the gear at the top right, reached with Up from the first row,
-opens the same settings: **Live video** (off makes enlarged cameras use snapshots) and a
-shown/hidden toggle per camera. The page posts its arrangement to loopback-only
-`POST /api/overlay/cameras` with the session nonce; Luma stores it by entity ID in
-`Store::gallery` (keeping entries for cameras absent right now), sends cameras in that order
-with `hidden` flags and `live`, and new cameras follow in Home Assistant's order. A new list
-while the gallery is open relaunches it with the same session; the page keeps its arrangement,
-tiles and selection and only swaps URLs. Back closes a sheet, an enlarged camera, then the
-gallery, which reports closing like the doorbell card; so does the
-page becoming hidden or unloaded, so a gallery left with Home or another app is not relaunched.
-A gallery is closed after an hour, and a `show_camera` call replaces it.
+inventory-failure checks. Launching it sets `State::show_cameras`; the main loop asks the
+service's thread, which answers with `Event::Cameras { open: true }` (or an `Event::Notice` for
+a missing pairing or empty list) carrying every camera as `cameras::Camera`, in the owner's saved
+order with `hidden` flags and the live-video choice. Changed lists (rotated tokens, unpairing,
+turning the setting off) arrive with `open: false`; an open gallery keeps its arrangement on
+screen, takes the new URLs and adds new cameras at the end, and an empty list closes it.
+
+The gallery is native (`src/cameras.rs`, drawn by `src/cameras-view.rs`) and opens as the
+opaque full-screen `Overlay::Cameras`. `cameras::Layout` keeps 16:9 tiles in one large view, 2×2,
+3×3 or four across, fitting three rows and scrolling the rest. Each frame is fetched off the SDL
+thread: `State::camera_watches` lists what is on screen (nothing unless the gallery is open and
+Luma visible), and `cameras::Service::sync` keeps one worker thread per watched camera, keeping a
+worker (and its connected stream) that is watched the same way and only giving it new URLs.
+Grid tiles poll snapshots every 2 s (4 s above nine cameras); an enlarged camera reads the
+motion-JPEG stream with `cameras::Parts`, which splits parts by Content-Length or JPEG markers
+and skips to the newest buffered frame. A stream that fails, ends or sends nothing for 5 s
+(ureq's per-read timeout) switches to back-to-back snapshots, at most four a second, and a
+**Live** or **Snapshots** badge says which is showing. Frames are decoded (at most two at once)
+and shrunk to their drawn size on the worker, then drawn with `Draw::Camera`, which keeps one
+GPU texture per camera, re-uploaded only for a newer frame; damage tracking compares frames by
+pointer, so a new frame redraws only its tile. The main loop wakes every 16 ms while the gallery
+is open.
+
+Holding OK (or a long pointer press, or Menu) on a tile opens **Move** (arrows move it, OK or Back
+ends), **Hide camera** and **Camera settings**; the settings button at the top right, reached
+with Up from the first row, opens the same settings: **Live video** (off makes enlarged cameras
+poll snapshots) and a shown/hidden toggle for every camera. Each change goes to the service's
+thread (`Service::arrange`), which stores it by entity ID in `Store::gallery`, keeping entries
+for cameras absent right now; new cameras follow in Home Assistant's order. Back ends moving,
+closes a sheet or the enlarged camera, then the gallery; Home also closes it.
 
 Rust tests drive the API without sockets through a recording `Tv` (pairing, lockout, validation,
 pause/resume, timeouts, persistence) plus one loopback HTTP round trip; helper tests use the
