@@ -5,6 +5,7 @@ mod app_artwork;
 #[path = "app-subscription.rs"]
 mod app_subscription;
 mod branding;
+mod cameras;
 mod clock;
 mod companion;
 mod damage;
@@ -117,7 +118,7 @@ impl Options {
         while let Some(arg) = args.next() {
             if arg == "--help" {
                 println!(
-                    "Luma native\n\n  --assets PATH       Generated artwork directory\n  --preferences PATH  Isolated preferences file\n  --fullscreen        Fullscreen desktop preview\n  --resolution SIZE   Request 1080p, 4k, or WIDTHxHEIGHT; verify actual drawable\n  --frames N          Exit after N event-loop frames\n  --profile-frames N  Force N presentations (20+) and report pacing after warmup\n  --script ACTIONS    Comma-separated home/apps/settings/up/down/left/right/enter/back/menu/hold/type:TEXT/click:X:Y/wait\n  --time RFC3339      Fix the preview's clock and date\n  --screenshot PATH   Save an offscreen PNG\n  --capture-scale N   Capture at 1x/1080p (default) or 2x/4k\n  --diagnostics PATH  Save actual drawable, GPU, font-cache and timing information\n  --dump-state PATH   Save final UI state as JSON\n\nCompile with --features webos for the TV backend. Desktop builds never call TV services."
+                    "Luma native\n\n  --assets PATH       Generated artwork directory\n  --preferences PATH  Isolated preferences file\n  --fullscreen        Fullscreen desktop preview\n  --resolution SIZE   Request 1080p, 4k, or WIDTHxHEIGHT; verify actual drawable\n  --frames N          Exit after N event-loop frames\n  --profile-frames N  Force N presentations (20+) and report pacing after warmup\n  --script ACTIONS    Comma-separated home/apps/settings/up/down/left/right/enter/back/menu/hold/cameras/await-cameras/type:TEXT/click:X:Y/wait\n  --time RFC3339      Fix the preview's clock and date\n  --screenshot PATH   Save an offscreen PNG\n  --capture-scale N   Capture at 1x/1080p (default) or 2x/4k\n  --diagnostics PATH  Save actual drawable, GPU, font-cache and timing information\n  --dump-state PATH   Save final UI state as JSON\n\nCompile with --features webos for the TV backend. Desktop builds never call TV services."
                 );
                 println!(
                     "\n  --test-extra-apps N  Explicit scroll preview with up to 300 non-launchable extra cards; separate preferences"
@@ -400,6 +401,7 @@ fn script(
         "enter" => state.activate(),
         "back" => state.back(),
         "recents" | "hold-back" => state.open_recents(),
+        "cameras" => vec![Effect::Launch(model::CAMERAS_APP.into())],
         "menu" => {
             state.options();
             vec![]
@@ -431,6 +433,7 @@ fn script(
         "await-recents" => vec![],
         "await-upload" => vec![],
         "await-tile-editor" => vec![],
+        "await-cameras" => vec![],
         _ => return Err(format!("Unknown scripted action: {action}")),
     })
 }
@@ -721,6 +724,7 @@ fn run() -> Result<(), String> {
     );
     let webhook_service = webhook::Service::new();
     // Pairings sit beside the preferences; a temporary --preferences profile keeps its own.
+    let mut camera_service = cameras::Service::default();
     let mut home_assistant = home_assistant::Service::new(
         home_assistant::Live { webos },
         Some(preferences_path.with_file_name("home-assistant.json")),
@@ -1246,8 +1250,27 @@ fn run() -> Result<(), String> {
                     language.t("homeAssistantFailed").to_owned()
                 }
                 home_assistant::Event::Notice(key) => language.t(key).to_owned(),
+                home_assistant::Event::Cameras {
+                    cameras,
+                    live,
+                    open,
+                } => {
+                    state.camera_list(cameras, live, open);
+                    continue;
+                }
             };
             state.notify(notice);
+        }
+        if !state.preferences.home_assistant && state.cameras_open() {
+            state.close_cameras();
+        }
+        if let Some(arrangement) = state.cameras.save.take() {
+            home_assistant.arrange(arrangement);
+        }
+        // Frames only while the gallery is open and on screen.
+        camera_service.sync(&state.camera_watches(visible));
+        for update in camera_service.receiver.try_iter() {
+            state.camera_update(update);
         }
         while let Ok(webhook::Response::Done { title, result }) =
             webhook_service.receiver.try_recv()
@@ -1486,7 +1509,10 @@ fn run() -> Result<(), String> {
                             let length = state.editing_text().len() as i32;
                             state.delete_surrounding_text(-length, length);
                         }
-                        Keycode::M | Keycode::Menu if !repeat && state.overlay.is_none() => {
+                        // The Cameras gallery is an overlay too; Menu opens a camera's options.
+                        Keycode::M | Keycode::Menu
+                            if !repeat && (state.overlay.is_none() || state.cameras_open()) =>
+                        {
                             press = None;
                             state.options();
                         }
@@ -1683,6 +1709,7 @@ fn run() -> Result<(), String> {
                     || (action == "await-tile-editor"
                         && matches!(state.overlay, Some(Overlay::TileEditor))
                         && state.tile_editor.is_none())
+                    || (action == "await-cameras" && !state.cameras_shown())
             })
             && let Some(action) = options.script.pop_front()
         {
@@ -1951,6 +1978,9 @@ fn run() -> Result<(), String> {
             || assets.artwork.pending()
         {
             8
+        } else if state.cameras_open() {
+            // Camera frames arrive from worker threads, not as SDL events.
+            16
         } else if !prewarm.is_empty() {
             500
         } else {

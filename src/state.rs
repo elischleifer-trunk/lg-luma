@@ -95,6 +95,15 @@ pub enum Target {
     TileTest(String),
     TileRemove(String),
     TileEditor,
+    /// Cameras app: a camera tile, the settings button, the options sheet's actions and the
+    /// settings sheet's rows.
+    Camera(String),
+    CameraGear,
+    CameraMove,
+    CameraHide,
+    CameraSettings,
+    CameraLive,
+    CameraShown(String),
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -128,16 +137,34 @@ pub struct Control {
 
 #[derive(Clone, Debug)]
 pub enum Overlay {
-    Options { id: String, restore: Target },
-    Delete { id: String, restore: Target },
-    Recents { restore: Target },
+    Options {
+        id: String,
+        restore: Target,
+    },
+    Delete {
+        id: String,
+        restore: Target,
+    },
+    Recents {
+        restore: Target,
+    },
     Keyboard,
     SystemKeyboard,
     WallpaperUpload,
     TileEditor,
     HomeAssistantSetup,
-    BackgroundOptions { id: String, restore: Target },
-    BackgroundDelete { id: String, restore: Target },
+    BackgroundOptions {
+        id: String,
+        restore: Target,
+    },
+    BackgroundDelete {
+        id: String,
+        restore: Target,
+    },
+    /// The full-screen Cameras gallery; Back returns focus to `restore`.
+    Cameras {
+        restore: Target,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -246,6 +273,7 @@ pub struct State {
     pub home_assistant_address: Option<String>,
     /// The Cameras app was opened; the main loop asks the Home Assistant service.
     pub show_cameras: bool,
+    pub cameras: crate::cameras::Gallery,
     /// Luma update (Settings → System), driven by the update worker.
     pub update: crate::update::InstallStatus,
     pub panel_started: Option<Instant>,
@@ -294,6 +322,7 @@ impl State {
             home_assistant_qr: None,
             home_assistant_address: None,
             show_cameras: false,
+            cameras: crate::cameras::Gallery::default(),
             update: crate::update::InstallStatus::default(),
             panel_started: None,
             weather: weather::Weather::default(),
@@ -459,6 +488,9 @@ impl State {
     pub fn return_home(&mut self) -> Vec<Effect> {
         // Commit keyboard drafts before open() clears their settings subpage.
         let pending = self.finish_text_input();
+        if self.cameras_open() {
+            self.close_cameras();
+        }
         self.recents.pending = None;
         self.recents.visibility = 0.;
         self.recents.closing_focus = None;
@@ -1118,6 +1150,9 @@ impl State {
         if self.recents_open() {
             return self.recent_direction(direction);
         }
+        if self.cameras_open() {
+            return self.camera_direction(direction);
+        }
         if matches!(self.overlay, Some(Overlay::SystemKeyboard)) {
             // The TV keyboard owns its arrows until Done/Back dismisses it.
             return vec![];
@@ -1645,6 +1680,10 @@ impl State {
     }
 
     pub fn options(&mut self) {
+        if self.cameras_open() {
+            self.camera_options();
+            return;
+        }
         if self.overlay.is_some() || self.moving.is_some() {
             return;
         }
@@ -1781,6 +1820,10 @@ impl State {
     }
 
     pub fn hold(&mut self) {
+        if self.cameras_open() {
+            self.camera_options();
+            return;
+        }
         if self.page == Page::Home && self.overlay.is_none() {
             // Input cards stay at the front of the strip and do not reorder; holding one
             // opens its options instead, where it can be removed from favorites.
@@ -2063,6 +2106,9 @@ impl State {
                 Target::RecentRetry => self.recent_request(Command::List),
                 _ => vec![],
             };
+        }
+        if self.cameras_open() {
+            return self.camera_activate();
         }
         if self.moving.take().is_some() {
             // Order was saved at every move. A fresh OK release finishes the
@@ -2625,6 +2671,9 @@ impl State {
     pub fn back(&mut self) -> Vec<Effect> {
         self.pointer = false;
         self.dirty = true;
+        if self.cameras_open() {
+            return self.camera_back();
+        }
         if self.moving.take().is_some() {
             return vec![];
         }

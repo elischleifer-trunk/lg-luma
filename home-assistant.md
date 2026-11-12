@@ -19,7 +19,8 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
   example when the door opens.
 - **`luma.notify`** and a **Toast** notify entity: a standard webOS toast over any app.
 - **A Cameras app** in Luma: every Home Assistant camera in a full-screen grid. Arrows choose a
-  camera, **OK** shows it full screen, **Back** returns to the grid and then closes it.
+  camera, **OK** shows it full screen, **Back** returns to the grid and then closes it. Hold
+  **OK** on a camera to move or hide it; the settings button shows hidden cameras again.
 - **Show example camera card** and **Show example toast** buttons: press them on the TV's device
   page to see what each popup looks like, before writing any automation. The example card shows a
   picture of a front door that comes with the integration, so it works without a camera.
@@ -84,8 +85,15 @@ stays with the show you are watching.
 While **Home Assistant** is on, Luma lists a **Cameras** app with your other apps. Favorite it to
 keep it on Home. Opening it shows every camera entity Home Assistant has (unavailable ones are
 skipped, at most 32) in a grid of snapshots that refresh every couple of seconds. Choose a camera
-and press **OK** to see it full screen as a live motion-JPEG stream; **Back** returns to the grid,
-and **Back** again closes it.
+and press **OK** to see it full screen as live video (Home Assistant's motion-JPEG stream); **Back**
+returns to the grid, and **Back** again closes it. A badge in the corner says **Live** or
+**Snapshots**: if the stream fails or freezes, Luma switches to snapshots, several a second.
+
+To arrange the grid, hold **OK** on a camera: **Move** lets you move it with the arrows (**OK**
+when done), **Hide camera** takes it off the grid, and **Camera settings** opens settings, which
+the settings button at the top right also opens (press **Up** from the first row). There you can
+show hidden cameras again and turn **Live video** off, so full-screen cameras use snapshots,
+which suits cameras whose stream is slow in Home Assistant. Luma remembers the arrangement.
 
 Nothing needs setting up: the integration sends the TV its camera list when it starts and again
 whenever a camera changes, including every few minutes when Home Assistant rotates camera access
@@ -93,8 +101,6 @@ tokens, so the URLs the TV holds keep working. Like camera overlays, the TV load
 Home Assistant's **local network URL**. The TV keeps the list in memory only; after it restarts,
 Home Assistant notices within a minute and sends the list again. With several Home Assistant
 servers paired, the app shows all of their cameras.
-
-A doorbell `luma.show_camera` call while the grid is open replaces it with the doorbell card.
 
 ## Doorbell example
 

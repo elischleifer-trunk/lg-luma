@@ -392,15 +392,34 @@ fn dismiss_closes_and_resumes_and_notify_sends_a_toast() {
     );
 }
 
+/// The newest camera list sent to Luma: (camera IDs with `*` for hidden, live, open).
+fn sent_cameras(h: &Harness) -> Option<(Vec<String>, bool, bool)> {
+    h.events.try_iter().fold(None, |last, event| match event {
+        Event::Cameras {
+            cameras,
+            live,
+            open,
+        } => Some((
+            cameras
+                .iter()
+                .map(|c| format!("{}{}", c.id, if c.hidden { "*" } else { "" }))
+                .collect(),
+            live,
+            open,
+        )),
+        _ => last,
+    })
+}
+
 #[test]
-fn cameras_are_validated_and_open_as_a_gallery_refreshed_with_new_urls() {
+fn cameras_are_validated_and_sent_to_the_gallery_with_new_urls() {
     let mut h = Harness::new();
-    // Before pairing, the Cameras app explains what is missing instead of launching anything.
-    h.api.show_cameras(h.now);
+    // Before pairing, the Cameras app explains what is missing instead of opening.
+    h.api.show_cameras();
     assert_eq!(h.events.try_recv(), Ok(Event::Notice("camerasNotPaired")));
     let token = h.pair();
     let _ = h.events.try_iter().count();
-    h.api.show_cameras(h.now);
+    h.api.show_cameras();
     assert_eq!(h.events.try_recv(), Ok(Event::Notice("camerasNone")));
 
     for bad in [
@@ -434,77 +453,59 @@ fn cameras_are_validated_and_open_as_a_gallery_refreshed_with_new_urls() {
         h.call("GET", "/api/status", Some(&token), json!({})).body["cameras"],
         2
     );
+    // A changed list goes to Luma, which uses it only while the gallery is open.
+    assert_eq!(
+        sent_cameras(&h),
+        Some((
+            vec!["0/camera.door".into(), "0/camera.yard".into()],
+            true,
+            false
+        ))
+    );
+
+    h.api.show_cameras();
+    let mut opened = None;
+    for event in h.events.try_iter() {
+        if let Event::Cameras { cameras, open, .. } = event {
+            opened = Some((cameras, open));
+        }
+    }
+    let (cameras, open) = opened.unwrap();
+    assert!(open);
+    assert_eq!(cameras[0].name, "Front door");
+    assert_eq!(cameras[1].name, "camera.yard");
+    assert_eq!(cameras[1].stream, None);
+    // Luma's gallery is native: nothing is launched on the TV.
     assert!(h.tv.calls().iter().all(|call| !call.starts_with("launch")));
 
-    h.api.show_cameras(h.now);
-    let launches: Vec<_> =
-        h.tv.calls()
-            .into_iter()
-            .filter(|call| call.starts_with("launch "))
-            .collect();
-    assert_eq!(launches.len(), 1);
-    let params: Value = serde_json::from_str(&launches[0]["launch ".len()..]).unwrap();
-    assert_eq!(params["mode"], "cameras");
-    assert_eq!(params["port"], PORT);
-    assert_eq!(params["cameras"][0]["name"], "Front door");
-    assert_eq!(params["cameras"][0]["id"], "0/camera.door");
-    assert_eq!(params["cameras"][1]["name"], "camera.yard");
-    assert_eq!(params["cameras"][1]["stream"], Value::Null);
-    let session = params["session"].as_str().unwrap().to_owned();
-
-    // Rotated tokens relaunch the open gallery with the same session; an unchanged list does not.
+    // Rotated tokens send the new URLs; an unchanged list sends nothing.
     h.call("POST", "/api/cameras", Some(&token), list("a"));
+    assert_eq!(sent_cameras(&h), None);
     h.call("POST", "/api/cameras", Some(&token), list("b"));
-    let launches: Vec<_> =
-        h.tv.calls()
-            .into_iter()
-            .filter(|call| call.starts_with("launch "))
-            .collect();
-    assert_eq!(launches.len(), 2);
-    let params: Value = serde_json::from_str(&launches[1]["launch ".len()..]).unwrap();
-    assert_eq!(params["session"], session.as_str());
+    assert!(sent_cameras(&h).is_some());
     assert!(
-        params["cameras"][0]["snapshot"]
-            .as_str()
+        h.api.gallery()[0]
+            .snapshot
+            .as_deref()
             .unwrap()
             .ends_with("token=b")
-    );
-
-    // Once the page reports closing, new lists no longer relaunch it.
-    let nonce = params["nonce"].as_str().unwrap().to_owned();
-    let body = json!({"session": session, "nonce": nonce}).to_string();
-    let mut closed = h.api.handle(
-        &Request {
-            method: "POST",
-            path: "/api/overlay/closed",
-            authorization: None,
-            origin: Some("null"),
-            peer: LOOPBACK,
-            body: body.as_bytes(),
-        },
-        h.now,
-    );
-    assert_eq!(closed.body, json!({"ended": true}));
-    h.call("POST", "/api/cameras", Some(&token), list("c"));
-    assert_eq!(
-        h.tv.calls()
-            .iter()
-            .filter(|call| call.starts_with("launch "))
-            .count(),
-        2
     );
 
     // Only the first cameras are kept.
     let many: Vec<_> = (0..40)
         .map(|i| json!({"id": format!("camera.c{i}"), "snapshot_url": "http://ha/s"}))
         .collect();
-    closed = h.call(
+    let reply = h.call(
         "POST",
         "/api/cameras",
         Some(&token),
         json!({"cameras": many}),
     );
-    assert_eq!(closed.body, json!({"cameras": MAX_CAMERAS}));
+    assert_eq!(reply.body, json!({"cameras": MAX_CAMERAS}));
+    // Turning Home Assistant off empties the list, which closes an open gallery.
+    let _ = h.events.try_iter().count();
+    h.api.forget();
+    assert_eq!(sent_cameras(&h), Some((vec![], true, false)));
 }
 
 #[test]
@@ -536,22 +537,15 @@ fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
     let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
     assert_eq!(ids, ["camera.a1", "camera.b1", "camera.b2"]);
     // The gallery tells servers' cameras apart even when they share an entity ID.
-    let session = Session {
-        id: "s".into(),
-        nonce: "n".into(),
-        media: None,
-        ends: h.now,
-        gallery: true,
-    };
     h.call(
         "POST",
         "/api/cameras",
         Some(&second),
         json!({"cameras": [camera("camera.a1")]}),
     );
-    let params = h.api.gallery_params(&session);
-    assert_eq!(params["cameras"][0]["id"], "0/camera.a1");
-    assert_eq!(params["cameras"][1]["id"], "1/camera.a1");
+    let gallery = h.api.gallery();
+    assert_eq!(gallery[0].id, "0/camera.a1");
+    assert_eq!(gallery[1].id, "1/camera.a1");
     // A second push from one server replaces only its own list.
     let again = h.call(
         "POST",
@@ -560,9 +554,15 @@ fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
         json!({"cameras": [camera("camera.b3")]}),
     );
     assert_eq!(again.body, json!({"cameras": 2}));
+    let _ = h.events.try_iter().count();
     h.call("DELETE", "/api/pair", Some(&first), json!({}));
     let ids: Vec<_> = h.api.all_cameras().iter().map(|c| c.id.clone()).collect();
     assert_eq!(ids, ["camera.b3"]);
+    // Unpairing tells an open gallery.
+    assert_eq!(
+        sent_cameras(&h),
+        Some((vec!["0/camera.b3".into()], true, false))
+    );
 }
 
 #[test]
@@ -633,4 +633,132 @@ fn the_listener_answers_info_over_http() {
     assert_eq!(body["name"], "Luma");
     assert_eq!(body["api"], API_VERSION);
     assert_eq!(body["id"], h.api.store().device_id.as_str());
+}
+
+#[test]
+fn the_gallery_arrangement_is_saved_and_applied_to_later_lists() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let camera = |id: &str| json!({"id": id, "snapshot_url": format!("http://ha/{id}")});
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.b"), camera("camera.c")]}),
+    );
+    for bad in [
+        json!({"order": "camera.a"}),
+        json!({"hidden": [3]}),
+        json!({"live": "no"}),
+    ] {
+        assert_eq!(h.api.arrange(&bad).status, 400);
+    }
+    // Cameras are stored by gallery ID: the server's position and the entity ID.
+    let saved = h.api.arrange(
+        &json!({"order": ["0/camera.c", "0/camera.a"], "hidden": ["0/camera.b"], "live": false}),
+    );
+    assert_eq!(saved.status, 200, "{:?}", saved.body);
+    let gallery = &h.api.store().gallery;
+    assert_eq!(gallery.order, ["0/camera.c", "0/camera.a"]);
+    assert_eq!(gallery.hidden, ["0/camera.b"]);
+    assert!(gallery.snapshots);
+
+    // Later lists apply it; unplaced cameras follow in Home Assistant's order.
+    let _ = h.events.try_iter().count();
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.b"), camera("camera.c"), camera("camera.d")]}),
+    );
+    assert_eq!(
+        sent_cameras(&h),
+        Some((
+            vec![
+                "0/camera.c".into(),
+                "0/camera.a".into(),
+                "0/camera.b*".into(),
+                "0/camera.d".into()
+            ],
+            false,
+            false
+        ))
+    );
+
+    // A camera Home Assistant stopped sending keeps its place and stays hidden for when it returns.
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.c")]}),
+    );
+    assert_eq!(
+        h.api
+            .arrange(&json!({"order": ["0/camera.a", "0/camera.c"], "hidden": []}))
+            .status,
+        200
+    );
+    let gallery = &h.api.store().gallery;
+    assert_eq!(gallery.order, ["0/camera.a", "0/camera.c"]);
+    assert_eq!(gallery.hidden, ["0/camera.b"]);
+    // Leaving `live` out keeps the earlier choice.
+    assert!(gallery.snapshots);
+
+    // A camera the gallery did not report (it came back in between) keeps its entries too.
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [camera("camera.a"), camera("camera.b"), camera("camera.c")]}),
+    );
+    h.api
+        .arrange(&json!({"order": ["0/camera.c", "0/camera.a"], "hidden": []}));
+    let gallery = &h.api.store().gallery;
+    assert_eq!(gallery.order, ["0/camera.c", "0/camera.a"]);
+    assert_eq!(gallery.hidden, ["0/camera.b"]);
+}
+
+#[test]
+fn two_servers_sharing_an_entity_id_are_arranged_separately() {
+    let mut h = Harness::new();
+    let first = h.pair();
+    h.now += PAIRING_COOLDOWN;
+    let second = h.pair();
+    let door = json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/door"}]});
+    // Only the second server has sent cameras (say, just after Luma restarted): its cameras
+    // still carry its place in pairing order, so saved choices stay with them.
+    h.call("POST", "/api/cameras", Some(&second), door.clone());
+    assert_eq!(h.api.gallery()[0].id, "1/camera.door");
+    h.call("POST", "/api/cameras", Some(&first), door);
+    h.api.arrange(&json!({
+        "order": ["1/camera.door", "0/camera.door"],
+        "hidden": ["1/camera.door"],
+    }));
+    let gallery: Vec<_> = h
+        .api
+        .gallery()
+        .into_iter()
+        .map(|camera| (camera.id, camera.hidden))
+        .collect();
+    assert_eq!(
+        gallery,
+        [
+            ("1/camera.door".to_owned(), true),
+            ("0/camera.door".to_owned(), false)
+        ]
+    );
+    // Unpairing the first server drops its entries; the second moves up and keeps its own.
+    h.call("DELETE", "/api/pair", Some(&first), json!({}));
+    assert_eq!(h.api.store().gallery.hidden, ["0/camera.door"]);
+    assert_eq!(h.api.store().gallery.order, ["0/camera.door"]);
+    let gallery: Vec<_> = h
+        .api
+        .gallery()
+        .into_iter()
+        .map(|camera| (camera.id, camera.hidden))
+        .collect();
+    assert_eq!(gallery, [("0/camera.door".to_owned(), true)]);
+    // Turning Home Assistant off forgets every pairing and the arrangement with them.
+    h.api.forget();
+    assert_eq!(h.api.store().gallery, Gallery::default());
 }
