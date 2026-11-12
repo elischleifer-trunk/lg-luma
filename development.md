@@ -475,6 +475,24 @@ GPU texture per camera, re-uploaded only for a newer frame; damage tracking comp
 pointer, so a new frame redraws only its tile. The main loop wakes every 16 ms while the gallery
 is open.
 
+Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
+(`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the
+integration adds `hls_url` to every camera with the stream feature while the `stream`
+integration is loaded: `/api/luma/stream/<entity>?token=<camera token>` (`StreamView`, which
+checks the camera's access tokens like Home Assistant's camera proxy) starts Home Assistant's
+HLS stream and answers `{"url": "/api/hls/<stream token>/master_playlist.m3u8"}`. Enlarging a
+camera with **Live video** on sets `cameras::Video::Resolving`; `cameras::Service::resolve` asks
+that endpoint off the SDL thread, and the answer makes the Home Assistant thread launch the
+overlay app with `mode: "video"` (`Api::show_video`), pausing the motion-JPEG worker underneath.
+The page plays the playlist in a `<video>` with the TV's own HLS support, or with the bundled
+hls.js light build (1.5.20, ES5, Apache-2.0, `overlay/vendor/`) through Media Source
+Extensions; HLS views allow any origin, so the `file://` page may fetch them. It stays
+transparent until the video plays, so Luma's own picture shows meanwhile. Back or OK closes it
+and reports closing, which also leaves the enlarged camera (`Event::VideoClosed`); a stream that
+fails, or shows nothing within 15 s, reports `failed`, and that camera stays on the motion-JPEG
+stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma
+closes it (`Service::close_video`).
+
 Holding OK (or a long pointer press, or Menu) on a tile opens **Move** (arrows move it, OK or Back
 ends), **Hide camera** and **Camera settings**; the settings button at the top right, reached
 with Up from the first row, opens the same settings: **Live video** (off makes enlarged cameras

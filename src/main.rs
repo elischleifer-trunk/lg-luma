@@ -1258,6 +1258,10 @@ fn run() -> Result<(), String> {
                     state.camera_list(cameras, live, open);
                     continue;
                 }
+                home_assistant::Event::VideoClosed { failed } => {
+                    state.camera_video_closed(failed);
+                    continue;
+                }
             };
             state.notify(notice);
         }
@@ -1266,6 +1270,17 @@ fn run() -> Result<(), String> {
         }
         if let Some(arrangement) = state.cameras.save.take() {
             home_assistant.arrange(arrangement);
+        }
+        // An enlarged camera's HLS video: ask Home Assistant to start it, then play it in the
+        // overlay app; close it when the gallery leaves the camera.
+        if let Some((id, endpoint)) = state.cameras.resolve.take() {
+            camera_service.resolve(id, endpoint);
+        }
+        if let Some((url, title)) = state.cameras.play.take() {
+            home_assistant.show_video(url, title);
+        }
+        if std::mem::take(&mut state.cameras.stop_video) {
+            home_assistant.close_video();
         }
         // Frames only while the gallery is open and on screen.
         camera_service.sync(&state.camera_watches(visible));

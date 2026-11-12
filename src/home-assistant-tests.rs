@@ -762,3 +762,103 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
     h.api.forget();
     assert_eq!(h.api.store().gallery, Gallery::default());
 }
+
+#[test]
+fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let reply = h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/s",
+            "hls_url": "http://ha:8123/api/luma/stream/camera.door?token=t"}]}),
+    );
+    assert_eq!(reply.status, 200);
+    assert_eq!(
+        h.api.gallery()[0].hls.as_deref(),
+        Some("http://ha:8123/api/luma/stream/camera.door?token=t")
+    );
+    assert_eq!(
+        h.call(
+            "POST",
+            "/api/cameras",
+            Some(&token),
+            json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/s",
+                "hls_url": "javascript:alert(1)"}]}),
+        )
+        .status,
+        400
+    );
+    let _ = h.events.try_iter().count();
+    let launched = |h: &Harness| -> Value {
+        let calls = h.tv.calls();
+        let last = calls
+            .iter()
+            .rev()
+            .find(|call| call.starts_with("launch "))
+            .unwrap();
+        serde_json::from_str(&last["launch ".len()..]).unwrap()
+    };
+    let closed = |h: &mut Harness, params: &Value, failed: bool| {
+        let body =
+            json!({"session": params["session"], "nonce": params["nonce"], "failed": failed})
+                .to_string();
+        h.api.handle(
+            &Request {
+                method: "POST",
+                path: "/api/overlay/closed",
+                authorization: None,
+                origin: Some("null"),
+                peer: LOOPBACK,
+                body: body.as_bytes(),
+            },
+            h.now,
+        )
+    };
+
+    h.api.show_video(
+        "http://ha:8123/api/hls/x/master_playlist.m3u8",
+        "Door",
+        h.now,
+    );
+    let params = launched(&h);
+    assert_eq!(params["mode"], "video");
+    assert_eq!(
+        params["url"],
+        "http://ha:8123/api/hls/x/master_playlist.m3u8"
+    );
+    assert_eq!(params["title"], "Door");
+    assert_eq!(closed(&mut h, &params, true).body, json!({"ended": true}));
+    assert_eq!(h.events.try_recv(), Ok(Event::VideoClosed { failed: true }));
+
+    // Back in the player.
+    h.api.show_video("http://ha/x.m3u8", "Door", h.now);
+    let params = launched(&h);
+    closed(&mut h, &params, false);
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::VideoClosed { failed: false })
+    );
+
+    // A doorbell card replaces the video; the gallery leaves the camera.
+    h.api.show_video("http://ha/x.m3u8", "Door", h.now);
+    h.call("POST", "/api/overlay", Some(&token), camera());
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::VideoClosed { failed: false })
+    );
+
+    // The gallery closing the video closes the overlay without reporting back.
+    let _ = h.events.try_iter().count();
+    h.call("DELETE", "/api/overlay", Some(&token), json!({}));
+    h.api.show_video("http://ha/x.m3u8", "Door", h.now);
+    h.api.close_video();
+    assert_eq!(h.tv.calls().last().unwrap(), "close");
+    assert!(h.events.try_recv().is_err());
+
+    // Without the overlay app installed yet, the gallery hears at once that it failed.
+    h.api.overlay_ready.store(false, Ordering::Release);
+    h.api.show_video("http://ha/x.m3u8", "Door", h.now);
+    assert_eq!(h.events.try_recv(), Ok(Event::VideoClosed { failed: true }));
+}

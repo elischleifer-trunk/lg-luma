@@ -365,3 +365,64 @@ async def test_example_buttons_preview_the_camera_card_and_toast(
     assert overlay[2]["pause"] is False
     notify = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/notify")
     assert notify[2] == {"message": "Example from Home Assistant: the washer is done"}
+
+
+async def test_streaming_cameras_get_an_hls_url_signed_with_their_token(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    hass.config.components.add("stream")
+    door = {"access_token": "d1", "friendly_name": "Door", "supported_features": 2}
+    hass.states.async_set("camera.door", "idle", door)
+    hass.states.async_set("camera.yard", "idle", {"access_token": "y1", "friendly_name": "Yard"})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 2})
+    await setup(hass, aioclient_mock)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    push = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/cameras")
+    door, yard = push[2]["cameras"]
+    assert door["hls_url"] == "http://192.168.1.10:8123/api/luma/stream/camera.door?token=d1"
+    # A camera without the stream feature keeps only its MJPEG and snapshot URLs.
+    assert "hls_url" not in yard
+
+
+async def test_the_stream_view_starts_hls_only_with_the_camera_token(
+    hass: HomeAssistant, hass_client_no_auth, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from homeassistant.setup import async_setup_component
+
+    assert await async_setup_component(hass, "http", {})
+    assert await async_setup_component(hass, DOMAIN, {})
+
+    class Camera:
+        def __init__(self) -> None:
+            self.access_tokens = ["old", "new"]
+
+    requested = []
+
+    async def request_stream(hass_: HomeAssistant, entity_id: str) -> str:
+        requested.append((entity_id, "hls"))
+        if entity_id == "camera.still":
+            raise HomeAssistantError("camera.still does not support play stream service")
+        return "/api/hls/abc/master_playlist.m3u8"
+
+    monkeypatch.setattr(
+        "custom_components.luma._camera",
+        lambda _hass, entity_id: Camera() if entity_id in ("camera.door", "camera.still") else None,
+    )
+    monkeypatch.setattr("custom_components.luma._request_stream", request_stream)
+    client = await hass_client_no_auth()
+
+    response = await client.get("/api/luma/stream/camera.door?token=new")
+    assert response.status == 200
+    assert await response.json() == {"url": "/api/hls/abc/master_playlist.m3u8"}
+    # The previous token still works, as for Home Assistant's own camera proxy.
+    assert (await client.get("/api/luma/stream/camera.door?token=old")).status == 200
+    assert requested == [("camera.door", "hls"), ("camera.door", "hls")]
+
+    assert (await client.get("/api/luma/stream/camera.door?token=guess")).status == 403
+    assert (await client.get("/api/luma/stream/camera.door")).status == 403
+    assert (await client.get("/api/luma/stream/camera.gone?token=new")).status == 404
+    assert (await client.get("/api/luma/stream/light.porch?token=new")).status == 404
+    assert (await client.get("/api/luma/stream/camera.still?token=new")).status == 404
+    assert len(requested) == 3
