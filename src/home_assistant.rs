@@ -155,6 +155,30 @@ pub struct Gallery {
     pub snapshots: bool,
 }
 
+impl Gallery {
+    /// The server at `index` in pairing order was unpaired: its entries go, and later servers,
+    /// which move up one place, keep theirs.
+    fn unpaired(&mut self, index: usize) {
+        let renumber = |list: &mut Vec<String>| {
+            *list = list
+                .drain(..)
+                .filter_map(|id| {
+                    let Some((server, entity)) = id.split_once('/') else {
+                        return Some(id);
+                    };
+                    match server.parse::<usize>() {
+                        Ok(server) if server == index => None,
+                        Ok(server) if server > index => Some(format!("{}/{entity}", server - 1)),
+                        _ => Some(id),
+                    }
+                })
+                .collect();
+        };
+        renumber(&mut self.order);
+        renumber(&mut self.hidden);
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Client {
     pub name: String,
@@ -399,8 +423,10 @@ impl<T: Tv> Api<T> {
             self.cameras.clear();
             self.send_cameras(false);
         }
-        if !self.store.clients.is_empty() {
+        if !self.store.clients.is_empty() || self.store.gallery != Gallery::default() {
             self.store.clients.clear();
+            // Gallery IDs name servers by pairing order, which starts over.
+            self.store.gallery = Gallery::default();
             self.save();
         }
     }
@@ -517,6 +543,7 @@ impl<T: Tv> Api<T> {
                     ("DELETE", "/api/pair") => {
                         let removed = self.store.clients.remove(client);
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
+                        self.store.gallery.unpaired(client);
                         self.save();
                         self.send_cameras(false);
                         reply(200, json!({"paired": false}))

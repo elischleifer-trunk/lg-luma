@@ -480,7 +480,8 @@ ends), **Hide camera** and **Camera settings**; the settings button at the top r
 with Up from the first row, opens the same settings: **Live video** (off makes enlarged cameras
 poll snapshots) and a shown/hidden toggle for every camera. Each change goes to the service's
 thread (`Service::arrange`), which stores it in `Store::gallery` by gallery camera ID (the
-server's pairing position and entity ID, so two servers' `camera.door` stay separate), keeping
+server's pairing position and entity ID, so two servers' `camera.door` stay separate; unpairing
+a server drops its entries and renumbers later servers', and turning the setting off clears it), keeping
 entries for every camera the gallery did not report; new cameras follow in Home Assistant's
 order, and one arriving while the gallery is open goes after its neighbour in that order. Back ends moving,
 closes a sheet or the enlarged camera, then the gallery; Home also closes it.

@@ -747,4 +747,18 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
             ("0/camera.door".to_owned(), false)
         ]
     );
+    // Unpairing the first server drops its entries; the second moves up and keeps its own.
+    h.call("DELETE", "/api/pair", Some(&first), json!({}));
+    assert_eq!(h.api.store().gallery.hidden, ["0/camera.door"]);
+    assert_eq!(h.api.store().gallery.order, ["0/camera.door"]);
+    let gallery: Vec<_> = h
+        .api
+        .gallery()
+        .into_iter()
+        .map(|camera| (camera.id, camera.hidden))
+        .collect();
+    assert_eq!(gallery, [("0/camera.door".to_owned(), true)]);
+    // Turning Home Assistant off forgets every pairing and the arrangement with them.
+    h.api.forget();
+    assert_eq!(h.api.store().gallery, Gallery::default());
 }
