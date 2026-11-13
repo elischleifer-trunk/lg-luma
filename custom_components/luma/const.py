@@ -5,6 +5,9 @@ DEFAULT_PORT = 5862
 CONF_TOKEN = "token"
 CONF_DEVICE_ID = "device_id"
 WEBOSTV_DOMAIN = "webostv"
+# Streaming search keys, kept in the entry's options. Home Assistant is their source of truth.
+CONF_MOTN_KEY = "motn_api_key"
+CONF_TMDB_TOKEN = "tmdb_read_access_token"
 
 SERVICE_SHOW_CAMERA = "show_camera"
 SERVICE_DISMISS = "dismiss"

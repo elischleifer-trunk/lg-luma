@@ -35,6 +35,26 @@
       "reauth_successful": "Paired again."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Streaming search keys",
+        "description": "Luma's search finds where shows stream with Movie of the Night and ranks them with TMDB. Keys are checked when saved, then sent to the TV, and again if the TV loses them or they are changed on the TV. Clearing a field here does not remove the TV's key.",
+        "data": {
+          "motn_api_key": "Movie of the Night API key",
+          "tmdb_read_access_token": "TMDB API Read Access Token"
+        },
+        "data_description": {
+          "motn_api_key": "From movieofthenight.com/about/api (starts with motn-key-), or a RapidAPI key for Streaming Availability.",
+          "tmdb_read_access_token": "The long token under themoviedb.org → Settings → API, not the shorter API key."
+        }
+      }
+    },
+    "error": {
+      "motn_refused": "Movie of the Night refused this key. Check it is complete and the subscription is active.",
+      "tmdb_refused": "TMDB refused this token. Use the API Read Access Token, not the API key."
+    }
+  },
   "entity": {
     "button": {
       "dismiss_overlay": { "name": "Dismiss overlay" },

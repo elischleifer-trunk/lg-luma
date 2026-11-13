@@ -98,6 +98,7 @@ struct Change {
 /// Applies a change without checking keys against their APIs.
 fn apply(keys: &Keys, change: &Change) -> Result<Keys, String> {
     let mut next = keys.clone();
+    next.home_assistant = false;
     if let Some(motn) = &change.motn {
         next.motn = clean(motn).map_err(|e| format!("Movie of the Night: {e}"))?;
     }
@@ -427,6 +428,7 @@ mod tests {
         Keys {
             motn: motn.into(),
             tmdb: tmdb.into(),
+            home_assistant: false,
         }
     }
 

@@ -2487,6 +2487,9 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                     "search",
                     Some(language.t(
                         match (state.streaming_keys.motn, state.streaming_keys.tmdb) {
+                            (true, true) if state.streaming_keys.home_assistant => {
+                                "streamingKeysFromHomeAssistant"
+                            }
                             (true, true) => "streamingKeysSet",
                             (false, false) => "streamingKeysNotSet",
                             _ => "streamingKeysPartial",

@@ -1328,6 +1328,12 @@ fn run() -> Result<(), String> {
                     state.camera_video_closed(failed);
                     continue;
                 }
+                // Sent only when the keys changed, so a reconnect does not repeat the notice.
+                home_assistant::Event::StreamingKeys(status) => {
+                    state.streaming_keys = status;
+                    state.dirty = true;
+                    language.t("streamingKeysSaved").to_owned()
+                }
             };
             state.notify(notice);
         }

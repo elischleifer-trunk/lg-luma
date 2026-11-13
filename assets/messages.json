@@ -3733,5 +3733,20 @@
     "vi": "Đã lưu khóa tìm kiếm phát trực tuyến",
     "nl": "Sleutels voor streamingzoeken opgeslagen",
     "sv": "Nycklar för strömningssökning sparade"
+  },
+  "streamingKeysFromHomeAssistant": {
+    "en": "From Home Assistant",
+    "de": "Von Home Assistant",
+    "es": "Desde Home Assistant",
+    "zh": "来自 Home Assistant",
+    "zh-tw": "來自 Home Assistant",
+    "pt": "Do Home Assistant",
+    "it": "Da Home Assistant",
+    "ru": "Из Home Assistant",
+    "pl": "Z Home Assistant",
+    "fr": "Depuis Home Assistant",
+    "vi": "Từ Home Assistant",
+    "nl": "Via Home Assistant",
+    "sv": "Från Home Assistant"
   }
 }

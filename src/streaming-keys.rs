@@ -22,6 +22,10 @@ pub struct Keys {
     /// TMDB API Read Access Token, sent as a bearer token.
     #[serde(default)]
     pub tmdb: String,
+    /// Home Assistant set these last. It is the source of truth and pushes them again after
+    /// a reset; keys entered on the QR page clear this until its next push.
+    #[serde(default)]
+    pub home_assistant: bool,
 }
 
 /// Keys must never reach logs, even through `{:?}`.
@@ -30,6 +34,7 @@ impl fmt::Debug for Keys {
         f.debug_struct("Keys")
             .field("motn", &mask(&self.motn))
             .field("tmdb", &mask(&self.tmdb))
+            .field("home_assistant", &self.home_assistant)
             .finish()
     }
 }
@@ -39,6 +44,7 @@ impl fmt::Debug for Keys {
 pub struct Status {
     pub motn: bool,
     pub tmdb: bool,
+    pub home_assistant: bool,
 }
 
 impl Status {
@@ -52,6 +58,7 @@ impl Keys {
         Status {
             motn: !self.motn.is_empty(),
             tmdb: !self.tmdb.is_empty(),
+            home_assistant: self.home_assistant,
         }
     }
 
@@ -121,6 +128,31 @@ pub fn clean(key: &str) -> Result<String, &'static str> {
     Ok(key.to_owned())
 }
 
+/// Applies a Home Assistant push: each non-empty key replaces the stored one, and an empty or
+/// missing key keeps it, so clearing a field in Home Assistant never erases the TV's key.
+pub fn merge_from_home_assistant(
+    keys: &Keys,
+    motn: Option<&str>,
+    tmdb: Option<&str>,
+) -> Result<Keys, String> {
+    let mut next = keys.clone();
+    let mut changed = false;
+    for (name, value, slot) in [
+        ("motn", motn, &mut next.motn),
+        ("tmdb", tmdb, &mut next.tmdb),
+    ] {
+        let value = clean(value.unwrap_or_default()).map_err(|e| format!("{name}: {e}"))?;
+        if !value.is_empty() {
+            *slot = value;
+            changed = true;
+        }
+    }
+    if changed {
+        next.home_assistant = true;
+    }
+    Ok(next)
+}
+
 pub fn path(preferences: &Path) -> PathBuf {
     preferences.with_file_name("streaming-keys.json")
 }
@@ -153,6 +185,7 @@ mod tests {
         let keys = Keys {
             motn: "motn-key-secretsecretsecret1234".into(),
             tmdb: "eyJhbGciOiJIUzI1NiJ9.secret.abcd".into(),
+            home_assistant: true,
         };
         let debug = format!("{keys:?}");
         assert!(!debug.contains("secret"), "{debug}");
@@ -184,7 +217,7 @@ mod tests {
         let file = path(&dir.join("preferences.json"));
         let keys = Keys {
             motn: "motn-key-0123456789abcdef".into(),
-            tmdb: String::new(),
+            ..Keys::default()
         };
         save(&file, &keys).unwrap();
         assert_eq!(load(&file), keys);
@@ -192,7 +225,8 @@ mod tests {
             load(&file).status(),
             Status {
                 motn: true,
-                tmdb: false
+                tmdb: false,
+                home_assistant: false,
             }
         );
         #[cfg(unix)]
@@ -202,6 +236,24 @@ mod tests {
             assert_eq!(mode & 0o777, 0o600);
         }
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn home_assistant_pushes_never_erase_a_key() {
+        let stored = Keys {
+            motn: "motn-key-0123456789abcdef".into(),
+            tmdb: "eyJhbGciOiJIUzI1NiJ9.e30.oldtoken".into(),
+            home_assistant: false,
+        };
+        let next = merge_from_home_assistant(&stored, None, Some("  ")).unwrap();
+        assert_eq!(next, stored, "empty push changed nothing");
+        let next =
+            merge_from_home_assistant(&stored, Some(""), Some("eyJhbGciOiJIUzI1NiJ9.e30.newtoken"))
+                .unwrap();
+        assert_eq!(next.motn, stored.motn);
+        assert_eq!(next.tmdb, "eyJhbGciOiJIUzI1NiJ9.e30.newtoken");
+        assert!(next.home_assistant);
+        assert!(merge_from_home_assistant(&stored, Some("bad key"), None).is_err());
     }
 
     #[test]
