@@ -1,0 +1,156 @@
+{
+  "request": {
+    "path": "/3/tv/154825",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:42.490Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/9XvDKzoFqDLepuC3K3FFXCuD8jc.jpg",
+    "created_by": [
+      {
+        "id": 3285113,
+        "credit_id": "622775282f1be00045aa92d2",
+        "name": "Han Sul-hee",
+        "original_name": "한설희",
+        "gender": 1,
+        "profile_path": "/7TbRZP2UL1kPgNd7HGZjWYigvcO.jpg"
+      },
+      {
+        "id": 2145271,
+        "credit_id": "622775961130bd001bbd5a7b",
+        "name": "Park Seon-ho",
+        "original_name": "박선호",
+        "gender": 2,
+        "profile_path": "/asuUwah7AtgbCCpnhkeIvGUfgrF.jpg"
+      },
+      {
+        "id": 2995806,
+        "credit_id": "64a86d14f495ee011fd700c4",
+        "name": "Hong Bo-hee",
+        "original_name": "Hong Bo-hee",
+        "gender": 1,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      61
+    ],
+    "first_air_date": "2022-02-28",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://programs.sbs.co.kr/drama/businessproposal",
+    "id": 154825,
+    "in_production": false,
+    "languages": [
+      "ko"
+    ],
+    "last_air_date": "2022-04-05",
+    "last_episode_to_air": {
+      "id": 3437965,
+      "name": "We're getting married",
+      "overview": "Ha-ri tries to win Da-goo over by keeping him company at his hospital bedside. A worried Tae-moo asks Ha-ri to go to the U.S. with him.",
+      "vote_average": 7.8,
+      "vote_count": 5,
+      "air_date": "2022-04-05",
+      "episode_number": 12,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 61,
+      "season_number": 1,
+      "show_id": 154825,
+      "still_path": "/BwsqMdS5tHzEuafftkZC4tJnyg.jpg"
+    },
+    "name": "Business Proposal",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 156,
+        "logo_path": "/uHQFPvRTlpgaIFQVN8eKWEnFOll.png",
+        "name": "SBS",
+        "origin_country": "KR"
+      }
+    ],
+    "number_of_episodes": 12,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "KR"
+    ],
+    "original_language": "ko",
+    "original_name": "사내맞선",
+    "overview": "In disguise as her friend, Ha-ri shows up to a blind date to scare him away. But plans go awry when he turns out to be her CEO — and makes a proposal.",
+    "popularity": 13.5459,
+    "poster_path": "/iLh7L8ZuvgdxFaM9sImyv2iKYLe.jpg",
+    "production_companies": [
+      {
+        "id": 83914,
+        "logo_path": "/nFcR2kd7vl5O3TITQs6x39BNo6Y.png",
+        "name": "Studio S",
+        "origin_country": "KR"
+      },
+      {
+        "id": 78691,
+        "logo_path": "/bLJDhuGNexE8w4Gn8wt1zAwU22y.png",
+        "name": "Kross Pictures",
+        "origin_country": "KR"
+      },
+      {
+        "id": 139214,
+        "logo_path": "/1aHsO2tVEdJfIBYCy0G4VpWYDY8.png",
+        "name": "Kakao Entertainment",
+        "origin_country": "KR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "KR",
+        "name": "South Korea"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2022-03-19",
+        "episode_count": 1,
+        "id": 284148,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2022-02-28",
+        "episode_count": 12,
+        "id": 238544,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/bdSnsLhfKcbi5YGLNSebVb9HhTS.jpg",
+        "season_number": 1,
+        "vote_average": 8
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Korean",
+        "iso_639_1": "ko",
+        "name": "한국어/조선말"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "If you come any closer, I'm not going to let you go again.",
+    "type": "Scripted",
+    "vote_average": 8.469,
+    "vote_count": 813
+  }
+}

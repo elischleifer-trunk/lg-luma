@@ -124,3 +124,9 @@ class LumaClient:
     async def cameras(self, cameras: list[dict[str, Any]]) -> None:
         """Replace the camera list shown by Luma's Cameras app."""
         await self._request("POST", "/api/cameras", {"cameras": cameras})
+
+    async def streaming_keys(self, motn: str | None, tmdb: str | None) -> dict[str, Any]:
+        """Set the TV's streaming search keys. Empty keys are left out, so a field cleared in
+        Home Assistant never erases the TV's key. Returns which keys the TV now holds."""
+        payload = {name: key for name, key in (("motn", motn), ("tmdb", tmdb)) if key}
+        return await self._request("PUT", "/api/streaming-keys", payload)

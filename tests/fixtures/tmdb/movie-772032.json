@@ -1,0 +1,68 @@
+{
+  "request": {
+    "path": "/3/movie/772032",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:15.995Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      },
+      {
+        "id": 14,
+        "name": "Fantasy"
+      }
+    ],
+    "homepage": "",
+    "id": 772032,
+    "imdb_id": "tt0213865",
+    "origin_country": [
+      "MX"
+    ],
+    "original_language": "es",
+    "original_title": "¡Mátenme porque me muero!",
+    "overview": "",
+    "popularity": 0.5436,
+    "poster_path": "/aotome5Cj4FTvE0qjwLWSETVjpx.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "MX",
+        "name": "Mexico"
+      }
+    ],
+    "release_date": "1991-01-01",
+    "revenue": 0,
+    "runtime": 92,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Mexican Ghostbusters",
+    "video": false,
+    "vote_average": 6.8,
+    "vote_count": 6
+  }
+}

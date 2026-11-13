@@ -1,0 +1,135 @@
+{
+  "request": {
+    "path": "/3/tv/253376",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:27.902Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/lnVWmFvLv2pTZGsuAJytiqKu541.jpg",
+    "created_by": [
+      {
+        "id": 1768997,
+        "credit_id": "6875699d5f509799908e4df8",
+        "name": "Naomi Sheldon",
+        "original_name": "Naomi Sheldon",
+        "gender": 1,
+        "profile_path": null
+      },
+      {
+        "id": 1617085,
+        "credit_id": "687569a17b1b0c1fca4437a1",
+        "name": "Gabbie Asher",
+        "original_name": "Gabbie Asher",
+        "gender": 1,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2025-09-10",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 9648,
+        "name": "Mystery"
+      }
+    ],
+    "homepage": "https://www.amazon.com/gp/video/detail/B0FB528M67",
+    "id": 253376,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2025-09-10",
+    "last_episode_to_air": {
+      "id": 6382678,
+      "name": "Episode 6",
+      "overview": "Cherry and Daniel seem blissfully in love, but cracks are starting to show. As Cherry fights to hold on to her new life, Laura discovers their relationship is progressing quickly. A tense visit to Cherry's family brings the evidence Laura thinks she needs to take Cherry down. It looks like Laura's won until the tables turn and a bitter showdown erupts, with Daniel caught in the crossfire.",
+      "vote_average": 5.5,
+      "vote_count": 12,
+      "air_date": "2025-09-10",
+      "episode_number": 6,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 52,
+      "season_number": 1,
+      "show_id": 253376,
+      "still_path": "/zKPJuB7qX0Df2l2SaB8z81yEvs3.jpg"
+    },
+    "name": "The Girlfriend",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1024,
+        "logo_path": "/w7HfLNm9CWwRmAMU58udl2L7We7.png",
+        "name": "Prime Video",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 6,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US",
+      "GB"
+    ],
+    "original_language": "en",
+    "original_name": "The Girlfriend",
+    "overview": "Laura has it all: a glittering career, a loving husband, and her precious son, Daniel. But her perfect life unravels when Daniel brings home Cherry, a girlfriend who changes everything. After a tense introduction, Laura becomes convinced Cherry is hiding something. Is she a manipulative social climber, or is Laura just paranoid? The truth is a matter of perspective.",
+    "popularity": 699.5649,
+    "poster_path": "/ktrp3tdZ5IQpFux4nLy8z70bt3n.jpg",
+    "production_companies": [
+      {
+        "id": 85284,
+        "logo_path": "/7RvgzApnxYrdy9sqIAn1axTKuxu.png",
+        "name": "The Imaginarium",
+        "origin_country": "GB"
+      },
+      {
+        "id": 210099,
+        "logo_path": "/g5oRCNCi8kNVb8gEoSoIcqkhjmR.png",
+        "name": "Amazon MGM Studios",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2025-09-10",
+        "episode_count": 6,
+        "id": 391955,
+        "name": "Miniseries",
+        "overview": "Laura Sanderson has it all: a glittering career, a loving husband, and her precious son, Daniel. But her perfect life unravels when Daniel brings home Cherry Lane, a girlfriend who changes everything. After a tense introduction, Laura becomes convinced Cherry is hiding something. Is she a manipulative social climber, or is Laura just paranoid? The truth is a matter of perspective.",
+        "poster_path": "/ktrp3tdZ5IQpFux4nLy8z70bt3n.jpg",
+        "season_number": 1,
+        "vote_average": 6.5
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "There are two sides to every story.",
+    "type": "Miniseries",
+    "vote_average": 7.137,
+    "vote_count": 168
+  }
+}

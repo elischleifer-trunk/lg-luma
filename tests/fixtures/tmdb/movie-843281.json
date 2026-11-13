@@ -1,0 +1,63 @@
+{
+  "request": {
+    "path": "/3/movie/843281",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:43.410Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/T6jRmCIYoHcTj1i0cmkueurkZw.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      }
+    ],
+    "homepage": "",
+    "id": 843281,
+    "imdb_id": "tt14450978",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Dune World",
+    "overview": "A deep space crew takes a job on a mysterious remote planet. A crash landing strands them on the hostile surface. Soon they find out what creatures live there, and the hidden fate of the crew before them.",
+    "popularity": 0.2606,
+    "poster_path": "/ztRN5ng5g2FSGjt1WexuFuRESgM.jpg",
+    "production_companies": [
+      {
+        "id": 64599,
+        "logo_path": null,
+        "name": "SRS Cinema",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2021-08-08",
+    "revenue": 0,
+    "runtime": 70,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "We don't belong out here.",
+    "title": "Dune World",
+    "video": false,
+    "vote_average": 2.6,
+    "vote_count": 7
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "request": {
+    "path": "/genres",
+    "query": {
+      "output_language": "en"
+    }
+  },
+  "capturedAt": "2026-11-13T20:26:47.021Z",
+  "response": [
+    {
+      "id": "action",
+      "name": "Action"
+    },
+    {
+      "id": "adventure",
+      "name": "Adventure"
+    },
+    {
+      "id": "animation",
+      "name": "Animation"
+    },
+    {
+      "id": "comedy",
+      "name": "Comedy"
+    },
+    {
+      "id": "crime",
+      "name": "Crime"
+    },
+    {
+      "id": "documentary",
+      "name": "Documentary"
+    },
+    {
+      "id": "drama",
+      "name": "Drama"
+    },
+    {
+      "id": "family",
+      "name": "Family"
+    },
+    {
+      "id": "fantasy",
+      "name": "Fantasy"
+    },
+    {
+      "id": "history",
+      "name": "History"
+    },
+    {
+      "id": "horror",
+      "name": "Horror"
+    },
+    {
+      "id": "music",
+      "name": "Music"
+    },
+    {
+      "id": "mystery",
+      "name": "Mystery"
+    },
+    {
+      "id": "news",
+      "name": "News"
+    },
+    {
+      "id": "reality",
+      "name": "Reality"
+    },
+    {
+      "id": "romance",
+      "name": "Romance"
+    },
+    {
+      "id": "scifi",
+      "name": "Science Fiction"
+    },
+    {
+      "id": "talk",
+      "name": "Talk Show"
+    },
+    {
+      "id": "thriller",
+      "name": "Thriller"
+    },
+    {
+      "id": "war",
+      "name": "War"
+    },
+    {
+      "id": "western",
+      "name": "Western"
+    }
+  ]
+}

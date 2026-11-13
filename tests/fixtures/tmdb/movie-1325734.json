@@ -1,0 +1,83 @@
+{
+  "request": {
+    "path": "/3/movie/1325734",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:45.561Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/1oKLEA9JOhvaBwLpqjROisvWMy7.jpg",
+    "belongs_to_collection": null,
+    "budget": 28000000,
+    "genres": [
+      {
+        "id": 10749,
+        "name": "Romance"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://a24films.com/films/the-drama",
+    "id": 1325734,
+    "imdb_id": "tt33071426",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Drama",
+    "overview": "A happily engaged couple is put to the test when an unexpected turn sends their wedding week off the rails.",
+    "popularity": 15.4417,
+    "poster_path": "/rnIOUhzwJDfgQakx8EjoNyItKgs.jpg",
+    "production_companies": [
+      {
+        "id": 41077,
+        "logo_path": "/1ZXsGaFPgrgS6ZZGS37AqD5uU12.png",
+        "name": "A24",
+        "origin_country": "US"
+      },
+      {
+        "id": 123620,
+        "logo_path": "/ePRhZ3yb09Ya6WMzCCBYopwIYbE.png",
+        "name": "Square Peg",
+        "origin_country": "US"
+      },
+      {
+        "id": 277538,
+        "logo_path": null,
+        "name": "Dilemma Films",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2026-04-01",
+    "revenue": 134670180,
+    "runtime": 105,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Witness the wedding of the year.",
+    "title": "The Drama",
+    "video": false,
+    "vote_average": 6.9,
+    "vote_count": 2065
+  }
+}

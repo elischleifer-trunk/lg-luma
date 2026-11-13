@@ -1,0 +1,146 @@
+{
+  "request": {
+    "path": "/3/tv/90762",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:20.406Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/iGrqdlhYRNsGG4ZQ5TBkRsJue4U.jpg",
+    "created_by": [
+      {
+        "id": 2239105,
+        "credit_id": "5d17be05ca0e1700186ff5e6",
+        "name": "Sumit Roy",
+        "original_name": "Sumit Roy",
+        "gender": 2,
+        "profile_path": "/kUl7pj6gVmTgufQIQI5qKaXe5mR.jpg"
+      },
+      {
+        "id": 2350861,
+        "credit_id": "5d17bde990fca30016ab2fd9",
+        "name": "Anurag Pandey",
+        "original_name": "Anurag Pandey",
+        "gender": 0,
+        "profile_path": null
+      },
+      {
+        "id": 1974823,
+        "credit_id": "5d17bdf2126ec300150e4b58",
+        "name": "Adhir Bhat",
+        "original_name": "Adhir Bhat",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      23
+    ],
+    "first_air_date": "2019-06-28",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://www.hotstar.com/tv/the-office/s-2187",
+    "id": 90762,
+    "in_production": false,
+    "languages": [
+      "hi"
+    ],
+    "last_air_date": "2019-09-15",
+    "last_episode_to_air": {
+      "id": 1938437,
+      "name": "Founder's Day",
+      "overview": "Chaddha organises a Founder's Day party for charity, but inadvertently ends up inviting both Riya and Geeta. Post party, Amit opens up to Pammi.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2019-09-15",
+      "episode_number": 15,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 29,
+      "season_number": 2,
+      "show_id": 90762,
+      "still_path": "/f3cGJbhKzARxmZ63ZK1zAgzxmf2.jpg"
+    },
+    "name": "The Office",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 3919,
+        "logo_path": "/eBa3TplonEHlR6S2wjJ616KnwIh.png",
+        "name": "Disney+ Hotstar",
+        "origin_country": "IN"
+      }
+    ],
+    "number_of_episodes": 28,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_name": "The Office",
+    "overview": "Life at Wilkins Chawla, a mediocre paper company is as boring as the humour of its 'Fun'jabi boss. Add to it some ordinary employees, an uncomfortable receptionist, the boss' sycophant, and the mediocrity goes a notch higher!",
+    "popularity": 4.2774,
+    "poster_path": "/p61QSlJor7edi2DJIH0jFL3whfa.jpg",
+    "production_companies": [
+      {
+        "id": 34088,
+        "logo_path": "/P7yqIC1NpxvSDyr1BLGTElL0lo.png",
+        "name": "Applause Entertainment",
+        "origin_country": "IN"
+      },
+      {
+        "id": 123348,
+        "logo_path": "/enAjeGPTtVw8pt7HSzZYBXPfbOY.png",
+        "name": "BBC Studios India",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2019-06-28",
+        "episode_count": 13,
+        "id": 126905,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/qkndFzy85qg114ppfG2kCMujptc.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-09-15",
+        "episode_count": 15,
+        "id": 133063,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/p61QSlJor7edi2DJIH0jFL3whfa.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.1,
+    "vote_count": 10
+  }
+}

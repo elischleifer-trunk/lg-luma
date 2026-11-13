@@ -1,0 +1,69 @@
+{
+  "request": {
+    "path": "/3/movie/413230",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:24.812Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.roninfilms.com.au/feature/13400/bluey.html",
+    "id": 413230,
+    "imdb_id": "tt4564506",
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_title": "Bluey",
+    "overview": "Bluey, an angry young woman trapped in a life of violence, meets a mystery mentor who could change everything. Bluey is a story of courage, heart and the fight for survival.",
+    "popularity": 0.6134,
+    "poster_path": "/tGtERHeboH3C30CZw0epnCzr8aO.jpg",
+    "production_companies": [
+      {
+        "id": 16577,
+        "logo_path": "/qildaLRTmB6fCBM3H7L02nQCreO.png",
+        "name": "Ronin Films",
+        "origin_country": "AU"
+      },
+      {
+        "id": 7584,
+        "logo_path": "/eGkfvvyf4fJTvBUR1xt1669IPA3.png",
+        "name": "Screen Australia",
+        "origin_country": "AU"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "AU",
+        "name": "Australia"
+      }
+    ],
+    "release_date": "2015-06-01",
+    "revenue": 0,
+    "runtime": 13,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Bluey",
+    "video": false,
+    "vote_average": 9,
+    "vote_count": 1
+  }
+}

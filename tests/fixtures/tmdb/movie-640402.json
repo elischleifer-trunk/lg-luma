@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/640402",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.007Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/l9gyf42WgkpBK2KLGCp5mMfyV4X.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 640402,
+    "imdb_id": "tt9378950",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_title": "घोस्ट",
+    "overview": "The story of the film follows Karan Khanna, a politician of Indian origin in the United Kingdom, who is accused of killing his wife. He tells his lawyer that a spirit committed the murder and should be tried.",
+    "popularity": 0.3685,
+    "poster_path": "/tPzw28qOSVU5kfyczbcOJkInqxF.jpg",
+    "production_companies": [
+      {
+        "id": 98389,
+        "logo_path": "/vhqXLOJ7D34h0RZI7NHENUyNe30.png",
+        "name": "Loneranger Production",
+        "origin_country": "IN"
+      },
+      {
+        "id": 124282,
+        "logo_path": null,
+        "name": "Vashu Bhagnani Production",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2019-10-18",
+    "revenue": 0,
+    "runtime": 130,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Arabic",
+        "iso_639_1": "ar",
+        "name": "العربية"
+      },
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Ghost",
+    "video": false,
+    "vote_average": 5.5,
+    "vote_count": 10
+  }
+}

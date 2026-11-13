@@ -1,0 +1,103 @@
+{
+  "request": {
+    "path": "/3/tv/213307",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:42.630Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/6xpS5lZvFhD1jd8S1k9Ig7U9Cak.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2022-10-27",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://shahid.mbc.net/en/series/The-Office/series-958387",
+    "id": 213307,
+    "in_production": false,
+    "languages": [
+      "ar"
+    ],
+    "last_air_date": "2023-01-08",
+    "last_episode_to_air": {
+      "id": 4148917,
+      "name": "Rumours",
+      "overview": "On the day before Ramadan, with Malek hosting his annual branch potluck, rumours spread around the office that steer attention away from what he has prepared.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2023-01-08",
+      "episode_number": 20,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 31,
+      "season_number": 1,
+      "show_id": 213307,
+      "still_path": "/gImON9ShhXtSdBdcgeg1GMJlzn7.jpg"
+    },
+    "name": "The Office (SA)",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 3626,
+        "logo_path": "/fPku7XI2slnF3LDaL5Tmiajjmke.png",
+        "name": "MBC Shahid",
+        "origin_country": "SA"
+      }
+    ],
+    "number_of_episodes": 20,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "SA"
+    ],
+    "original_language": "ar",
+    "original_name": "المكتب",
+    "overview": "In a postal service company in Riyadh, a group of employees go about their daily work while dealing with their clumsy, but kind-hearted boss.",
+    "popularity": 2.3837,
+    "poster_path": "/r55H1Klk1y1GxdJsH2yQdyGfIv7.jpg",
+    "production_companies": [
+      {
+        "id": 150718,
+        "logo_path": "/9WNCdYfkJYs4Yjv2i4ElcoazDly.png",
+        "name": "MBC Shahid",
+        "origin_country": "SA"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "SA",
+        "name": "Saudi Arabia"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2022-10-27",
+        "episode_count": 20,
+        "id": 314335,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/fgOQ0FZBrrTcUV3Fps6WsBXnaa9.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Arabic",
+        "iso_639_1": "ar",
+        "name": "العربية"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.8,
+    "vote_count": 4
+  }
+}

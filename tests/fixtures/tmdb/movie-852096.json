@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/852096",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:40.634Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/25xur6csh3XXtQcOq4zx3cyvbEN.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://www.netflix.com/title/80230619",
+    "id": 852096,
+    "imdb_id": "tt7798604",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "We Have a Ghost",
+    "overview": "After Kevin finds a ghost named Ernest haunting his new home, he becomes an overnight social media sensation. But when Kevin and Ernest go rogue to investigate the mystery of the latter's past, they become targets of the CIA.",
+    "popularity": 3.2229,
+    "poster_path": "/xo0fgAUoEeVQ7KsKeMWypyglvnf.jpg",
+    "production_companies": [
+      {
+        "id": 12292,
+        "logo_path": "/5J93SHsuvIV32AE9oSbMi02pqw9.png",
+        "name": "Temple Hill Entertainment",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2023-02-24",
+    "revenue": 0,
+    "runtime": 127,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Set your spirit free.",
+    "title": "We Have a Ghost",
+    "video": false,
+    "vote_average": 6.423,
+    "vote_count": 740
+  }
+}

@@ -1,0 +1,1691 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "tmdb-api",
+    "version": "3",
+    "x-luma-source": "https://developer.themoviedb.org/openapi/tmdb-api.json",
+    "x-luma-patches": [
+      {
+        "path": [
+          "paths",
+          "/3/tv/{series_id}",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+          "properties",
+          "seasons",
+          "items",
+          "properties",
+          "vote_average",
+          "type"
+        ],
+        "value": "number"
+      }
+    ]
+  },
+  "servers": [
+    {
+      "url": "https://api.themoviedb.org"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "x-bearer-format": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/3/collection/{collection_id}": {
+      "get": {
+        "summary": "Details",
+        "description": "Get collection details by ID.",
+        "operationId": "collection-details",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "required": true
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en-US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"id\": 10,\n  \"name\": \"Star Wars Collection\",\n  \"original_language\": \"en\",\n  \"original_name\": \"Star Wars Collection\",\n  \"overview\": \"An epic space-opera theatrical film series, which depicts the adventures of various characters \\\"a long time ago in a galaxy far, far away….\\\"\",\n  \"poster_path\": \"/22dj38IckjzEEUZwN1tPU5VJ1qq.jpg\",\n  \"backdrop_path\": \"/4z9ijhgEthfRHShoOvMaBlpciXS.jpg\",\n  \"parts\": [\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/2w4xG178RpB4MDAIfTkqAuSJzec.jpg\",\n      \"id\": 11,\n      \"name\": \"Star Wars\",\n      \"original_name\": \"Star Wars\",\n      \"overview\": \"Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.\",\n      \"poster_path\": \"/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 15.8557,\n      \"release_date\": \"1977-05-25\",\n      \"video\": false,\n      \"vote_average\": 8.205,\n      \"vote_count\": 21522\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/dMZxEdrWIzUmUoOz2zvmFuutbj7.jpg\",\n      \"id\": 1891,\n      \"name\": \"The Empire Strikes Back\",\n      \"original_name\": \"The Empire Strikes Back\",\n      \"overview\": \"The epic saga continues as Luke Skywalker, in hopes of defeating the evil Galactic Empire, learns the ways of the Jedi from aging master Yoda. But Darth Vader is more determined than ever to capture Luke. Meanwhile, rebel leader Princess Leia, cocky Han Solo, Chewbacca, and droids C-3PO and R2-D2 are thrown into various stages of capture, betrayal and despair.\",\n      \"poster_path\": \"/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 6.7352,\n      \"release_date\": \"1980-05-20\",\n      \"video\": false,\n      \"vote_average\": 8.395,\n      \"vote_count\": 17713\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/r2IOBOeg5wLfLtyOnT5Pur6Tl4q.jpg\",\n      \"id\": 1892,\n      \"name\": \"Return of the Jedi\",\n      \"original_name\": \"Return of the Jedi\",\n      \"overview\": \"Luke Skywalker leads a mission to rescue his friend Han Solo from the clutches of Jabba the Hutt, while the Emperor seeks to destroy the Rebellion once and for all with a second dreaded Death Star.\",\n      \"poster_path\": \"/jQYlydvHm3kUix1f8prMucrplhm.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 5.5117,\n      \"release_date\": \"1983-05-25\",\n      \"video\": false,\n      \"vote_average\": 7.9,\n      \"vote_count\": 16334\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/wDe8LzwuvHYYiuwyNfxdYQq8ti4.jpg\",\n      \"id\": 1893,\n      \"name\": \"Star Wars: Episode I - The Phantom Menace\",\n      \"original_name\": \"Star Wars: Episode I - The Phantom Menace\",\n      \"overview\": \"Anakin Skywalker, a young slave strong with the Force, is discovered on Tatooine. Meanwhile, the evil Sith have returned, enacting their plot for revenge against the Jedi.\",\n      \"poster_path\": \"/6wkfovpn7Eq8dYNKaG5PY3q2oq6.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 7.1731,\n      \"release_date\": \"1999-05-19\",\n      \"video\": false,\n      \"vote_average\": 6.6,\n      \"vote_count\": 15251\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/msYmRFJfXy0zsFd73PAEqdetKpO.jpg\",\n      \"id\": 1894,\n      \"name\": \"Star Wars: Episode II - Attack of the Clones\",\n      \"original_name\": \"Star Wars: Episode II - Attack of the Clones\",\n      \"overview\": \"Following an assassination attempt on Senator Padmé Amidala, Jedi Knights Anakin Skywalker and Obi-Wan Kenobi investigate a mysterious plot that could change the galaxy forever.\",\n      \"poster_path\": \"/oZNPzxqM2s5DyVWab09NTQScDQt.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 6.9779,\n      \"release_date\": \"2002-05-15\",\n      \"video\": false,\n      \"vote_average\": 6.6,\n      \"vote_count\": 13807\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/jniabJVBSW3EqLlyhjxWCZjVkiE.jpg\",\n      \"id\": 1895,\n      \"name\": \"Star Wars: Episode III - Revenge of the Sith\",\n      \"original_name\": \"Star Wars: Episode III - Revenge of the Sith\",\n      \"overview\": \"The evil Darth Sidious enacts his final plan for unlimited power – and the heroic Jedi Anakin Skywalker must choose a side.\",\n      \"poster_path\": \"/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 7.0776,\n      \"release_date\": \"2005-05-17\",\n      \"video\": false,\n      \"vote_average\": 7.5,\n      \"vote_count\": 14365\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/8BTsTfln4jlQrLXUBquXJ0ASQy9.jpg\",\n      \"id\": 140607,\n      \"name\": \"Star Wars: The Force Awakens\",\n      \"original_name\": \"Star Wars: The Force Awakens\",\n      \"overview\": \"Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers.\",\n      \"poster_path\": \"/wqnLdwVXoBjKibFRR5U3y0aDUhs.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 10.9225,\n      \"release_date\": \"2015-12-15\",\n      \"video\": false,\n      \"vote_average\": 7.256,\n      \"vote_count\": 19985\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/SPkEiZGxq5aHWQ2Zw7AITwSEo2.jpg\",\n      \"id\": 181812,\n      \"name\": \"Star Wars: The Rise of Skywalker\",\n      \"original_name\": \"Star Wars: The Rise of Skywalker\",\n      \"overview\": \"The surviving Resistance faces the First Order once again as the journey of Rey, Finn and Poe Dameron continues. With the power and knowledge of generations behind them, the final battle begins.\",\n      \"poster_path\": \"/db32LaOibwEliAmSL2jjDF6oDdj.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 10.4568,\n      \"release_date\": \"2019-12-18\",\n      \"video\": false,\n      \"vote_average\": 6.283,\n      \"vote_count\": 10367\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/5Iw7zQTHVRBOYpA0V6z0yypOPZh.jpg\",\n      \"id\": 181808,\n      \"name\": \"Star Wars: The Last Jedi\",\n      \"original_name\": \"Star Wars: The Last Jedi\",\n      \"overview\": \"Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.\",\n      \"poster_path\": \"/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 8.732,\n      \"release_date\": \"2017-12-13\",\n      \"video\": false,\n      \"vote_average\": 6.768,\n      \"vote_count\": 15821\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 10,
+                      "default": 0
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Star Wars Collection"
+                    },
+                    "original_language": {
+                      "type": "string",
+                      "example": "en"
+                    },
+                    "original_name": {
+                      "type": "string",
+                      "example": "Star Wars Collection"
+                    },
+                    "overview": {
+                      "type": "string",
+                      "example": "An epic space-opera theatrical film series, which depicts the adventures of various characters \"a long time ago in a galaxy far, far away….\""
+                    },
+                    "poster_path": {
+                      "type": "string",
+                      "example": "/22dj38IckjzEEUZwN1tPU5VJ1qq.jpg"
+                    },
+                    "backdrop_path": {
+                      "type": "string",
+                      "example": "/4z9ijhgEthfRHShoOvMaBlpciXS.jpg"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "adult": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "backdrop_path": {
+                            "type": "string",
+                            "example": "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "example": 11,
+                            "default": 0
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Star Wars"
+                          },
+                          "original_name": {
+                            "type": "string",
+                            "example": "Star Wars"
+                          },
+                          "overview": {
+                            "type": "string",
+                            "example": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire."
+                          },
+                          "poster_path": {
+                            "type": "string",
+                            "example": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"
+                          },
+                          "media_type": {
+                            "type": "string",
+                            "example": "movie"
+                          },
+                          "original_language": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "genre_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "example": 12,
+                              "default": 0
+                            }
+                          },
+                          "popularity": {
+                            "type": "number",
+                            "example": 15.8557,
+                            "default": 0
+                          },
+                          "release_date": {
+                            "type": "string",
+                            "example": "1977-05-25"
+                          },
+                          "video": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "vote_average": {
+                            "type": "number",
+                            "example": 8.205,
+                            "default": 0
+                          },
+                          "vote_count": {
+                            "type": "integer",
+                            "example": 21522,
+                            "default": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/3/find/{external_id}": {
+      "get": {
+        "summary": "Find By ID",
+        "description": "Find data by external ID's.",
+        "operationId": "find-by-id",
+        "parameters": [
+          {
+            "name": "external_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "external_source",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "imdb_id",
+                "facebook_id",
+                "instagram_id",
+                "tvdb_id",
+                "tiktok_id",
+                "twitter_id",
+                "wikidata_id",
+                "youtube_id"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en-US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\"movie_results\":[{\"adult\":false,\"backdrop_path\":\"/44immBwzhDVyjn87b3x3l9mlhAD.jpg\",\"id\":934433,\"title\":\"Scream VI\",\"original_language\":\"en\",\"original_title\":\"Scream VI\",\"overview\":\"Following the latest Ghostface killings, the four survivors leave Woodsboro behind and start a fresh chapter.\",\"poster_path\":\"/wDWwtvkRRlgTiUr6TyLSMX8FCuZ.jpg\",\"media_type\":\"movie\",\"genre_ids\":[27,9648,53],\"popularity\":853.917,\"release_date\":\"2023-03-08\",\"video\":false,\"vote_average\":7.388,\"vote_count\":708}],\"person_results\":[],\"tv_results\":[],\"tv_episode_results\":[],\"tv_season_results\":[]}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "movie_results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "adult": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "backdrop_path": {
+                            "type": "string",
+                            "example": "/44immBwzhDVyjn87b3x3l9mlhAD.jpg"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "example": 934433,
+                            "default": 0
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Scream VI"
+                          },
+                          "original_language": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "original_title": {
+                            "type": "string",
+                            "example": "Scream VI"
+                          },
+                          "overview": {
+                            "type": "string",
+                            "example": "Following the latest Ghostface killings, the four survivors leave Woodsboro behind and start a fresh chapter."
+                          },
+                          "poster_path": {
+                            "type": "string",
+                            "example": "/wDWwtvkRRlgTiUr6TyLSMX8FCuZ.jpg"
+                          },
+                          "media_type": {
+                            "type": "string",
+                            "example": "movie"
+                          },
+                          "genre_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "example": 27,
+                              "default": 0
+                            }
+                          },
+                          "popularity": {
+                            "type": "number",
+                            "example": 853.917,
+                            "default": 0
+                          },
+                          "release_date": {
+                            "type": "string",
+                            "example": "2023-03-08"
+                          },
+                          "video": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "vote_average": {
+                            "type": "number",
+                            "example": 7.388,
+                            "default": 0
+                          },
+                          "vote_count": {
+                            "type": "integer",
+                            "example": 708,
+                            "default": 0
+                          }
+                        }
+                      }
+                    },
+                    "person_results": {
+                      "type": "array"
+                    },
+                    "tv_results": {
+                      "type": "array"
+                    },
+                    "tv_episode_results": {
+                      "type": "array"
+                    },
+                    "tv_season_results": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/3/movie/{movie_id}": {
+      "get": {
+        "summary": "Details",
+        "description": "Get the top level details of a movie by ID.",
+        "operationId": "movie-details",
+        "parameters": [
+          {
+            "name": "movie_id",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "required": true
+          },
+          {
+            "name": "append_to_response",
+            "in": "query",
+            "description": "comma separated list of endpoints within this namespace, 20 items max",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en-US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "summary": "OK",
+                    "value": {
+                      "adult": false,
+                      "backdrop_path": "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg",
+                      "belongs_to_collection": {
+                        "id": 10,
+                        "name": "Star Wars Collection",
+                        "poster_path": "/pWVLFh4OuejTpUaDQbB1C4zoS2p.jpg",
+                        "backdrop_path": "/iY2ujEY2m68OTTlPFTiHub9joHS.jpg"
+                      },
+                      "budget": 11000000,
+                      "genres": [
+                        {
+                          "id": 12,
+                          "name": "Adventure"
+                        },
+                        {
+                          "id": 28,
+                          "name": "Action"
+                        },
+                        {
+                          "id": 878,
+                          "name": "Science Fiction"
+                        }
+                      ],
+                      "homepage": "http://www.starwars.com/films/star-wars-episode-iv-a-new-hope",
+                      "id": 11,
+                      "imdb_id": "tt0076759",
+                      "origin_country": [
+                        "US"
+                      ],
+                      "original_language": "en",
+                      "original_title": "Star Wars",
+                      "overview": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.",
+                      "popularity": 20.6912,
+                      "poster_path": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
+                      "production_companies": [
+                        {
+                          "id": 1,
+                          "logo_path": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png",
+                          "name": "Lucasfilm Ltd.",
+                          "origin_country": "US"
+                        },
+                        {
+                          "id": 25,
+                          "logo_path": "/qZCc1lty5FzX30aOCVRBLzaVmcp.png",
+                          "name": "20th Century Fox",
+                          "origin_country": "US"
+                        }
+                      ],
+                      "production_countries": [
+                        {
+                          "iso_3166_1": "US",
+                          "name": "United States of America"
+                        }
+                      ],
+                      "release_date": "1977-05-25",
+                      "revenue": 775398007,
+                      "runtime": 121,
+                      "spoken_languages": [
+                        {
+                          "english_name": "English",
+                          "iso_639_1": "en",
+                          "name": "English"
+                        }
+                      ],
+                      "status": "Released",
+                      "tagline": "A long time ago in a galaxy far, far away...",
+                      "title": "Star Wars",
+                      "video": false,
+                      "vote_average": 8.2,
+                      "vote_count": 22061
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adult": {
+                      "type": "boolean",
+                      "example": false,
+                      "default": "false"
+                    },
+                    "backdrop_path": {
+                      "type": "string",
+                      "example": "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg"
+                    },
+                    "belongs_to_collection": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 10,
+                          "default": 0
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Star Wars Collection"
+                        },
+                        "poster_path": {
+                          "type": "string",
+                          "example": "/pWVLFh4OuejTpUaDQbB1C4zoS2p.jpg"
+                        },
+                        "backdrop_path": {
+                          "type": "string",
+                          "example": "/iY2ujEY2m68OTTlPFTiHub9joHS.jpg"
+                        }
+                      }
+                    },
+                    "budget": {
+                      "type": "integer",
+                      "example": 11000000,
+                      "default": 0
+                    },
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 12,
+                            "default": 0
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Adventure"
+                          }
+                        }
+                      }
+                    },
+                    "homepage": {
+                      "type": "string",
+                      "example": "http://www.starwars.com/films/star-wars-episode-iv-a-new-hope"
+                    },
+                    "id": {
+                      "type": "integer",
+                      "example": 11,
+                      "default": 0
+                    },
+                    "imdb_id": {
+                      "type": "string",
+                      "example": "tt0076759"
+                    },
+                    "origin_country": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "US"
+                      }
+                    },
+                    "original_language": {
+                      "type": "string",
+                      "example": "en"
+                    },
+                    "original_title": {
+                      "type": "string",
+                      "example": "Star Wars"
+                    },
+                    "overview": {
+                      "type": "string",
+                      "example": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire."
+                    },
+                    "popularity": {
+                      "type": "number",
+                      "example": 20.6912,
+                      "default": 0
+                    },
+                    "poster_path": {
+                      "type": "string",
+                      "example": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"
+                    },
+                    "production_companies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1,
+                            "default": 0
+                          },
+                          "logo_path": {
+                            "type": "string",
+                            "example": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Lucasfilm Ltd."
+                          },
+                          "origin_country": {
+                            "type": "string",
+                            "example": "US"
+                          }
+                        }
+                      }
+                    },
+                    "production_countries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "iso_3166_1": {
+                            "type": "string",
+                            "example": "US"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "United States of America"
+                          }
+                        }
+                      }
+                    },
+                    "release_date": {
+                      "type": "string",
+                      "example": "1977-05-25"
+                    },
+                    "revenue": {
+                      "type": "integer",
+                      "example": 775398007,
+                      "default": 0
+                    },
+                    "runtime": {
+                      "type": "integer",
+                      "example": 121,
+                      "default": 0
+                    },
+                    "spoken_languages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "english_name": {
+                            "type": "string",
+                            "example": "English"
+                          },
+                          "iso_639_1": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "English"
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "Released"
+                    },
+                    "tagline": {
+                      "type": "string",
+                      "example": "A long time ago in a galaxy far, far away..."
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Star Wars"
+                    },
+                    "video": {
+                      "type": "boolean",
+                      "example": false,
+                      "default": "false"
+                    },
+                    "vote_average": {
+                      "type": "number",
+                      "example": 8.2,
+                      "default": 0
+                    },
+                    "vote_count": {
+                      "type": "integer",
+                      "example": 22061,
+                      "default": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/3/search/multi": {
+      "get": {
+        "summary": "Multi",
+        "description": "Use multi search when you want to search for movies, TV shows and people in a single request.",
+        "operationId": "search-multi",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include_adult",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en-US"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": {
+                      "page": 1,
+                      "results": [
+                        {
+                          "adult": false,
+                          "backdrop_path": "/aDYSnJAK0BTVeE8osOy22Kz3SXY.jpg",
+                          "id": 11,
+                          "title": "Star Wars",
+                          "original_language": "en",
+                          "original_title": "Star Wars",
+                          "overview": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.",
+                          "poster_path": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            12,
+                            28,
+                            878
+                          ],
+                          "popularity": 78.047,
+                          "release_date": "1977-05-25",
+                          "video": false,
+                          "vote_average": 8.208,
+                          "vote_count": 18528
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/iflKt34Ck2JpY2PY9wW1zwdJgJi.jpg",
+                          "id": 782054,
+                          "title": "Doraemon: Nobita's Little Star Wars 2021",
+                          "original_language": "ja",
+                          "original_title": "映画ドラえもん のび太の宇宙小戦争 2021",
+                          "overview": "One day during summer vacation, a palm-sized alien named Papi appears from a small rocket that Nobita picks up. He is the president of Pirika, a small planet in outer space, and has come to Earth to escape the rebels. Doraemon and his friends are puzzled by Papi’s small size, but as they play together using the secret tool “Small Light”, they gradually become friends. However, a whale-shaped space battleship comes to earth and attacks Doraemon, Nobita and the others in order to capture Papi. Feeling responsible for getting everyone involved, Papi tries to stand up to the rebels. Doraemon and his friends leave for the planet Pirika to protect their dear friend and his home.",
+                          "poster_path": "/48gKZioIDeUOI0afbYv3kh9u9RQ.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            16,
+                            878,
+                            12
+                          ],
+                          "popularity": 33.466,
+                          "release_date": "2022-03-04",
+                          "video": false,
+                          "vote_average": 5.825,
+                          "vote_count": 60
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/ajztm40qDPqMONaSJhQ2PaNe2Xd.jpg",
+                          "id": 83867,
+                          "name": "Star Wars: Andor",
+                          "original_language": "en",
+                          "original_name": "Star Wars: Andor",
+                          "overview": "The tale of the burgeoning rebellion against the Empire and how people and planets became involved. In an era filled with danger, deception and intrigue, Cassian Andor embarks on the path that is destined to turn him into a rebel hero.",
+                          "poster_path": "/59SVNwLfoMnZPPB6ukW6dlPxAdI.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            10765,
+                            10759,
+                            10768,
+                            18
+                          ],
+                          "popularity": 87.697,
+                          "first_air_date": "2022-09-21",
+                          "vote_average": 8.223,
+                          "vote_count": 671,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/7Q0diljpwSnUuHfxrZmexxztrEZ.jpg",
+                          "id": 114478,
+                          "name": "Star Wars: Visions",
+                          "original_language": "ja",
+                          "original_name": "スター・ウォーズ：ビジョンズ",
+                          "overview": "An anthology series of animated short films celebrating Star Wars through the lens of the world's best anime creators.",
+                          "poster_path": "/8yECMpsZ8wAvra4Sow6Bz9WOO5f.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            16,
+                            10765,
+                            10759
+                          ],
+                          "popularity": 32.764,
+                          "first_air_date": "2021-09-22",
+                          "vote_average": 7.304,
+                          "vote_count": 237,
+                          "origin_country": [
+                            "JP",
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+                          "id": 4194,
+                          "name": "Star Wars: The Clone Wars",
+                          "original_language": "en",
+                          "original_name": "Star Wars: The Clone Wars",
+                          "overview": "Yoda, Obi-Wan Kenobi, Anakin Skywalker, Mace Windu and other Jedi Knights lead the Grand Army of the Republic against the droid army of the Separatists.",
+                          "poster_path": "/e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            10759,
+                            16,
+                            10765
+                          ],
+                          "popularity": 93.955,
+                          "first_air_date": "2008-10-03",
+                          "vote_average": 8.48,
+                          "vote_count": 1649,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/sjxtIUCWR74yPPcZFfTsToepfWm.jpg",
+                          "id": 105971,
+                          "name": "Star Wars: The Bad Batch",
+                          "original_language": "en",
+                          "original_name": "Star Wars: The Bad Batch",
+                          "overview": "The 'Bad Batch' of elite and experimental clones make their way through an ever-changing galaxy in the immediate aftermath of the Clone Wars.",
+                          "poster_path": "/5Q6z9bjy8dHKA5T8kNmCd8hj6Gl.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            16,
+                            10759,
+                            10765
+                          ],
+                          "popularity": 56.538,
+                          "first_air_date": "2021-05-04",
+                          "vote_average": 8.334,
+                          "vote_count": 738,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/AdJgkXb8oLI8e4rsk8XzkvABIuw.jpg",
+                          "id": 60554,
+                          "name": "Star Wars Rebels",
+                          "original_language": "en",
+                          "original_name": "Star Wars Rebels",
+                          "overview": "Set between the events of Star Wars: Episodes III and IV, the story unfolds during a dark time when the evil Galactic Empire is tightening its grip of power on the galaxy. Imperial forces have occupied a remote planet and are ruining the lives of its people. The motley but clever crew of the starship Ghost — cowboy Jedi Kanan, ace pilot Hera, street-smart teenager Ezra, the “muscle” Zeb, warrior firebrand Sabine, and cantankerous old astromech droid Chopper — is among a select few who are brave enough to stand against the Empire. Together, they will face threatening new villains, encounter colorful adversaries, embark on thrilling adventures, and become heroes with the power to ignite a rebellion.",
+                          "poster_path": "/vOUxo5sfXyQPIoF8rtYK1OVVBPi.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            10759,
+                            16,
+                            10765
+                          ],
+                          "popularity": 57.151,
+                          "first_air_date": "2014-10-13",
+                          "vote_average": 7.667,
+                          "vote_count": 650,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/8BTsTfln4jlQrLXUBquXJ0ASQy9.jpg",
+                          "id": 140607,
+                          "title": "Star Wars: The Force Awakens",
+                          "original_language": "en",
+                          "original_title": "Star Wars: The Force Awakens",
+                          "overview": "Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers.",
+                          "poster_path": "/wqnLdwVXoBjKibFRR5U3y0aDUhs.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            12,
+                            28,
+                            878,
+                            14
+                          ],
+                          "popularity": 54.208,
+                          "release_date": "2015-12-15",
+                          "video": false,
+                          "vote_average": 7.3,
+                          "vote_count": 17946
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/jOzrELAzFxtMx2I4uDGHOotdfsS.jpg",
+                          "id": 181812,
+                          "title": "Star Wars: The Rise of Skywalker",
+                          "original_language": "en",
+                          "original_title": "Star Wars: The Rise of Skywalker",
+                          "overview": "The surviving Resistance faces the First Order once again as the journey of Rey, Finn and Poe Dameron continues. With the power and knowledge of generations behind them, the final battle begins.",
+                          "poster_path": "/db32LaOibwEliAmSL2jjDF6oDdj.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            12,
+                            28,
+                            878
+                          ],
+                          "popularity": 57.195,
+                          "release_date": "2019-12-18",
+                          "video": false,
+                          "vote_average": 6.389,
+                          "vote_count": 8671
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/5Iw7zQTHVRBOYpA0V6z0yypOPZh.jpg",
+                          "id": 181808,
+                          "title": "Star Wars: The Last Jedi",
+                          "original_language": "en",
+                          "original_title": "Star Wars: The Last Jedi",
+                          "overview": "Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.",
+                          "poster_path": "/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            12,
+                            28,
+                            878
+                          ],
+                          "popularity": 47.022,
+                          "release_date": "2017-12-13",
+                          "video": false,
+                          "vote_average": 6.8,
+                          "vote_count": 13924
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": null,
+                          "id": 432134,
+                          "title": "Star Wars: Heroes & Villains",
+                          "original_language": "en",
+                          "original_title": "Star Wars: Heroes & Villains",
+                          "overview": "A look at the creation and filming of the various heroes and villains from all six Star Wars movies, leading up to the release of Star Wars: Episode III - Revenge of the Sith.",
+                          "poster_path": "/uPlEvzDy4lez92nEhUt3UFJOoQ6.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            99
+                          ],
+                          "popularity": 2.851,
+                          "release_date": "2005-05-03",
+                          "video": false,
+                          "vote_average": 9.438,
+                          "vote_count": 8
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/ojHCeDULAkQK25700fhRU75Tur2.jpg",
+                          "id": 348350,
+                          "title": "Solo: A Star Wars Story",
+                          "original_language": "en",
+                          "original_title": "Solo: A Star Wars Story",
+                          "overview": "Through a series of daring escapades deep within a dark and dangerous criminal underworld, Han Solo meets his mighty future copilot Chewbacca and encounters the notorious gambler Lando Calrissian.",
+                          "poster_path": "/3IGbjc5ZC5yxim5W0sFING2kdcz.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            878,
+                            12,
+                            28
+                          ],
+                          "popularity": 34.732,
+                          "release_date": "2018-05-15",
+                          "video": false,
+                          "vote_average": 6.6,
+                          "vote_count": 7651
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/6t8ES1d12OzWyCGxBeDYLHoaDrT.jpg",
+                          "id": 330459,
+                          "title": "Rogue One: A Star Wars Story",
+                          "original_language": "en",
+                          "original_title": "Rogue One: A Star Wars Story",
+                          "overview": "A rogue band of resistance fighters unite for a mission to steal the Death Star plans and bring a new hope to the galaxy.",
+                          "poster_path": "/i0yw1mFbB7sNGHCs7EXZPzFkdA1.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            28,
+                            12,
+                            878
+                          ],
+                          "popularity": 34.32,
+                          "release_date": "2016-12-14",
+                          "video": false,
+                          "vote_average": 7.5,
+                          "vote_count": 13977
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/wDe8LzwuvHYYiuwyNfxdYQq8ti4.jpg",
+                          "id": 1893,
+                          "title": "Star Wars: Episode I - The Phantom Menace",
+                          "original_language": "en",
+                          "original_title": "Star Wars: Episode I - The Phantom Menace",
+                          "overview": "Anakin Skywalker, a young slave strong with the Force, is discovered on Tatooine. Meanwhile, the evil Sith have returned, enacting their plot for revenge against the Jedi.",
+                          "poster_path": "/6wkfovpn7Eq8dYNKaG5PY3q2oq6.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            12,
+                            28,
+                            878
+                          ],
+                          "popularity": 31.5,
+                          "release_date": "1999-05-19",
+                          "video": false,
+                          "vote_average": 6.5,
+                          "vote_count": 13124
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/dUkCHy02dtFWQwyCKQKlf1sRm0D.jpg",
+                          "id": 161704,
+                          "title": "Doraemon: Nobita's Little Star Wars",
+                          "original_language": "ja",
+                          "original_title": "映画ドラえもん のび太の宇宙小戦争",
+                          "overview": "Papi, the tiny president of a faraway planet, escapes to Earth to avoid being captured by the military forces that took over. Despite being welcomed by Doraemon, Nobita and their friends, the little alien notices that his enemies have also reached this world and doesn't want to get his human friends involved in this war. Doraemon, Nobita, Gian, Suneo, and Shizuka start a big adventure as they try to hide and protect Papi.",
+                          "poster_path": "/oLXqorJ3CtXkR90wCBkg4WnITL3.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            16,
+                            12,
+                            10751,
+                            14,
+                            878
+                          ],
+                          "popularity": 9.276,
+                          "release_date": "1985-03-16",
+                          "video": false,
+                          "vote_average": 7.444,
+                          "vote_count": 18
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/dVTvzp1PEnvloYy7qzYCFeAkPQ3.jpg",
+                          "id": 203085,
+                          "name": "Star Wars: Tales of the Jedi",
+                          "original_language": "en",
+                          "original_name": "Star Wars: Tales of the Jedi",
+                          "overview": "Journey into the lives of two distinctly different Jedi from the prequel era – Ahsoka Tano and Count Dooku. Each will be put to the test as they make choices that will define their destinies.",
+                          "poster_path": "/9gshOJpjmZaUGM1En5wR1V1fcBE.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            16,
+                            10765
+                          ],
+                          "popularity": 35.917,
+                          "first_air_date": "2022-10-26",
+                          "vote_average": 8.102,
+                          "vote_count": 172,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/dKH2l6WrrYS3tGp4JD3Y0AtVzPu.jpg",
+                          "id": 101978,
+                          "name": "Disney Gallery / Star Wars: The Mandalorian",
+                          "original_language": "en",
+                          "original_name": "Disney Gallery / Star Wars: The Mandalorian",
+                          "overview": "Executive producer Jon Favreau invites the cast and crew of The Mandalorian to share an unprecedented look at the making of the series. Each chapter explores a different facet of the first live-action Star Wars television show through interviews, never-before-seen footage, and roundtable conversations hosted by Favreau himself.",
+                          "poster_path": "/6Hc2eHp59iTyMqkhcumNovq2l6y.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            99
+                          ],
+                          "popularity": 39.403,
+                          "first_air_date": "2020-05-04",
+                          "vote_average": 7.3,
+                          "vote_count": 45,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/xEdnGUc8KeZ7h0eEgSN3ERhjgL0.jpg",
+                          "id": 12180,
+                          "title": "Star Wars: The Clone Wars",
+                          "original_language": "en",
+                          "original_title": "Star Wars: The Clone Wars",
+                          "overview": "As the Clone Wars sweep through the galaxy, the heroic Jedi Knights struggle to maintain order and restore peace. More and more systems are falling prey to the forces of the dark side as the Galactic Republic slips further and further under the sway of the Separatists and their never-ending droid army. Anakin Skywalker and his Padawan learner Ahsoka Tano find themselves on a mission with far-reaching consequences, one that brings them face-to-face with crime lord Jabba the Hutt. But Count Dooku and his sinister agents, including the nefarious Asajj Ventress, will stop at nothing to ensure that Anakin and Ahsoka fail at their quest. Meanwhile, on the front lines of the Clone Wars, Obi-Wan Kenobi and Master Yoda lead the massive clone army in a valiant effort to resist the forces of the dark side...",
+                          "poster_path": "/d6YOfi0T9GowglzIkDQGGvGYVTM.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            16,
+                            28,
+                            878,
+                            12
+                          ],
+                          "popularity": 17.361,
+                          "release_date": "2008-08-05",
+                          "video": false,
+                          "vote_average": 6.113,
+                          "vote_count": 1738
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/9eXNA3K010TlkUTLSzQ07cP6uPF.jpg",
+                          "id": 79093,
+                          "name": "Star Wars Resistance",
+                          "original_language": "en",
+                          "original_name": "Star Wars Resistance",
+                          "overview": "Kazuda Xiono, a young pilot for the Resistance, is tasked with a top secret mission to investigate the First Order, a growing threat in the galaxy.",
+                          "poster_path": "/xul6SG8rar3wkHPY8YusUtxcdlZ.jpg",
+                          "media_type": "tv",
+                          "genre_ids": [
+                            10765,
+                            16,
+                            10759
+                          ],
+                          "popularity": 20.486,
+                          "first_air_date": "2018-10-07",
+                          "vote_average": 6.417,
+                          "vote_count": 96,
+                          "origin_country": [
+                            "US"
+                          ]
+                        },
+                        {
+                          "adult": false,
+                          "backdrop_path": "/eFaRU5y8wIwV0D14DPkbLaRUzOV.jpg",
+                          "id": 1895,
+                          "title": "Star Wars: Episode III - Revenge of the Sith",
+                          "original_language": "en",
+                          "original_title": "Star Wars: Episode III - Revenge of the Sith",
+                          "overview": "The evil Darth Sidious enacts his final plan for unlimited power -- and the heroic Jedi Anakin Skywalker must choose a side.",
+                          "poster_path": "/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg",
+                          "media_type": "movie",
+                          "genre_ids": [
+                            12,
+                            28,
+                            878
+                          ],
+                          "popularity": 32.108,
+                          "release_date": "2005-05-17",
+                          "video": false,
+                          "vote_average": 7.401,
+                          "vote_count": 12350
+                        }
+                      ],
+                      "total_pages": 11,
+                      "total_results": 201
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "page": {
+                      "type": "integer",
+                      "example": 1,
+                      "default": 0
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "adult": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "backdrop_path": {
+                            "type": "string",
+                            "example": "/aDYSnJAK0BTVeE8osOy22Kz3SXY.jpg"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "example": 11,
+                            "default": 0
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Star Wars"
+                          },
+                          "original_language": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "original_title": {
+                            "type": "string",
+                            "example": "Star Wars"
+                          },
+                          "overview": {
+                            "type": "string",
+                            "example": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire."
+                          },
+                          "poster_path": {
+                            "type": "string",
+                            "example": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"
+                          },
+                          "media_type": {
+                            "type": "string",
+                            "example": "movie"
+                          },
+                          "genre_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "example": 12,
+                              "default": 0
+                            }
+                          },
+                          "popularity": {
+                            "type": "number",
+                            "example": 78.047,
+                            "default": 0
+                          },
+                          "release_date": {
+                            "type": "string",
+                            "example": "1977-05-25"
+                          },
+                          "video": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "vote_average": {
+                            "type": "number",
+                            "example": 8.208,
+                            "default": 0
+                          },
+                          "vote_count": {
+                            "type": "integer",
+                            "example": 18528,
+                            "default": 0
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "original_name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_pages": {
+                      "type": "integer",
+                      "example": 11,
+                      "default": 0
+                    },
+                    "total_results": {
+                      "type": "integer",
+                      "example": 201,
+                      "default": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/3/tv/{series_id}": {
+      "get": {
+        "summary": "Details",
+        "description": "Get the details of a TV show.",
+        "operationId": "tv-series-details",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "required": true
+          },
+          {
+            "name": "append_to_response",
+            "in": "query",
+            "description": "comma separated list of endpoints within this namespace, 20 items max",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en-US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"adult\": false,\n  \"backdrop_path\": \"/6LWy0jvMpmjoS9fojNgHIKoWL05.jpg\",\n  \"created_by\": [\n    {\n      \"id\": 9813,\n      \"credit_id\": \"5256c8c219c2956ff604858a\",\n      \"name\": \"David Benioff\",\n      \"gender\": 2,\n      \"profile_path\": \"/xvNN5huL0X8yJ7h3IZfGG4O2zBD.jpg\"\n    },\n    {\n      \"id\": 228068,\n      \"credit_id\": \"552e611e9251413fea000901\",\n      \"name\": \"D.B. Weiss\",\n      \"gender\": 2,\n      \"profile_path\": \"/2RMejaT793U9KRk2IEbFfteQntE.jpg\"\n    }\n  ],\n  \"episode_run_time\": [\n    60\n  ],\n  \"first_air_date\": \"2011-04-17\",\n  \"genres\": [\n    {\n      \"id\": 10765,\n      \"name\": \"Sci-Fi & Fantasy\"\n    },\n    {\n      \"id\": 18,\n      \"name\": \"Drama\"\n    },\n    {\n      \"id\": 10759,\n      \"name\": \"Action & Adventure\"\n    }\n  ],\n  \"homepage\": \"http://www.hbo.com/game-of-thrones\",\n  \"id\": 1399,\n  \"in_production\": false,\n  \"languages\": [\n    \"en\"\n  ],\n  \"last_air_date\": \"2019-05-19\",\n  \"last_episode_to_air\": {\n    \"id\": 1551830,\n    \"name\": \"The Iron Throne\",\n    \"overview\": \"In the aftermath of the devastating attack on King's Landing, Daenerys must face the survivors.\",\n    \"vote_average\": 4.809,\n    \"vote_count\": 241,\n    \"air_date\": \"2019-05-19\",\n    \"episode_number\": 6,\n    \"production_code\": \"806\",\n    \"runtime\": 80,\n    \"season_number\": 8,\n    \"show_id\": 1399,\n    \"still_path\": \"/zBi2O5EJfgTS6Ae0HdAYLm9o2nf.jpg\"\n  },\n  \"name\": \"Game of Thrones\",\n  \"next_episode_to_air\": null,\n  \"networks\": [\n    {\n      \"id\": 49,\n      \"logo_path\": \"/tuomPhY2UtuPTqqFnKMVHvSb724.png\",\n      \"name\": \"HBO\",\n      \"origin_country\": \"US\"\n    }\n  ],\n  \"number_of_episodes\": 73,\n  \"number_of_seasons\": 8,\n  \"origin_country\": [\n    \"US\"\n  ],\n  \"original_language\": \"en\",\n  \"original_name\": \"Game of Thrones\",\n  \"overview\": \"Seven noble families fight for control of the mythical land of Westeros. Friction between the houses leads to full-scale war. All while a very ancient evil awakens in the farthest north. Amidst the war, a neglected military order of misfits, the Night's Watch, is all that stands between the realms of men and icy horrors beyond.\",\n  \"popularity\": 346.098,\n  \"poster_path\": \"/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg\",\n  \"production_companies\": [\n    {\n      \"id\": 76043,\n      \"logo_path\": \"/9RO2vbQ67otPrBLXCaC8UMp3Qat.png\",\n      \"name\": \"Revolution Sun Studios\",\n      \"origin_country\": \"US\"\n    },\n    {\n      \"id\": 12525,\n      \"logo_path\": null,\n      \"name\": \"Television 360\",\n      \"origin_country\": \"\"\n    },\n    {\n      \"id\": 5820,\n      \"logo_path\": null,\n      \"name\": \"Generator Entertainment\",\n      \"origin_country\": \"GB\"\n    },\n    {\n      \"id\": 12526,\n      \"logo_path\": null,\n      \"name\": \"Bighead Littlehead\",\n      \"origin_country\": \"\"\n    }\n  ],\n  \"production_countries\": [\n    {\n      \"iso_3166_1\": \"GB\",\n      \"name\": \"United Kingdom\"\n    },\n    {\n      \"iso_3166_1\": \"US\",\n      \"name\": \"United States of America\"\n    }\n  ],\n  \"seasons\": [\n    {\n      \"air_date\": \"2010-12-05\",\n      \"episode_count\": 272,\n      \"id\": 3627,\n      \"name\": \"Specials\",\n      \"overview\": \"\",\n      \"poster_path\": \"/kMTcwNRfFKCZ0O2OaBZS0nZ2AIe.jpg\",\n      \"season_number\": 0,\n      \"vote_average\": 0\n    },\n    {\n      \"air_date\": \"2011-04-17\",\n      \"episode_count\": 10,\n      \"id\": 3624,\n      \"name\": \"Season 1\",\n      \"overview\": \"Trouble is brewing in the Seven Kingdoms of Westeros. For the driven inhabitants of this visionary world, control of Westeros' Iron Throne holds the lure of great power. But in a land where the seasons can last a lifetime, winter is coming...and beyond the Great Wall that protects them, an ancient evil has returned. In Season One, the story centers on three primary areas: the Stark and the Lannister families, whose designs on controlling the throne threaten a tenuous peace; the dragon princess Daenerys, heir to the former dynasty, who waits just over the Narrow Sea with her malevolent brother Viserys; and the Great Wall--a massive barrier of ice where a forgotten danger is stirring.\",\n      \"poster_path\": \"/wgfKiqzuMrFIkU1M68DDDY8kGC1.jpg\",\n      \"season_number\": 1,\n      \"vote_average\": 8.3\n    },\n    {\n      \"air_date\": \"2012-04-01\",\n      \"episode_count\": 10,\n      \"id\": 3625,\n      \"name\": \"Season 2\",\n      \"overview\": \"The cold winds of winter are rising in Westeros...war is coming...and five kings continue their savage quest for control of the all-powerful Iron Throne. With winter fast approaching, the coveted Iron Throne is occupied by the cruel Joffrey, counseled by his conniving mother Cersei and uncle Tyrion. But the Lannister hold on the Throne is under assault on many fronts. Meanwhile, a new leader is rising among the wildings outside the Great Wall, adding new perils for Jon Snow and the order of the Night's Watch.\",\n      \"poster_path\": \"/9xfNkPwDOqyeUvfNhs1XlWA0esP.jpg\",\n      \"season_number\": 2,\n      \"vote_average\": 8.2\n    },\n    {\n      \"air_date\": \"2013-03-31\",\n      \"episode_count\": 10,\n      \"id\": 3626,\n      \"name\": \"Season 3\",\n      \"overview\": \"Duplicity and treachery...nobility and honor...conquest and triumph...and, of course, dragons. In Season 3, family and loyalty are the overarching themes as many critical storylines from the first two seasons come to a brutal head. Meanwhile, the Lannisters maintain their hold on King's Landing, though stirrings in the North threaten to alter the balance of power; Robb Stark, King of the North, faces a major calamity as he tries to build on his victories; a massive army of wildlings led by Mance Rayder march for the Wall; and Daenerys Targaryen--reunited with her dragons--attempts to raise an army in her quest for the Iron Throne.\",\n      \"poster_path\": \"/5MkZjRnCKiIGn3bkXrXfndEzqOU.jpg\",\n      \"season_number\": 3,\n      \"vote_average\": 8.2\n    },\n    {\n      \"air_date\": \"2014-04-06\",\n      \"episode_count\": 10,\n      \"id\": 3628,\n      \"name\": \"Season 4\",\n      \"overview\": \"The War of the Five Kings is drawing to a close, but new intrigues and plots are in motion, and the surviving factions must contend with enemies not only outside their ranks, but within.\",\n      \"poster_path\": \"/jXIMScXE4J4EVHUba1JgxZnWbo4.jpg\",\n      \"season_number\": 4,\n      \"vote_average\": 8.4\n    },\n    {\n      \"air_date\": \"2015-04-12\",\n      \"episode_count\": 10,\n      \"id\": 62090,\n      \"name\": \"Season 5\",\n      \"overview\": \"The War of the Five Kings, once thought to be drawing to a close, is instead entering a new and more chaotic phase. Westeros is on the brink of collapse, and many are seizing what they can while the realm implodes, like a corpse making a feast for crows.\",\n      \"poster_path\": \"/7Q1Hy1AHxAzA2lsmzEMBvuWTX0x.jpg\",\n      \"season_number\": 5,\n      \"vote_average\": 8.2\n    },\n    {\n      \"air_date\": \"2016-04-24\",\n      \"episode_count\": 10,\n      \"id\": 71881,\n      \"name\": \"Season 6\",\n      \"overview\": \"Following the shocking developments at the conclusion of season five, survivors from all parts of Westeros and Essos regroup to press forward, inexorably, towards their uncertain individual fates. Familiar faces will forge new alliances to bolster their strategic chances at survival, while new characters will emerge to challenge the balance of power in the east, west, north and south.\",\n      \"poster_path\": \"/p1udLh0gfqyZFmXBGa393gk8go5.jpg\",\n      \"season_number\": 6,\n      \"vote_average\": 8.3\n    },\n    {\n      \"air_date\": \"2017-07-16\",\n      \"episode_count\": 7,\n      \"id\": 81266,\n      \"name\": \"Season 7\",\n      \"overview\": \"The long winter is here. And with it comes a convergence of armies and attitudes that have been brewing for years.\",\n      \"poster_path\": \"/oX51n32QyHeFP5kErksemJsJljL.jpg\",\n      \"season_number\": 7,\n      \"vote_average\": 8.2\n    },\n    {\n      \"air_date\": \"2019-04-14\",\n      \"episode_count\": 6,\n      \"id\": 107971,\n      \"name\": \"Season 8\",\n      \"overview\": \"The Great War has come, the Wall has fallen and the Night King's army of the dead marches towards Westeros. The end is here, but who will take the Iron Throne?\",\n      \"poster_path\": \"/3OcQhbrecf4F4pYss2gSirTGPvD.jpg\",\n      \"season_number\": 8,\n      \"vote_average\": 6.5\n    }\n  ],\n  \"spoken_languages\": [\n    {\n      \"english_name\": \"English\",\n      \"iso_639_1\": \"en\",\n      \"name\": \"English\"\n    }\n  ],\n  \"status\": \"Ended\",\n  \"tagline\": \"Winter Is Coming\",\n  \"type\": \"Scripted\",\n  \"vote_average\": 8.438,\n  \"vote_count\": 21390\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adult": {
+                      "type": "boolean",
+                      "example": false,
+                      "default": true
+                    },
+                    "backdrop_path": {
+                      "type": "string",
+                      "example": "/6LWy0jvMpmjoS9fojNgHIKoWL05.jpg"
+                    },
+                    "created_by": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 9813,
+                            "default": 0
+                          },
+                          "credit_id": {
+                            "type": "string",
+                            "example": "5256c8c219c2956ff604858a"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "David Benioff"
+                          },
+                          "gender": {
+                            "type": "integer",
+                            "example": 2,
+                            "default": 0
+                          },
+                          "profile_path": {
+                            "type": "string",
+                            "example": "/xvNN5huL0X8yJ7h3IZfGG4O2zBD.jpg"
+                          }
+                        }
+                      }
+                    },
+                    "episode_run_time": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "example": 60,
+                        "default": 0
+                      }
+                    },
+                    "first_air_date": {
+                      "type": "string",
+                      "example": "2011-04-17"
+                    },
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 10765,
+                            "default": 0
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Sci-Fi & Fantasy"
+                          }
+                        }
+                      }
+                    },
+                    "homepage": {
+                      "type": "string",
+                      "example": "http://www.hbo.com/game-of-thrones"
+                    },
+                    "id": {
+                      "type": "integer",
+                      "example": 1399,
+                      "default": 0
+                    },
+                    "in_production": {
+                      "type": "boolean",
+                      "example": false,
+                      "default": true
+                    },
+                    "languages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "en"
+                      }
+                    },
+                    "last_air_date": {
+                      "type": "string",
+                      "example": "2019-05-19"
+                    },
+                    "last_episode_to_air": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1551830,
+                          "default": 0
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "The Iron Throne"
+                        },
+                        "overview": {
+                          "type": "string",
+                          "example": "In the aftermath of the devastating attack on King's Landing, Daenerys must face the survivors."
+                        },
+                        "vote_average": {
+                          "type": "number",
+                          "example": 4.809,
+                          "default": 0
+                        },
+                        "vote_count": {
+                          "type": "integer",
+                          "example": 241,
+                          "default": 0
+                        },
+                        "air_date": {
+                          "type": "string",
+                          "example": "2019-05-19"
+                        },
+                        "episode_number": {
+                          "type": "integer",
+                          "example": 6,
+                          "default": 0
+                        },
+                        "production_code": {
+                          "type": "string",
+                          "example": "806"
+                        },
+                        "runtime": {
+                          "type": "integer",
+                          "example": 80,
+                          "default": 0
+                        },
+                        "season_number": {
+                          "type": "integer",
+                          "example": 8,
+                          "default": 0
+                        },
+                        "show_id": {
+                          "type": "integer",
+                          "example": 1399,
+                          "default": 0
+                        },
+                        "still_path": {
+                          "type": "string",
+                          "example": "/zBi2O5EJfgTS6Ae0HdAYLm9o2nf.jpg"
+                        }
+                      }
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Game of Thrones"
+                    },
+                    "next_episode_to_air": {},
+                    "networks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 49,
+                            "default": 0
+                          },
+                          "logo_path": {
+                            "type": "string",
+                            "example": "/tuomPhY2UtuPTqqFnKMVHvSb724.png"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "HBO"
+                          },
+                          "origin_country": {
+                            "type": "string",
+                            "example": "US"
+                          }
+                        }
+                      }
+                    },
+                    "number_of_episodes": {
+                      "type": "integer",
+                      "example": 73,
+                      "default": 0
+                    },
+                    "number_of_seasons": {
+                      "type": "integer",
+                      "example": 8,
+                      "default": 0
+                    },
+                    "origin_country": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "US"
+                      }
+                    },
+                    "original_language": {
+                      "type": "string",
+                      "example": "en"
+                    },
+                    "original_name": {
+                      "type": "string",
+                      "example": "Game of Thrones"
+                    },
+                    "overview": {
+                      "type": "string",
+                      "example": "Seven noble families fight for control of the mythical land of Westeros. Friction between the houses leads to full-scale war. All while a very ancient evil awakens in the farthest north. Amidst the war, a neglected military order of misfits, the Night's Watch, is all that stands between the realms of men and icy horrors beyond."
+                    },
+                    "popularity": {
+                      "type": "number",
+                      "example": 346.098,
+                      "default": 0
+                    },
+                    "poster_path": {
+                      "type": "string",
+                      "example": "/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg"
+                    },
+                    "production_companies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 76043,
+                            "default": 0
+                          },
+                          "logo_path": {
+                            "type": "string",
+                            "example": "/9RO2vbQ67otPrBLXCaC8UMp3Qat.png"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Revolution Sun Studios"
+                          },
+                          "origin_country": {
+                            "type": "string",
+                            "example": "US"
+                          }
+                        }
+                      }
+                    },
+                    "production_countries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "iso_3166_1": {
+                            "type": "string",
+                            "example": "GB"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "United Kingdom"
+                          }
+                        }
+                      }
+                    },
+                    "seasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "air_date": {
+                            "type": "string",
+                            "example": "2010-12-05"
+                          },
+                          "episode_count": {
+                            "type": "integer",
+                            "example": 272,
+                            "default": 0
+                          },
+                          "id": {
+                            "type": "integer",
+                            "example": 3627,
+                            "default": 0
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Specials"
+                          },
+                          "overview": {
+                            "type": "string",
+                            "example": ""
+                          },
+                          "poster_path": {
+                            "type": "string",
+                            "example": "/kMTcwNRfFKCZ0O2OaBZS0nZ2AIe.jpg"
+                          },
+                          "season_number": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "vote_average": {
+                            "type": "number",
+                            "example": 0,
+                            "default": 0
+                          }
+                        }
+                      }
+                    },
+                    "spoken_languages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "english_name": {
+                            "type": "string",
+                            "example": "English"
+                          },
+                          "iso_639_1": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "English"
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "Ended"
+                    },
+                    "tagline": {
+                      "type": "string",
+                      "example": "Winter Is Coming"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "Scripted"
+                    },
+                    "vote_average": {
+                      "type": "number",
+                      "example": 8.438,
+                      "default": 0
+                    },
+                    "vote_count": {
+                      "type": "integer",
+                      "example": 21390,
+                      "default": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true
+}

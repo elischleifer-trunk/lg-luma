@@ -5,6 +5,7 @@ dist/
 *.key
 .env
 .env.*
+!.env.example
 target/
 __pycache__/
 .pytest_cache/

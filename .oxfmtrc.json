@@ -18,6 +18,8 @@
     "assets/fonts/**",
     "assets/licenses/**",
     "assets/ui-icons/**",
-    "overlay/vendor/**"
+    "overlay/vendor/**",
+    "tests/fixtures/**",
+    "tools/openapi/*.json"
   ]
 }

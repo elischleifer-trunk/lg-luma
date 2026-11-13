@@ -1,0 +1,126 @@
+{
+  "request": {
+    "path": "/3/tv/13869",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:25.901Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/kTtNvqMal2GlK2YGsdvyyf8OZQf.jpg",
+    "created_by": [
+      {
+        "id": 1430276,
+        "credit_id": "61b514bcd1444300669000ae",
+        "name": "Ian Jones",
+        "original_name": "Ian Jones",
+        "gender": 2,
+        "profile_path": "/z0iYvWyomjNXvmx4qJEMWrF6qyE.jpg"
+      },
+      {
+        "id": 79384,
+        "credit_id": "61b514c3f9183a0041e3561c",
+        "name": "Jock Blair",
+        "original_name": "Jock Blair",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      60
+    ],
+    "first_air_date": "1976-08-02",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "",
+    "id": 13869,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1977-04-25",
+    "last_episode_to_air": {
+      "id": 507637,
+      "name": "Son of Bluey",
+      "overview": "While investigating some new evidence concerning an old case, Bluey is shot and seriously wounded by the criminals concerned. It becomes a case for the Homicide squad, and Det. Sgt. Harry White takes up the investigation. Not satisfied with progress, Det. Gary Dawson conducts his own investigation, 'Bluey' style, much to the annoyance of Sgt. White. Bluey eventually recovers from his wounds, and the Assistant Commissioner laments that 'another Bluey Hills' has sprung up in the police force - in the form of Det. Dawson.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1977-04-25",
+      "episode_number": 39,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 60,
+      "season_number": 1,
+      "show_id": 13869,
+      "still_path": null
+    },
+    "name": "Bluey",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 118,
+        "logo_path": "/83L2wF8tM76nUQHzOBOBAGlPQVP.png",
+        "name": "Seven Network",
+        "origin_country": "AU"
+      }
+    ],
+    "number_of_episodes": 39,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_name": "Bluey",
+    "overview": "At Melbourne's Russell Street Police Headquarters, Sgt. \"Bluey\" Hills, unable to work within the existing police squads, oversees Department B. They're assigned cases other departments could not readily solve by conventional means, with Hills applying his unconventional methods to bring about their resolution. Bluey's investigations are supported by newly assigned Gary Dawson, long-time cohort Monica Rourke, and undercover officer Reg Truscott, who spends his time ostensibly working as a small-time burglar, and supplying Bluey with information on the activities of local criminals.",
+    "popularity": 3.8474,
+    "poster_path": "/oAuJijwBiqzIUeLA06zRMPfdiqz.jpg",
+    "production_companies": [
+      {
+        "id": 75144,
+        "logo_path": "/lAkAX5WgHJOagd3zDoDydKNqQh6.png",
+        "name": "Crawfords Australia",
+        "origin_country": "AU"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "AU",
+        "name": "Australia"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1976-08-02",
+        "episode_count": 39,
+        "id": 25076,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.4,
+    "vote_count": 5
+  }
+}

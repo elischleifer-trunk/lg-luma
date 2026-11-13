@@ -514,3 +514,118 @@ async def test_the_stream_view_starts_hls_only_with_the_camera_token(
     assert (await client.get("/api/luma/stream/light.porch?token=new")).status == 404
     assert (await client.get("/api/luma/stream/camera.still?token=new")).status == 404
     assert len(requested) == 3
+
+
+MOTN = "motn-key-0123456789abcdef"
+TMDB_KEY = "eyJhbGciOiJIUzI1NiJ9.e30.signature"
+MOTN_CHECK = "https://api.movieofthenight.com/v4/genres"
+TMDB_CHECK = "https://api.themoviedb.org/3/find/tt0087332?external_source=imdb_id"
+
+
+def key_pushes(aioclient_mock: AiohttpClientMocker) -> list:
+    return [
+        call[2]
+        for call in aioclient_mock.mock_calls
+        if call[0] == "PUT" and call[1].path == "/api/streaming-keys"
+    ]
+
+
+async def test_options_check_streaming_keys_then_send_them_to_the_tv(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    config = await setup(hass, aioclient_mock)
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
+    aioclient_mock.get(MOTN_CHECK, status=403, json={"message": "Not subscribed"})
+    aioclient_mock.get(TMDB_CHECK, json={"movie_results": []})
+
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    assert result["step_id"] == "init"
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"motn_api_key": f" {MOTN} ", "tmdb_read_access_token": TMDB_KEY}
+    )
+    # A refused key keeps the form open and nothing reaches the TV.
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"motn_api_key": "motn_refused"}
+    assert key_pushes(aioclient_mock) == []
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
+    aioclient_mock.get(MOTN_CHECK, json=[{"id": "action", "name": "Action"}])
+    aioclient_mock.get(TMDB_CHECK, json={"movie_results": []})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert config.options == {"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
+    assert key_pushes(aioclient_mock) == [{"motn": MOTN, "tmdb": TMDB_KEY}]
+    # The TMDB token travels as a bearer token, the Movie of the Night key in its header.
+    headers = {call[1].host: call[3] for call in aioclient_mock.mock_calls if call[0] == "GET"}
+    assert headers["api.themoviedb.org"]["Authorization"] == f"Bearer {TMDB_KEY}"
+    assert headers["api.movieofthenight.com"]["X-API-Key"] == MOTN
+
+
+async def test_a_cleared_key_is_not_sent_and_unchanged_keys_are_not_checked_again(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    config = entry(hass)
+    hass.config_entries.async_update_entry(
+        config, options={"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
+    )
+    aioclient_mock.get(f"{TV}/api/status", json={"overlay": None, "overlay_ready": True})
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    # Setup sends the keys Home Assistant holds.
+    assert key_pushes(aioclient_mock) == [{"motn": MOTN, "tmdb": TMDB_KEY}]
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"motn_api_key": MOTN, "tmdb_read_access_token": ""}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    # No service was asked about the unchanged key, and the cleared one is left out.
+    assert not [call for call in aioclient_mock.mock_calls if call[0] == "GET"]
+    assert key_pushes(aioclient_mock) == [{"motn": MOTN}]
+
+
+@pytest.mark.parametrize(
+    ("held", "pushed"),
+    [
+        ({"motn": True, "tmdb": True, "home_assistant": True}, False),
+        ({"motn": True, "tmdb": False, "home_assistant": True}, True),
+        # Changed on the TV's own QR page: Home Assistant is the source of truth.
+        ({"motn": True, "tmdb": True, "home_assistant": False}, True),
+        # A Luma without streaming search reports nothing and is left alone.
+        (None, False),
+    ],
+)
+async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    monkeypatch: pytest.MonkeyPatch,
+    held,
+    pushed,
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    config = entry(hass)
+    hass.config_entries.async_update_entry(
+        config, options={"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
+    )
+    status = {"overlay": None, "overlay_ready": True, "cameras": 0}
+    if held is not None:
+        status["streaming_keys"] = held
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    before = len(key_pushes(aioclient_mock))
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert (len(key_pushes(aioclient_mock)) > before) is pushed

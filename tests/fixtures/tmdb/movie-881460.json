@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/881460",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:21.832Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/3BBwgGaZmM8KqEdCqovoTwLQHBY.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      }
+    ],
+    "homepage": "",
+    "id": 881460,
+    "imdb_id": "tt15331462",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Planet Dune",
+    "overview": "A crew on a mission to rescue a marooned base on a desert planet turns deadly when the crew finds themselves hunted and attacked by the planet’s apex predators: giant sand worms.",
+    "popularity": 1.82,
+    "poster_path": "/cPSPghn6tr6fGY6hTi78SrxBcqY.jpg",
+    "production_companies": [
+      {
+        "id": 162087,
+        "logo_path": null,
+        "name": "Atomic Blonde Entertainment",
+        "origin_country": ""
+      },
+      {
+        "id": 1311,
+        "logo_path": "/ic2bTizdzRLDVzAvN7MXdUg3WQV.png",
+        "name": "The Asylum",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2021-10-29",
+    "revenue": 0,
+    "runtime": 86,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Their mission... was doomed to fail.",
+    "title": "Planet Dune",
+    "video": false,
+    "vote_average": 5.074,
+    "vote_count": 74
+  }
+}

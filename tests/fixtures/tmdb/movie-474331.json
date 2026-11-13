@@ -1,0 +1,98 @@
+{
+  "request": {
+    "path": "/3/movie/474331",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:43.219Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/isvZHZa4cKySbnVqUCAZPHjMKRB.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 474331,
+    "imdb_id": "tt7156222",
+    "origin_country": [
+      "BE",
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "Au poste !",
+    "overview": "Louis just found the corpse of a man in front of his apartment building. Taken in for custody by Captain Buron, he finds himself on the wrong end of a surreal interrogation. But how can you prove you are innocent when the cops are crazy?",
+    "popularity": 1.0367,
+    "poster_path": "/zfq8FfMbaYL3fHVgrIsFBaDhRPC.jpg",
+    "production_companies": [
+      {
+        "id": 102468,
+        "logo_path": "/7116YZNSKt5xKXgO9inx6bH0bq8.png",
+        "name": "Atelier de Production",
+        "origin_country": "FR"
+      },
+      {
+        "id": 19037,
+        "logo_path": "/tceh2aAORA5JxIZSLQ1GkzTBZDL.png",
+        "name": "uMedia",
+        "origin_country": "BE"
+      },
+      {
+        "id": 75816,
+        "logo_path": "/nVDVcbfYplh43TvxGyj1rGUWiif.png",
+        "name": "Cinéfrance Studios",
+        "origin_country": "FR"
+      },
+      {
+        "id": 109458,
+        "logo_path": null,
+        "name": "Cinéfrance Plus",
+        "origin_country": "FR"
+      },
+      {
+        "id": 7561,
+        "logo_path": "/yWTuzkQnp4NCS7fDVd5vzgLjoux.png",
+        "name": "Nexus Factory",
+        "origin_country": "BE"
+      },
+      {
+        "id": 11246,
+        "logo_path": "/4YZ5CQZkJa2FIKGtjLLoKhNOAIw.png",
+        "name": "La Région Île-de-France",
+        "origin_country": "FR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "BE",
+        "name": "Belgium"
+      },
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "2018-07-04",
+    "revenue": 0,
+    "runtime": 73,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Keep an Eye Out",
+    "video": false,
+    "vote_average": 6.7,
+    "vote_count": 660
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "request": {
+    "path": "/3/collection/1565",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.917Z",
+  "response": {
+    "id": 1565,
+    "name": "28 Days/Weeks/Years Later Collection",
+    "original_language": "en",
+    "original_name": "28 Days/Weeks/Years Later Collection",
+    "overview": "A post-apocalyptic horror film series focused on survivors of a blood-borne disease called Rage that turns the infected into mindless, zombie-like savages, the hordes of whom have decimated the population of Great Britain.",
+    "poster_path": "/2DMKMinwjGb45rC2nA4nr1JsT37.jpg",
+    "backdrop_path": "/liImaqVpPGo3ddLWkJPeJxvaqCI.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/aJFwk1clMal1prxAvKAgHxKPAf.jpg",
+        "id": 170,
+        "title": "28 Days Later",
+        "original_title": "28 Days Later",
+        "overview": "Twenty-eight days after a killer virus was accidentally unleashed from a British research facility, a small group of London survivors are caught in a desperate struggle to protect themselves from the infected. Carried by animals and humans, the virus turns those it infects into homicidal maniacs -- and it's absolutely impossible to contain.",
+        "poster_path": "/sQckQRt17VaWbo39GIu0TMOiszq.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          27,
+          53,
+          878
+        ],
+        "popularity": 12.8727,
+        "release_date": "2002-10-31",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.2,
+        "vote_count": 9072
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/83ownpZPvBHJD5UVNShzQfa3LaW.jpg",
+        "id": 1562,
+        "title": "28 Weeks Later",
+        "original_title": "28 Weeks Later",
+        "overview": "Twenty-eight weeks after the spread of a deadly rage virus, the inhabitants of the British Isles have lost their battle against the onslaught, as the virus has killed everyone there. Six months later, a group of Americans dare to set foot on the Isles, convinced the danger has passed. But it soon becomes all too clear that the scourge continues to live, waiting to pounce on its next victims.",
+        "poster_path": "/oix0aNv1lvW3nUGspUyvSIBlpbs.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          27,
+          53,
+          878
+        ],
+        "popularity": 7.0813,
+        "release_date": "2007-04-26",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.591,
+        "vote_count": 5997
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6WqqEjiycNvDLjbEClM1zCwIbDD.jpg",
+        "id": 1100988,
+        "title": "28 Years Later",
+        "original_title": "28 Years Later",
+        "overview": "Twenty-eight years after the Rage virus outbreak, a heavily-defended island survives connected to the mainland by a single causeway. When one of the group leaves the island into the dark heart of the mainland, he discovers secrets, wonders, and horrors that have mutated not only the infected but other survivors as well.",
+        "poster_path": "/n5FygjEppOvac6yEaowi26nTyw3.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          27,
+          53,
+          878
+        ],
+        "popularity": 13.8231,
+        "release_date": "2025-06-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.599,
+        "vote_count": 3150
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/hHDNOlATHhre4eZ7aYz5cdyJLik.jpg",
+        "id": 1272837,
+        "title": "28 Years Later: The Bone Temple",
+        "original_title": "28 Years Later: The Bone Temple",
+        "overview": "Dr. Kelson finds himself in a shocking new relationship - with consequences that could change the world as they know it - and Spike's encounter with Jimmy Crystal becomes a nightmare he can't escape.",
+        "poster_path": "/kK1BGkG3KAvWB0WMV1DfOx9yTMZ.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          27,
+          53,
+          878
+        ],
+        "popularity": 13.2083,
+        "release_date": "2026-01-14",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.096,
+        "vote_count": 1941
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1273002,
+        "title": "28 Years Later: Part III",
+        "original_title": "28 Years Later: Part III",
+        "overview": "The third installment in the 28 Days Later sequel trilogy. Plot TBA.",
+        "poster_path": "/2loBxp99k59RT8PGmdrLssA17q5.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          27,
+          53,
+          878
+        ],
+        "popularity": 1.2922,
+        "release_date": "",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "request": {
+    "path": "/3/movie/732670",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.494Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/ucEQXe6wPpPhgcJh4oXOAvX1lnb.jpg",
+    "belongs_to_collection": {
+      "id": 1004630,
+      "name": "LEGO Star Wars (Seasonal) Collection",
+      "poster_path": "/jHITUzB6fZVOYZ13YCqVTS06iyw.jpg",
+      "backdrop_path": "/cVYUqWzzUSrkLQwb4jlWAkaFCAX.jpg"
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://www.disneyplus.com/movies/lego-star-wars-holiday-special/22xf1U47vVe0",
+    "id": 732670,
+    "imdb_id": "tt12885438",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "LEGO Star Wars Holiday Special",
+    "overview": "As her friends prep for a Life Day holiday celebration, Rey journeys with BB-8 on a quest to gain a deeper knowledge of the Force at a mysterious Jedi Temple. There, she embarks on a cross-timeline adventure through beloved moments in Star Wars history, coming into contact with iconic heroes and villains from all eras of the saga. But will she make it back in time for the Life Day feast?",
+    "popularity": 2.3663,
+    "poster_path": "/zyzJSI7UZZzz5Toj10rYGF5689z.jpg",
+    "production_companies": [
+      {
+        "id": 1,
+        "logo_path": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png",
+        "name": "Lucasfilm Ltd.",
+        "origin_country": "US"
+      },
+      {
+        "id": 299443,
+        "logo_path": "/4B43I3FGlYr83zLGEvhBc0vvJIE.png",
+        "name": "The LEGO Group",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2020-11-17",
+    "revenue": 0,
+    "runtime": 50,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "To: Luke. From: Your father.",
+    "title": "LEGO Star Wars Holiday Special",
+    "video": false,
+    "vote_average": 6.564,
+    "vote_count": 377
+  }
+}

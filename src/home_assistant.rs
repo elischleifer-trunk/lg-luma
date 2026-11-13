@@ -132,6 +132,8 @@ pub enum Event {
         live: bool,
         open: bool,
     },
+    /// Home Assistant saved streaming search keys; Settings shows the new status.
+    StreamingKeys(crate::streaming_keys::Status),
     /// The camera video closed: Back, a doorbell card replacing it, or (`failed`) the stream
     /// could not be played, so the gallery keeps showing the motion-JPEG stream.
     VideoClosed {
@@ -736,9 +738,21 @@ impl<T: Tv> Api<T> {
                             "cameras": self.cameras.iter()
                                 .find(|(owner, _)| *owner == self.store.clients[client].token)
                                 .map_or(0, |(_, cameras)| cameras.len()),
+                            // Which streaming search keys the TV holds and whether Home
+                            // Assistant set them, so it pushes its keys again after a reset or
+                            // a change on the TV. Never the keys themselves.
+                            "streaming_keys": self.streaming_keys_path().map(|path| {
+                                let status = crate::streaming_keys::load(&path).status();
+                                json!({
+                                    "motn": status.motn,
+                                    "tmdb": status.tmdb,
+                                    "home_assistant": status.home_assistant,
+                                })
+                            }),
                         }),
                     ),
                     ("POST", "/api/cameras") => self.set_cameras(client, &body),
+                    ("PUT", "/api/streaming-keys") => self.set_streaming_keys(&body),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         // Dismissing closes a doorbell card, never a camera the owner is
@@ -957,6 +971,44 @@ impl<T: Tv> Api<T> {
 
     /// Replaces the camera list. Home Assistant sends every camera each time a camera's access
     /// token rotates, so an open gallery gets the fresh URLs.
+    /// Streaming search keys sit beside the pairings, which sit beside the preferences.
+    fn streaming_keys_path(&self) -> Option<PathBuf> {
+        self.store_path
+            .as_ref()
+            .map(|store| store.with_file_name("streaming-keys.json"))
+    }
+
+    /// Home Assistant is the source of truth for streaming search keys: a non-empty key it
+    /// sends replaces the TV's, an empty or missing one leaves the TV's key alone.
+    fn set_streaming_keys(&mut self, body: &Value) -> Reply {
+        let Some(path) = self.streaming_keys_path() else {
+            return error(503, "This TV has no storage for keys");
+        };
+        let field = |key| match body.get(key) {
+            None | Some(Value::Null) => Ok(None),
+            Some(Value::String(value)) => Ok(Some(value.as_str())),
+            Some(_) => Err(error(400, &format!("{key} must be a string"))),
+        };
+        let (motn, tmdb) = match (field("motn"), field("tmdb")) {
+            (Ok(motn), Ok(tmdb)) => (motn, tmdb),
+            (Err(reply), _) | (_, Err(reply)) => return reply,
+        };
+        let current = crate::streaming_keys::load(&path);
+        let next = match crate::streaming_keys::merge_from_home_assistant(&current, motn, tmdb) {
+            Ok(next) => next,
+            Err(message) => return error(400, &message),
+        };
+        if next != current {
+            if let Err(message) = crate::streaming_keys::save(&path, &next) {
+                eprintln!("Luma Home Assistant: could not save streaming keys: {message}");
+                return error(500, "Could not save the keys");
+            }
+            let _ = self.events.send(Event::StreamingKeys(next.status()));
+        }
+        let status = next.status();
+        reply(200, json!({"motn": status.motn, "tmdb": status.tmdb}))
+    }
+
     fn set_cameras(&mut self, client: usize, body: &Value) -> Reply {
         let Some(list) = body.get("cameras").and_then(Value::as_array) else {
             return error(400, "cameras must be a list");
@@ -1205,7 +1257,8 @@ impl<T: Tv> Api<T> {
     }
 }
 
-fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
+/// Atomically replaces `path` with a file only Luma can read (mode 0600 on Unix).
+pub(crate) fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
     let temporary = path.with_extension(format!("json.new-{}", std::process::id()));
     let mut options = std::fs::OpenOptions::new();
     options.write(true).create(true).truncate(true);

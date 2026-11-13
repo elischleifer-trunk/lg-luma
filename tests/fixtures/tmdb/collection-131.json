@@ -1,0 +1,84 @@
+{
+  "request": {
+    "path": "/3/collection/131",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.848Z",
+  "response": {
+    "id": 131,
+    "name": "Three Colors Collection",
+    "original_language": "en",
+    "original_name": "Trois Couleurs Collection",
+    "overview": "Three Colors is a film trilogy who’s colors make up the films and the three colors of France – Blue, White and Red. With the colors meaning – freedom, equality and brotherliness.",
+    "poster_path": "/4956Sh4CHYbweRBMNmEiflNjhnb.jpg",
+    "backdrop_path": "/2WRTI3eKcwiU1n6mH6X5uYueJ3X.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/pXvYw0QOPbHJVvwGbZfrSNY2vnB.jpg",
+        "genre_ids": [
+          18
+        ],
+        "id": 108,
+        "title": "Three Colors: Blue",
+        "original_language": "fr",
+        "original_title": "Trois couleurs : Bleu",
+        "overview": "The wife of a famous composer survives a car accident that kills her husband and daughter. Now alone, she shakes off her old identity and explores her newfound freedom but finds that she is unbreakably bound to other humans, including her husband’s mistress, whose existence she never suspected.",
+        "popularity": 3.9955,
+        "poster_path": "/33wsWxzsNstI8N7dvuwzFmj1qBd.jpg",
+        "release_date": "1993-09-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.612,
+        "vote_count": 1988,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/b1CVjSYinzm6tx1TGA7c75W8X9k.jpg",
+        "genre_ids": [
+          35,
+          18,
+          9648
+        ],
+        "id": 109,
+        "title": "Three Colors: White",
+        "original_language": "fr",
+        "original_title": "Trois couleurs : Blanc",
+        "overview": "Polish immigrant Karol Karol finds himself out of a marriage, a job and a country when his French wife, Dominique, divorces him after six months due to his impotence. Forced to leave France after losing the business they jointly owned, Karol enlists fellow Polish expatriate Mikołaj to smuggle him back to their homeland.",
+        "popularity": 4.9024,
+        "poster_path": "/6r09mQLfJmQes0uFD4yTa8NAKPj.jpg",
+        "release_date": "1994-01-26",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.425,
+        "vote_count": 1402,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/xkk7cqXFzY4aCCG5AYWZCFQFbIX.jpg",
+        "genre_ids": [
+          18,
+          9648,
+          10749
+        ],
+        "id": 110,
+        "title": "Three Colors: Red",
+        "original_language": "fr",
+        "original_title": "Trois couleurs : Rouge",
+        "overview": "Part-time model Valentine unexpectedly befriends a retired judge after she runs over his dog. At first, the grumpy man shows no concern about the dog, and Valentine decides to keep it. But the two form a bond when she returns to his house and catches him listening to his neighbors’ phone calls.",
+        "popularity": 6.3902,
+        "poster_path": "/JHmsBiX1tjCKqAul1lzC20WcAW.jpg",
+        "release_date": "1994-05-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.881,
+        "vote_count": 1630,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

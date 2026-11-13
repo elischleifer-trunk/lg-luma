@@ -1,0 +1,99 @@
+{
+  "request": {
+    "path": "/3/tv/307531",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:22.724Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/4t9gRAssk8Ol6sbdTWIcvT76Ebn.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2025-12-05",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "",
+    "id": 307531,
+    "in_production": true,
+    "languages": [
+      "mr"
+    ],
+    "last_air_date": "2025-12-05",
+    "last_episode_to_air": {
+      "id": 6780937,
+      "name": "And Then",
+      "overview": "The police and Abhay get out of the lift, after many efforts, and continue to search for Neha. Abhay sadly recounts the moments before she vanished. Will Neha ever find her way back to him?",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2025-12-05",
+      "episode_number": 5,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 16,
+      "season_number": 1,
+      "show_id": 307531,
+      "still_path": "/74AmE7zbNFPr9Sy11JwfOLw1pBV.jpg"
+    },
+    "name": "Be Dune Teen",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2590,
+        "logo_path": "/q6meEcCbZXTb1cDbJ7bl1ITorAa.png",
+        "name": "ZEE5",
+        "origin_country": "IN"
+      }
+    ],
+    "number_of_episodes": 5,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "mr",
+    "original_name": "Be Dune Teen",
+    "overview": "Abhay and Neha, an ordinary married couple, find their lives overturned when a routine checkup reveals they are expecting triplets.",
+    "popularity": 0.3472,
+    "poster_path": "/eP3sReaCV2BUkc4bEEslaCb0Kww.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "2025-12-05",
+        "episode_count": 5,
+        "id": 488050,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/8G9jFq8uI4buni7SYOZU3c2Etc1.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Marathi",
+        "iso_639_1": "mr",
+        "name": ""
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

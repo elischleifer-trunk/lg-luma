@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/37793",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.107Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/mYi8ZYtHaoEBSJU8pbOAjfATUtF.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 10402,
+        "name": "Music"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "https://www.michaeljackson.com/video/ghost-video/",
+    "id": 37793,
+    "imdb_id": "tt0119194",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Ghosts",
+    "overview": "In the town of Normal Valley, an eccentric magician named Maestro entertains the local children every day in his spooky mansion. One stormy night, the town's mayor leads a group of angry citizens to the mansion in an attempt to run Maestro out of town.",
+    "popularity": 1.7385,
+    "poster_path": "/aLMS2GWnJwkAADd8Dnl2dK1eg13.jpg",
+    "production_companies": [
+      {
+        "id": 19222,
+        "logo_path": "/aQrYO4ziZbm24huYBahFKG4TfrJ.png",
+        "name": "Optimum Productions",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "1997-09-04",
+    "revenue": 0,
+    "runtime": 39,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Are you scared yet?",
+    "title": "Ghosts",
+    "video": false,
+    "vote_average": 8.097,
+    "vote_count": 305
+  }
+}

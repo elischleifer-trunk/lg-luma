@@ -1,0 +1,140 @@
+{
+  "request": {
+    "path": "/3/tv/256953",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:25.789Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/t6bAceQqyEFmEigfjjb9gaqm169.jpg",
+    "created_by": [
+      {
+        "id": 1482514,
+        "credit_id": "666fa4b4f924b74c54084e18",
+        "name": "Joe Brumm",
+        "original_name": "Joe Brumm",
+        "gender": 2,
+        "profile_path": "/lI6AoQnS9eLH5LjXL6GSy8VGPfv.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2024-06-16",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 10762,
+        "name": "Kids"
+      }
+    ],
+    "homepage": "https://iview.abc.net.au/show/bluey-minisodes",
+    "id": 256953,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2024-12-08",
+    "last_episode_to_air": {
+      "id": 5806103,
+      "name": "Alongside",
+      "overview": "Bluey and Honey go about their separate days until luck brings them together momentarily.",
+      "vote_average": 10,
+      "vote_count": 1,
+      "air_date": "2024-12-08",
+      "episode_number": 18,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 3,
+      "season_number": 1,
+      "show_id": 256953,
+      "still_path": "/3CnojLSD5Pt7bfrwuRwn669esRk.jpg"
+    },
+    "name": "Bluey Minisodes",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2854,
+        "logo_path": "/5MebMTNo5FbHIS57vdi8ta77AMn.png",
+        "name": "ABC Kids",
+        "origin_country": "AU"
+      }
+    ],
+    "number_of_episodes": 18,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_name": "Bluey Minisodes",
+    "overview": "A collection of funny and sweet episodes featuring Bluey and her family and friends. This collection of every day moments introduces some new characters and games they have been playing together.",
+    "popularity": 6.4943,
+    "poster_path": "/xqHt3vc3iKnnp2yuMP2Y4RAZF1Q.jpg",
+    "production_companies": [
+      {
+        "id": 81576,
+        "logo_path": "/m1sQ0FG05KeveKGufbcJbsHUKYi.png",
+        "name": "Ludo Studio",
+        "origin_country": "AU"
+      },
+      {
+        "id": 205723,
+        "logo_path": "/5cNKpioIMvZ0DrPrWUR9RNfl7Sf.png",
+        "name": "BBC Studios Kids & Family",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "AU",
+        "name": "Australia"
+      },
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2024-07-03",
+        "episode_count": 5,
+        "id": 400865,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/sqZ1kkTbG31uRt7V74ZyvES8KzU.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2024-06-16",
+        "episode_count": 18,
+        "id": 398584,
+        "name": "Series 1",
+        "overview": "Bluey Minisodes is a collection of funny and sweet moments featuring Bluey & Bingo. Introducing some new characters alongside fan favorites including Muffin doing an unboxing video, Dad getting a \"tattoo\", and going behind the scenes at Bluey and Bingo's dreamhouse.",
+        "poster_path": "/xfZIVOlvBnYVD7ITJJFSB9VvtPs.jpg",
+        "season_number": 1,
+        "vote_average": 6.9
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 8.204,
+    "vote_count": 49
+  }
+}

@@ -319,6 +319,22 @@ fn tile_editor(out: &mut Scene, state: &State, assets: &Assets) {
     );
 }
 
+fn key_editor(out: &mut Scene, state: &State, assets: &Assets) {
+    companion(
+        out,
+        state,
+        assets,
+        state.key_editor.as_ref(),
+        Companion {
+            title: "streamingKeysTitle",
+            keep_open: "streamingKeysKeepOpen",
+            private: "streamingKeysPrivate",
+            error: "streamingKeysError",
+            starting: "streamingKeysStarting",
+        },
+    );
+}
+
 /// A QR code and address for a page on the owner's phone or computer, with a Close button.
 fn companion(
     out: &mut Scene,
@@ -718,6 +734,7 @@ pub fn scene_with_pill(
         | Overlay::Keyboard
         | Overlay::WallpaperUpload
         | Overlay::TileEditor
+        | Overlay::StreamingKeys
         | Overlay::HomeAssistantSetup),
     ) = &state.overlay
     {
@@ -779,6 +796,7 @@ pub fn scene_with_pill(
             Overlay::Keyboard => keyboard(&mut out, state, assets),
             Overlay::WallpaperUpload => wallpaper_upload(&mut out, state, assets),
             Overlay::TileEditor => tile_editor(&mut out, state, assets),
+            Overlay::StreamingKeys => key_editor(&mut out, state, assets),
             Overlay::HomeAssistantSetup => home_assistant_setup(&mut out, state, assets),
             Overlay::SystemKeyboard | Overlay::Recents { .. } | Overlay::Cameras { .. } => {}
         }
@@ -2632,6 +2650,22 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets, now: Offset
                     language.t("homeAssistant"),
                     "tv",
                     Some(on_off(state.preferences.home_assistant)),
+                    true,
+                ),
+                (
+                    10,
+                    language.t("streamingKeys"),
+                    "search",
+                    Some(language.t(
+                        match (state.streaming_keys.motn, state.streaming_keys.tmdb) {
+                            (true, true) if state.streaming_keys.home_assistant => {
+                                "streamingKeysFromHomeAssistant"
+                            }
+                            (true, true) => "streamingKeysSet",
+                            (false, false) => "streamingKeysNotSet",
+                            _ => "streamingKeysPartial",
+                        },
+                    )),
                     true,
                 ),
                 (

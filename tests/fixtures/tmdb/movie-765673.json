@@ -1,0 +1,69 @@
+{
+  "request": {
+    "path": "/3/movie/765673",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.582Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/pPVF3MjemzrHUAmVSfiQQhokO53.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 99,
+        "name": "Documentary"
+      }
+    ],
+    "homepage": "https://www.holidayspecialdoc.com",
+    "id": 765673,
+    "imdb_id": "tt13021790",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "A Disturbance in the Force: How the Star Wars Holiday Special Happened",
+    "overview": "In 1978, CBS aired the “Star Wars Holiday Special” the week before Thanksgiving to an audience of 13 million people. Considered one of the worst shows in television history, it aired only once. George Lucas tried to bury it and an infamous camp legend was born. This documentary unravels the mysteries behind the most bizarre Star Wars spin-offs of all time.",
+    "popularity": 0.9866,
+    "poster_path": "/s1sdJpXOp0HZOeLfL7peA09FTNG.jpg",
+    "production_companies": [
+      {
+        "id": 77649,
+        "logo_path": null,
+        "name": "Jeremy Coon Productions",
+        "origin_country": "US"
+      },
+      {
+        "id": 149935,
+        "logo_path": null,
+        "name": "September Club",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2023-03-11",
+    "revenue": 0,
+    "runtime": 91,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "A long time ago, in a part of the galaxy that George Lucas would like us to forget...",
+    "title": "A Disturbance in the Force: How the Star Wars Holiday Special Happened",
+    "video": false,
+    "vote_average": 6.2,
+    "vote_count": 10
+  }
+}

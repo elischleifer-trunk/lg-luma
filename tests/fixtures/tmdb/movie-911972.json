@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/movie/911972",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:43.515Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/pyw45YPB9Mk01zQiAnvfIdUFYQo.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 911972,
+    "imdb_id": "tt23780438",
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "zh",
+    "original_title": "沙丘虫暴",
+    "overview": "In the near future which the earth is irreversibly sandy, as human emissions and rubbish exceed its carrying capacity. As plants and animals mutate to create the Earth's new masters, the \"sand worms\", which are slaughtering the planet and driving humans to the brink of extinction, the survivors are left to their own devices to find the only remaining refuge in the deep desert, the \"Oasis\". An exiled team of wealthy businessmen, scientists, security chiefs, mechanic families and gangsters set out on an adventure to find the Oasis in a special armored vehicle, but the bloodthirsty insects are hot on their heels.",
+    "popularity": 0.9079,
+    "poster_path": "/nQLdzYYB71sUugtSR7e7YdjF6Vx.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      }
+    ],
+    "release_date": "2021-12-03",
+    "revenue": 0,
+    "runtime": 78,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Devil In Dune",
+    "video": false,
+    "vote_average": 6.7,
+    "vote_count": 18
+  }
+}

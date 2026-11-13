@@ -1,0 +1,134 @@
+{
+  "request": {
+    "path": "/3/tv/288055",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:42.020Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/pBeromoLUKlw7TNjus5glQnJTD9.jpg",
+    "created_by": [
+      {
+        "id": 71538,
+        "credit_id": "67ed76c3b9424cd895ab0cd9",
+        "name": "Dave Filoni",
+        "original_name": "Dave Filoni",
+        "gender": 2,
+        "profile_path": "/iMpXDe7D3eimy3Y8esJcF9czVbm.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2025-05-04",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.disneyplus.com/browse/entity-421b732e-fe78-4cfc-93e9-d3fbca13bb91",
+    "id": 288055,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2025-05-04",
+    "last_episode_to_air": {
+      "id": 6090078,
+      "name": "One Good Deed",
+      "overview": "Cad Bane and his gang return home to settle a score.",
+      "vote_average": 7.9,
+      "vote_count": 15,
+      "air_date": "2025-05-04",
+      "episode_number": 6,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 17,
+      "season_number": 1,
+      "show_id": 288055,
+      "still_path": "/eYZB0USAbfan7bQJWksZXFLXOK7.jpg"
+    },
+    "name": "Star Wars: Tales of the Underworld",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2739,
+        "logo_path": "/1edZOYAfoyZyZ3rklNSiUpXX30Q.png",
+        "name": "Disney+",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 6,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Star Wars: Tales of the Underworld",
+    "overview": "Two outlaws must navigate the galaxy's dangerous underworld as they chart their destinies.",
+    "popularity": 5.9242,
+    "poster_path": "/qv1hagzp08cDJF6C04LyJVhcI1x.jpg",
+    "production_companies": [
+      {
+        "id": 1,
+        "logo_path": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png",
+        "name": "Lucasfilm Ltd.",
+        "origin_country": "US"
+      },
+      {
+        "id": 108270,
+        "logo_path": "/eDWGeg5tdVNcI8aBaaJ21bEBtFa.png",
+        "name": "Lucasfilm Animation",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2025-05-04",
+        "episode_count": 6,
+        "id": 449458,
+        "name": "Miniseries",
+        "overview": "Enter the galaxy's dangerous underworld in this journey through the experiences of two iconic villains. Former assassin and bounty hunter Asajj Ventress is given a new chance at life and must go on the run with an unexpected new ally, while outlaw Cad Bane faces his past when he confronts an old friend, now a Marshal on the opposite side of the law.",
+        "poster_path": "/qv1hagzp08cDJF6C04LyJVhcI1x.jpg",
+        "season_number": 1,
+        "vote_average": 7.6
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "Return to a galaxy outside the law.",
+    "type": "Miniseries",
+    "vote_average": 7.218,
+    "vote_count": 140
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "request": {
+    "path": "/3/movie/567641",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.571Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/erTa1PIshyGdBobO7KtMCb9cGET.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [],
+    "homepage": "",
+    "id": 567641,
+    "imdb_id": "tt0389236",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "On the Scene with the Ghostbusters",
+    "overview": "",
+    "popularity": 0.6744,
+    "poster_path": "/hULfp0aI0WtgUjQIs9OWkajqOsF.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "1984-12-04",
+    "revenue": 0,
+    "runtime": 0,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "On the Scene with the Ghostbusters",
+    "video": false,
+    "vote_average": 9.5,
+    "vote_count": 2
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/movie/1553372",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:25.025Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/1769Jfq5wu4TWNBIZBmbljdfFtW.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [],
+    "homepage": "",
+    "id": 1553372,
+    "imdb_id": null,
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_title": "Bluey: Turtleboy (Auslan)",
+    "overview": "Bingo finds a toy turtle at the playground and wants to take him home, but Dad says it's not the done thing. (Auslan)",
+    "popularity": 0.0835,
+    "poster_path": "/puocjW2QIZazBJLH746hYjSsOVu.jpg",
+    "production_companies": [
+      {
+        "id": 33089,
+        "logo_path": "/duXAF2LB2BgSFJ3CqRxQJUyM5js.png",
+        "name": "TeamTO",
+        "origin_country": "FR"
+      },
+      {
+        "id": 195929,
+        "logo_path": "/aWiuPynK2DuM7Wb8Q48oZIbHjc7.png",
+        "name": "FrogBox",
+        "origin_country": "FR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "2022-06-16",
+    "revenue": 0,
+    "runtime": 7,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Bluey: Turtleboy (Auslan)",
+    "video": true,
+    "vote_average": 10,
+    "vote_count": 1
+  }
+}

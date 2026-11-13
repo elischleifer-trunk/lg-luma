@@ -1,0 +1,143 @@
+{
+  "request": {
+    "path": "/3/tv/239212",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:24.232Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/Ad6ei4atB31f6479H79yCzNSpxv.jpg",
+    "created_by": [
+      {
+        "id": 3274467,
+        "credit_id": "654e31905a5ed000c6ada89a",
+        "name": "Allan Wylie",
+        "original_name": "Allan Wylie",
+        "gender": 2,
+        "profile_path": null
+      },
+      {
+        "id": 4367522,
+        "credit_id": "654e31af67b61300e5dda6d1",
+        "name": "Mary MacDonald Rival",
+        "original_name": "Mary MacDonald Rival",
+        "gender": 0,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2017-09-11",
+    "genres": [
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "",
+    "id": 239212,
+    "in_production": true,
+    "languages": [
+      "fr"
+    ],
+    "last_air_date": "2017-09-11",
+    "last_episode_to_air": {
+      "id": 4909084,
+      "name": "S1.E1 ∙ Un intrus au refuge",
+      "overview": "Thanks to a neighbor's dog, Amélie makes an incredible discovery in the old animal shelter that her mother ran.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2017-09-11",
+      "episode_number": 1,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 1,
+      "show_id": 239212,
+      "still_path": null
+    },
+    "name": "Amélie and Company",
+    "next_episode_to_air": null,
+    "networks": [],
+    "number_of_episodes": 1,
+    "number_of_seasons": 4,
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "fr",
+    "original_name": "Amélie et Compagnie",
+    "overview": "Welcome to the enchanting world of Amélie and her companions. Meet Amélie, a cheerful and imaginative young girl who has a special ability to communicate with animals. Newton, the mischievous yet lovable cat, adds a touch of humor with his sarcastic wit. Despite having an irritating older brother, Amélie's family is close-knit and supportive. She is surrounded by loyal and intelligent friends who stand by her side. However, there is one neighbor she wouldn't mind parting ways with. Along her journey, Amélie discovers an abandoned pet shelter and her mind brims with brilliant ideas. Prepare yourself for thrilling and occasionally extravagant adventures in the world of Amélie et compagnie.",
+    "popularity": 0.7439,
+    "poster_path": "/hm1hllaZtmNKTK6DfonX7zXlHy0.jpg",
+    "production_companies": [
+      {
+        "id": 23831,
+        "logo_path": null,
+        "name": "Carte Blanche Films",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2017-09-11",
+        "episode_count": 1,
+        "id": 365121,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/hm1hllaZtmNKTK6DfonX7zXlHy0.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": null,
+        "episode_count": 0,
+        "id": 365123,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": null,
+        "episode_count": 0,
+        "id": 365124,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": null,
+        "episode_count": 0,
+        "id": 365125,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 4,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

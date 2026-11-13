@@ -1,0 +1,160 @@
+{
+  "request": {
+    "path": "/3/tv/120462",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:45.073Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/nleG20xwqGsEbCEHnIRRwZmz3l6.jpg",
+    "created_by": [
+      {
+        "id": 3043536,
+        "credit_id": "606f05440816c70041de8002",
+        "name": "Little Marvin",
+        "original_name": "Little Marvin",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      43
+    ],
+    "first_air_date": "2021-04-09",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 9648,
+        "name": "Mystery"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "https://www.amazon.com/dp/B08XXH31FS",
+    "id": 120462,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2024-04-25",
+    "last_episode_to_air": {
+      "id": 5206272,
+      "name": "The Box",
+      "overview": "Will Dawn discover the truth in time to stop the killer… or become his final victim?",
+      "vote_average": 6,
+      "vote_count": 5,
+      "air_date": "2024-04-25",
+      "episode_number": 8,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 44,
+      "season_number": 2,
+      "show_id": 120462,
+      "still_path": "/dlFrSBV6IZvBL40hIQ7EFD9ORrn.jpg"
+    },
+    "name": "Them",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1024,
+        "logo_path": "/w7HfLNm9CWwRmAMU58udl2L7We7.png",
+        "name": "Prime Video",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 18,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Them",
+    "overview": "A limited anthology series that explores terror in America.",
+    "popularity": 12.9559,
+    "poster_path": "/2JIrVunDSjldv7Jv2uNKrrqwfej.jpg",
+    "production_companies": [
+      {
+        "id": 11073,
+        "logo_path": "/wHs44fktdoj6c378ZbSWfzKsM2Z.png",
+        "name": "Sony Pictures Television",
+        "origin_country": "US"
+      },
+      {
+        "id": 20580,
+        "logo_path": "/oRR9EXVoKP9szDkVKlze5HVJS7g.png",
+        "name": "Amazon Studios",
+        "origin_country": "US"
+      },
+      {
+        "id": 829,
+        "logo_path": "/iJo9zP5QCKyBsmKSOcvXd6UDNih.png",
+        "name": "Vertigo Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 210099,
+        "logo_path": "/g5oRCNCi8kNVb8gEoSoIcqkhjmR.png",
+        "name": "Amazon MGM Studios",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": null,
+        "episode_count": 4,
+        "id": 458604,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-04-09",
+        "episode_count": 10,
+        "id": 185252,
+        "name": "Covenant",
+        "overview": "The Emorys move to Compton, but Palmer Drive isn’t what it seems.",
+        "poster_path": "/lvjdl7MOH9FUoI6JP4hQSzA3lBJ.jpg",
+        "season_number": 1,
+        "vote_average": 8.5
+      },
+      {
+        "air_date": "2024-04-25",
+        "episode_count": 8,
+        "id": 370793,
+        "name": "The Scare",
+        "overview": "It's 1991, and LAPD Homicide Detective Dawn Reeve is assigned to a new case: the gruesome murder of a foster home mother that has left even the most hardened detectives shaken. Navigating a tumultuous time in Los Angeles, with a city on the razor's edge of chaos, Dawn is determined to stop the killer. But as she draws closer to the truth, something ominous and malevolent grips her and her family…",
+        "poster_path": "/2JIrVunDSjldv7Jv2uNKrrqwfej.jpg",
+        "season_number": 2,
+        "vote_average": 6
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.571,
+    "vote_count": 496
+  }
+}

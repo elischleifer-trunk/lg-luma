@@ -1,0 +1,138 @@
+{
+  "request": {
+    "path": "/3/tv/80707",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:40.245Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/mDqK7bgPLAdIB40dWnTDOJofwdt.jpg",
+    "created_by": [
+      {
+        "id": 2081233,
+        "credit_id": "5b472bdbc3a3686e73005ea9",
+        "name": "Patrick Graham",
+        "original_name": "Patrick Graham",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      45
+    ],
+    "first_air_date": "2018-08-24",
+    "genres": [
+      {
+        "id": 9648,
+        "name": "Mystery"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.netflix.com/title/80245450",
+    "id": 80707,
+    "in_production": false,
+    "languages": [
+      "hi"
+    ],
+    "last_air_date": "2018-08-24",
+    "last_episode_to_air": {
+      "id": 1527495,
+      "name": "Reveal Their Guilt, Eat Their Flesh",
+      "overview": "Nida learns of the ghoul inhabiting Saeed. Upon telling her fellow interrogators, she learns the alarming truth about what its presence reveals.",
+      "vote_average": 7.556,
+      "vote_count": 9,
+      "air_date": "2018-08-24",
+      "episode_number": 3,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 50,
+      "season_number": 1,
+      "show_id": 80707,
+      "still_path": "/9lJl0VNTF143bNiOsLydCp0ljhl.jpg"
+    },
+    "name": "GHOUL",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 213,
+        "logo_path": "/wwemzKWzjKYJFfCeiB57q3r4Bcm.png",
+        "name": "Netflix",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 3,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_name": "GHOUL",
+    "overview": "A newly minted military interrogator arrives at a covert detention center to discover that some of the terrorists held there are not of this world.",
+    "popularity": 2.3493,
+    "poster_path": "/r3cbfNl77zK7XhFMNpdbxy0B7gW.jpg",
+    "production_companies": [
+      {
+        "id": 68884,
+        "logo_path": "/1BYexT6Vikz4ulCcYKGPmOi6Jm0.png",
+        "name": "Blumhouse Television",
+        "origin_country": "US"
+      },
+      {
+        "id": 7435,
+        "logo_path": "/8l5ZhHhmImbgsQ6bgpG2XN1XVpZ.png",
+        "name": "Phantom Films",
+        "origin_country": "IN"
+      },
+      {
+        "id": 107897,
+        "logo_path": "/etLApUoJoD853bluxamsZOLlWII.png",
+        "name": "Ivanhoe Pictures",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2018-08-24",
+        "episode_count": 3,
+        "id": 106100,
+        "name": "Season 1",
+        "overview": "When a new prisoner at a military detention center exhibits eerie behavior, a young interrogator’s search for the truth becomes a battle for survival.",
+        "poster_path": "/zhRnyv5forBOOcu9AVe8DOcy0FL.jpg",
+        "season_number": 1,
+        "vote_average": 7
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.824,
+    "vote_count": 242
+  }
+}

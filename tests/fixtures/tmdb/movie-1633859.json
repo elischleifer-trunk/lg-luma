@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/1633859",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.391Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/y7nLL3fmif4AKb4c40Ukb5NJOw8.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "",
+    "id": 1633859,
+    "imdb_id": "tt41568963",
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_title": "Bluey at the Cinema: Playdates with Friends",
+    "overview": "A compilation of eight episodes from across the show’s three series, united around themes of play, friendship and family.",
+    "popularity": 0.7926,
+    "poster_path": "/s7ETRI4k07kjlR4FhyYimMqOHru.jpg",
+    "production_companies": [
+      {
+        "id": 81576,
+        "logo_path": "/m1sQ0FG05KeveKGufbcJbsHUKYi.png",
+        "name": "Ludo Studio",
+        "origin_country": "AU"
+      },
+      {
+        "id": 214718,
+        "logo_path": "/3kybnp1s4DAlJw2kLAx9G7l9Bz7.png",
+        "name": "BBC Studios Productions",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "AU",
+        "name": "Australia"
+      },
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "release_date": "2026-03-26",
+    "revenue": 0,
+    "runtime": 66,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Bluey at the Cinema: Playdates with Friends",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "request": {
+    "path": "/3/movie/891850",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:23.608Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [],
+    "homepage": "",
+    "id": 891850,
+    "imdb_id": null,
+    "origin_country": [
+      "IL"
+    ],
+    "original_language": "he",
+    "original_title": "Amélie",
+    "overview": "Rotem is a teenage boy who lives in the kibbutz and feels like he doesn’t belong there. The main reason is that Rotem is also a Drag Queen known as Amelie. Rotem goes through a process with himself and his family – he has a unique story.",
+    "popularity": 0.1257,
+    "poster_path": "/xMl2byt1R4fqGrG52fT2emLG3d0.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2021-11-11",
+    "revenue": 0,
+    "runtime": 11,
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Released",
+    "tagline": "",
+    "title": "Amélie",
+    "video": false,
+    "vote_average": 6,
+    "vote_count": 2
+  }
+}

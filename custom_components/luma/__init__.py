@@ -37,6 +37,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 
+from . import streaming_keys
 from .api import LumaAuthError, LumaClient, LumaError
 from .const import (
     CONF_TOKEN,
@@ -99,8 +100,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         _LOGGER.debug("Luma at %s is not reachable yet: %s", client.host, err)
     entry.runtime_data = LumaData(client)
     _track_cameras(hass, entry, client)
+    # Home Assistant holds the streaming search keys: send them now and whenever they change.
+    entry.async_create_background_task(
+        hass, streaming_keys.push(client, dict(entry.options)), f"{DOMAIN} keys {entry.entry_id}"
+    )
+    entry.async_on_unload(entry.add_update_listener(_options_updated))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
+
+async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
+    await streaming_keys.push(entry.runtime_data.client, dict(entry.options))
 
 
 def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
@@ -163,14 +173,19 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
 
     async def check(_now) -> None:
         # After the TV or Luma restarts it reports no cameras; send the list again then.
-        if pending or not camera_list(hass):
+        # The same status says whether the TV lost or replaced the streaming search keys.
+        cameras = not pending and bool(camera_list(hass))
+        has_keys = any(streaming_keys.keys(entry.options))
+        if not (cameras or has_keys):
             return
         try:
             status = await client.status()
         except LumaError:
             return
-        if status.get("cameras") == 0:
+        if cameras and status.get("cameras") == 0:
             schedule()
+        if streaming_keys.needs_push(dict(entry.options), status):
+            await streaming_keys.push(client, dict(entry.options))
 
     entry.async_on_unload(hass.bus.async_listen(EVENT_STATE_CHANGED, changed, is_camera))
     entry.async_on_unload(

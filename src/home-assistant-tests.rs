@@ -1111,3 +1111,72 @@ fn ok_on_a_doorbell_card_keeps_it_full_screen_until_closed() {
     );
     assert!(h.tv.calls().iter().any(|call| call == "resume _media1"));
 }
+
+#[test]
+fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
+    let dir = std::env::temp_dir().join(format!("luma-ha-keys-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let keys_path = dir.join("streaming-keys.json");
+    let mut h = Harness::new();
+    let (sender, events) = mpsc::channel();
+    h.api = Api::new(h.tv.clone(), Some(dir.join("home-assistant.json")), sender).unwrap();
+    h.events = events;
+    let token = h.pair();
+    let _ = h.events.try_iter().count();
+    let motn = "motn-key-0123456789abcdef";
+    let tmdb = "eyJhbGciOiJIUzI1NiJ9.e30.signature";
+
+    // Only paired servers may set keys.
+    let refused = h.call("PUT", "/api/streaming-keys", None, json!({"motn": motn}));
+    assert_eq!(refused.status, 401);
+    assert!(!keys_path.exists());
+
+    let saved = h.call(
+        "PUT",
+        "/api/streaming-keys",
+        Some(&token),
+        json!({"motn": motn, "tmdb": tmdb}),
+    );
+    assert_eq!(saved.status, 200, "{:?}", saved.body);
+    assert_eq!(saved.body, json!({"motn": true, "tmdb": true}));
+    let stored = crate::streaming_keys::load(&keys_path);
+    assert_eq!((stored.motn.as_str(), stored.tmdb.as_str()), (motn, tmdb));
+    assert!(stored.home_assistant);
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::StreamingKeys(crate::streaming_keys::Status {
+            motn: true,
+            tmdb: true,
+            home_assistant: true,
+        }))
+    );
+    // Keys are never echoed back to Home Assistant, but status says which it holds.
+    assert!(!saved.body.to_string().contains("0123456789"));
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(
+        status.body["streaming_keys"],
+        json!({"motn": true, "tmdb": true, "home_assistant": true})
+    );
+    assert!(!status.body.to_string().contains("0123456789"));
+
+    // A cleared field in Home Assistant keeps the TV's key; an unchanged push stays quiet.
+    let cleared = h.call(
+        "PUT",
+        "/api/streaming-keys",
+        Some(&token),
+        json!({"motn": "", "tmdb": null}),
+    );
+    assert_eq!(cleared.body, json!({"motn": true, "tmdb": true}));
+    assert_eq!(crate::streaming_keys::load(&keys_path), stored);
+    assert!(h.events.try_recv().is_err());
+
+    for bad in [json!({"motn": 5}), json!({"tmdb": "has spaces in it"})] {
+        assert_eq!(
+            h.call("PUT", "/api/streaming-keys", Some(&token), bad)
+                .status,
+            400
+        );
+    }
+    assert_eq!(crate::streaming_keys::load(&keys_path), stored);
+    std::fs::remove_dir_all(&dir).unwrap();
+}
