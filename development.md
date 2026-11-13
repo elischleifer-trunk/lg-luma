@@ -104,9 +104,13 @@ shown only when `listApps` reports one: `platform::lg_search_app` takes the firs
 with "search" in its ID, else `com.webos.app.voice`; the inventory log names the choice and
 every search/voice app seen. Only Right from the Settings tab focuses it (geometric moves skip
 it); Left and Back return to the current tab, Down to the page's content.
-**System** in the sidebar groups the update card, **TV settings** (`Target::TvSettings`, which
-launches `com.palm.app.settings`), **Refresh apps & inputs** and the vector power-icon **Quit app**
-action separately from General preferences.
+**General** holds a single update row: the installed version and when it was last checked
+(`State::update_checked`), with **Check now** (or **Install**) as a button on the right.
+**System** lists **TV settings** (`Target::TvSettings`, which launches `com.palm.app.settings`),
+**App names**, **Language**, **Reduced motion**, **Home Assistant**, **Text rendering**,
+**Refresh apps & inputs** and the vector power-icon **Quit app** action. **Home Assistant** opens
+a subpage with the on/off toggle and, while on, **Add to Home Assistant**, which reopens the HACS
+QR code.
 On Apps, OK or a normal pointer click on an app opens its side popup, with **Open** first and focused by
 default, followed by favorite, hide/show and **Delete app** actions. A second OK launches the app.
 Home favorites, Inputs and Recent apps launch directly. Hold OK on Home still reorders favorites.
@@ -139,9 +143,9 @@ in-memory sample inventory. Verify app opening, real deletion, denial and focus 
 manually on a TV, including Home-takeover mode.
 The **Clock** subpage contains **Clock format** (12-hour or 24-hour) and **Time format** (`HH:MM`
 or `HH:MM:SS`, defaulting to `HH:MM`). Choosing a format returns to its row in Clock, and Back
-from Clock restores its General row. With seconds shown, the header clock redraws once per second
+from Clock restores its Widgets row (Clock sits above Date). With seconds shown, the header clock redraws once per second
 instead of once per minute. Existing saved hour and seconds preferences are retained.
-General has an **App names** subpage with independent **Show on Home** and **Show on Apps** toggles.
+System has an **App names** subpage with independent **Show on Home** and **Show on Apps** toggles.
 Home captions default to off and Apps captions default to on, stored independently in `show_home_names`
 and `show_app_names`. The legacy `show_names` preference does not override these defaults. Hidden
 captions do not reserve layout space.
@@ -166,7 +170,7 @@ Long greetings scale down to fit their existing single-line area, centred vertic
 moving the weather summary or favorite cards. Short greetings retain their original size.
 The keyboard starts empty; closing it without a name preserves the saved value. Clear name removes
 it. Preferences are saved when the keyboard closes, including automatic system-keyboard dismissal.
-Back from Greeting restores its Widgets row; App names returns to General. Input name removal
+Back from Greeting restores its Widgets row; App names returns to System. Input name removal
 also uses **Clear name**.
 Choice checkmarks identify saved values, while the bright row fill identifies only the current focus.
 
@@ -409,7 +413,7 @@ Verify scanning, editing and a test request against a real webhook on TV hardwar
 
 ## Home Assistant overlay
 
-**Settings → General → Home Assistant** (`home_assistant`, default Off) starts a persistent
+**Settings → System → Home Assistant** (`home_assistant`, default Off) starts a persistent
 listener on port 5862 (`src/home_assistant.rs`), unlike the short-lived companion sessions. It binds
 every interface, because the TV's address can change, and answers only loopback, private and
 link-local peers. Requests are small and handled in turn on the service's own thread, with a

@@ -59,36 +59,6 @@
     "nl": "Lokaal (weekdag, maand en dag)",
     "sv": "Lokalt (veckodag, månad och dag)"
   },
-  "latestVersionInstalled": {
-    "zh-tw": "未發現更新版本",
-    "en": "No newer version found",
-    "de": "Keine neuere Version gefunden",
-    "es": "No se encontró una versión más reciente",
-    "zh": "未发现更新版本",
-    "pt": "Nenhuma versão mais recente encontrada",
-    "it": "Nessuna versione più recente trovata",
-    "ru": "Более новая версия не найдена",
-    "pl": "Nie znaleziono nowszej wersji",
-    "fr": "Aucune version plus récente trouvée",
-    "vi": "Không tìm thấy phiên bản mới hơn",
-    "nl": "Geen nieuwere versie gevonden",
-    "sv": "Ingen nyare version hittades"
-  },
-  "checkAgain": {
-    "zh-tw": "重新檢查",
-    "en": "Check again",
-    "de": "Erneut prüfen",
-    "es": "Comprobar de nuevo",
-    "zh": "重新检查",
-    "pt": "Verificar novamente",
-    "it": "Controlla di nuovo",
-    "ru": "Проверить снова",
-    "pl": "Sprawdź ponownie",
-    "fr": "Vérifier à nouveau",
-    "vi": "Kiểm tra lại",
-    "nl": "Opnieuw controleren",
-    "sv": "Kontrollera igen"
-  },
   "checkingUpdates": {
     "zh-tw": "正在檢查更新…",
     "en": "Checking for updates…",
@@ -104,21 +74,6 @@
     "nl": "Controleren op updates…",
     "sv": "Söker efter uppdateringar…"
   },
-  "checkForUpdates": {
-    "zh-tw": "檢查更新",
-    "en": "Check for updates",
-    "de": "Nach Updates suchen",
-    "es": "Buscar actualizaciones",
-    "zh": "检查更新",
-    "pt": "Verificar atualizações",
-    "it": "Cerca aggiornamenti",
-    "ru": "Проверить обновления",
-    "pl": "Sprawdź aktualizacje",
-    "fr": "Rechercher des mises à jour",
-    "vi": "Kiểm tra bản cập nhật",
-    "nl": "Controleren op updates",
-    "sv": "Sök efter uppdateringar"
-  },
   "updateCheckFailed": {
     "zh-tw": "無法檢查更新",
     "en": "Couldn't check for updates",
@@ -133,21 +88,6 @@
     "vi": "Không thể kiểm tra bản cập nhật",
     "nl": "Controleren op updates mislukt",
     "sv": "Det gick inte att söka efter uppdateringar"
-  },
-  "currentVersion": {
-    "zh-tw": "目前版本：{current}",
-    "en": "Current version: {current}",
-    "de": "Installierte Version: {current}",
-    "es": "Versión actual: {current}",
-    "zh": "当前版本：{current}",
-    "pt": "Versão atual: {current}",
-    "it": "Versione attuale: {current}",
-    "ru": "Текущая версия: {current}",
-    "pl": "Obecna wersja: {current}",
-    "fr": "Version actuelle : {current}",
-    "vi": "Phiên bản hiện tại: {current}",
-    "nl": "Huidige versie: {current}",
-    "sv": "Nuvarande version: {current}"
   },
   "addFirstShortcutHint": {
     "zh-tw": "按「設定」新增第一個捷徑。",
@@ -178,21 +118,6 @@
     "vi": "Có bản cập nhật",
     "nl": "Update beschikbaar",
     "sv": "Uppdatering tillgänglig"
-  },
-  "updateVersions": {
-    "zh-tw": "目前版本：{current} · 最新版本：{latest}",
-    "en": "Current: {current} · Latest: {latest}",
-    "de": "Installiert: {current} · Neueste Version: {latest}",
-    "es": "Actual: {current} · Última: {latest}",
-    "zh": "当前版本：{current} · 最新版本：{latest}",
-    "pt": "Atual: {current} · Mais recente: {latest}",
-    "it": "Attuale: {current} · Più recente: {latest}",
-    "ru": "Текущая: {current} · Последняя: {latest}",
-    "pl": "Obecna: {current} · Najnowsza: {latest}",
-    "fr": "Actuelle : {current} · Dernière : {latest}",
-    "vi": "Hiện tại: {current} · Mới nhất: {latest}",
-    "nl": "Huidig: {current} · Nieuwste: {latest}",
-    "sv": "Nuvarande: {current} · Senaste: {latest}"
   },
   "testShortcut": {
     "zh-tw": "測試捷徑",
@@ -3523,5 +3448,80 @@
     "vi": "Camera không khả dụng",
     "nl": "Camera niet beschikbaar",
     "sv": "Kameran är inte tillgänglig"
+  },
+  "checkNow": {
+    "zh-tw": "立即檢查",
+    "nl": "Nu controleren",
+    "en": "Check now",
+    "de": "Jetzt prüfen",
+    "es": "Comprobar ahora",
+    "zh": "立即检查",
+    "pt": "Verificar agora",
+    "it": "Controlla ora",
+    "ru": "Проверить",
+    "pl": "Sprawdź teraz",
+    "fr": "Vérifier",
+    "vi": "Kiểm tra ngay",
+    "sv": "Sök nu"
+  },
+  "lastChecked": {
+    "zh-tw": "上次檢查於 {time}",
+    "nl": "Gecontroleerd om {time}",
+    "en": "Checked {time}",
+    "de": "Geprüft um {time}",
+    "es": "Comprobado a las {time}",
+    "zh": "上次检查于 {time}",
+    "pt": "Verificado às {time}",
+    "it": "Controllato alle {time}",
+    "ru": "Проверено в {time}",
+    "pl": "Sprawdzono o {time}",
+    "fr": "Vérifié à {time}",
+    "vi": "Đã kiểm tra lúc {time}",
+    "sv": "Kontrollerad {time}"
+  },
+  "notChecked": {
+    "zh-tw": "尚未檢查",
+    "nl": "Nog niet gecontroleerd",
+    "en": "Not checked yet",
+    "de": "Noch nicht geprüft",
+    "es": "Aún no comprobado",
+    "zh": "尚未检查",
+    "pt": "Ainda não verificado",
+    "it": "Non ancora controllato",
+    "ru": "Ещё не проверено",
+    "pl": "Jeszcze nie sprawdzono",
+    "fr": "Pas encore vérifié",
+    "vi": "Chưa kiểm tra",
+    "sv": "Inte kontrollerad än"
+  },
+  "updateReady": {
+    "zh-tw": "{latest} 可供更新",
+    "nl": "{latest} beschikbaar",
+    "en": "{latest} available",
+    "de": "{latest} verfügbar",
+    "es": "{latest} disponible",
+    "zh": "{latest} 可供更新",
+    "pt": "{latest} disponível",
+    "it": "{latest} disponibile",
+    "ru": "Доступна {latest}",
+    "pl": "Dostępna {latest}",
+    "fr": "{latest} disponible",
+    "vi": "Đã có {latest}",
+    "sv": "{latest} tillgänglig"
+  },
+  "homeAssistantToggleHint": {
+    "zh-tw": "讓 Home Assistant 控制這台電視上的 Luma",
+    "nl": "Laat Home Assistant Luma op deze tv bedienen",
+    "en": "Lets Home Assistant control Luma on this TV",
+    "de": "Erlaubt Home Assistant, Luma auf diesem TV zu steuern",
+    "es": "Permite que Home Assistant controle Luma en este televisor",
+    "zh": "让 Home Assistant 控制这台电视上的 Luma",
+    "pt": "Permite que o Home Assistant controle o Luma nesta TV",
+    "it": "Consente a Home Assistant di controllare Luma su questa TV",
+    "ru": "Позволяет Home Assistant управлять Luma на этом телевизоре",
+    "pl": "Pozwala Home Assistant sterować Lumą na tym telewizorze",
+    "fr": "Permet à Home Assistant de contrôler Luma sur ce téléviseur",
+    "vi": "Cho phép Home Assistant điều khiển Luma trên TV này",
+    "sv": "Låter Home Assistant styra Luma på den här tv:n"
   }
 }

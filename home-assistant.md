@@ -29,11 +29,11 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
 
 ## Set up
 
-1. **On the TV**, open **Luma → Settings → General** and turn on **Home Assistant**. Luma shows a
+1. **On the TV**, open **Luma → Settings → System → Home Assistant** and turn it on. Luma shows a
    QR code and the address Home Assistant should use (for example `192.168.1.50:5862`). The first
    time, Luma also installs its small overlay app from its own package. This needs Homebrew
    Channel's root service, like Luma's other TV features. To see the QR code again later, choose
-   **Add to Home Assistant** below the setting.
+   **Add to Home Assistant** on the same page.
 2. **Install the integration** (you need [HACS](https://hacs.xyz)):
    - **From the QR code:** scan it with your phone. It opens HACS on your Home Assistant with
      **Luma for LG webOS** ready to download, through the

@@ -629,7 +629,7 @@ pub fn scene_with_pill(
     match state.page {
         Page::Home => home(&mut out, state, assets, now),
         Page::Apps => library(&mut out, state, assets),
-        Page::Settings => settings(&mut out, state, assets),
+        Page::Settings => settings(&mut out, state, assets, now),
     }
     if let Some(error) = &state.error
         && !state.inventory.apps.is_empty()
@@ -1723,7 +1723,7 @@ fn update_value(state: &State) -> String {
                     .t(if state.update_status == Status::Checking {
                         "checkingUpdates"
                     } else {
-                        "checkAgain"
+                        "checkNow"
                     })
                     .to_owned()
             }
@@ -2113,8 +2113,8 @@ fn location_settings(out: &mut Scene, state: &State, assets: &Assets) {
     }
 }
 
-fn settings(out: &mut Scene, state: &State, assets: &Assets) {
-    settings_content(out, state, assets);
+fn settings(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
+    settings_content(out, state, assets, now);
     settings_sidebar(out, state, assets);
 }
 
@@ -2177,6 +2177,7 @@ fn settings_sidebar(out: &mut Scene, state: &State, assets: &Assets) {
                 Some(Subpage::Clock) => language.t("clock"),
                 Some(Subpage::Language) => language.t("language"),
                 Some(Subpage::TextRendering) => language.t("textRendering"),
+                Some(Subpage::HomeAssistant) => language.t("homeAssistant"),
                 _ => "",
             };
             let mut path = vec![label];
@@ -2242,7 +2243,7 @@ fn settings_sidebar(out: &mut Scene, state: &State, assets: &Assets) {
     }
 }
 
-fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
+fn settings_content(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
     let language = state.preferences.language;
     let s = state.scroll;
     if let Some(subpage) = &state.subpage {
@@ -2257,6 +2258,7 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                 | Subpage::Date
                 | Subpage::AppNames
                 | Subpage::Clock
+                | Subpage::HomeAssistant
         ) {
             match subpage {
                 Subpage::WeatherLocation => location_settings(out, state, assets),
@@ -2267,6 +2269,7 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                 Subpage::Date => date_settings(out, state, assets),
                 Subpage::AppNames => app_name_settings(out, state, assets),
                 Subpage::Clock => clock_settings(out, state, assets),
+                Subpage::HomeAssistant => home_assistant_settings(out, state, assets),
                 _ => unreachable!(),
             }
             if let Some(opened) = state.panel_started {
@@ -2346,7 +2349,8 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
             | Subpage::Greeting
             | Subpage::Date
             | Subpage::AppNames
-            | Subpage::Clock => {
+            | Subpage::Clock
+            | Subpage::HomeAssistant => {
                 unreachable!()
             }
             Subpage::Language => Language::ALL
@@ -2395,56 +2399,7 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
         return;
     }
     match state.section {
-        0 => {
-            for (position, (index, key, icon, value, chevron)) in [
-                (0, "appNames", "type", None, true),
-                (1, "clock", "clock", None, true),
-                (4, "language", "language", Some(language.name()), true),
-                (
-                    2,
-                    "reducedMotion",
-                    "motion",
-                    Some(if state.preferences.reduced_motion {
-                        language.t("stateOn")
-                    } else {
-                        language.t("stateOff")
-                    }),
-                    false,
-                ),
-                (
-                    8,
-                    "homeAssistant",
-                    "tv",
-                    Some(if state.preferences.home_assistant {
-                        language.t("stateOn")
-                    } else {
-                        language.t("stateOff")
-                    }),
-                    false,
-                ),
-                (9, "homeAssistantSetup", "arrow", None, true),
-            ]
-            .into_iter()
-            .filter(|(index, ..)| *index != 9 || state.preferences.home_assistant)
-            .enumerate()
-            {
-                row(
-                    out,
-                    state,
-                    assets,
-                    Row {
-                        target: Target::Setting(index),
-                        rect: Rect::new(640., 164.8 + position as f32 * 84. - s, 1120., 72.),
-                        title: language.t(key),
-                        icon: Some(icon),
-                        value,
-                        description: None,
-                        selected: false,
-                        chevron,
-                    },
-                );
-            }
-        }
+        0 => update_row(out, state, assets, now),
         1 => {
             let actions_start = out.draw.len();
             let upload_label = language.t("uploadWallpaper");
@@ -2572,7 +2527,8 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
         }
         WIDGETS_SECTION => {
             for (index, (widget, key, icon)) in [
-                (4, "date", "clock"),
+                (5, "clock", "clock"),
+                (4, "date", "calendar"),
                 (0, "greeting", "type"),
                 (1, "weather", "weather-sun"),
                 (2, "shortcuts", "sparkles"),
@@ -2599,71 +2555,13 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
             }
         }
         SYSTEM_SECTION => {
-            let rect = Rect::new(640., 164.8 - s, 1120., 220.);
-            let title = if matches!(state.update, crate::update::InstallStatus::Failed(_)) {
-                "updateError"
-            } else if state.available_update.is_some() {
-                "updateAvailable"
-            } else {
-                match state.update_status {
-                    crate::update::Status::Unchecked => "checkForUpdates",
-                    crate::update::Status::Checking => "checkingUpdates",
-                    crate::update::Status::Checked => "latestVersionInstalled",
-                    crate::update::Status::Failed => "updateCheckFailed",
-                }
-            };
-            settings_surface(out, rect, 20.);
-            out.text(
-                language.t(title),
-                Rect::new(rect.x + 24.2, rect.y + 24., rect.w - 48.4, 34.),
-                text(24., 550, -0.02).leading(1.4),
-                WHITE,
-                false,
-            );
-            out.text(
-                if let Some(latest) = &state.available_update {
-                    language.format(
-                        "updateVersions",
-                        &[("current", assets.version.trim()), ("latest", latest)],
-                    )
-                } else {
-                    language.format("currentVersion", &[("current", assets.version.trim())])
-                },
-                Rect::new(rect.x + 24.2, rect.y + 74., rect.w - 48.4, 32.),
-                text(20.8, 450, -0.02).leading(1.4),
-                c(0xeeeeee, 0.73),
-                false,
-            );
-            row(
-                out,
-                state,
-                assets,
-                Row {
-                    target: if state.available_update.is_some() {
-                        Target::InstallUpdate
-                    } else {
-                        Target::CheckUpdates
-                    },
-                    rect: Rect::new(rect.x + 24., rect.y + 132., rect.w - 48., 64.),
-                    title: &update_value(state),
-                    icon: Some(if state.available_update.is_some() {
-                        "arrow"
-                    } else {
-                        "refresh"
-                    }),
-                    value: None,
-                    description: None,
-                    selected: false,
-                    chevron: false,
-                },
-            );
             row(
                 out,
                 state,
                 assets,
                 Row {
                     target: Target::TvSettings,
-                    rect: Rect::new(640., 408.8 - s, 1120., 72.),
+                    rect: Rect::new(640., 164.8 - s, 1120., 72.),
                     title: language.t("tvSettings"),
                     icon: Some("settings"),
                     value: None,
@@ -2672,7 +2570,37 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                     chevron: true,
                 },
             );
+            let on_off = |on: bool| language.t(if on { "stateOn" } else { "stateOff" });
             for (position, (index, title, icon, value, chevron)) in [
+                (0, language.t("appNames"), "type", None, true),
+                (
+                    4,
+                    language.t("language"),
+                    "language",
+                    Some(language.name()),
+                    true,
+                ),
+                (
+                    2,
+                    language.t("reducedMotion"),
+                    "motion",
+                    Some(on_off(state.preferences.reduced_motion)),
+                    false,
+                ),
+                (
+                    8,
+                    language.t("homeAssistant"),
+                    "tv",
+                    Some(on_off(state.preferences.home_assistant)),
+                    true,
+                ),
+                (
+                    7,
+                    language.t("textRendering"),
+                    "type",
+                    Some(language.t(state.preferences.text_rendering.label_key())),
+                    true,
+                ),
                 (
                     3,
                     language.t(if state.loading {
@@ -2683,13 +2611,6 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                     "refresh",
                     None,
                     false,
-                ),
-                (
-                    7,
-                    language.t("textRendering"),
-                    "type",
-                    Some(language.t(state.preferences.text_rendering.label_key())),
-                    true,
                 ),
                 (5, language.t("quitApp"), "power", None, false),
             ]
@@ -2702,7 +2623,7 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
                     assets,
                     Row {
                         target: Target::Setting(index),
-                        rect: Rect::new(640., 492.8 + position as f32 * 84. - s, 1120., 72.),
+                        rect: Rect::new(640., 248.8 + position as f32 * 84. - s, 1120., 72.),
                         title,
                         icon: Some(icon),
                         value,
@@ -2714,6 +2635,139 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets) {
             }
         }
         _ => {}
+    }
+}
+
+/// One line: the installed version and when it was last checked, with the
+/// check or install action as a button on the right.
+fn update_row(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
+    use crate::update::{InstallStatus, Status};
+    let language = state.preferences.language;
+    let rect = Rect::new(640., 164.8 - state.scroll, 1120., 72.);
+    settings_surface(out, rect, 20.);
+    let version = assets.version.trim();
+    let status = if matches!(state.update, InstallStatus::Failed(_)) {
+        language.t("updateCheckFailed").to_owned()
+    } else if let Some(latest) = &state.available_update {
+        language.format("updateReady", &[("latest", latest)])
+    } else {
+        match (state.update_status, state.update_checked) {
+            (Status::Checking, _) => language.t("checkingUpdates").to_owned(),
+            (Status::Failed, _) => language.t("updateCheckFailed").to_owned(),
+            (_, Some(checked)) => {
+                let ago = crate::state::unix_now().saturating_sub(checked);
+                let at = now - time::Duration::seconds(ago.min(i64::MAX as u64) as i64);
+                language.format(
+                    "lastChecked",
+                    &[(
+                        "time",
+                        &language.clock(at, state.preferences.hour_24, false),
+                    )],
+                )
+            }
+            _ => language.t("notChecked").to_owned(),
+        }
+    };
+    let (target, icon) = if state.available_update.is_some() {
+        (Target::InstallUpdate, "arrow")
+    } else {
+        (Target::CheckUpdates, "refresh")
+    };
+    let label = update_value(state);
+    let style = text(18.4, 550, -0.01);
+    // Sized for its widest label so progress text never moves the button.
+    let install = language.format(
+        "installUpdate",
+        &[("version", state.available_update.as_deref().unwrap_or(""))],
+    );
+    let downloading = language.format("updateDownloading", &[("percent", "100")]);
+    let button_width = [
+        language.t("checkNow"),
+        language.t("checkingUpdates"),
+        language.t("updateInstalling"),
+        language.t("updateFailed"),
+        &install,
+        &downloading,
+    ]
+    .into_iter()
+    .map(|label| assets.width(label, style))
+    .fold(0., f32::max);
+    let button_width = (button_width + 82.).ceil().min(460.);
+    let button = Rect::new(
+        rect.x + rect.w - 12. - button_width,
+        rect.y + 10.,
+        button_width,
+        52.,
+    );
+    let line = format!("{version} · {status}");
+    let line_width = button.x - rect.x - 48.4;
+    out.text(
+        &line,
+        Rect::new(rect.x + 24.2, rect.y + 23.5, line_width, 25.),
+        assets.fit_text(&line, text(20.8, 550, -0.02), line_width),
+        WHITE,
+        false,
+    );
+    let focused = state.focus == target;
+    out.pill(button, focused, false);
+    let color = if focused {
+        c(0x2c2c2c, 1.)
+    } else {
+        c(0xeeeeee, 0.85)
+    };
+    out.icon(
+        assets,
+        icon,
+        Rect::new(button.x + 20., button.y + 17., 18.4, 18.4),
+        color,
+    );
+    out.text(
+        &label,
+        Rect::new(button.x + 48., button.y + 14., button.w - 60., 25.),
+        style,
+        color,
+        false,
+    );
+    out.control(target, button, false);
+}
+
+fn home_assistant_settings(out: &mut Scene, state: &State, assets: &Assets) {
+    let language = state.preferences.language;
+    row(
+        out,
+        state,
+        assets,
+        Row {
+            target: Target::HomeAssistantToggle,
+            rect: Rect::new(640., 164.8 - state.scroll, 1120., 90.7),
+            title: language.t("homeAssistant"),
+            icon: None,
+            value: Some(language.t(if state.preferences.home_assistant {
+                "stateOn"
+            } else {
+                "stateOff"
+            })),
+            description: Some(language.t("homeAssistantToggleHint")),
+            selected: false,
+            chevron: false,
+        },
+    );
+    if state.preferences.home_assistant {
+        row(
+            out,
+            state,
+            assets,
+            Row {
+                target: Target::HomeAssistantCode,
+                rect: Rect::new(640., 267.5 - state.scroll, 1120., 72.),
+                title: language.t("homeAssistantSetup"),
+                icon: None,
+                value: None,
+                description: None,
+                selected: false,
+                chevron: true,
+            },
+        );
     }
 }
 
@@ -3775,7 +3829,7 @@ mod tests {
             let label = language.t("uploadWallpaper");
             let label_width = assets.width(label, text(20.8, 550, -0.02));
             let mut scene = Scene::new();
-            settings(&mut scene, &state, &assets);
+            settings(&mut scene, &state, &assets, OffsetDateTime::UNIX_EPOCH);
             let button = scene
                 .controls
                 .iter()
@@ -3806,7 +3860,7 @@ mod tests {
         for enabled in [false, true] {
             state.preferences.wallpaper_cycle = enabled;
             let mut scene = Scene::new();
-            settings(&mut scene, &state, &assets);
+            settings(&mut scene, &state, &assets, OffsetDateTime::UNIX_EPOCH);
             let button = scene
                 .controls
                 .iter()

@@ -67,6 +67,8 @@ pub enum Target {
     AppNamesApps,
     ClockFormat,
     ClockTimeFormat,
+    HomeAssistantToggle,
+    HomeAssistantCode,
     Background(usize),
     UploadWallpaper,
     WallpaperCycle,
@@ -188,6 +190,7 @@ pub enum Subpage {
     Temperature,
     Language,
     TextRendering,
+    HomeAssistant,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize)]
@@ -260,6 +263,8 @@ pub struct State {
     pub error: Option<String>,
     pub available_update: Option<String>,
     pub update_status: crate::update::Status,
+    /// Unix seconds of the last successful update check.
+    pub update_checked: Option<u64>,
     pub update_check_requested: bool,
     /// Inventory loads that failed in a row while no apps were shown yet.
     pub inventory_failures: u32,
@@ -313,6 +318,7 @@ impl State {
             error: None,
             available_update: None,
             update_status: crate::update::Status::Unchecked,
+            update_checked: None,
             update_check_requested: false,
             inventory_failures: 0,
             dirty: true,
@@ -359,6 +365,7 @@ impl State {
                 let announce = latest.is_some() && latest != self.available_update;
                 self.available_update = latest;
                 self.update_status = crate::update::Status::Checked;
+                self.update_checked = Some(unix_now());
                 if announce {
                     self.notify(self.preferences.language.t("updateAvailable"));
                 }
@@ -1101,10 +1108,10 @@ impl State {
                     })
                     .unwrap_or(0),
             ),
-            WIDGETS_SECTION => Target::Widget(4),
-            SYSTEM_SECTION if self.available_update.is_some() => Target::InstallUpdate,
-            SYSTEM_SECTION => Target::CheckUpdates,
-            _ => Target::Setting(0),
+            WIDGETS_SECTION => Target::Widget(5),
+            SYSTEM_SECTION => Target::TvSettings,
+            _ if self.available_update.is_some() => Target::InstallUpdate,
+            _ => Target::CheckUpdates,
         }
     }
 
@@ -1125,7 +1132,7 @@ impl State {
             Some(Subpage::Weather) => Target::Widget(1),
             Some(Subpage::Shortcuts) => Target::Widget(2),
             Some(Subpage::Inputs) => Target::Widget(3),
-            Some(Subpage::Clock) => Target::Setting(1),
+            Some(Subpage::Clock) => Target::Widget(5),
             Some(Subpage::ClockFormat) => {
                 self.subpage = Some(Subpage::Clock);
                 Target::ClockFormat
@@ -1148,6 +1155,7 @@ impl State {
             }
             Some(Subpage::Language) => Target::Setting(4),
             Some(Subpage::TextRendering) => Target::Setting(7),
+            Some(Subpage::HomeAssistant) => Target::Setting(8),
             None => Target::Sidebar(self.section),
         };
         self.scroll = 0.;
@@ -1257,6 +1265,11 @@ impl State {
                     return vec![];
                 }
             }
+            let home_assistant_rows: &[Target] = if self.preferences.home_assistant {
+                &[Target::HomeAssistantToggle, Target::HomeAssistantCode]
+            } else {
+                &[Target::HomeAssistantToggle]
+            };
             let setting_rows: Option<&[Target]> = match self.subpage {
                 Some(Subpage::Greeting) => Some(&[
                     Target::GreetingToggle,
@@ -1266,6 +1279,7 @@ impl State {
                 Some(Subpage::AppNames) => Some(&[Target::AppNamesHome, Target::AppNamesApps]),
                 Some(Subpage::Date) => Some(&[Target::DateToggle, Target::DateFormat]),
                 Some(Subpage::Clock) => Some(&[Target::ClockFormat, Target::ClockTimeFormat]),
+                Some(Subpage::HomeAssistant) => Some(home_assistant_rows),
                 _ => None,
             };
             if let Some(rows) = setting_rows
@@ -1291,6 +1305,7 @@ impl State {
                                 | Target::ClockFormat
                                 | Target::ClockTimeFormat
                                 | Target::DateFormat
+                                | Target::HomeAssistantCode
                         ) =>
                     {
                         return self.activate();
@@ -1396,7 +1411,7 @@ impl State {
             }
             if matches!(
                 self.focus,
-                Target::Setting(0 | 1 | 4 | 7 | 9)
+                Target::Setting(0 | 4 | 7 | 8)
                     | Target::Widget(_)
                     | Target::InputMode(_)
                     | Target::WeatherLocation
@@ -1421,7 +1436,11 @@ impl State {
                 self.focus(Target::Nav(2), controls);
                 return vec![];
             }
-            if self.focus == Target::Setting(0) && matches!(direction, Direction::Up) {
+            if matches!(
+                self.focus,
+                Target::TvSettings | Target::CheckUpdates | Target::InstallUpdate
+            ) && matches!(direction, Direction::Up)
+            {
                 self.focus(Target::Nav(2), controls);
                 return vec![];
             }
@@ -2313,12 +2332,23 @@ impl State {
                 }
             }
             Target::InputRename => self.open_keyboard(TextField::InputName),
+            Target::HomeAssistantToggle => {
+                self.preferences.home_assistant = !self.preferences.home_assistant;
+                self.sync_custom_tiles();
+                self.reconcile_focus();
+                if self.preferences.home_assistant {
+                    self.open_home_assistant_setup();
+                }
+                return vec![Effect::Save];
+            }
+            Target::HomeAssistantCode => self.open_home_assistant_setup(),
             Target::Widget(index) => {
                 let (subpage, focus) = match index {
                     0 => (Subpage::Greeting, Target::GreetingToggle),
                     1 => (Subpage::Weather, Target::WeatherToggle),
                     2 => (Subpage::Shortcuts, Target::TileEditor),
                     4 => (Subpage::Date, Target::DateToggle),
+                    5 => (Subpage::Clock, Target::ClockFormat),
                     3 => (
                         Subpage::Inputs,
                         self.inventory
@@ -2427,26 +2457,14 @@ impl State {
                         }
                         return vec![];
                     }
-                    1 => {
-                        self.subpage = Some(Subpage::Clock);
+                    2 => self.preferences.reduced_motion = !self.preferences.reduced_motion,
+                    8 => {
+                        self.subpage = Some(Subpage::HomeAssistant);
+                        self.focus = Target::HomeAssistantToggle;
                         self.scroll = 0.;
                         if !self.preferences.reduced_motion {
                             self.panel_started = Some(crate::clock::now());
                         }
-                        self.focus = Target::ClockFormat;
-                        return vec![];
-                    }
-                    2 => self.preferences.reduced_motion = !self.preferences.reduced_motion,
-                    8 => {
-                        self.preferences.home_assistant = !self.preferences.home_assistant;
-                        self.sync_custom_tiles();
-                        self.reconcile_focus();
-                        if self.preferences.home_assistant {
-                            self.open_home_assistant_setup();
-                        }
-                    }
-                    9 => {
-                        self.open_home_assistant_setup();
                         return vec![];
                     }
                     4 => {
@@ -2585,7 +2603,8 @@ impl State {
                         | Subpage::Clock
                         | Subpage::Weather
                         | Subpage::Shortcuts
-                        | Subpage::Inputs,
+                        | Subpage::Inputs
+                        | Subpage::HomeAssistant,
                     ) => {
                         return vec![];
                     }
@@ -2767,11 +2786,11 @@ impl State {
             }
             if matches!(overlay, Overlay::HomeAssistantSetup) {
                 self.home_assistant_qr = None;
-                self.focus = Target::Setting(if self.preferences.home_assistant {
-                    9
+                self.focus = if self.preferences.home_assistant {
+                    Target::HomeAssistantCode
                 } else {
-                    8
-                });
+                    Target::HomeAssistantToggle
+                };
                 self.pressed = None;
                 return vec![];
             }
