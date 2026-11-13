@@ -807,7 +807,7 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
             ("0/camera.door".to_owned(), false)
         ]
     );
-    // Unpairing the first server drops its entries; the second moves up and keeps its own.
+    // Unpairing the first server parks its entries; the second moves up and keeps its own.
     h.call("DELETE", "/api/pair", Some(&first), json!({}));
     assert_eq!(h.api.store().gallery.hidden, ["0/camera.door"]);
     assert_eq!(h.api.store().gallery.order, ["0/camera.door"]);
@@ -822,9 +822,109 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
         .map(|camera| (camera.id, camera.hidden))
         .collect();
     assert_eq!(gallery, [("0/camera.door".to_owned(), true)]);
-    // Turning Home Assistant off forgets every pairing and the arrangement with them.
+    assert_eq!(h.api.store().gallery.parked.len(), 1);
+    assert_eq!(
+        h.api.store().gallery.parked[0].names["camera.door"],
+        "Front"
+    );
+    // Turning Home Assistant off forgets every pairing but parks the arrangement.
     h.api.forget();
-    assert_eq!(h.api.store().gallery, Gallery::default());
+    let gallery = &h.api.store().gallery;
+    assert!(gallery.order.is_empty() && gallery.hidden.is_empty() && gallery.names.is_empty());
+    assert_eq!(gallery.parked.len(), 1);
+    assert_eq!(gallery.parked[0].hidden, ["camera.door"]);
+}
+
+/// Pairs as the server `name`, optionally with a Home Assistant instance ID.
+fn pair_as(h: &mut Harness, name: &str, server: Option<&str>) -> String {
+    h.now += PAIRING_COOLDOWN;
+    let mut body = json!({"name": name});
+    if let Some(server) = server {
+        body["server"] = json!(server);
+    }
+    let started = h.call("POST", "/api/pair", None, body);
+    assert_eq!(started.status, 200, "{:?}", started.body);
+    let id = started.body["pairing_id"].as_str().unwrap().to_owned();
+    let code = h.code();
+    let confirmed = h.call(
+        "POST",
+        "/api/pair/confirm",
+        None,
+        json!({"pairing_id": id, "code": code}),
+    );
+    assert_eq!(confirmed.status, 200, "{:?}", confirmed.body);
+    confirmed.body["token"].as_str().unwrap().to_owned()
+}
+
+#[test]
+fn camera_names_and_order_come_back_when_the_same_server_pairs_again() {
+    let mut h = Harness::new();
+    let token = pair_as(&mut h, "Home", Some("abc"));
+    let cameras = json!({"cameras": [
+        {"id": "camera.a", "snapshot_url": "http://ha/a"},
+        {"id": "camera.b", "snapshot_url": "http://ha/b"},
+    ]});
+    h.call("POST", "/api/cameras", Some(&token), cameras.clone());
+    h.api.arrange(&json!({
+        "order": ["0/camera.b", "0/camera.a"],
+        "hidden": ["0/camera.a"],
+        "names": {"0/camera.b": "Porch"},
+        "live": false,
+    }));
+    // Home Assistant turned off and on in Luma, then the server pairs again under a new name.
+    h.api.forget();
+    assert!(h.api.store().gallery.snapshots, "the live setting stays");
+    let other = pair_as(&mut h, "Cabin", Some("other"));
+    let token = pair_as(&mut h, "Home renamed", Some("abc"));
+    h.call("POST", "/api/cameras", Some(&other), json!({"cameras": []}));
+    h.call("POST", "/api/cameras", Some(&token), cameras.clone());
+    let gallery: Vec<_> = h
+        .api
+        .gallery()
+        .into_iter()
+        .map(|camera| (camera.id, camera.hidden, camera.label))
+        .collect();
+    assert_eq!(
+        gallery,
+        [
+            ("1/camera.b".to_owned(), false, Some("Porch".to_owned())),
+            ("1/camera.a".to_owned(), true, None),
+        ]
+    );
+    assert!(h.api.store().gallery.parked.is_empty());
+    // An integration that sends no instance ID is recognised by the name it pairs under.
+    h.call("DELETE", "/api/pair", Some(&token), json!({}));
+    let token = pair_as(&mut h, "Home renamed", None);
+    h.call("POST", "/api/cameras", Some(&token), cameras);
+    assert_eq!(h.api.gallery()[0].label.as_deref(), Some("Porch"));
+}
+
+#[test]
+fn pairing_codes_that_lapse_are_reported() {
+    let mut h = Harness::new();
+    h.call("POST", "/api/pair", None, json!({"name": "HA"}));
+    let _ = h.code();
+    h.api.tick(h.now + PAIRING_TTL);
+    assert!(
+        h.events
+            .try_iter()
+            .any(|event| event == Event::PairingEnded)
+    );
+}
+
+#[test]
+fn settings_from_a_newer_luma_survive_a_save() {
+    let store: Store = serde_json::from_value(json!({
+        "device_id": "d",
+        "clients": [{"name": "HA", "token": "t", "paired": 1, "future": [1]}],
+        "gallery": {"order": [], "future_gallery": true},
+        "future_store": "x",
+    }))
+    .unwrap();
+    let saved = serde_json::to_value(&store).unwrap();
+    assert_eq!(saved["future_store"], "x");
+    assert_eq!(saved["gallery"]["future_gallery"], true);
+    assert_eq!(saved["clients"][0]["future"], json!([1]));
 }
 
 fn video(url: &str) -> crate::cameras::VideoRequest {

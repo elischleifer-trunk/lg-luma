@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PORT
+from homeassistant.helpers import instance_id
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 try:  # Home Assistant 2025.1+
@@ -136,7 +137,8 @@ class LumaConfigFlow(ConfigFlow, domain=DOMAIN):
         if self._pairing_id is None:
             try:
                 self._pairing_id = await self._client().start_pairing(
-                    self.hass.config.location_name or "Home Assistant"
+                    self.hass.config.location_name or "Home Assistant",
+                    await instance_id.async_get(self.hass),
                 )
             except LumaConnectionError:
                 return self.async_abort(reason="cannot_connect")

@@ -82,9 +82,16 @@ class LumaClient:
             raise LumaConnectionError("Not a Luma TV")
         return info
 
-    async def start_pairing(self, name: str) -> str:
-        """Ask the TV to show a pairing code; returns the pairing request ID."""
-        reply = await self._request("POST", "/api/pair", {"name": name}, auth=False)
+    async def start_pairing(self, name: str, server: str | None = None) -> str:
+        """Ask the TV to show a pairing code; returns the pairing request ID.
+
+        `server` is this Home Assistant's instance ID: Luma uses it to give back how the
+        owner arranged this server's cameras when it pairs again.
+        """
+        payload = {"name": name}
+        if server:
+            payload["server"] = server
+        reply = await self._request("POST", "/api/pair", payload, auth=False)
         return str(reply["pairing_id"])
 
     async def confirm_pairing(self, pairing_id: str, code: str) -> str:

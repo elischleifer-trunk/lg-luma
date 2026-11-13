@@ -1240,10 +1240,22 @@ fn run() -> Result<(), String> {
                     continue;
                 }
                 home_assistant::Event::PairingCode(code) => {
-                    language.format("homeAssistantCode", &[("code", &code)])
+                    let notice = language.format("homeAssistantCode", &[("code", &code)]);
+                    if state.home_assistant_pairing(code) {
+                        continue;
+                    }
+                    notice
+                }
+                home_assistant::Event::PairingEnded => {
+                    state.home_assistant_pairing_ended();
+                    continue;
                 }
                 home_assistant::Event::Paired(name) => {
-                    language.format("homeAssistantPaired", &[("name", &name)])
+                    let notice = language.format("homeAssistantPaired", &[("name", &name)]);
+                    if state.home_assistant_paired_with(name) {
+                        continue;
+                    }
+                    notice
                 }
                 home_assistant::Event::Failed(error) => {
                     eprintln!("Luma Home Assistant: {error}");

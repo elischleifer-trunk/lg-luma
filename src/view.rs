@@ -486,30 +486,70 @@ fn home_assistant_setup(out: &mut Scene, state: &State, assets: &Assets) {
         WHITE,
         true,
     );
+    // Home Assistant asked to pair: its code replaces the QR code until it pairs or expires.
+    let hint = if state.home_assistant_paired.is_some() {
+        "homeAssistantPairedHint"
+    } else if state.home_assistant_code.is_some() {
+        "homeAssistantPairingHint"
+    } else {
+        "homeAssistantSetupHint"
+    };
     out.text(
-        language.t("homeAssistantSetupHint"),
+        language.t(hint),
         Rect::new(604., 264., 712., 32.),
         text(19., 400, 0.).leading(1.5),
         c(0xffffff, 0.65),
         true,
     );
-    match &state.home_assistant_qr {
-        Some(Ok(session)) => qr_code(out, assets, session, 310.),
-        _ => out.text(
-            language.t("homeAssistantFailed"),
-            Rect::new(604., 470., 712., 90.),
-            text(22., 450, 0.).leading(1.5),
-            c(0xffffff, 0.75),
+    if let Some(name) = &state.home_assistant_paired {
+        out.icon(assets, "check", Rect::new(920., 380., 80., 80.), WHITE);
+        let paired = language.format("homeAssistantPaired", &[("name", name)]);
+        out.text(
+            &paired,
+            Rect::new(568., 500., 784., 48.),
+            assets.fit_text(&paired, text(34., 600, -0.01), 784.),
+            WHITE,
             true,
-        ),
+        );
+    } else if let Some(code) = &state.home_assistant_code {
+        // Two groups of three digits read back more easily across a room.
+        let shown = match code.split_at_checked(3) {
+            Some((first, second)) => format!("{first} {second}"),
+            None => code.clone(),
+        };
+        out.text(
+            &shown,
+            Rect::new(520., 390., 880., 140.),
+            text(120., 600, 0.06),
+            WHITE,
+            true,
+        );
+        out.text(
+            language.t("homeAssistantPairingExpires"),
+            Rect::new(604., 560., 712., 32.),
+            text(19., 400, 0.).leading(1.5),
+            c(0xffffff, 0.65),
+            true,
+        );
+    } else {
+        match &state.home_assistant_qr {
+            Some(Ok(session)) => qr_code(out, assets, session, 310.),
+            _ => out.text(
+                language.t("homeAssistantFailed"),
+                Rect::new(604., 470., 712., 90.),
+                text(22., 450, 0.).leading(1.5),
+                c(0xffffff, 0.75),
+                true,
+            ),
+        }
+        out.text(
+            language.t("homeAssistantSetupNext"),
+            Rect::new(604., 670., 712., 60.),
+            text(19., 400, 0.).leading(1.5),
+            c(0xffffff, 0.65),
+            true,
+        );
     }
-    out.text(
-        language.t("homeAssistantSetupNext"),
-        Rect::new(604., 670., 712., 60.),
-        text(19., 400, 0.).leading(1.5),
-        c(0xffffff, 0.65),
-        true,
-    );
     if let Some(address) = &state.home_assistant_address {
         let address = language.format("homeAssistantListening", &[("address", address)]);
         out.text(
