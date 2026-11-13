@@ -200,7 +200,14 @@
   // VIDEO_STALL_MS, or shows nothing within VIDEO_WAIT_MS. `stop()` ends it without calling either.
   function playHls(element, url, onPlaying, onFail, options) {
     options = options || {};
-    var playback = { stopped: false, playing: false, hls: null, wait: null, watch: null };
+    var playback = {
+      stopped: false,
+      playing: false,
+      hls: null,
+      wait: null,
+      watch: null,
+      startedAt: null,
+    };
     var native = !!(element.canPlayType && element.canPlayType('application/vnd.apple.mpegurl'));
     function fail() {
       if (playback.stopped) return;
@@ -208,19 +215,37 @@
       playback.stop();
       onFail(wasPlaying);
     }
+    // Whichever player is trying gets the whole wait to show something.
+    function arm() {
+      clearTimeout(playback.wait);
+      playback.wait = setTimeout(function () {
+        if (!playback.playing) fail();
+      }, VIDEO_WAIT_MS);
+    }
+    // The other player takes over: progress is measured on its own timeline, with a fresh wait
+    // (the TV's player can need most of it to fetch whole segments).
+    function handOver() {
+      playback.startedAt = null;
+      arm();
+    }
     function withNative() {
       element.onerror = function () {
         element.onerror = null;
         if (playback.playing || options.hlsFirst) fail();
-        else withHlsJs();
+        else {
+          handOver();
+          withHlsJs();
+        }
       };
       element.src = url;
       start(element);
     }
     // hls.js going first hands over to the TV's player if it cannot play before anything shows.
     function nativeFallback() {
-      if (options.hlsFirst && native && !playback.playing) withNative();
-      else fail();
+      if (options.hlsFirst && native && !playback.playing) {
+        handOver();
+        withNative();
+      } else fail();
     }
     function withHlsJs() {
       loadHls(function (Hls) {
@@ -284,19 +309,16 @@
     if (options.settle) {
       // Shown once the video has advanced a little past its first frame: webOS shows hardware
       // video on a plane behind the page that is black until frames decode.
-      var startedAt = null;
       element.ontimeupdate = function () {
         if (playback.playing) return;
-        if (startedAt === null) startedAt = element.currentTime;
-        if (element.currentTime - startedAt >= VIDEO_SETTLE_S) began();
+        if (playback.startedAt === null) playback.startedAt = element.currentTime;
+        if (element.currentTime - playback.startedAt >= VIDEO_SETTLE_S) began();
       };
     } else {
       element.onplaying = began;
     }
     element.onended = fail;
-    playback.wait = setTimeout(function () {
-      if (!playback.playing) fail();
-    }, VIDEO_WAIT_MS);
+    arm();
     if (native && !options.hlsFirst) withNative();
     else withHlsJs();
     return playback;
