@@ -1,0 +1,121 @@
+{
+  "request": {
+    "path": "/3/tv/282345",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:16.742Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7ewD0UjgpQzxFFNvTAClitjlI4r.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2025-01-17",
+    "genres": [
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "https://okko.tv/serial/okhotniki-za-prizrakom",
+    "id": 282345,
+    "in_production": false,
+    "languages": [
+      "ru"
+    ],
+    "last_air_date": "2025-02-28",
+    "last_episode_to_air": {
+      "id": 5924255,
+      "name": "I will always be there",
+      "overview": "Zhenya, Lysy, and Andrey discover who the ghost was in life. To end it, they must destroy its remains.",
+      "vote_average": 8,
+      "vote_count": 1,
+      "air_date": "2025-02-28",
+      "episode_number": 8,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 44,
+      "season_number": 1,
+      "show_id": 282345,
+      "still_path": "/q82LZUjarezJOGpvdoCdYxl1TBJ.jpg"
+    },
+    "name": "Ghostbusters",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 3871,
+        "logo_path": "/pMy0zJmwHTsmR2mxLd4ifkOSq6h.png",
+        "name": "Okko",
+        "origin_country": "RU"
+      }
+    ],
+    "number_of_episodes": 8,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "RU"
+    ],
+    "original_language": "ru",
+    "original_name": "Охотники за призраком",
+    "overview": "A merciless ghost-killer, capable of possessing his victims, is haunting the city. While everyone around him remains skeptical of the mysticism, ghost hunters take up the case: former investigator Maxim, his strange mute partner, and a 14-year-old teenager named Zhenya, who accidentally joins them.",
+    "popularity": 1.3497,
+    "poster_path": "/wR6WN0xgZ5NIZIyxe1lLIYDa5oz.jpg",
+    "production_companies": [
+      {
+        "id": 69021,
+        "logo_path": "/aSB6HMp0WwENBz7LScQIVTF9K4Y.png",
+        "name": "LookFilm",
+        "origin_country": "RU"
+      },
+      {
+        "id": 152668,
+        "logo_path": "/mDODixuTMbK0TNFNvGqqXX6zqQX.png",
+        "name": "MC² Production",
+        "origin_country": "RU"
+      },
+      {
+        "id": 224758,
+        "logo_path": null,
+        "name": "Originals Production",
+        "origin_country": "RU"
+      },
+      {
+        "id": 175169,
+        "logo_path": "/qyqiYpqa9IWKfy48MSXTnquWYau.png",
+        "name": "Okko",
+        "origin_country": "RU"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "RU",
+        "name": "Russia"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2025-01-17",
+        "episode_count": 8,
+        "id": 438530,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/5ynwHn6pwwx3OzS9jS5HLCZsLSR.jpg",
+        "season_number": 1,
+        "vote_average": 7.9
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Russian",
+        "iso_639_1": "ru",
+        "name": "Pусский"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.8,
+    "vote_count": 4
+  }
+}

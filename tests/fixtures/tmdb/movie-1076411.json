@@ -1,0 +1,63 @@
+{
+  "request": {
+    "path": "/3/movie/1076411",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:23.398Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/oKD9vOceZ0OV18EcxdCz6AChAN3.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 1076411,
+    "imdb_id": "tt26629526",
+    "origin_country": [
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "La véritable histoire d'Amélie Poulain",
+    "overview": "The truth about the real Amélie Poulain is finally revealed.",
+    "popularity": 0.6513,
+    "poster_path": "/bYtJshi0pGm6ZE58WqdSD6tHH85.jpg",
+    "production_companies": [
+      {
+        "id": 1233,
+        "logo_path": null,
+        "name": "Tapioca Production",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "2023-01-15",
+    "revenue": 0,
+    "runtime": 7,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Amélie: The Real Story",
+    "video": false,
+    "vote_average": 5.2,
+    "vote_count": 4
+  }
+}

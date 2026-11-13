@@ -1,0 +1,80 @@
+{
+  "request": {
+    "path": "/3/movie/491392",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:43.960Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/zCv2stg4umSrRMwWcjk9FLOUqxM.jpg",
+    "belongs_to_collection": {
+      "id": 44937,
+      "name": "The Bodin’s Collection",
+      "poster_path": "/yOtOtd8EbWdBvMG2f7ZPSk3CgXR.jpg",
+      "backdrop_path": "/56fL43Dgyhj6qAvV0RR1SVsJ9LK.jpg"
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 491392,
+    "imdb_id": "tt1636727",
+    "origin_country": [
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "Amélie au pays des Bodin's",
+    "overview": "",
+    "popularity": 0.5984,
+    "poster_path": "/iX9O6PRtMBGHXOLBGCOYEHMtYLe.jpg",
+    "production_companies": [
+      {
+        "id": 2901,
+        "logo_path": null,
+        "name": "ADR Productions",
+        "origin_country": "FR"
+      },
+      {
+        "id": 11066,
+        "logo_path": null,
+        "name": "Agence BJP",
+        "origin_country": ""
+      },
+      {
+        "id": 107605,
+        "logo_path": null,
+        "name": "SND Films",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "2010-04-05",
+    "revenue": 0,
+    "runtime": 80,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Amélie au pays des Bodin's",
+    "video": false,
+    "vote_average": 6.9,
+    "vote_count": 15
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "request": {
+    "path": "/3/tv/314883",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.436Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "created_by": [],
+    "episode_run_time": [
+      5
+    ],
+    "first_air_date": "2025-09-01",
+    "genres": [
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 10762,
+        "name": "Kids"
+      }
+    ],
+    "homepage": "",
+    "id": 314883,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2025-09-01",
+    "last_episode_to_air": {
+      "id": 6978618,
+      "name": "Paradise Palms",
+      "overview": "Willow, Olive, and Poppy serve tropical dishes poolside - until a surprise swim turns their romantic cafe into a splashy, unforgettable family moment.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2025-09-01",
+      "episode_number": 10,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 5,
+      "season_number": 1,
+      "show_id": 314883,
+      "still_path": null
+    },
+    "name": "Bluey Fancy Restaurant",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1327,
+        "logo_path": "/yQrlu1TLTWLc4QSCsC1N7M7lGoz.png",
+        "name": "ABC iview",
+        "origin_country": "AU"
+      }
+    ],
+    "number_of_episodes": 10,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_name": "Bluey Fancy Restaurant",
+    "overview": "Inspired by Bluey's \"Fancy Restaurant\" kids transform their homes into themed restaurants to give their parents a romantic night, complete with creative menus, decorations, and sweet surprises.",
+    "popularity": 0.1346,
+    "poster_path": null,
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "AU",
+        "name": "Australia"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2025-09-01",
+        "episode_count": 10,
+        "id": 502176,
+        "name": "Season 1",
+        "overview": "Inspired by Bluey's \"Fancy Restaurant\" kids transform their homes into themed restaurants to give their parents a romantic night, complete with creative menus, decorations, and sweet surprises.",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Miniseries",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

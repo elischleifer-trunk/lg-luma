@@ -9,6 +9,9 @@ mod cameras;
 mod clock;
 mod companion;
 mod damage;
+// Not wired into the UI yet; remove once the search screen uses it.
+#[allow(dead_code)]
+mod deeplink;
 mod diagnostics;
 mod egl_damage;
 mod font;
@@ -16,6 +19,8 @@ mod home_assistant;
 mod i18n;
 #[path = "input-refresh.rs"]
 mod input_refresh;
+#[path = "key-editor.rs"]
+mod key_editor;
 #[cfg(all(feature = "webos", target_os = "linux", target_arch = "arm"))]
 mod luna;
 mod model;
@@ -30,9 +35,31 @@ mod sdl_events;
 mod signal_watch;
 mod state;
 mod storage;
+// Not wired into the UI yet; remove once the search screen uses it.
+#[allow(dead_code)]
+#[path = "motn-api.rs"]
+mod motn_api;
+#[allow(dead_code)]
+mod openapi;
+#[allow(dead_code)]
+mod relevance;
+#[allow(dead_code)]
+#[path = "search-cache.rs"]
+mod search_cache;
+#[allow(dead_code)]
+mod streaming;
+#[allow(dead_code)]
+#[path = "streaming-keys.rs"]
+mod streaming_keys;
+#[allow(dead_code)]
+#[path = "streaming-search.rs"]
+mod streaming_search;
 mod text_rendering;
 #[path = "tile-editor.rs"]
 mod tile_editor;
+#[allow(dead_code)]
+#[path = "tmdb-api.rs"]
+mod tmdb_api;
 mod update;
 mod vector;
 mod view;
@@ -720,6 +747,10 @@ fn run() -> Result<(), String> {
     let mut wallpaper_service =
         wallpapers::Service::new(&preferences_path, !webos && !options.script.is_empty())?;
     let mut tile_editor_service = tile_editor::Service::new(!webos && !options.script.is_empty())?;
+    let keys_path = streaming_keys::path(&preferences_path);
+    state.streaming_keys = streaming_keys::load(&keys_path).status();
+    let mut key_editor_service =
+        key_editor::Service::new(keys_path, !webos && !options.script.is_empty())?;
     if options.test_extra_apps > 0 {
         eprintln!(
             "Luma scroll preview: explicit {}-app expansion; preferences {}",
@@ -1096,6 +1127,37 @@ fn run() -> Result<(), String> {
                 _ => {}
             }
         }
+        key_editor_service.set_active(
+            focused && visible && matches!(state.overlay, Some(Overlay::StreamingKeys)),
+        );
+        while let Ok(event) = key_editor_service.receiver.try_recv() {
+            match event {
+                // Applied even after the dialog closed: the phone was already told it saved.
+                key_editor::Event::Saved(status) => {
+                    state.streaming_keys = status;
+                    state.notify(state.preferences.language.t("streamingKeysSaved"));
+                    state.dirty = true;
+                }
+                key_editor::Event::Session(generation, result)
+                    if generation == key_editor_service.generation()
+                        && matches!(state.overlay, Some(Overlay::StreamingKeys)) =>
+                {
+                    if let Err(error) = &result {
+                        eprintln!("Luma key editor: {error}");
+                    }
+                    state.key_editor = Some(result);
+                    state.dirty = true;
+                }
+                key_editor::Event::Ended(generation)
+                    if generation == key_editor_service.generation()
+                        && matches!(state.overlay, Some(Overlay::StreamingKeys)) =>
+                {
+                    state.back();
+                    state.notify(state.preferences.language.t("streamingKeysEnded"));
+                }
+                _ => {}
+            }
+        }
         state.dirty |= assets.artwork.poll();
         let unix = state::unix_now();
         let startup_cycle = wallpaper_cycle::startup_due(
@@ -1293,6 +1355,12 @@ fn run() -> Result<(), String> {
                     state.camera_video_closed(closed);
                     continue;
                 }
+                // Sent only when the keys changed, so a reconnect does not repeat the notice.
+                home_assistant::Event::StreamingKeys(status) => {
+                    state.streaming_keys = status;
+                    state.dirty = true;
+                    language.t("streamingKeysSaved").to_owned()
+                }
             };
             state.notify(notice);
         }
@@ -1439,12 +1507,17 @@ fn run() -> Result<(), String> {
                     WindowEvent::Hidden | WindowEvent::Minimized => {
                         if matches!(
                             state.overlay,
-                            Some(Overlay::WallpaperUpload | Overlay::TileEditor)
+                            Some(
+                                Overlay::WallpaperUpload
+                                    | Overlay::TileEditor
+                                    | Overlay::StreamingKeys
+                            )
                         ) {
                             state.back();
                         }
                         wallpaper_service.set_active(false);
                         tile_editor_service.set_active(false, &[]);
+                        key_editor_service.set_active(false);
                         visible = false;
                         focused = false;
                         press = None;
@@ -1458,12 +1531,17 @@ fn run() -> Result<(), String> {
                         if webos {
                             if matches!(
                                 state.overlay,
-                                Some(Overlay::WallpaperUpload | Overlay::TileEditor)
+                                Some(
+                                    Overlay::WallpaperUpload
+                                        | Overlay::TileEditor
+                                        | Overlay::StreamingKeys
+                                )
                             ) {
                                 state.back();
                             }
                             wallpaper_service.set_active(false);
                             tile_editor_service.set_active(false, &[]);
+                            key_editor_service.set_active(false);
                         }
                         focused = false;
                         press = None;

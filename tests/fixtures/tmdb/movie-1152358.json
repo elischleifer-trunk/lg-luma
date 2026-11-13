@@ -1,0 +1,93 @@
+{
+  "request": {
+    "path": "/3/movie/1152358",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:40.081Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/sBL1rrqndFDlwE0JqvCZU8eZTA4.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 14,
+        "name": "Fantasy"
+      }
+    ],
+    "homepage": "http://pierrot.jp/yuhaku25/",
+    "id": 1152358,
+    "imdb_id": "tt8768112",
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_title": "幽☆遊☆白書 TWO SHOTS/のるかそるか",
+    "overview": "Two Shots adapts the extra chapter of the same name, while All or Nothing adapts Chapter 174 of the same name and a scene of the final chapter of the manga, which also matches with the conclusion of the final episode of the anime series. Two Shots tells the story of how Kurama and Hiei met, while All or Nothing covers a story of the main characters coming back together to solve a hostage crisis in the spirit world.",
+    "popularity": 0.7593,
+    "poster_path": "/dGckPJgurYosaIAwWuFmDuZ9tQ.jpg",
+    "production_companies": [
+      {
+        "id": 136217,
+        "logo_path": "/dBYuplhBgeOsGPQOI0LukWNbFWE.png",
+        "name": "Bandai Namco Arts",
+        "origin_country": "JP"
+      },
+      {
+        "id": 3234,
+        "logo_path": "/wTPPnz05ZCQgEQVeSOxTkUCyhr5.png",
+        "name": "Pierrot",
+        "origin_country": "JP"
+      },
+      {
+        "id": 27716,
+        "logo_path": "/9Pp6m0fRqe86E7MOFaj1ZZiuuL1.png",
+        "name": "YOMIKO Advertising",
+        "origin_country": "JP"
+      },
+      {
+        "id": 2918,
+        "logo_path": "/gyEWUBWwqrm3H5T2hkERD9LxpOq.png",
+        "name": "Shueisha",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "release_date": "2018-10-26",
+    "revenue": 0,
+    "runtime": 29,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Yu Yu Hakusho - Two Shots / All or Nothing",
+    "video": false,
+    "vote_average": 5.7,
+    "vote_count": 3
+  }
+}

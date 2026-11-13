@@ -1,0 +1,128 @@
+{
+  "request": {
+    "path": "/3/tv/93097",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.229Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7OCAlRz13R9HZIbXTNUfyEAYyvf.jpg",
+    "created_by": [
+      {
+        "id": 2039962,
+        "credit_id": "5d6ac00d55c926001009675a",
+        "name": "Im Sang-choon",
+        "original_name": "임상춘",
+        "gender": 1,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      35
+    ],
+    "first_air_date": "2019-09-18",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "http://program.kbs.co.kr/2tv/drama/camellia2019/",
+    "id": 93097,
+    "in_production": false,
+    "languages": [
+      "ko"
+    ],
+    "last_air_date": "2019-11-21",
+    "last_episode_to_air": {
+      "id": 1986202,
+      "name": "Do Miracles Happen? (2)",
+      "overview": "Dongbaek and Yong-sik come to a sinking realization about the Joker, Gyu-tae goes after what he wants, and Jong-ryeol makes peace with Jessica.",
+      "vote_average": 9,
+      "vote_count": 1,
+      "air_date": "2019-11-21",
+      "episode_number": 40,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 35,
+      "season_number": 1,
+      "show_id": 93097,
+      "still_path": "/7ixNLEScK9IMk75C5iyo61gpPOc.jpg"
+    },
+    "name": "When the Camellia Blooms",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 342,
+        "logo_path": "/nFmWwUAf2D3iAtizUcmkxufaM0q.png",
+        "name": "KBS2",
+        "origin_country": "KR"
+      }
+    ],
+    "number_of_episodes": 40,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "KR"
+    ],
+    "original_language": "ko",
+    "original_name": "동백꽃 필 무렵",
+    "overview": "Dongbaek is a single mother. When a potential new love enters her life, she finds ways to defy the social stigmas surrounding her.",
+    "popularity": 10.2498,
+    "poster_path": "/bCrYA7xyHJtPnTWZU60pVBRSFZc.jpg",
+    "production_companies": [
+      {
+        "id": 10675,
+        "logo_path": "/4g8trWzgZLMZTjzRzJbt56DUg4E.png",
+        "name": "Pan Entertainment",
+        "origin_country": "KR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "KR",
+        "name": "South Korea"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2019-11-27",
+        "episode_count": 4,
+        "id": 150377,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-09-18",
+        "episode_count": 40,
+        "id": 131370,
+        "name": "Season 1",
+        "overview": "Dongbaek is a single mother. When a potential new love enters her life, she finds ways to defy the social stigmas surrounding her.",
+        "poster_path": "/3BWFr377FbszEv4IX4DCqaHFWv3.jpg",
+        "season_number": 1,
+        "vote_average": 7.1
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Korean",
+        "iso_639_1": "ko",
+        "name": "한국어/조선말"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "Now that I think about it, everything about my life was nothing but a miracle.",
+    "type": "Scripted",
+    "vote_average": 8.2,
+    "vote_count": 70
+  }
+}

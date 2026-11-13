@@ -1,0 +1,179 @@
+{
+  "request": {
+    "path": "/3/tv/63333",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:28.252Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/QbtctI8EzlhsyFDMUMyG3fli8B.jpg",
+    "created_by": [
+      {
+        "id": 1240815,
+        "credit_id": "561a877dc3a368630d0004fc",
+        "name": "Stephen Butchard",
+        "original_name": "Stephen Butchard",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      60,
+      50
+    ],
+    "first_air_date": "2015-10-10",
+    "genres": [
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10768,
+        "name": "War & Politics"
+      }
+    ],
+    "homepage": "https://www.netflix.com/title/80074249",
+    "id": 63333,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2022-03-09",
+    "last_episode_to_air": {
+      "id": 3584616,
+      "name": "Episode 10",
+      "overview": "Armies converge in an epic, final showdown that determines the fate of a king's dream for England — and Uhtred's hope of securing his family's future.",
+      "vote_average": 9,
+      "vote_count": 24,
+      "air_date": "2022-03-09",
+      "episode_number": 10,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 56,
+      "season_number": 5,
+      "show_id": 63333,
+      "still_path": "/yAafXX6P0TmN9UJQFfMTvqjBOkK.jpg"
+    },
+    "name": "The Last Kingdom",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 213,
+        "logo_path": "/wwemzKWzjKYJFfCeiB57q3r4Bcm.png",
+        "name": "Netflix",
+        "origin_country": ""
+      },
+      {
+        "id": 332,
+        "logo_path": "/7HVPn1p2w1nC5oRKBehXVHpss7e.png",
+        "name": "BBC Two",
+        "origin_country": "GB"
+      }
+    ],
+    "number_of_episodes": 46,
+    "number_of_seasons": 5,
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_name": "The Last Kingdom",
+    "overview": "A show of heroic deeds and epic battles with a thematic depth that embraces politics, religion, warfare, courage, love, loyalty and our universal search for identity. Combining real historical figures and events with fictional characters, it is the story of how a people combined their strength under one of the most iconic kings of history in order to reclaim their land for themselves and build a place they call home.",
+    "popularity": 703.4088,
+    "poster_path": "/8eJf0hxgIhE6QSxbtuNCekTddy1.jpg",
+    "production_companies": [
+      {
+        "id": 6196,
+        "logo_path": "/nTHxXVnXL58M7jJGNFAjRTCRgyg.png",
+        "name": "Carnival Films",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2017-03-08",
+        "episode_count": 1,
+        "id": 113628,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/nPUUQd92HSgbiXLJodL5fcsEtqt.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2015-10-10",
+        "episode_count": 8,
+        "id": 68878,
+        "name": "Season 1",
+        "overview": "In Season 1, young Saxon noble Uhtred transforms into a warrior and seeks to regain the lands annexed by his cunning uncle.",
+        "poster_path": "/3YRcYKY1m3c2Y2b0IXQWs2RSEED.jpg",
+        "season_number": 1,
+        "vote_average": 8
+      },
+      {
+        "air_date": "2017-03-16",
+        "episode_count": 8,
+        "id": 77334,
+        "name": "Season 2",
+        "overview": "In season 2, while the bloody struggle between Saxons and Vikings engulfs the land, Uhtred sets out to avenge his slain family and reclaim his ancestral home.",
+        "poster_path": "/2zVx2TOMgMSuiVHv0Ma7f4H9T36.jpg",
+        "season_number": 2,
+        "vote_average": 8.2
+      },
+      {
+        "air_date": "2018-11-19",
+        "episode_count": 10,
+        "id": 111257,
+        "name": "Season 3",
+        "overview": "As Alfred's health weakens -- and with it his dream of a united England -- Uhtred must take command and confront a new threat, Danish warlord Sigrid.",
+        "poster_path": "/7ZTRAuWXq1amsMtVIAll6qB0Hc2.jpg",
+        "season_number": 3,
+        "vote_average": 8.2
+      },
+      {
+        "air_date": "2020-04-26",
+        "episode_count": 10,
+        "id": 145588,
+        "name": "Season 4",
+        "overview": "As Edward and Aethelflaed spar over the future of Mercia and their father's dream of a united England, Uhtred tries to recover his lost birthright.",
+        "poster_path": "/9DAuDj275Z8gPWKsV3QTihXmMtB.jpg",
+        "season_number": 4,
+        "vote_average": 8.2
+      },
+      {
+        "air_date": "2022-03-09",
+        "episode_count": 10,
+        "id": 219986,
+        "name": "Season 5",
+        "overview": "A fragile peace has reigned in England for years, but Uhtred believes that trouble is just over the horizon — and events soon confirm his suspicions.",
+        "poster_path": "/8eJf0hxgIhE6QSxbtuNCekTddy1.jpg",
+        "season_number": 5,
+        "vote_average": 8.1
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "England is born",
+    "type": "Scripted",
+    "vote_average": 8.254,
+    "vote_count": 2092
+  }
+}

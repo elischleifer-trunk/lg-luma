@@ -1,0 +1,94 @@
+{
+  "request": {
+    "path": "/3/tv/249145",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:20.734Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/bGXwtVYNDD34GodfCjqTEuleYM7.jpg",
+    "created_by": [
+      {
+        "id": 1313841,
+        "credit_id": "65f5829606f984017cc7ad69",
+        "name": "Streeter Seidell",
+        "original_name": "Streeter Seidell",
+        "gender": 2,
+        "profile_path": "/V4smSAxssqfk1kbnNp9dGx0PnN.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2008-05-28",
+    "genres": [],
+    "homepage": "https://www.dropout.tv/phantom-of-the-office",
+    "id": 249145,
+    "in_production": false,
+    "languages": [],
+    "last_air_date": "2013-05-24",
+    "last_episode_to_air": {
+      "id": 5213911,
+      "name": "Too Phantom Too Furious",
+      "overview": "The Phantom of the Office returns to his own haunts.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2013-05-24",
+      "episode_number": 18,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 4,
+      "season_number": 1,
+      "show_id": 249145,
+      "still_path": "/9R6rFbh0JQkKezYAa4CAZ4yhVwN.jpg"
+    },
+    "name": "Phantom of the Office",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 447,
+        "logo_path": "/qtOgRuzVgP8skW96UmIYSIj61f4.png",
+        "name": "CollegeHumor",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 18,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Phantom of the Office",
+    "overview": "The Phantom (Streeter Seidell) isn't here to make friends. He isn't here to work or haunt, either. Honestly, we think he's a freelance corporate loiterer.",
+    "popularity": 2.6499,
+    "poster_path": "/zCRbeOg1k7e6DpVPgm4FOemyTt4.jpg",
+    "production_companies": [
+      {
+        "id": 216446,
+        "logo_path": "/xSh7CDlNGLprGlA8z5LWz5LvciV.png",
+        "name": "Dropout",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "2008-05-28",
+        "episode_count": 18,
+        "id": 383872,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/gTNH9mL1RT8Vib8oVBV3QwVaeFN.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

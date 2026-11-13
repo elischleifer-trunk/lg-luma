@@ -1,0 +1,218 @@
+{
+  "request": {
+    "path": "/3/tv/17174",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:40.375Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/2FXDdIGjDhEoBkuFk5NhHWLd3VX.jpg",
+    "created_by": [
+      {
+        "id": 211681,
+        "credit_id": "5f31383cfcadb40034e4bee9",
+        "name": "Jim Howick",
+        "original_name": "Jim Howick",
+        "gender": 2,
+        "profile_path": "/1HzAboxM0ay7eed284VbSveG3ku.jpg"
+      },
+      {
+        "id": 1236982,
+        "credit_id": "5f31384ccdf2e6003a27b01c",
+        "name": "Ben Willbond",
+        "original_name": "Ben Willbond",
+        "gender": 2,
+        "profile_path": "/lPbG2095GBoUkmpw6A2IbiyEnjV.jpg"
+      },
+      {
+        "id": 114253,
+        "credit_id": "5f31382a1967570039ae74e3",
+        "name": "Simon Farnaby",
+        "original_name": "Simon Farnaby",
+        "gender": 2,
+        "profile_path": "/xslxzBfDYYHNFnAMWyjjxFUTlEk.jpg"
+      },
+      {
+        "id": 1405880,
+        "credit_id": "5f313844f1b5710035ea3ddc",
+        "name": "Laurence Rickard",
+        "original_name": "Laurence Rickard",
+        "gender": 2,
+        "profile_path": "/y2Hn3kX70wKduMMWdzd9eTOgMuT.jpg"
+      },
+      {
+        "id": 1238457,
+        "credit_id": "5f3138317739410036e7752b",
+        "name": "Martha Howe-Douglas",
+        "original_name": "Martha Howe-Douglas",
+        "gender": 1,
+        "profile_path": "/hk39eTYpKXAHJePNu0J6WBrCwR0.jpg"
+      },
+      {
+        "id": 1246784,
+        "credit_id": "5f31381fcdf2e6003924b117",
+        "name": "Mathew Baynton",
+        "original_name": "Mathew Baynton",
+        "gender": 2,
+        "profile_path": "/g3FnkjMKL5bsGQc0sEpuXFYK4u4.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2019-04-15",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "https://www.bbc.co.uk/programmes/m00049t9",
+    "id": 17174,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2023-11-10",
+    "last_episode_to_air": {
+      "id": 4743991,
+      "name": "Last Resort",
+      "overview": "Mike and Alison receive an incredible offer far beyond their expectations. They must make a decision, the result of which will change their lives forever.",
+      "vote_average": 5.6,
+      "vote_count": 8,
+      "air_date": "2023-11-10",
+      "episode_number": 6,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 29,
+      "season_number": 5,
+      "show_id": 17174,
+      "still_path": "/vqgG0K64k15D4NSkD4Z9Kh1vsWY.jpg"
+    },
+    "name": "Ghosts",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 4,
+        "logo_path": "/uJjcCg3O4DMEjM0xtno9OWFciRP.png",
+        "name": "BBC One",
+        "origin_country": "GB"
+      }
+    ],
+    "number_of_episodes": 30,
+    "number_of_seasons": 5,
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_name": "Ghosts",
+    "overview": "A cash-strapped young couple inherits a grand country house, only to find it is both falling apart and teeming with the ghosts of former inhabitants.",
+    "popularity": 16.5496,
+    "poster_path": "/3Xz4JtqISyVCKct96O94k4Mz5sU.jpg",
+    "production_companies": [
+      {
+        "id": 116893,
+        "logo_path": null,
+        "name": "Monumental Television",
+        "origin_country": "GB"
+      },
+      {
+        "id": 167845,
+        "logo_path": null,
+        "name": "Them There",
+        "origin_country": "GB"
+      },
+      {
+        "id": 3324,
+        "logo_path": "/dqT3yOTlfJRmtvk52Ccd1O6dZ0A.png",
+        "name": "BBC",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2020-12-23",
+        "episode_count": 27,
+        "id": 172199,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/xfNTSnGqxsQqJpngXcILhnwOkPb.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-04-15",
+        "episode_count": 6,
+        "id": 121963,
+        "name": "Series 1",
+        "overview": "Cash-strapped Alison and Mike think their dreams have come true when they inherit a grand country house, unaware that it's falling apart and teeming with the ghosts of former inhabitants...",
+        "poster_path": "/jP9C4znnGQPAwbncQxyyHiLlisi.jpg",
+        "season_number": 1,
+        "vote_average": 7.3
+      },
+      {
+        "air_date": "2020-09-21",
+        "episode_count": 6,
+        "id": 162217,
+        "name": "Series 2",
+        "overview": "Alison and Mike are trying to find a semi-harmonious routine with the ghostly housemates of Button House.",
+        "poster_path": "/x1BFxoaVGbCgHnqifhEVo320OAd.jpg",
+        "season_number": 2,
+        "vote_average": 7.4
+      },
+      {
+        "air_date": "2021-08-09",
+        "episode_count": 6,
+        "id": 204160,
+        "name": "Series 3",
+        "overview": "Alison and Mike are working hard to bring their new 'guest house' plans to fruition.",
+        "poster_path": "/3Xz4JtqISyVCKct96O94k4Mz5sU.jpg",
+        "season_number": 3,
+        "vote_average": 7.1
+      },
+      {
+        "air_date": "2022-09-23",
+        "episode_count": 6,
+        "id": 307748,
+        "name": "Series 4",
+        "overview": "Alison and Mike try to make a success of their humble B&B.",
+        "poster_path": "/s7dbxmhfVAJPzc89m6g246A81BL.jpg",
+        "season_number": 4,
+        "vote_average": 6.9
+      },
+      {
+        "air_date": "2023-10-06",
+        "episode_count": 6,
+        "id": 357613,
+        "name": "Series 5",
+        "overview": "",
+        "poster_path": "/l6qNooZeJISwgqpDwwQ3qChpNH3.jpg",
+        "season_number": 5,
+        "vote_average": 5.7
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "It's a live-in nightmare.",
+    "type": "Scripted",
+    "vote_average": 7.943,
+    "vote_count": 283
+  }
+}

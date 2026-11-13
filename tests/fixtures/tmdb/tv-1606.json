@@ -1,0 +1,194 @@
+{
+  "request": {
+    "path": "/3/tv/1606",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:15.014Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/dWhMavg03rBGM96JSQmiUGcj3WE.jpg",
+    "created_by": [
+      {
+        "id": 35155,
+        "credit_id": "52570e2819c295711402643c",
+        "name": "John Gray",
+        "original_name": "John Gray",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2005-09-23",
+    "genres": [
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 9648,
+        "name": "Mystery"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1606,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2010-05-21",
+    "last_episode_to_air": {
+      "id": 82661,
+      "name": "The Children's Parade",
+      "overview": "Jim's hospital is being haunted by the ghosts of kids from an abandoned polio ward in the early 1900’s. And the connection of Aidan, Melinda, the Shinies and the Shadows will come to a climax and Melinda and Jim will realize that they know almost nothing about Aiden's powers.",
+      "vote_average": 4,
+      "vote_count": 5,
+      "air_date": "2010-05-21",
+      "episode_number": 22,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 45,
+      "season_number": 5,
+      "show_id": 1606,
+      "still_path": "/f6esMQmnETLjsBN6L7bN4B6mu6e.jpg"
+    },
+    "name": "Ghost Whisperer",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 16,
+        "logo_path": "/wju8KhOUsR5y4bH9p3Jc50hhaLO.png",
+        "name": "CBS",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 107,
+    "number_of_seasons": 5,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Ghost Whisperer",
+    "overview": "Newlywed Melinda Gordon tries to help the dead communicate with loved ones, but sometimes the messages she receives are intense and confusing. Most of Melinda's efforts involve resolving conflicts that are preventing the spirits from passing over.",
+    "popularity": 50.4549,
+    "poster_path": "/9ZtGupUFaHhws7mOcwhNTtRpRHC.jpg",
+    "production_companies": [
+      {
+        "id": 19366,
+        "logo_path": "/vOH8dyQhLK01pg5fYkgiS31jlFm.png",
+        "name": "ABC Studios",
+        "origin_country": "US"
+      },
+      {
+        "id": 56469,
+        "logo_path": null,
+        "name": "Sander/Moses Productions",
+        "origin_country": "US"
+      },
+      {
+        "id": 9223,
+        "logo_path": "/40qzTBM38vokoWhLKurficZ5syV.png",
+        "name": "Paramount Television",
+        "origin_country": "US"
+      },
+      {
+        "id": 1081,
+        "logo_path": "/19kn4jVvpc3sAL3YpZNb3elhSMl.png",
+        "name": "CBS Studios",
+        "origin_country": "US"
+      },
+      {
+        "id": 1558,
+        "logo_path": "/wwaKUcOENHix2jxLfFBfNkCtOEQ.png",
+        "name": "Touchstone Television",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": null,
+        "episode_count": 33,
+        "id": 4421,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/lUtmHnE1SxI5RUgNhYe1ObSCz1.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2005-09-23",
+        "episode_count": 22,
+        "id": 4416,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/rbqOmSwTygUCkFz0T4jRFqsLk6u.jpg",
+        "season_number": 1,
+        "vote_average": 7.3
+      },
+      {
+        "air_date": "2006-09-22",
+        "episode_count": 22,
+        "id": 4417,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/6GupkoLNjTrHuLX1VBibPiWE6LQ.jpg",
+        "season_number": 2,
+        "vote_average": 7.6
+      },
+      {
+        "air_date": "2007-09-28",
+        "episode_count": 18,
+        "id": 4418,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/cXf7bRjkZPKSOT9aBGFm7BewmYk.jpg",
+        "season_number": 3,
+        "vote_average": 7.1
+      },
+      {
+        "air_date": "2008-10-03",
+        "episode_count": 23,
+        "id": 4419,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/8VZqNQA5fuIMxL9BnHlZ6vvPcVJ.jpg",
+        "season_number": 4,
+        "vote_average": 6.9
+      },
+      {
+        "air_date": "2009-09-25",
+        "episode_count": 22,
+        "id": 4420,
+        "name": "Season 5",
+        "overview": "The fifth and final season leaps five years into the future, where Melinda's son Aiden is already conversing with ghosts and her husband Jim has become a doctor.",
+        "poster_path": "/9pLQT83vE2Pyx5Zqv4CeINdp7ro.jpg",
+        "season_number": 5,
+        "vote_average": 6.9
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Canceled",
+    "tagline": "The dead are talking...and she is listening.",
+    "type": "Scripted",
+    "vote_average": 8.059,
+    "vote_count": 1934
+  }
+}

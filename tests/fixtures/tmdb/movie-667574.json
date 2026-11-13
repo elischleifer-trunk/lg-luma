@@ -1,0 +1,71 @@
+{
+  "request": {
+    "path": "/3/movie/667574",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.675Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/c8XIFuJCPTtTJdSRpqnUoMr6eK1.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 10770,
+        "name": "TV Movie"
+      }
+    ],
+    "homepage": "",
+    "id": 667574,
+    "imdb_id": "tt11518196",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Battle Star Wars",
+    "overview": "When the leader of the evil Coalition threatens to destroy a Rebel planet for its resources, his daughter will have no choice but to join the Rebel side and fight for what is right.",
+    "popularity": 0.6816,
+    "poster_path": "/ocA0ECiFoB4d1HITyEDQlLk7x84.jpg",
+    "production_companies": [
+      {
+        "id": 1311,
+        "logo_path": "/ic2bTizdzRLDVzAvN7MXdUg3WQV.png",
+        "name": "The Asylum",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2020-01-28",
+    "revenue": 0,
+    "runtime": 86,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Beyond ours stars the battle for the universe rages..",
+    "title": "Battle Star Wars",
+    "video": false,
+    "vote_average": 4.6,
+    "vote_count": 44
+  }
+}

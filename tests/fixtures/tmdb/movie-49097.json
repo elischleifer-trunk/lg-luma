@@ -1,0 +1,63 @@
+{
+  "request": {
+    "path": "/3/movie/49097",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:19.781Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/u3P1p4PbZrkU4RP6KA3k0Mtf6tp.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 99,
+        "name": "Documentary"
+      }
+    ],
+    "homepage": "",
+    "id": 49097,
+    "imdb_id": "tt0167319",
+    "origin_country": [
+      "PL"
+    ],
+    "original_language": "pl",
+    "original_title": "Urząd",
+    "overview": "The insane government bureaucracy at a state pension window.",
+    "popularity": 0.5769,
+    "poster_path": "/8eK9f7mfG2ZZVDvOlW97kF6JGp6.jpg",
+    "production_companies": [
+      {
+        "id": 21778,
+        "logo_path": "/pKaywrtWfuwLKmocmexmgYLsHhf.png",
+        "name": "Lodz Film School",
+        "origin_country": "PL"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "PL",
+        "name": "Poland"
+      }
+    ],
+    "release_date": "1966-01-01",
+    "revenue": 0,
+    "runtime": 6,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Polish",
+        "iso_639_1": "pl",
+        "name": "Polski"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Office",
+    "video": false,
+    "vote_average": 7.009,
+    "vote_count": 55
+  }
+}

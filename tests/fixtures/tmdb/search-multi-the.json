@@ -1,0 +1,478 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "the",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:32.341Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/jIArNHIekrCSVgdMbKPAXpPY03Y.jpg",
+        "id": 456,
+        "name": "The Simpsons",
+        "original_name": "The Simpsons",
+        "overview": "Set in Springfield, the average American town, the show focuses on the antics and everyday adventures of the Simpson family; Homer, Marge, Bart, Lisa and Maggie, as well as a virtual cast of thousands. Since the beginning, the series has been a pop culture icon, attracting hundreds of celebrities to guest star. The show has also made name for itself in its fearless satirical take on politics, media and American life in general.",
+        "poster_path": "/tf0CUEynk6GfmrlHIQKQ5mfFP5P.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          35
+        ],
+        "popularity": 1932.1709,
+        "first_air_date": "1989-12-17",
+        "softcore": false,
+        "vote_average": 8.028,
+        "vote_count": 11168,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/rJFqKcmMSttdNP58l0dVzY2NcTA.jpg",
+        "id": 5920,
+        "name": "The Mentalist",
+        "original_name": "The Mentalist",
+        "overview": "Patrick Jane, a former celebrity psychic medium, uses his razor sharp skills of observation and expertise at \"reading\" people to solve serious crimes with the California Bureau of Investigation.",
+        "poster_path": "/acYXu4KaDj1NIkMgObnhe4C4a0T.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          80,
+          18,
+          9648
+        ],
+        "popularity": 1335.3527,
+        "first_air_date": "2008-09-23",
+        "softcore": false,
+        "vote_average": 8.419,
+        "vote_count": 4995,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/lnVWmFvLv2pTZGsuAJytiqKu541.jpg",
+        "id": 253376,
+        "name": "The Girlfriend",
+        "original_name": "The Girlfriend",
+        "overview": "Laura has it all: a glittering career, a loving husband, and her precious son, Daniel. But her perfect life unravels when Daniel brings home Cherry, a girlfriend who changes everything. After a tense introduction, Laura becomes convinced Cherry is hiding something. Is she a manipulative social climber, or is Laura just paranoid? The truth is a matter of perspective.",
+        "poster_path": "/ktrp3tdZ5IQpFux4nLy8z70bt3n.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          9648
+        ],
+        "popularity": 699.5649,
+        "first_air_date": "2025-09-10",
+        "softcore": false,
+        "vote_average": 7.137,
+        "vote_count": 168,
+        "origin_country": [
+          "US",
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/9vMzIrMIncPmtalcxh1MOrgcE6C.jpg",
+        "id": 2316,
+        "name": "The Office",
+        "original_name": "The Office",
+        "overview": "The everyday lives of office employees in the Scranton, Pennsylvania branch of the fictional Dunder Mifflin Paper Company.",
+        "poster_path": "/7DJKHzAi83BmQrWLrYYOqcoKfhR.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 1944.6525,
+        "first_air_date": "2005-03-24",
+        "softcore": false,
+        "vote_average": 8.584,
+        "vote_count": 5703,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/gFkHcIh7iE5G0oVOgpmY8ONQjhl.jpg",
+        "id": 60735,
+        "name": "The Flash",
+        "original_name": "The Flash",
+        "overview": "After being struck by lightning, CSI investigator Barry Allen awakens from a nine-month coma to discover he has been  granted the gift of super speed.  Teaming up with S.T.A.R. Labs, Barry takes on the persona of The Flash, the Fastest  Man Alive, to protect his city.",
+        "poster_path": "/yZevl2vHQgmosfwUdVNzviIfaWS.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          10765
+        ],
+        "popularity": 1163.6659,
+        "first_air_date": "2014-10-07",
+        "softcore": false,
+        "vote_average": 7.738,
+        "vote_count": 11867,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8ZerYKvIaNUJZvAHXYTQu4qTwFw.jpg",
+        "id": 48866,
+        "name": "The 100",
+        "original_name": "The 100",
+        "overview": "100 years in the future, when the Earth has been abandoned due to radioactivity, the last surviving humans live on an ark orbiting the planet — but the ark won't last forever. So the repressive regime picks 100 expendable juvenile delinquents to send down to Earth to see if the planet is still habitable.",
+        "poster_path": "/wHIMMLFsk32wIzDmawWkYVbxFCS.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10765,
+          10759,
+          18,
+          80
+        ],
+        "popularity": 707.7859,
+        "first_air_date": "2014-03-19",
+        "softcore": false,
+        "vote_average": 7.876,
+        "vote_count": 8882,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/QbtctI8EzlhsyFDMUMyG3fli8B.jpg",
+        "id": 63333,
+        "name": "The Last Kingdom",
+        "original_name": "The Last Kingdom",
+        "overview": "A show of heroic deeds and epic battles with a thematic depth that embraces politics, religion, warfare, courage, love, loyalty and our universal search for identity. Combining real historical figures and events with fictional characters, it is the story of how a people combined their strength under one of the most iconic kings of history in order to reclaim their land for themselves and build a place they call home.",
+        "poster_path": "/8eJf0hxgIhE6QSxbtuNCekTddy1.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          18,
+          10768
+        ],
+        "popularity": 703.4088,
+        "first_air_date": "2015-10-10",
+        "softcore": false,
+        "vote_average": 8.254,
+        "vote_count": 2092,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/cJYLon9ejKJV7ua03ab8Tj9u067.jpg",
+        "id": 18165,
+        "name": "The Vampire Diaries",
+        "original_name": "The Vampire Diaries",
+        "overview": "The story of two vampire brothers obsessed with the same girl, who bears a striking resemblance to the beautiful but ruthless vampire they knew and loved in 1864.",
+        "poster_path": "/aBkVgChtyyJaHyZh1gfd8DbzQon.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          10765
+        ],
+        "popularity": 1228.5641,
+        "first_air_date": "2009-09-10",
+        "softcore": false,
+        "vote_average": 8.297,
+        "vote_count": 9847,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/erljE3cOZ4eyISQunUYmKZ0q7cu.jpg",
+        "id": 2490,
+        "name": "The IT Crowd",
+        "original_name": "The IT Crowd",
+        "overview": "The comedic misadventures of Roy, Moss, and their grifting supervisor Jen, a 'motley crew' of IT support workers at a large corporation headed by a hotheaded yuppie.",
+        "poster_path": "/qtxL0ZLAZN1nd0kOpcu8V32bsU4.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 98.4135,
+        "first_air_date": "2006-02-03",
+        "softcore": false,
+        "vote_average": 8.173,
+        "vote_count": 1736,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/bk7QdAIUqkGpZO5GUX4AMB2AZIB.jpg",
+        "id": 82873,
+        "name": "The Kelly Clarkson Show",
+        "original_name": "The Kelly Clarkson Show",
+        "overview": "Kelly Clarkson presents the biggest newsmakers and names in film, television and music; as well as emerging new talent and everyday people who are beacons of hope in their communities.",
+        "poster_path": "/sBix25bie9UQFzbarN51DpFO5ky.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10767
+        ],
+        "popularity": 442.1625,
+        "first_air_date": "2019-09-09",
+        "softcore": false,
+        "vote_average": 6.227,
+        "vote_count": 75,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/bp30imMTFKAcxrZMi4hjBwY91A6.jpg",
+        "id": 3002,
+        "name": "The Benny Hill Show",
+        "original_name": "The Benny Hill Show",
+        "overview": "The Benny Hill Show is a British comedy television show that starred Benny Hill and aired in various incarnations between 15 January 1955 and 30 May 1991 in over 140 countries. The show focused on sketches that were full of slapstick, mime, parody, and double-entendre. Thames Television cancelled production of the show in 1989 due to declining ratings and large production costs at £450,000 per show.",
+        "poster_path": "/y3mGj6YAy7CRWMq06gjsXf3rIJ1.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 431.2815,
+        "first_air_date": "1969-11-19",
+        "softcore": false,
+        "vote_average": 7.219,
+        "vote_count": 185,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/twiVn9oFXOVR0uoYgawyEBlnFu8.jpg",
+        "id": 1368337,
+        "title": "The Odyssey",
+        "original_title": "The Odyssey",
+        "overview": "Odysseus, the legendary King of Ithaca, embarks on a long and perilous journey home following the Trojan War. Throughout his voyage, he is forced to confront the whims of gods, mythological monsters, and trials that stretch both his cunning and his humanity to the breaking point.",
+        "poster_path": "/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          12,
+          28,
+          14
+        ],
+        "popularity": 452.6652,
+        "release_date": "2026-07-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8,
+        "vote_count": 4748
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dxiQX78VYBhn44SA9lbahgs9eTo.jpg",
+        "id": 1791,
+        "name": "The Guardian",
+        "original_name": "The Guardian",
+        "overview": "Nick Fallin is a hotshot lawyer working at his father's ultrasuccessful Pittsburgh law firm. Unfortunately, the high life has gotten the best of Nick. Arrested for drug use, he's sentenced to do 1,500 hours of community service, somehow to be squeezed into his 24/7 cutthroat world of mergers, acquisitions and board meetings. Reluctantly, he's now The Guardian - a part-time child advocate at Legal Aid Services, where one case after another is an eye-opening instance of kids caught up in difficult circumstances.",
+        "poster_path": "/5USMJz2qw9QBd8yHpguYSz7RzKA.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18
+        ],
+        "popularity": 22.3784,
+        "first_air_date": "2001-09-25",
+        "softcore": false,
+        "vote_average": 6.983,
+        "vote_count": 60,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/AtcZyZizpGhofYumo1JrjuIFkXv.jpg",
+        "id": 82104,
+        "name": "The Order",
+        "original_name": "The Order",
+        "overview": "Out to avenge his mother's death, a college student pledges a secret order and lands in a war between werewolves and practitioners of dark magic.",
+        "poster_path": "/yMPjmuSd5Fac8YMNOwofGALQWjR.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          9648,
+          10765
+        ],
+        "popularity": 27.1947,
+        "first_air_date": "2019-03-07",
+        "softcore": false,
+        "vote_average": 7.596,
+        "vote_count": 949,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/hbz4aeVsjnKb2HRoFbbr46Egh8y.jpg",
+        "id": 1596275,
+        "title": "Drive - The Pretenders",
+        "original_title": "Drive – The Pretenders",
+        "overview": "A young mechanic fakes an engagement with racing's most scandalous star — officially for his reputation, secretly for her own shot behind the wheel. But soon the lie threatens to destroy everything — including what's already become so much more than just a deal.",
+        "poster_path": "/s9syckECnUYhKePQ1A0DC0mFVZ9.jpg",
+        "media_type": "movie",
+        "original_language": "de",
+        "genre_ids": [
+          10749,
+          53
+        ],
+        "popularity": 123.9977,
+        "release_date": "2026-10-27",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.599,
+        "vote_count": 171
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/hVRWuAY03KfLjjAbwmy9QhrfAPs.jpg",
+        "id": 84773,
+        "name": "The Lord of the Rings: The Rings of Power",
+        "original_name": "The Lord of the Rings: The Rings of Power",
+        "overview": "Beginning in a time of relative peace, we follow an ensemble cast of characters as they confront the re-emergence of evil to Middle-earth. From the darkest depths of the Misty Mountains, to the majestic forests of Lindon, to the breathtaking island kingdom of Númenor, to the furthest reaches of the map, these kingdoms and characters will carve out legacies that live on long after they are gone.",
+        "poster_path": "/bMXWXKM9ydUmMTNvDnYo9QtCBRt.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          10765
+        ],
+        "popularity": 776.7183,
+        "first_air_date": "2022-09-01",
+        "softcore": false,
+        "vote_average": 7.2,
+        "vote_count": 4059,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/cfT29Im5VDvjE0RpyKOSdCKZal7.jpg",
+        "id": 155,
+        "title": "The Dark Knight",
+        "original_title": "The Dark Knight",
+        "overview": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.",
+        "poster_path": "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          28,
+          53,
+          80
+        ],
+        "popularity": 135.3225,
+        "release_date": "2008-07-16",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.54,
+        "vote_count": 37354
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg",
+        "id": 79744,
+        "name": "The Rookie",
+        "original_name": "The Rookie",
+        "overview": "Starting over isn't easy, especially for small-town guy John Nolan who, after a life-altering incident, is pursuing his dream of being an LAPD officer. As the force's oldest rookie, he's met with skepticism from some higher-ups who see him as just a walking midlife crisis.",
+        "poster_path": "/70kTz0OmjjZe7zHvIDrq2iKW7PJ.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          80,
+          18,
+          35
+        ],
+        "popularity": 173.6267,
+        "first_air_date": "2018-10-16",
+        "softcore": false,
+        "vote_average": 8.5,
+        "vote_count": 3616,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/qLMfcvdCcCGD2BNLH8b6ZCBuO7D.jpg",
+        "id": 2224,
+        "name": "The Daily Show",
+        "original_name": "The Daily Show",
+        "overview": "The World's Fakest News Team tackle the biggest stories in news, politics and pop culture.",
+        "poster_path": "/ixcfyK7it6FjRM36Te4OdblAq4X.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10763,
+          35
+        ],
+        "popularity": 270.869,
+        "first_air_date": "1996-07-22",
+        "softcore": false,
+        "vote_average": 6.426,
+        "vote_count": 677,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/bauKfP3CX5JPAXpmveOlPG1pngC.jpg",
+        "id": 33880,
+        "name": "The Legend of Korra",
+        "original_name": "The Legend of Korra",
+        "overview": "Avatar Korra, a headstrong, rebellious, feisty young woman who continually challenges and breaks with tradition, is on her quest to become a fully realized Avatar. In this story, the Avatar struggles to find balance within herself.",
+        "poster_path": "/dZgYvSfuh1YHDrJuILlVQ5oA2hF.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10759,
+          10765
+        ],
+        "popularity": 126.2474,
+        "first_air_date": "2012-04-14",
+        "softcore": false,
+        "vote_average": 8.223,
+        "vote_count": 2499,
+        "origin_country": [
+          "US"
+        ]
+      }
+    ],
+    "total_pages": 500,
+    "total_results": 10000
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "request": {
+    "path": "/3/movie/682012",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:23.286Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/2WCpiFmRqXyu5y7WoZjEa3CJbiI.jpg",
+    "belongs_to_collection": null,
+    "budget": 11100000,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "https://gkids.com/films/little-amelie-or-the-character-of-rain",
+    "id": 682012,
+    "imdb_id": "tt29313285",
+    "origin_country": [
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "Amélie et la métaphysique des tubes",
+    "overview": "The world is a perplexing, peaceful mystery to Amélie until a miraculous encounter with chocolate ignites her wild sense of curiosity. As she develops a deep attachment to her family's housekeeper, Nishio-san, Amélie discovers the wonders of nature as well as the emotional truths hidden beneath the surface of her family's idyllic life as foreigners in post-war Japan.",
+    "popularity": 3.2624,
+    "poster_path": "/qoqDvTUVPoZJWw24AjGDt3J4tZN.jpg",
+    "production_companies": [
+      {
+        "id": 27350,
+        "logo_path": "/eb7RokgOJarHrvBD5G9QKE9seKr.png",
+        "name": "Maybe Movies",
+        "origin_country": "FR"
+      },
+      {
+        "id": 42210,
+        "logo_path": "/90jvlHsNtaFyft0LVMyw8cDBIQc.png",
+        "name": "2 Minutes",
+        "origin_country": "FR"
+      },
+      {
+        "id": 591,
+        "logo_path": "/q5I5RDwMEiqoNmfaJgd2LraEOJY.png",
+        "name": "France 3 Cinéma",
+        "origin_country": "FR"
+      },
+      {
+        "id": 271840,
+        "logo_path": null,
+        "name": "Puffin Pictures",
+        "origin_country": ""
+      },
+      {
+        "id": 156201,
+        "logo_path": null,
+        "name": "22D Music",
+        "origin_country": "FR"
+      },
+      {
+        "id": 94752,
+        "logo_path": "/cNg6uSRpzMeFDqlM2PpVVlZMhlK.png",
+        "name": "Ikki Films",
+        "origin_country": "FR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "2025-06-25",
+    "revenue": 1530750,
+    "runtime": 77,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      },
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Released",
+    "tagline": "When you're three years old, you see everything and understand nothing.",
+    "title": "Little Amélie or the Character of Rain",
+    "video": false,
+    "vote_average": 7.887,
+    "vote_count": 230
+  }
+}

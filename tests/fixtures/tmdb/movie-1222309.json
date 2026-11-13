@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/1222309",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:13.546Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.zee5.com/movies/details/gho-mala-asala-hawa/0-0-ghomalaasalahawa",
+    "id": 1222309,
+    "imdb_id": "tt1520485",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "mr",
+    "original_title": "घो मला असला हवा",
+    "overview": "Savitri, a young girl, revolts against the age-old custom of arranged marriages. Despite facing troubles, she manages to convince an entire village about the upshots of pre-planned matches.",
+    "popularity": 0.4185,
+    "poster_path": "/sAmU2Tmx5PfNQXEgOzZs19rNyU2.jpg",
+    "production_companies": [
+      {
+        "id": 216754,
+        "logo_path": null,
+        "name": "Vichitra Nirmiti Productions",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2009-02-20",
+    "revenue": 0,
+    "runtime": 120,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Marathi",
+        "iso_639_1": "mr",
+        "name": ""
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Gho Mala Asala Hawa",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

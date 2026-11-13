@@ -1,0 +1,51 @@
+{
+  "request": {
+    "path": "/3/movie/1563251",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:19.152Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 1563251,
+    "imdb_id": null,
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_title": "The Office",
+    "overview": "Middle manager Norman is preparing an address to senior management. When an interview with his new boss leads to an awful misunderstanding, Norman finds himself naked in the wrong office with minutes to go until his presentation.",
+    "popularity": 0.6891,
+    "poster_path": "/s9V0Fn7dd9VAmyiwngmt76ttB6m.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "1996-07-02",
+    "revenue": 0,
+    "runtime": 30,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Office",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

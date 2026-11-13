@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Streaming search keys · Luma</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="app.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand"><img src="luma-mark.svg" alt="" /><span>luma</span></div>
+      </header>
+      <form id="keys">
+        <h1>Streaming search keys</h1>
+        <p class="intro">
+          Search on your TV finds where shows stream with Movie of the Night and ranks them with
+          TMDB. Keys are checked, then stored only on your TV.
+        </p>
+        <label class="field"
+          ><span>Movie of the Night API key</span
+          ><input
+            id="motn"
+            type="text"
+            maxlength="1024"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="motn-key-…"
+        /></label>
+        <p class="hint">
+          From the
+          <a href="https://www.movieofthenight.com/about/api" target="_blank" rel="noreferrer"
+            >Developers Platform</a
+          >, or a RapidAPI key for Streaming Availability.
+          <span id="motn-state"></span>
+        </p>
+        <button id="motn-remove" type="button" class="danger wide" hidden>
+          Remove Movie of the Night key
+        </button>
+        <label class="field"
+          ><span>TMDB API Read Access Token</span
+          ><input
+            id="tmdb"
+            type="text"
+            maxlength="1024"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="eyJ…"
+        /></label>
+        <p class="hint">
+          The long token under
+          <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noreferrer"
+            >TMDB → Settings → API</a
+          >, not the shorter API key.
+          <span id="tmdb-state"></span>
+        </p>
+        <button id="tmdb-remove" type="button" class="danger wide" hidden>Remove TMDB token</button>
+        <div class="actions">
+          <button id="save" type="submit" disabled>Check and save to TV</button>
+        </div>
+      </form>
+      <p id="status" role="status" aria-live="polite"></p>
+      <footer>Keys never leave your network except to the service they belong to.</footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/tv/304633",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:26.326Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/sTJzikC9XtZkOydO44sAmyeBWLo.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      3
+    ],
+    "first_air_date": "2025-10-03",
+    "genres": [
+      {
+        "id": 10762,
+        "name": "Kids"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "https://iview.abc.net.au/show/bluey-cookalongs/",
+    "id": 304633,
+    "in_production": true,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2025-10-03",
+    "last_episode_to_air": {
+      "id": 6650297,
+      "name": "Curry Quest Curry",
+      "overview": "When adventure calls, Scarlett and Parker embark on a curry quest, swapping their creation with grandparents Mimi and Gagi.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2025-10-03",
+      "episode_number": 10,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 3,
+      "season_number": 1,
+      "show_id": 304633,
+      "still_path": null
+    },
+    "name": "Bluey Cookalongs",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1327,
+        "logo_path": "/yQrlu1TLTWLc4QSCsC1N7M7lGoz.png",
+        "name": "ABC iview",
+        "origin_country": "AU"
+      }
+    ],
+    "number_of_episodes": 10,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "AU"
+    ],
+    "original_language": "en",
+    "original_name": "Bluey Cookalongs",
+    "overview": "Australian families in their kitchens, creating delicious memories with kid-safe knives, family recipes, and giggles. These cooking adventures celebrate the joy of making, sharing, and failing together.",
+    "popularity": 0.1426,
+    "poster_path": "/t3eirRLUSijWulibNUSnR7I1s9T.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "2025-10-03",
+        "episode_count": 10,
+        "id": 482891,
+        "name": "Series 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

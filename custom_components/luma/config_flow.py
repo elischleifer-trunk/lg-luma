@@ -7,18 +7,33 @@ from typing import Any
 from urllib.parse import urlparse
 
 import voluptuous as vol
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_HOST, CONF_PORT
+from homeassistant.core import callback
 from homeassistant.helpers import instance_id
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import (
+    TextSelector,
+    TextSelectorConfig,
+    TextSelectorType,
+)
 
 try:  # Home Assistant 2025.1+
     from homeassistant.helpers.service_info.ssdp import SsdpServiceInfo
 except ImportError:  # pragma: no cover - older releases
     from homeassistant.components.ssdp import SsdpServiceInfo
 
+from . import streaming_keys
 from .api import LumaApiError, LumaClient, LumaConnectionError, LumaError
-from .const import CONF_DEVICE_ID, CONF_TOKEN, DEFAULT_PORT, DOMAIN, WEBOSTV_DOMAIN
+from .const import (
+    CONF_DEVICE_ID,
+    CONF_MOTN_KEY,
+    CONF_TMDB_TOKEN,
+    CONF_TOKEN,
+    DEFAULT_PORT,
+    DOMAIN,
+    WEBOSTV_DOMAIN,
+)
 
 CONF_CODE = "code"
 
@@ -34,6 +49,11 @@ class LumaConfigFlow(ConfigFlow, domain=DOMAIN):
         self._title: str | None = None
         self._device_id: str | None = None
         self._pairing_id: str | None = None
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> LumaOptionsFlow:
+        return LumaOptionsFlow()
 
     def _client(self, token: str | None = None) -> LumaClient:
         assert self._host
@@ -181,4 +201,45 @@ class LumaConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="reauth_confirm",
             description_placeholders={"name": self._title or self._host or ""},
+        )
+
+
+SECRET = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
+
+
+class LumaOptionsFlow(OptionsFlow):
+    """Streaming search keys. Saving pushes them to the TV (see __init__.py)."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
+        current = self.config_entry.options
+        if user_input is not None:
+            motn, tmdb = streaming_keys.keys(user_input)
+            old_motn, old_tmdb = streaming_keys.keys(current)
+            # Only keys that changed are checked, so saving again costs no API calls.
+            errors = await streaming_keys.check(
+                self.hass,
+                motn if motn != old_motn else "",
+                tmdb if tmdb != old_tmdb else "",
+            )
+            if not errors:
+                return self.async_create_entry(
+                    data={**current, CONF_MOTN_KEY: motn, CONF_TMDB_TOKEN: tmdb}
+                )
+        values = user_input or current
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_MOTN_KEY,
+                        description={"suggested_value": values.get(CONF_MOTN_KEY, "")},
+                    ): SECRET,
+                    vol.Optional(
+                        CONF_TMDB_TOKEN,
+                        description={"suggested_value": values.get(CONF_TMDB_TOKEN, "")},
+                    ): SECRET,
+                }
+            ),
+            errors=errors,
         )

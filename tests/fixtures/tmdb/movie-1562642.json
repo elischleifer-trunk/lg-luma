@@ -1,0 +1,85 @@
+{
+  "request": {
+    "path": "/3/movie/1562642",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:13.655Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/ggqvhSdAASrseKuMlzk51sbvbE8.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "https://ghostsoldier.movie",
+    "id": 1562642,
+    "imdb_id": "tt38686316",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Ghost Soldier",
+    "overview": "Henry “Fitz” Fitzgerald has spent years living quietly off the grid, hiding from a past few people know anything about. But when a powerful foreign corporation moves into his hometown to seize his neighbors’ land for a massive payday, Fitz is forced to reveal who he really is: a former Special Forces soldier and advanced weapons developer. Armed with experimental technology, lethal combat skills, and an unwavering code of justice, Fitz wages a one-man war against an enemy that never saw him coming.",
+    "popularity": 120.5826,
+    "poster_path": "/8Y4oJ5iUs3hgPcDB3SIEmsNYjZk.jpg",
+    "production_companies": [
+      {
+        "id": 5,
+        "logo_path": "/71BqEFAF4V3qjjMPCpLuyJFB9A.png",
+        "name": "Columbia Pictures",
+        "origin_country": "US"
+      },
+      {
+        "id": 551,
+        "logo_path": "/jSlzEZZ4Z1g7B2UExjZEIKsUvD9.png",
+        "name": "Mandalay Pictures",
+        "origin_country": "US"
+      },
+      {
+        "id": 130448,
+        "logo_path": "/yHWTTGKbOGZKUd1cp6l3uLyDeiv.png",
+        "name": "Project X Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 22213,
+        "logo_path": "/qx9K6bFWJupwde0xQDwOvXkOaL8.png",
+        "name": "TSG Entertainment",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2026-11-06",
+    "revenue": 0,
+    "runtime": 90,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Heaven sent. Hell to pay.",
+    "title": "Ghost Soldier",
+    "video": false,
+    "vote_average": 9.1,
+    "vote_count": 9
+  }
+}

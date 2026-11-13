@@ -1,0 +1,73 @@
+{
+  "request": {
+    "path": "/3/movie/114564",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:13.432Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/62pNpSI2Pq7ZnLXifKKKuhAoArR.jpg",
+    "belongs_to_collection": null,
+    "budget": 380000,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 114564,
+    "imdb_id": "tt2321513",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "mr",
+    "original_title": "शिक्षणाच्या आयचा घो!",
+    "overview": "Shrinivas feels pressurised by his father's constant endeavours to make him the brightest student. This, in turn, affects their relationship, eventually leading to disastrous consequences.",
+    "popularity": 0.3967,
+    "poster_path": "/xWMwKTKnqCz1rYaOzWgjTgqqZiC.jpg",
+    "production_companies": [
+      {
+        "id": 12902,
+        "logo_path": null,
+        "name": "Satya Films",
+        "origin_country": "IN"
+      },
+      {
+        "id": 215562,
+        "logo_path": null,
+        "name": "Everest Entertainment",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2010-01-15",
+    "revenue": 520000,
+    "runtime": 103,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Marathi",
+        "iso_639_1": "mr",
+        "name": ""
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Shikshanachya Aaicha Gho!",
+    "video": false,
+    "vote_average": 5.3,
+    "vote_count": 7
+  }
+}

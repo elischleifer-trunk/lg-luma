@@ -1,0 +1,118 @@
+{
+  "request": {
+    "path": "/3/movie/782054",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.627Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/iflKt34Ck2JpY2PY9wW1zwdJgJi.jpg",
+    "belongs_to_collection": {
+      "id": 148065,
+      "name": "Doraemon Movies",
+      "poster_path": "/4TLSP1KD1uAlp2q1rTrc6SFlktX.jpg",
+      "backdrop_path": "/ii3bjKdqurBH8OZAGnKyfsZTde7.jpg"
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 14,
+        "name": "Fantasy"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://doraeiga.com/2021/",
+    "id": 782054,
+    "imdb_id": "tt13740078",
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_title": "映画ドラえもん のび太の宇宙小戦争 2021",
+    "overview": "During summer vacation Nobita picks up a small rocket containing Papi, a palm-sized alien president escaping rebels on his home planet Pirika.",
+    "popularity": 2.8327,
+    "poster_path": "/u5sFU0Uw3qtFOeWNvnhLAt9JzbA.jpg",
+    "production_companies": [
+      {
+        "id": 5141,
+        "logo_path": "/fK2QKfHdSdw42Xx4MiD7KhDufBV.png",
+        "name": "Shin-Ei Animation",
+        "origin_country": "JP"
+      },
+      {
+        "id": 15329,
+        "logo_path": "/syX05FyAOUjs618Q3bMlDhIjgwE.png",
+        "name": "Fujiko Productions",
+        "origin_country": "JP"
+      },
+      {
+        "id": 9149,
+        "logo_path": "/isLUpud9N56ifftJZ4XvzwBBpoG.png",
+        "name": "Shogakukan",
+        "origin_country": "JP"
+      },
+      {
+        "id": 9300,
+        "logo_path": "/9sSD1XufVCJWAadNiC9Mwu994VD.png",
+        "name": "TV Asahi",
+        "origin_country": "JP"
+      },
+      {
+        "id": 173235,
+        "logo_path": "/nkfGU0YSf1O1tTVBwyaDkE7yBCv.png",
+        "name": "ADK Emotions",
+        "origin_country": "JP"
+      },
+      {
+        "id": 12655,
+        "logo_path": "/dfGqf2NoMVPrDywDL90D5HAhBlW.png",
+        "name": "Shogakukan-Shueisha Productions",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "release_date": "2022-03-04",
+    "revenue": 22044058,
+    "runtime": 108,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Doraemon the Movie: Nobita's Little Star Wars 2021",
+    "video": false,
+    "vote_average": 6.6,
+    "vote_count": 134
+  }
+}

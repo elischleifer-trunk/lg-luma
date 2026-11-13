@@ -1,0 +1,115 @@
+{
+  "request": {
+    "path": "/3/movie/271683",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:43.364Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/3HpMbtAvtxn2CWlKHWi5lM8jVGC.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "http://www.le-pacte.com/international/library/single/the-dune/",
+    "id": 271683,
+    "imdb_id": "tt2251648",
+    "origin_country": [
+      "IL",
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "La dune",
+    "overview": "Through the course of several accidents and chance encounters, Hanoch and Ruben will meet and each of them will have to face a page of his personal history, a page that they both need to turn for good.",
+    "popularity": 0.5313,
+    "poster_path": "/qNnFzvRyXk0FkHOGuxS4jWqj1vO.jpg",
+    "production_companies": [
+      {
+        "id": 2426,
+        "logo_path": "/ebQiHrVpqSs93D3A6eEDy9OFO52.png",
+        "name": "Les Films du Poisson",
+        "origin_country": "FR"
+      },
+      {
+        "id": 30233,
+        "logo_path": "/4vLhnE0fxPiqm01waJBkeVVJF1j.png",
+        "name": "Cinémage",
+        "origin_country": "FR"
+      },
+      {
+        "id": 41258,
+        "logo_path": null,
+        "name": "Région Aquitaine",
+        "origin_country": ""
+      },
+      {
+        "id": 24477,
+        "logo_path": null,
+        "name": "Rabinovich Film Fund Cinema Project",
+        "origin_country": "IL"
+      },
+      {
+        "id": 15,
+        "logo_path": "/2GukAxjXAF3Qf4GosI6WzIgljL3.png",
+        "name": "Lama Films",
+        "origin_country": "PS"
+      },
+      {
+        "id": 11246,
+        "logo_path": "/4YZ5CQZkJa2FIKGtjLLoKhNOAIw.png",
+        "name": "La Région Île-de-France",
+        "origin_country": "FR"
+      },
+      {
+        "id": 310,
+        "logo_path": "/4Gp5A4YdjPBfsHT47ngHMaXWmb9.png",
+        "name": "CNC",
+        "origin_country": "FR"
+      },
+      {
+        "id": 65060,
+        "logo_path": null,
+        "name": "La Banque Postale Image",
+        "origin_country": "FR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      },
+      {
+        "iso_3166_1": "IL",
+        "name": "Israel"
+      }
+    ],
+    "release_date": "2014-08-13",
+    "revenue": 57993,
+    "runtime": 86,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hebrew",
+        "iso_639_1": "he",
+        "name": "עִבְרִית"
+      },
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Dune",
+    "video": false,
+    "vote_average": 5.5,
+    "vote_count": 21
+  }
+}

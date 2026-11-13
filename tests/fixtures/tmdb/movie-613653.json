@@ -1,0 +1,51 @@
+{
+  "request": {
+    "path": "/3/movie/613653",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:19.468Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [],
+    "homepage": "",
+    "id": 613653,
+    "imdb_id": "tt6097546",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Office",
+    "overview": "Joseph Minion's debut short film about a newly hired employee who gradually becomes disillusioned with life in the office and tries to transcend the alienation he feels.",
+    "popularity": 0.2125,
+    "poster_path": "/ufXsFbHqGQ9PNrtAvhvcaule8yi.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "1981-12-31",
+    "revenue": 0,
+    "runtime": 20,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Office",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

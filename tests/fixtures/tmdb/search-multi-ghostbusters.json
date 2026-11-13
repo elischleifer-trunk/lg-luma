@@ -1,0 +1,462 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "ghostbusters",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:31.451Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/c6yfABGVKuB5cjoOwdX4AJMlzUz.jpg",
+        "id": 620,
+        "title": "Ghostbusters",
+        "original_title": "Ghostbusters",
+        "overview": "After losing their university jobs, three parapsychologists start a ghost-catching business in New York City and uncover a supernatural threat that could destroy the world.",
+        "poster_path": "/7E8nLijS9AwwUEPu2oFYOVKhdFA.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          14
+        ],
+        "popularity": 11.6183,
+        "release_date": "1984-06-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.5,
+        "vote_count": 10152
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/gRMwBmDEhAVJu54Pwli5YKR0VOa.jpg",
+        "id": 18131,
+        "name": "Ghostbusters",
+        "original_name": "Ghostbusters",
+        "overview": "Jake Kong Jr. and Eddie Spencer Jr. are sons of the original Ghost Busters, and they work alongside Tracy the Gorilla (who also worked with their fathers). Together, they are dedicated to ridding the world of the evil ghost wizard Prime Evil and his cast of henchmen.",
+        "poster_path": "/eCFVXOKruQ5Rt5Pv87si2LcnmRU.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          9648,
+          16,
+          35,
+          10762
+        ],
+        "popularity": 9.815,
+        "first_air_date": "1986-09-08",
+        "softcore": false,
+        "vote_average": 6.8,
+        "vote_count": 86,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/vA0rSXM1gwpiefyJamQBvMbIb4B.jpg",
+        "id": 2286,
+        "name": "The Real Ghostbusters",
+        "original_name": "The Real Ghostbusters",
+        "overview": "The continuing adventures of paranormal investigators Dr. Peter Venkman, Dr. Egon Spengler, Dr. Ray Stantz, Winston Zeddemore, their secretary Janine Melnitz and their mascot ghost Slimer.",
+        "poster_path": "/kLquadlhGPfpKHkVNRgrq0tzHkL.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          16,
+          35,
+          10762,
+          10765,
+          10751
+        ],
+        "popularity": 27.0501,
+        "first_air_date": "1986-09-13",
+        "softcore": false,
+        "vote_average": 7.705,
+        "vote_count": 307,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/3KDHaahgXlUhmpXzoRZrLc7QSBM.jpg",
+        "id": 43074,
+        "title": "Ghostbusters",
+        "original_title": "Ghostbusters",
+        "overview": "Following a ghost invasion of Manhattan, paranormal enthusiasts Erin Gilbert and Abby Yates, nuclear engineer Jillian Holtzmann, and subway worker Patty Tolan band together to stop the otherworldly threat.",
+        "poster_path": "/wJmWliwXIgZOCCVOcGRBhce7xPS.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          28,
+          14,
+          35
+        ],
+        "popularity": 6.9417,
+        "release_date": "2016-07-14",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.345,
+        "vote_count": 6977
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/EnDlndEvw6Ptpp8HIwmRcSSNKQ.jpg",
+        "id": 425909,
+        "title": "Ghostbusters: Afterlife",
+        "original_title": "Ghostbusters: Afterlife",
+        "overview": "When single mom Callie and her two kids Trevor and Phoebe arrive in a small Oklahoma town, they begin to discover their connection to the original Ghostbusters and the secret legacy their grandfather left behind.",
+        "poster_path": "/sg4xJaufDiQl7caFEskBtQXfD4x.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          14,
+          35,
+          12
+        ],
+        "popularity": 10.456,
+        "release_date": "2021-11-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.291,
+        "vote_count": 5437
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6M7CuNytVXL57OjWf3u9cu1HUb2.jpg",
+        "id": 4793,
+        "name": "Extreme Ghostbusters",
+        "original_name": "Extreme Ghostbusters",
+        "overview": "Based on the blockbuster films, this action-packed animated series starts a decade after the original Ghostbusters saved New York City from ghosts, goblins and ghouls. All the guys have left town, except Egon, now teaching a Paranormal Studies class at the local university. But Zuul, the all-powerful demon, has awakened from hibernation to wreak havoc on the unsuspecting masses. Desperate to recruit a new team, Egon and the plucky Janine turn to four of his teenage students: Kylie, a genius with an encyclopedic knowledge of the occult; Eduardo, a hip slacker with a crush on Kylie; Garrett, a wheelchair-bound athlete with a hot temper; and Roland, a “gentle giant” mechanical whiz. It's only a matter of time before Egon, Janine, old pal Slimer and the “kids” band together to rid the city of the evildoers.",
+        "poster_path": "/7E3jimDtr5oNNM3NGf8MP8So3yp.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10759,
+          35,
+          10765,
+          10762
+        ],
+        "popularity": 9.5141,
+        "first_air_date": "1997-09-01",
+        "softcore": false,
+        "vote_average": 6.7,
+        "vote_count": 76,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/tgHO1DdnaS0xHcRxBHxE4kOQeIm.jpg",
+        "id": 2978,
+        "title": "Ghostbusters II",
+        "original_title": "Ghostbusters II",
+        "overview": "The discovery of a massive river of ectoplasm and a resurgence of spectral activity allows the staff of Ghostbusters to revive the business.",
+        "poster_path": "/iUZPi31KDP0n5ycpycEsvl51BdV.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          14
+        ],
+        "popularity": 7.4882,
+        "release_date": "1989-06-16",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.606,
+        "vote_count": 5088
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/5cCfqeUH2f5Gnu7Lh9xepY9TB6x.jpg",
+        "id": 967847,
+        "title": "Ghostbusters: Frozen Empire",
+        "original_title": "Ghostbusters: Frozen Empire",
+        "overview": "The Spengler family returns to where it all started - the iconic New York City firehouse - to team up with the original Ghostbusters, who've developed a top-secret research lab to take busting ghosts to the next level. But when the discovery of an ancient artifact unleashes an evil force, Ghostbusters new and old must join forces to protect their home and save the world from a second Ice Age.",
+        "poster_path": "/e1J2oNzSBdou01sUvriVuoYp0pJ.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          14,
+          12,
+          35
+        ],
+        "popularity": 9.1226,
+        "release_date": "2024-03-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.407,
+        "vote_count": 2378
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/napJI40XqbQ4wv5zgPbJlgboEAJ.jpg",
+        "id": 21871,
+        "name": "Slimer! and the Real Ghostbusters",
+        "original_name": "Slimer! and the Real Ghostbusters",
+        "overview": "Episodes feature the Ghostbusters as well as their secretary Janine. But the main star of this show is their pet ghost Slimer, who's joined by some new friends and some new enemies.",
+        "poster_path": "/tz66RkWHcjwR2c3nJWaDxgC4a1G.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          16,
+          10762,
+          35
+        ],
+        "popularity": 4.9732,
+        "first_air_date": "1988-09-10",
+        "softcore": false,
+        "vote_average": 7,
+        "vote_count": 19,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/7ewD0UjgpQzxFFNvTAClitjlI4r.jpg",
+        "id": 282345,
+        "name": "Ghostbusters",
+        "original_name": "Охотники за призраком",
+        "overview": "A merciless ghost-killer, capable of possessing his victims, is haunting the city. While everyone around him remains skeptical of the mysticism, ghost hunters take up the case: former investigator Maxim, his strange mute partner, and a 14-year-old teenager named Zhenya, who accidentally joins them.",
+        "poster_path": "/wR6WN0xgZ5NIZIyxe1lLIYDa5oz.jpg",
+        "media_type": "tv",
+        "original_language": "ru",
+        "genre_ids": [
+          10765
+        ],
+        "popularity": 1.3497,
+        "first_air_date": "2025-01-17",
+        "softcore": false,
+        "vote_average": 6.8,
+        "vote_count": 4,
+        "origin_country": [
+          "RU"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 772032,
+        "title": "Mexican Ghostbusters",
+        "original_title": "¡Mátenme porque me muero!",
+        "overview": "",
+        "poster_path": "/aotome5Cj4FTvE0qjwLWSETVjpx.jpg",
+        "media_type": "movie",
+        "original_language": "es",
+        "genre_ids": [
+          35,
+          27,
+          53,
+          14
+        ],
+        "popularity": 0.5436,
+        "release_date": "1991-01-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.8,
+        "vote_count": 6
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/65C4Lh939zyEv84mN1XXrE817s.jpg",
+        "id": 203680,
+        "name": "Ghostbusters: Night Shift",
+        "original_name": "Ghostbusters: Night Shift",
+        "overview": "New York City, 1994. Five years after the Ghostbusters took the Statue of Liberty for a walk, a new supernatural threat hits the Big Apple. Now, a group of young New Yorkers must suit up, face their fears, and bust some ghosts.",
+        "poster_path": "/x99qaKukvqr2RNaPJicvIIWBZs.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10765,
+          16,
+          35
+        ],
+        "popularity": 1.6658,
+        "first_air_date": "",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1225314,
+        "title": "Ghostbusters 1999",
+        "original_title": "Ghostbusters 1999",
+        "overview": "Documentary Interviews of the director and cast of the original Ghostbusters film",
+        "poster_path": "/pfqGiAfBFkehVRMCwQoDuzde76q.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          99
+        ],
+        "popularity": 0.3946,
+        "release_date": "1999-10-29",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.7,
+        "vote_count": 3
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 124374,
+        "name": "The Ghostbusters of East Finchley",
+        "original_name": "The Ghostbusters of East Finchley",
+        "overview": "A young man on a council estate becomes suspicious of his mother's employer and, with help from a friend and an Inland Revenue investigator, starts a tax fraud investigation, using the nickname 'Ghostbusters' ror their undercover work.",
+        "poster_path": null,
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "popularity": 2.0015,
+        "first_air_date": "1995-11-16",
+        "softcore": false,
+        "vote_average": 7,
+        "vote_count": 2,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1710594,
+        "title": "Real! A Ghostbusters Tale",
+        "original_title": "Real! A Ghostbusters Tale",
+        "overview": "",
+        "poster_path": "/b09Iwhli6T8GtEnrKUYIV0iBej5.jpg",
+        "media_type": "movie",
+        "original_language": "it",
+        "genre_ids": [],
+        "popularity": 0.6219,
+        "release_date": "2021-10-31",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/e9QXnG8IWYyjudoIAcdr2eu3pIf.jpg",
+        "id": 1289732,
+        "title": "Return Of The Ghostbusters",
+        "original_title": "Return Of The Ghostbusters",
+        "overview": "The Ghost Adventures crew return to tackle the terrors of the night.",
+        "poster_path": "/6RF6myhncd7KODguJZKZitOJCq8.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          28,
+          35,
+          878
+        ],
+        "popularity": 0.7098,
+        "release_date": "2007-10-31",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.5,
+        "vote_count": 2
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1646693,
+        "title": "Freddy vs. Ghostbusters",
+        "original_title": "Freddy vs. Ghostbusters",
+        "overview": "Every town has an Elm Street, and Denver is no exception. The man of your dreams crosses paths with the boys in gray--who will win the battle for 1980's supremacy? The nightmare is always the same: dirty brown hat, striped sweater, and a glove of razors. Neil is having a lot of trouble sleeping lately, and the terrors are getting worse. Fortunately, help soon arrives in the the form of an old friend",
+        "poster_path": "/xhVTKqj0TeW6FEiEWCi6vupzM1r.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "popularity": 0.336,
+        "release_date": "2004-03-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7,
+        "vote_count": 3
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1388011,
+        "title": "Ghostbusters Return",
+        "original_title": "Ghostbusters Return",
+        "overview": "A high school student short film project. Sequel to Ghostbusters: The Beginning.",
+        "poster_path": null,
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [],
+        "popularity": 0.04,
+        "release_date": "2017-04-27",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/oTWLcdVrcjDdf3Cp4zQyZ561Cex.jpg",
+        "id": 236426,
+        "title": "Cleanin' Up the Town: Remembering Ghostbusters",
+        "original_title": "Cleanin' Up the Town: Remembering Ghostbusters",
+        "overview": "The documentary that tells us the full story from where it all started through to the future of the \"Ghostbusters\" franchise.",
+        "poster_path": "/kcc6qTeofnrBYX84LbvLIeHzIf0.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          99
+        ],
+        "popularity": 1.1808,
+        "release_date": "2020-01-07",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.778,
+        "vote_count": 18
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1377658,
+        "title": "Ghostbusters: Family Edition",
+        "original_title": "Ghostbusters: Family Edition",
+        "overview": "A short film.",
+        "poster_path": null,
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          27,
+          35
+        ],
+        "popularity": 0.1107,
+        "release_date": "2024-10-26",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      }
+    ],
+    "total_pages": 2,
+    "total_results": 30
+  }
+}

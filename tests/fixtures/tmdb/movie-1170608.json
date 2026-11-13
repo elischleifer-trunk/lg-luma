@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/1170608",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:21.381Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/i5E9H7Ik0u61ylDDTbmUpTL3Yw.jpg",
+    "belongs_to_collection": {
+      "id": 726871,
+      "name": "Dune Collection",
+      "poster_path": "/lxIGYkpvYjLtYtZH684AQft0FhD.jpg",
+      "backdrop_path": "/fahk0Fu7VUUfK6IkTt1R3waOD9F.jpg"
+    },
+    "budget": 200000000,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      }
+    ],
+    "homepage": "https://www.dunemovie.com",
+    "id": 1170608,
+    "imdb_id": "tt31378509",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Dune: Part Three",
+    "overview": "Nearly two decades after he seized control of the Imperium, Paul Atreides is now a ruthless Emperor, and must face the consequences of his reign as old allies return, terrifying new threats emerge, and betrayal lurks in every shadow. Haunted by visions of Imperial collapse and the reappearance of his long-lost love, Paul is drawn into a sweeping conspiracy, with Chani at the heart of its unfolding mystery. As enemies close in, Paul must confront the true cost of power and the fate of those he loves the most.",
+    "popularity": 25.1497,
+    "poster_path": "/glt0v4I89rMWstDNCaFXc5SNyO1.jpg",
+    "production_companies": [
+      {
+        "id": 923,
+        "logo_path": "/5UQsZrfbfG2dYJbx8DxfoTr2Bvu.png",
+        "name": "Legendary Pictures",
+        "origin_country": "US"
+      },
+      {
+        "id": 6736,
+        "logo_path": "/cD0sxmCrppVSInHrOJn7B1dSFlm.png",
+        "name": "Image Nation Studios",
+        "origin_country": "AE"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      },
+      {
+        "iso_3166_1": "AE",
+        "name": "United Arab Emirates"
+      }
+    ],
+    "release_date": "2026-12-15",
+    "revenue": 0,
+    "runtime": 150,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Post Production",
+    "tagline": "The epic conclusion.",
+    "title": "Dune: Part Three",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

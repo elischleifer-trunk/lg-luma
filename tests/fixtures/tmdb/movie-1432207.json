@@ -1,0 +1,75 @@
+{
+  "request": {
+    "path": "/3/movie/1432207",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.865Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/mnk9eSwyzKSj31z9qkX3GAtsQmJ.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1432207,
+    "imdb_id": "tt36987417",
+    "origin_country": [
+      "IT"
+    ],
+    "original_language": "it",
+    "original_title": "Blue",
+    "overview": "Luce, a bright young student from a good family, falls for Loris, a reckless boy whose debts put them both in danger. She turns to Vittoria, a once-familiar friend now living in luxury, who convinces her to use erotic sites to pay off the debt. But, like dominos, every part of her life starts collapsing. The two girls won't leave until dawn, once Luce's debt is paid, but at what cost?",
+    "popularity": 6.972,
+    "poster_path": "/7twlevJFJzq2icPbIgKCeIrS9TB.jpg",
+    "production_companies": [
+      {
+        "id": 152885,
+        "logo_path": "/r5FrL52tTZ60Qdt7BNRRNP8Szws.png",
+        "name": "Camaleo Film",
+        "origin_country": "IT"
+      },
+      {
+        "id": 228664,
+        "logo_path": "/rKNzL97WA26KnyeUUycdJDggxLq.png",
+        "name": "PiperFilm",
+        "origin_country": "IT"
+      },
+      {
+        "id": 119525,
+        "logo_path": null,
+        "name": "Marche Film Commission",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IT",
+        "name": "Italy"
+      }
+    ],
+    "release_date": "2026-06-23",
+    "revenue": 0,
+    "runtime": 83,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Italian",
+        "iso_639_1": "it",
+        "name": "Italiano"
+      }
+    ],
+    "status": "Released",
+    "tagline": "One Room. One Night. A Thousand Pieces.",
+    "title": "Blue",
+    "video": false,
+    "vote_average": 6.8,
+    "vote_count": 5
+  }
+}

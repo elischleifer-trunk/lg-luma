@@ -1,0 +1,619 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "bluey",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:32.221Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/tWdNZ3xuFBhJ2ZoQ9vShNGHTb85.jpg",
+        "id": 82728,
+        "name": "Bluey",
+        "original_name": "Bluey",
+        "overview": "Bluey is an inexhaustible six year-old Blue Heeler dog, who loves to play and turns everyday family life into extraordinary adventures, developing her imagination as well as her mental, physical and emotional resilience.",
+        "poster_path": "/9p4pNoGcuyCfHcGWKNrTopqMWtq.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          35,
+          10751,
+          10762
+        ],
+        "popularity": 52.1513,
+        "first_air_date": "2018-10-01",
+        "softcore": false,
+        "vote_average": 8.579,
+        "vote_count": 759,
+        "origin_country": [
+          "AU"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/t6bAceQqyEFmEigfjjb9gaqm169.jpg",
+        "id": 256953,
+        "name": "Bluey Minisodes",
+        "original_name": "Bluey Minisodes",
+        "overview": "A collection of funny and sweet episodes featuring Bluey and her family and friends. This collection of every day moments introduces some new characters and games they have been playing together.",
+        "poster_path": "/xqHt3vc3iKnnp2yuMP2Y4RAZF1Q.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10751,
+          10762
+        ],
+        "popularity": 6.4943,
+        "first_air_date": "2024-06-16",
+        "softcore": false,
+        "vote_average": 8.204,
+        "vote_count": 49,
+        "origin_country": [
+          "AU"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/kTtNvqMal2GlK2YGsdvyyf8OZQf.jpg",
+        "id": 13869,
+        "name": "Bluey",
+        "original_name": "Bluey",
+        "overview": "At Melbourne's Russell Street Police Headquarters, Sgt. \"Bluey\" Hills, unable to work within the existing police squads, oversees Department B. They're assigned cases other departments could not readily solve by conventional means, with Hills applying his unconventional methods to bring about their resolution. Bluey's investigations are supported by newly assigned Gary Dawson, long-time cohort Monica Rourke, and undercover officer Reg Truscott, who spends his time ostensibly working as a small-time burglar, and supplying Bluey with information on the activities of local criminals.",
+        "poster_path": "/oAuJijwBiqzIUeLA06zRMPfdiqz.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          80
+        ],
+        "popularity": 3.8474,
+        "first_air_date": "1976-08-02",
+        "softcore": false,
+        "vote_average": 6.4,
+        "vote_count": 5,
+        "origin_country": [
+          "AU"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jUpYhGiBcFEEa9gCALfACW9fkHk.jpg",
+        "id": 1403836,
+        "title": "The Bluey Movie",
+        "original_title": "The Bluey Movie",
+        "overview": "On an action-packed day, a big surprise changes everything for Bluey and her family.",
+        "poster_path": "/6SumSGYgZClqPy8rjhJXRrScGlq.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          10751,
+          16,
+          35
+        ],
+        "popularity": 2.7274,
+        "release_date": "2027-08-04",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/znyGmKo8oDwODCmP6ZoD6z2Y3Ho.jpg",
+        "id": 257018,
+        "name": "Bluey Book Reads",
+        "original_name": "Bluey Book Reads",
+        "overview": "Bluey Book Reads offers fans a new way to experience their favourite Bluey storybooks, combining off-screen narration from global talent with visuals from Bluey storybooks and live action shots.",
+        "poster_path": "/qPr1v0YnRMzL4IL6S5ehRiWK4PF.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10762
+        ],
+        "popularity": 3.5466,
+        "first_air_date": "2024-02-13",
+        "softcore": false,
+        "vote_average": 10,
+        "vote_count": 1,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 413230,
+        "title": "Bluey",
+        "original_title": "Bluey",
+        "overview": "Bluey, an angry young woman trapped in a life of violence, meets a mystery mentor who could change everything. Bluey is a story of courage, heart and the fight for survival.",
+        "poster_path": "/tGtERHeboH3C30CZw0epnCzr8aO.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          18
+        ],
+        "popularity": 0.6134,
+        "release_date": "2015-06-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 9,
+        "vote_count": 1
+      },
+      {
+        "adult": false,
+        "id": 4157746,
+        "name": "Bluey",
+        "original_name": "Bluey",
+        "media_type": "person",
+        "popularity": 0.0989,
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1150850,
+            "title": "Girl Sunset Girl",
+            "original_title": "Girl Sunset Girl",
+            "overview": "",
+            "poster_path": null,
+            "media_type": "movie",
+            "original_language": "es",
+            "genre_ids": [
+              16
+            ],
+            "popularity": 0.0466,
+            "release_date": "2023-07-11",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/9odRU37ksPlXjRzVpQUAbgvSob5.jpg",
+        "id": 328337,
+        "name": "Bluey Compilations",
+        "original_name": "Bluey Compilations",
+        "overview": "In this series of compilations, Bluey uses her limitless energy to play games that unfold in hilarious ways, bringing her family and the whole neighborhood into her world of fun.",
+        "poster_path": "/gt5MDinPvpqLcMf6EjYLyUxyXfI.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          35,
+          10751,
+          10762
+        ],
+        "popularity": 1.3519,
+        "first_air_date": "2026-07-02",
+        "softcore": false,
+        "vote_average": 8.6,
+        "vote_count": 14,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 880966,
+        "title": "Bluey",
+        "original_title": "Bluey",
+        "overview": "An Aussie Horror Story, is the hilarious comedy flick inspired by the Australian TV shows taking the world by strom",
+        "poster_path": null,
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "popularity": 0.0952,
+        "release_date": "2021-01-20",
+        "softcore": false,
+        "video": true,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "id": 2676443,
+        "name": "Bluey Robinson",
+        "original_name": "Bluey Robinson",
+        "media_type": "person",
+        "popularity": 0.2518,
+        "gender": 2,
+        "known_for_department": "Acting",
+        "profile_path": "/wd7yL00Y4IJ47hqfawc88d4veB6.jpg",
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/rXSDDbT43pcTjppu1qTxs1cOwla.jpg",
+            "id": 536869,
+            "title": "Cats",
+            "original_title": "Cats",
+            "overview": "A tribe of cats called the Jellicles must decide yearly which one will ascend to the Heaviside Layer and come back to a new Jellicle life.",
+            "poster_path": "/aCNch5FmzT2WaUcY44925owIZXY.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              14,
+              35,
+              18
+            ],
+            "popularity": 3.6841,
+            "release_date": "2019-12-19",
+            "softcore": false,
+            "video": false,
+            "vote_average": 4.074,
+            "vote_count": 1068
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/7vonjNjQ272lz0rJYM31K8V7b2m.jpg",
+            "id": 226749,
+            "name": "The Librarians: The Next Chapter",
+            "original_name": "The Librarians: The Next Chapter",
+            "overview": "A Librarian from the past time travels to the present and finds himself stuck here. When he returns to his castle, which is now a museum, he inadvertently releases magic across the continent. He is given a new team to help him clean up the mess he made, forming a new team of Librarians.",
+            "poster_path": "/w2PhnfYgY1yjxnUc1M4Jp5CjXvD.jpg",
+            "media_type": "tv",
+            "original_language": "en",
+            "genre_ids": [
+              10759,
+              10765
+            ],
+            "popularity": 8.9489,
+            "first_air_date": "2025-05-25",
+            "softcore": false,
+            "vote_average": 6.6,
+            "vote_count": 57,
+            "origin_country": [
+              "US"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/c6NFVDZsJNCrXRThoFnCa7t3HV2.jpg",
+            "id": 553030,
+            "title": "Dirty God",
+            "original_title": "Dirty God",
+            "overview": "Jade is a young mother in the prime of her life when an acid attack leaves her severely burned. While her face has been reconstructed, her beauty is lost beneath the scars. Descending a self-destructive path with relationships crumbling, Jade must take drastic action to reclaim her life.",
+            "poster_path": "/jmbCoaki8csu4cfH9Pa8FuFQGmp.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              18
+            ],
+            "popularity": 0.3815,
+            "release_date": "2019-04-11",
+            "softcore": false,
+            "video": false,
+            "vote_average": 5.6,
+            "vote_count": 47
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 1604070,
+        "name": "Bluey Hill",
+        "original_name": "Bluey Hill",
+        "media_type": "person",
+        "popularity": 0.1081,
+        "gender": 0,
+        "known_for_department": "Directing",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/pMIIOovLyyCr8W5JFOqsSO8gK1r.jpg",
+            "id": 14698,
+            "title": "Suddenly, Last Summer",
+            "original_title": "Suddenly, Last Summer",
+            "overview": "The only son of wealthy widow Violet Venable dies while on vacation with his cousin Catherine. What the girl saw was so horrible that she went insane; now Mrs. Venable wants Catherine lobotomized to cover up the truth.",
+            "poster_path": "/igma0zn9J5srRvOMDRnxyUDQXJL.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              53,
+              18,
+              9648
+            ],
+            "popularity": 1.8102,
+            "release_date": "1959-12-22",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.3,
+            "vote_count": 331
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/fb9k7H14y7htb4VBYiaAlko689M.jpg",
+            "id": 29710,
+            "title": "Khartoum",
+            "original_title": "Khartoum",
+            "overview": "English General Charles George Gordon is appointed military governor of Anglo-Egyptian Sudan by the Prime Minister. Ordered to evacuate Egyptians from the Sudan, Gordon stays on to protect the people of Khartoum, who are under threat of being conquered by a Muslim army.",
+            "poster_path": "/lcqulOKVAPkyEbvvYtPYgVQazWD.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              36,
+              10752,
+              12
+            ],
+            "popularity": 1.8344,
+            "release_date": "1966-06-09",
+            "softcore": false,
+            "video": false,
+            "vote_average": 6.4,
+            "vote_count": 135
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/xUBfm1vfD7jboORRg71Vk98y1a5.jpg",
+            "id": 39262,
+            "title": "The Mummy's Shroud",
+            "original_title": "The Mummy's Shroud",
+            "overview": "Archaeologists discover the final resting place of a boy king, removing the remains to be exhibited in a museum. By disturbing the sarcophagus they unleash the forces of darkness. The Mummy has returned to discharge a violent retribution on the defilers as the curse that surrounds the tomb begins to come true. One by one the explorers are murdered until one of them discovers the ancient words that have the power to reduce the brutal killer to particles of dust.",
+            "poster_path": "/bHWIncz6asTzkBeQYO1KmxztS9v.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              27
+            ],
+            "popularity": 1.3322,
+            "release_date": "1967-03-15",
+            "softcore": false,
+            "video": false,
+            "vote_average": 5.418,
+            "vote_count": 61
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 1446323,
+        "name": "Bluey Richards",
+        "original_name": "Bluey Richards",
+        "media_type": "person",
+        "popularity": 0.182,
+        "gender": 0,
+        "known_for_department": "Production",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/gfUt1YfrHtSocgpc1fsdBkqO6Fz.jpg",
+            "id": 1393,
+            "name": "Not Going Out",
+            "original_name": "Not Going Out",
+            "overview": "Lee is a childish northerner who lives in a fancy penthouse apartment in London who goes through a variety of jobs such as a janitor and ice cream man, as well as attempting relationships with female flatmates. His best mate, Daily Mail reading, middle-class citizen Tim is always there to stop Lee from getting in trouble, or not? Mayhem is never far away with cleaner Barbara who has never done an honest day's work in her life.",
+            "poster_path": "/gRDWAJiWKOPQrxO6BzSwdnOgK4R.jpg",
+            "media_type": "tv",
+            "original_language": "en",
+            "genre_ids": [
+              35
+            ],
+            "popularity": 18.9696,
+            "first_air_date": "2006-10-06",
+            "softcore": false,
+            "vote_average": 7.5,
+            "vote_count": 80,
+            "origin_country": [
+              "GB"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 23270,
+            "title": "Russell Howard: Live",
+            "original_title": "Russell Howard: Live",
+            "overview": "Russell has been busy cementing his place as one of the hottest properties in comedy with his BBC6 Music show every Sunday, loads of Mock The Week and Never Mind The Buzzcocks on BBC2, Would I Lie To You? and Live At The Apollo on BBC1, Law of the Playground on Channel 4 and Tough Gig, The Brits and The British Comedy Awards on ITV! But it is on stage where Russell really storms it.",
+            "poster_path": "/2vaUS1n9AKoH0aiodvMu4GGmlis.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              35
+            ],
+            "popularity": 0.271,
+            "release_date": "2008-11-17",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.1,
+            "vote_count": 18
+          },
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 332992,
+            "title": "Selling Off Britain",
+            "original_title": "Selling Off Britain",
+            "overview": "Will Hutton presents an impassioned argument on the British economy, claiming that business leaders and politicians are selling off some of the nation's best companies for quick and easy profits, and that this is creating a dumbed-down, low-wage Britain. He reveals that in the past 10 years, 440billion of British firms have been sold to new overseas owners, illustrating a radical view of the economy that MPs rarely talk about, ranging from the takeover of Cadbury to the foreign-owned Thames Water.",
+            "poster_path": null,
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              99
+            ],
+            "popularity": 0.0719,
+            "release_date": "2015-03-21",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/1769Jfq5wu4TWNBIZBmbljdfFtW.jpg",
+        "id": 1553372,
+        "title": "Bluey: Turtleboy (Auslan)",
+        "original_title": "Bluey: Turtleboy (Auslan)",
+        "overview": "Bingo finds a toy turtle at the playground and wants to take him home, but Dad says it's not the done thing. (Auslan)",
+        "poster_path": "/puocjW2QIZazBJLH746hYjSsOVu.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [],
+        "popularity": 0.0835,
+        "release_date": "2022-06-16",
+        "softcore": false,
+        "video": true,
+        "vote_average": 10,
+        "vote_count": 1
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1036892,
+        "title": "Bluey au cinéma !",
+        "original_title": "Bluey au cinéma !",
+        "overview": "",
+        "poster_path": "/yyoIU5YmaI8C4NyPXLG4PBpy1My.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          16,
+          10751
+        ],
+        "popularity": 0.2903,
+        "release_date": "2022-10-19",
+        "softcore": false,
+        "video": true,
+        "vote_average": 7.1,
+        "vote_count": 5
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/fPZgb0hMZ679eXd3DYuNPyN2U5w.jpg",
+        "id": 331634,
+        "name": "Bluey Tunes",
+        "original_name": "Bluey Tunes",
+        "overview": "Get ready to dance, sing and groove because Bluey Tunes is here! Join Bluey, Bingo, Mum, Dad and friends in a musical adventure filled with fun and dance-worthy beats.  Bluey Tunes is the perfect way to enjoy your favourite Bluey songs like never before. So, turn up the volume, get your body moving and get ready for Bluey Tunes!",
+        "poster_path": "/iACtKMMP8ZZidn4XfycTd3OcEM4.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          10762
+        ],
+        "popularity": 0.2115,
+        "first_air_date": "2025-08-05",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "AU"
+        ]
+      },
+      {
+        "adult": false,
+        "id": 4158113,
+        "name": "Bluey Alegría",
+        "original_name": "Bluey Alegría",
+        "media_type": "person",
+        "popularity": 0.0125,
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": []
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/sTJzikC9XtZkOydO44sAmyeBWLo.jpg",
+        "id": 304633,
+        "name": "Bluey Cookalongs",
+        "original_name": "Bluey Cookalongs",
+        "overview": "Australian families in their kitchens, creating delicious memories with kid-safe knives, family recipes, and giggles. These cooking adventures celebrate the joy of making, sharing, and failing together.",
+        "poster_path": "/t3eirRLUSijWulibNUSnR7I1s9T.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10762,
+          10751
+        ],
+        "popularity": 0.1426,
+        "first_air_date": "2025-10-03",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "AU"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1741566,
+        "title": "Mickey+ Shorts: Mickey + Bluey",
+        "original_title": "Mickey+ Shorts: Mickey + Bluey",
+        "overview": "Mickey's friends and Bluey's family play musical statues.",
+        "poster_path": "/5qBeDx3zuSSEqS2IyRZKLmhivJQ.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [],
+        "popularity": 0.0651,
+        "release_date": "",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 328341,
+        "name": "Bluey Cake Off",
+        "original_name": "Bluey Cake Off",
+        "overview": "Join two famous friends as they go head to head in a playful baking adventure, each will have to follow instructions by baker Tigga Mac and try to recreate a delicious bake inspired by Bluey.\n\nFrom a longdog yule log to the recreation of the Heelers’ House, watch as the duo mix, decorate and mould their creations while sharing plenty of laughs along the way. Once all finished, Tigga will choose an honorary winner… but the real winner is having fun in the kitchen.",
+        "poster_path": "/uCIS7Q6jBdhjGHF43SJypUspom9.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [],
+        "popularity": 0.3473,
+        "first_air_date": "2026-06-24",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/e4jvAyz4xQoI5kyU4bYiLagBqce.jpg",
+        "id": 1453792,
+        "title": "Bluey's Big Play",
+        "original_title": "Bluey's Big Play",
+        "overview": "When Dad feels like a little bit of time out, Bluey and Bingo have other plans! Join them as they pull out all the games and tricks to get Dad off that bean bag.",
+        "poster_path": "/pPy4mwfqtpAM718RsRLNWLLeror.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          10751
+        ],
+        "popularity": 0.9024,
+        "release_date": "2025-04-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.8,
+        "vote_count": 4
+      }
+    ],
+    "total_pages": 3,
+    "total_results": 44
+  }
+}

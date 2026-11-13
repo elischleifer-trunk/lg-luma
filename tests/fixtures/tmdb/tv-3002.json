@@ -1,0 +1,323 @@
+{
+  "request": {
+    "path": "/3/tv/3002",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:32.715Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/bp30imMTFKAcxrZMi4hjBwY91A6.jpg",
+    "created_by": [
+      {
+        "id": 55879,
+        "credit_id": "56fd570e92514124c000025f",
+        "name": "Benny Hill",
+        "original_name": "Benny Hill",
+        "gender": 2,
+        "profile_path": "/i3Yw1laJhKw104a2lGtjDVVtHN8.jpg"
+      }
+    ],
+    "episode_run_time": [
+      60,
+      45
+    ],
+    "first_air_date": "1969-11-19",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 3002,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1989-05-01",
+    "last_episode_to_air": {
+      "id": 229184,
+      "name": "Tales of the Unexpected",
+      "overview": "1.Benny Quickies:  a. Where Is Granny Now?  b. Peeping Tom  c. Sex Life Of A Tiger  d. Eye Of The Beholder  e. Pepys's Diary\n\n2.Benny Quickies: Getting Away With It  a. Can You Lend Me $5  b. The Morgue  c. The Window Cleaner\n\n3.The Good Guys\n\n4.Marriage Guidance\n\n5.Benny Hill: A Single Life\n\n6.Hill's Angels: TV Shows Titles\n\n7.Tales of The Unexpected\n\n8.Hill's Angels: Happy Days\n\n9.The Bill\n\n10.Boon\n\n11.Benny Quickie: You're Next!\n\n12.School Master\n\n13.Hill's Little Angels: Gone Fishing\n\n14.Closing Chase",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1989-05-01",
+      "episode_number": 3,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 60,
+      "season_number": 19,
+      "show_id": 3002,
+      "still_path": null
+    },
+    "name": "The Benny Hill Show",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 9,
+        "logo_path": "/oz9pjTHnBUmlju8OkaTymhKbh6C.png",
+        "name": "ITV1",
+        "origin_country": "GB"
+      },
+      {
+        "id": 4,
+        "logo_path": "/uJjcCg3O4DMEjM0xtno9OWFciRP.png",
+        "name": "BBC One",
+        "origin_country": "GB"
+      },
+      {
+        "id": 117,
+        "logo_path": "/hEdI56n4EHSP6kto7BUPEOb6bqo.png",
+        "name": "Associated Television",
+        "origin_country": "GB"
+      }
+    ],
+    "number_of_episodes": 58,
+    "number_of_seasons": 19,
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_name": "The Benny Hill Show",
+    "overview": "The Benny Hill Show is a British comedy television show that starred Benny Hill and aired in various incarnations between 15 January 1955 and 30 May 1991 in over 140 countries. The show focused on sketches that were full of slapstick, mime, parody, and double-entendre. Thames Television cancelled production of the show in 1989 due to declining ratings and large production costs at £450,000 per show.",
+    "popularity": 431.2815,
+    "poster_path": "/y3mGj6YAy7CRWMq06gjsXf3rIJ1.jpg",
+    "production_companies": [
+      {
+        "id": 5846,
+        "logo_path": "/h9O2O30eqiYaNi8qRKclV2U4Wjw.png",
+        "name": "Thames Television",
+        "origin_country": "GB"
+      },
+      {
+        "id": 3324,
+        "logo_path": "/dqT3yOTlfJRmtvk52Ccd1O6dZ0A.png",
+        "name": "BBC",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": null,
+        "episode_count": 36,
+        "id": 9638,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1969-11-19",
+        "episode_count": 4,
+        "id": 9621,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/uUg003XdkrQs9jGXPRosFnTLw8b.jpg",
+        "season_number": 1,
+        "vote_average": 9
+      },
+      {
+        "air_date": "1970-10-28",
+        "episode_count": 5,
+        "id": 9619,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/uUg003XdkrQs9jGXPRosFnTLw8b.jpg",
+        "season_number": 2,
+        "vote_average": 8.3
+      },
+      {
+        "air_date": "1971-11-24",
+        "episode_count": 4,
+        "id": 9620,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/kO5KZxKx5HdfC7eBad2XXCG4KNh.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1972-10-25",
+        "episode_count": 4,
+        "id": 9628,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/kO5KZxKx5HdfC7eBad2XXCG4KNh.jpg",
+        "season_number": 4,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1973-12-05",
+        "episode_count": 4,
+        "id": 9623,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": "/kO5KZxKx5HdfC7eBad2XXCG4KNh.jpg",
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1975-01-08",
+        "episode_count": 3,
+        "id": 9631,
+        "name": "Season 6",
+        "overview": "",
+        "poster_path": "/adsLCO9H7No5jmCF1TbV7XqGBfV.jpg",
+        "season_number": 6,
+        "vote_average": 8
+      },
+      {
+        "air_date": "1975-12-17",
+        "episode_count": 4,
+        "id": 9626,
+        "name": "Season 7",
+        "overview": "",
+        "poster_path": "/adsLCO9H7No5jmCF1TbV7XqGBfV.jpg",
+        "season_number": 7,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1977-01-26",
+        "episode_count": 3,
+        "id": 9624,
+        "name": "Season 8",
+        "overview": "",
+        "poster_path": "/adsLCO9H7No5jmCF1TbV7XqGBfV.jpg",
+        "season_number": 8,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1978-05-30",
+        "episode_count": 1,
+        "id": 9629,
+        "name": "Season 9",
+        "overview": "",
+        "poster_path": "/kznPz0iK6Uy3FrrWPdRxTmexQHJ.jpg",
+        "season_number": 9,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1978-12-26",
+        "episode_count": 3,
+        "id": 9630,
+        "name": "Season 10",
+        "overview": "",
+        "poster_path": "/kznPz0iK6Uy3FrrWPdRxTmexQHJ.jpg",
+        "season_number": 10,
+        "vote_average": 9
+      },
+      {
+        "air_date": "1980-02-06",
+        "episode_count": 3,
+        "id": 9622,
+        "name": "Season 11",
+        "overview": "",
+        "poster_path": "/kznPz0iK6Uy3FrrWPdRxTmexQHJ.jpg",
+        "season_number": 11,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1981-01-07",
+        "episode_count": 3,
+        "id": 9627,
+        "name": "Season 12",
+        "overview": "",
+        "poster_path": "/kznPz0iK6Uy3FrrWPdRxTmexQHJ.jpg",
+        "season_number": 12,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1982-01-06",
+        "episode_count": 2,
+        "id": 9625,
+        "name": "Season 13",
+        "overview": "",
+        "poster_path": "/1X02B9aeItocWRORT6XAXnRGDZj.jpg",
+        "season_number": 13,
+        "vote_average": 8.5
+      },
+      {
+        "air_date": "1983-01-05",
+        "episode_count": 2,
+        "id": 9633,
+        "name": "Season 14",
+        "overview": "",
+        "poster_path": "/1X02B9aeItocWRORT6XAXnRGDZj.jpg",
+        "season_number": 14,
+        "vote_average": 7.5
+      },
+      {
+        "air_date": "1984-01-16",
+        "episode_count": 2,
+        "id": 9632,
+        "name": "Season 15",
+        "overview": "",
+        "poster_path": "/1X02B9aeItocWRORT6XAXnRGDZj.jpg",
+        "season_number": 15,
+        "vote_average": 9.5
+      },
+      {
+        "air_date": "1985-01-02",
+        "episode_count": 3,
+        "id": 9634,
+        "name": "Season 16",
+        "overview": "",
+        "poster_path": "/1X02B9aeItocWRORT6XAXnRGDZj.jpg",
+        "season_number": 16,
+        "vote_average": 7
+      },
+      {
+        "air_date": "1986-03-12",
+        "episode_count": 3,
+        "id": 9637,
+        "name": "Season 17",
+        "overview": "",
+        "poster_path": "/uya4Pf2MsALRAT4xCQE2cOmrt7A.jpg",
+        "season_number": 17,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1988-01-13",
+        "episode_count": 2,
+        "id": 9635,
+        "name": "Season 18",
+        "overview": "",
+        "poster_path": "/uya4Pf2MsALRAT4xCQE2cOmrt7A.jpg",
+        "season_number": 18,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1989-02-08",
+        "episode_count": 3,
+        "id": 9636,
+        "name": "Season 19",
+        "overview": "",
+        "poster_path": "/uya4Pf2MsALRAT4xCQE2cOmrt7A.jpg",
+        "season_number": 19,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.219,
+    "vote_count": 185
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "zzqxjvw",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  "capturedAt": "2026-11-13T20:26:54.081Z",
+  "response": []
+}

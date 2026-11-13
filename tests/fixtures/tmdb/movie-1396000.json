@@ -1,0 +1,63 @@
+{
+  "request": {
+    "path": "/3/movie/1396000",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:42.347Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1396000,
+    "imdb_id": "tt37315353",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "bn",
+    "original_title": "আপিস",
+    "overview": "Aapish follows two working women from different backgrounds, facing the same struggle, balancing home and work while being expected to sacrifice when problems arise. The story highlights how this cycle can be questioned and broken when support and understanding come into play.",
+    "popularity": 0.2513,
+    "poster_path": "/bduQjXfhVamYFaVTNddJmw6Eclb.jpg",
+    "production_companies": [
+      {
+        "id": 131949,
+        "logo_path": null,
+        "name": "Macneill Engineering Limited",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2025-06-13",
+    "revenue": 0,
+    "runtime": 104,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Bengali",
+        "iso_639_1": "bn",
+        "name": "বাংলা"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Office",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

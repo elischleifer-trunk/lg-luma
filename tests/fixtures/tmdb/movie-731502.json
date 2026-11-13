@@ -1,0 +1,65 @@
+{
+  "request": {
+    "path": "/3/movie/731502",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.249Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 14,
+        "name": "Fantasy"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      }
+    ],
+    "homepage": "",
+    "id": 731502,
+    "imdb_id": "tt0127569",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Filmation's Ghostbusters: The Revenge of Prime Evil",
+    "overview": "A squad of supernatural investigators are Earth's only defense against an evil ghost wizard and his minions.",
+    "popularity": 0.0476,
+    "poster_path": "/ia0tiIAYFl43elAd0YM7rf93qMX.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "1988-01-01",
+    "revenue": 0,
+    "runtime": 60,
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Released",
+    "tagline": "",
+    "title": "Filmation's Ghostbusters: The Revenge of Prime Evil",
+    "video": false,
+    "vote_average": 8,
+    "vote_count": 1
+  }
+}

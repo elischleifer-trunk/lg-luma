@@ -15,16 +15,17 @@
     "build": "sh tools/build-webos.sh",
     "package": "pnpm assets && pnpm build && node tools/package.mjs && node tools/repository.mjs",
     "deploy": "pnpm run package && node tools/deploy.mjs",
-    "test": "pnpm test:release && pnpm test:home && pnpm test:icons && pnpm test:wallpapers && pnpm test:tiles && pnpm test:overlay && cargo test --locked --workspace --all-features",
+    "test": "pnpm test:release && pnpm test:home && pnpm test:icons && pnpm test:wallpapers && pnpm test:tiles && pnpm test:keys && pnpm test:overlay && cargo test --locked --workspace --all-features",
     "test:release": "node --test tests/release.test.mjs",
     "test:home": "node --test tests/self-update.test.mjs tests/home-wrapper.test.mjs && cargo test --locked -p luma-tv-helper",
     "test:icons": "node --test tests/brand-assets.test.mjs",
     "test:wallpapers": "node --test tests/wallpaper-upload.test.mjs",
     "test:tiles": "node --test tests/tile-editor.test.mjs",
+    "test:keys": "node --test tests/key-editor.test.mjs",
     "test:overlay": "node --test tests/overlay.test.mjs",
     "test:smoke": "node tests/smoke.mjs && node tests/brands-smoke.mjs && node tests/weather-smoke.mjs && node tests/translations-smoke.mjs",
     "test:brands": "node tests/brands-smoke.mjs",
-    "check": "pnpm version:check && pnpm lint && cargo clippy --locked --workspace --all-targets --all-features -- -D warnings",
+    "check": "pnpm version:check && pnpm openapi --check && pnpm lint && cargo clippy --locked --workspace --all-targets --all-features -- -D warnings",
     "lint": "oxlint --deny-warnings .",
     "lint:fix": "oxlint --fix --deny-warnings .",
     "format": "cargo fmt --all && oxfmt --write .",
@@ -34,6 +35,9 @@
     "assets:vector": "node tools/vector-assets.mjs",
     "assets:brands": "node tools/brand-assets.mjs",
     "assets:fonts": "node tools/font-assets.mjs",
+    "fixtures:streaming": "node tools/streaming-fixtures.mjs",
+    "openapi": "node tools/openapi.mjs",
+    "deeplink:probe": "node tools/deeplink-probe.mjs",
     "runtime": "node tools/webos-runtime.mjs",
     "sdk": "node tools/setup-webos-sdk.mjs",
     "test:weather": "node tests/weather-smoke.mjs",
@@ -47,6 +51,7 @@
     "acorn": "8.18.0",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
-    "sharp": "0.35.5"
+    "sharp": "0.35.5",
+    "yaml": "2.9.1"
   }
 }

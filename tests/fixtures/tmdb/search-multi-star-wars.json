@@ -1,0 +1,489 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "star wars",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:31.558Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/zqkmTXzjkAgXmEWLRsY4UpTWCeo.jpg",
+        "id": 11,
+        "title": "Star Wars",
+        "original_title": "Star Wars",
+        "overview": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.",
+        "poster_path": "/fai0rspsNeJCS69wHNjOdWxcI7P.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          12,
+          28,
+          878
+        ],
+        "popularity": 31.8342,
+        "release_date": "1977-05-25",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.206,
+        "vote_count": 23164
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+        "id": 4194,
+        "name": "Star Wars: The Clone Wars",
+        "original_name": "Star Wars: The Clone Wars",
+        "overview": "Yoda, Obi-Wan Kenobi, Anakin Skywalker, Mace Windu and other Jedi Knights lead the Grand Army of the Republic against the droid army of the Separatists.",
+        "poster_path": "/e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          10765,
+          16
+        ],
+        "popularity": 71.0393,
+        "first_air_date": "2008-10-03",
+        "softcore": false,
+        "vote_average": 8.461,
+        "vote_count": 2467,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8BNjxMJMFp0BgqMh4PyuwZMXxh1.jpg",
+        "id": 60554,
+        "name": "Star Wars Rebels",
+        "original_name": "Star Wars Rebels",
+        "overview": "Set between the events of Star Wars: Episodes III and IV, the story unfolds during a dark time when the evil Galactic Empire is tightening its grip of power on the galaxy. Imperial forces have occupied a remote planet and are ruining the lives of its people. The motley but clever crew of the starship Ghost — cowboy Jedi Kanan, ace pilot Hera, street-smart teenager Ezra, the “muscle” Zeb, warrior firebrand Sabine, and cantankerous old astromech droid Chopper — is among a select few who are brave enough to stand against the Empire. Together, they will face threatening new villains, encounter colorful adversaries, embark on thrilling adventures, and become heroes with the power to ignite a rebellion.",
+        "poster_path": "/eLrScs6Bs26JMcS8hiZhf7YRROr.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          16,
+          10765
+        ],
+        "popularity": 31.9387,
+        "first_air_date": "2014-10-13",
+        "softcore": false,
+        "vote_average": 7.727,
+        "vote_count": 1056,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/m2QTmJhe36uKrkQjC1MsNV7Dcqp.jpg",
+        "id": 114478,
+        "name": "Star Wars: Visions",
+        "original_name": "Star Wars: Visions",
+        "overview": "This anthology of animated shorts from around the world celebrates the mythos of Star Wars through unique cultural lenses.",
+        "poster_path": "/lG9ltUP4FwvsQBcwOJYceDbP48E.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10765,
+          10759
+        ],
+        "popularity": 16.9542,
+        "first_air_date": "2021-09-22",
+        "softcore": false,
+        "vote_average": 7.089,
+        "vote_count": 503,
+        "origin_country": [
+          "JP",
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/Ad2y46YKP2u81bsR4axajbbJKwS.jpg",
+        "id": 79093,
+        "name": "Star Wars Resistance",
+        "original_name": "Star Wars Resistance",
+        "overview": "Kazuda Xiono, a young pilot for the Resistance, is tasked with a top secret mission to investigate the First Order, a growing threat in the galaxy.",
+        "poster_path": "/xul6SG8rar3wkHPY8YusUtxcdlZ.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10765,
+          16,
+          10759
+        ],
+        "popularity": 17.9467,
+        "first_air_date": "2018-10-07",
+        "softcore": false,
+        "vote_average": 6.169,
+        "vote_count": 183,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/5Iw7zQTHVRBOYpA0V6z0yypOPZh.jpg",
+        "id": 181808,
+        "title": "Star Wars: The Last Jedi",
+        "original_title": "Star Wars: The Last Jedi",
+        "overview": "Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.",
+        "poster_path": "/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          12,
+          28,
+          878
+        ],
+        "popularity": 16.3847,
+        "release_date": "2017-12-13",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.728,
+        "vote_count": 16874
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/sjxtIUCWR74yPPcZFfTsToepfWm.jpg",
+        "id": 105971,
+        "name": "Star Wars: The Bad Batch",
+        "original_name": "Star Wars: The Bad Batch",
+        "overview": "The 'Bad Batch' of elite and experimental clones make their way through an ever-changing galaxy in the immediate aftermath of the Clone Wars.",
+        "poster_path": "/5mHus672nuinyaE0FtqvD0AddcY.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10759,
+          10765
+        ],
+        "popularity": 25.0859,
+        "first_air_date": "2021-05-04",
+        "softcore": false,
+        "vote_average": 8.136,
+        "vote_count": 1217,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8BTsTfln4jlQrLXUBquXJ0ASQy9.jpg",
+        "id": 140607,
+        "title": "Star Wars: The Force Awakens",
+        "original_title": "Star Wars: The Force Awakens",
+        "overview": "Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers.",
+        "poster_path": "/wqnLdwVXoBjKibFRR5U3y0aDUhs.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          12,
+          28,
+          878
+        ],
+        "popularity": 15.0892,
+        "release_date": "2015-12-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.237,
+        "vote_count": 21131
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/qWIhNn6ZxbjYya6m5amiKXUhlQY.jpg",
+        "id": 25,
+        "name": "Star Wars: Droids",
+        "original_name": "Star Wars: Droids",
+        "overview": "An animated television series that features the exploits of R2-D2 and C-3PO. The series takes place between the events depicted in Star Wars Episode III: Revenge of the Sith and Star Wars Episode IV: A New Hope.",
+        "poster_path": "/AuGZbGeOQt30zsoTUSPlS8kMe1v.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10762,
+          16,
+          10759,
+          10765
+        ],
+        "popularity": 10.7656,
+        "first_air_date": "1985-09-07",
+        "softcore": false,
+        "vote_average": 5.5,
+        "vote_count": 95,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6Bsfr4QipqfAMlv9DCk8zNACvUG.jpg",
+        "id": 3122,
+        "name": "Star Wars: Clone Wars",
+        "original_name": "Star Wars: Clone Wars",
+        "overview": "During the Clone Wars, Jedi Master Obi-Wan Kenobi leads an assault on the planet Muunilinst, home of the Intergalactic Banking Clan; and his Padawan, Anakin Skywalker, is appointed by Supreme Chancellor Palpatine to lead the Republic’s space forces. Meanwhile, Separatist leader and Sith Lord Count Dooku takes in Force-sensitive gladiator Asajj Ventress as his Sith apprentice, and tasks her with eliminating Skywalker.",
+        "poster_path": "/jKfAVTGkf9qpGPZ4E1pNKdW6vra.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          16,
+          10765,
+          18
+        ],
+        "popularity": 10.7705,
+        "first_air_date": "2003-11-07",
+        "softcore": false,
+        "vote_average": 7.8,
+        "vote_count": 524,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/7SJctp269UEMvRGt9d3eddSpcLL.jpg",
+        "id": 202998,
+        "name": "Star Wars: Young Jedi Adventures",
+        "original_name": "Star Wars: Young Jedi Adventures",
+        "overview": "Set during the High Republic era and the prime of the Jedi Order, follow Jedi younglings as they study the ways of the Force, explore the galaxy, help citizens and creatures in need, and learn valuable skills needed to become Jedi along the way.",
+        "poster_path": "/bC2Mix1WPUiY6pldh77oiFl1MvI.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10762,
+          10759,
+          35
+        ],
+        "popularity": 17.845,
+        "first_air_date": "2023-05-04",
+        "softcore": false,
+        "vote_average": 4.6,
+        "vote_count": 34,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/auJKGst3vXpJozHZh4nMFs0xWIU.jpg",
+        "id": 181812,
+        "title": "Star Wars: The Rise of Skywalker",
+        "original_title": "Star Wars: The Rise of Skywalker",
+        "overview": "The surviving Resistance faces the First Order once again as the journey of Rey, Finn and Poe Dameron continues. With the power and knowledge of generations behind them, the final battle begins.",
+        "poster_path": "/db32LaOibwEliAmSL2jjDF6oDdj.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          12,
+          28,
+          878
+        ],
+        "popularity": 14.4897,
+        "release_date": "2019-12-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.237,
+        "vote_count": 11327
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/y9jGaGNn1dQDhPkhMumXaLize73.jpg",
+        "id": 348350,
+        "title": "Solo: A Star Wars Story",
+        "original_title": "Solo: A Star Wars Story",
+        "overview": "Through a series of daring escapades deep within a dark and dangerous criminal underworld, Han Solo meets his mighty future copilot Chewbacca and encounters the notorious gambler Lando Calrissian.",
+        "poster_path": "/4oD6VEccFkorEBTEDXtpLAaz0Rl.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          878,
+          12,
+          28
+        ],
+        "popularity": 8.1328,
+        "release_date": "2018-05-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.55,
+        "vote_count": 9649
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/fciU7RVyfcdsTeksTnBXGPmkKg2.jpg",
+        "id": 202879,
+        "name": "Star Wars: Skeleton Crew",
+        "original_name": "Star Wars: Skeleton Crew",
+        "overview": "Four ordinary kids search for their home planet after getting lost in the Star Wars galaxy.",
+        "poster_path": "/srQbJhLRKoAwRrNN5ga7webPHbC.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          10765,
+          10751
+        ],
+        "popularity": 10.1975,
+        "first_air_date": "2024-12-02",
+        "softcore": false,
+        "vote_average": 6.781,
+        "vote_count": 509,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6t8ES1d12OzWyCGxBeDYLHoaDrT.jpg",
+        "id": 330459,
+        "title": "Rogue One: A Star Wars Story",
+        "original_title": "Rogue One: A Star Wars Story",
+        "overview": "A rogue band of resistance fighters unite for a mission to steal the Death Star plans and bring a new hope to the galaxy.",
+        "poster_path": "/i0yw1mFbB7sNGHCs7EXZPzFkdA1.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          28,
+          12,
+          878
+        ],
+        "popularity": 9.4707,
+        "release_date": "2016-12-14",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.511,
+        "vote_count": 16968
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/cvvj1RXGmmAZ1FZr6CrUu8LgQm5.jpg",
+        "id": 289219,
+        "name": "Star Wars: Maul - Shadow Lord",
+        "original_name": "Star Wars: Maul - Shadow Lord",
+        "overview": "After the Clone Wars, Maul plots to rebuild his criminal syndicate on a planet untouched by the Empire.",
+        "poster_path": "/fTfLd3s9yBNOzbFHD2aXvwEs93H.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10759,
+          16,
+          10765
+        ],
+        "popularity": 11.2025,
+        "first_air_date": "2026-04-06",
+        "softcore": false,
+        "vote_average": 8.524,
+        "vote_count": 254,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/upecGaCuQOIbSpdz85mrJ395UMg.jpg",
+        "id": 1731694,
+        "title": "LEGO Star Wars: The Mandalorian",
+        "original_title": "LEGO Star Wars: The Mandalorian",
+        "overview": "The Mandalorian and Grogu join their misfit allies for an epic party, celebrating their heroism. As friends regale the crowd with tales of their adventures, a pirate threat looms.",
+        "poster_path": "/x3HEvYXWOW6WHqsHmg2MUVy3SLm.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          878,
+          12,
+          10751,
+          28
+        ],
+        "popularity": 6.7916,
+        "release_date": "2026-09-02",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.593,
+        "vote_count": 43
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/iHfyFYYFtceiJ5Zq7S6qMpmRggm.jpg",
+        "id": 71412,
+        "name": "Star Wars: Forces of Destiny",
+        "original_name": "Star Wars: Forces of Destiny",
+        "overview": "An animated micro-series starring Rey, Jyn Erso, Princess Leia, Ahsoka Tano, and more. Small moments and everyday decisions shape a larger heroic saga.",
+        "poster_path": "/7xe9Hx4sVxuRa3uPGXYvPclTcnq.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10765,
+          10759,
+          10751
+        ],
+        "popularity": 9.3858,
+        "first_air_date": "2017-07-03",
+        "softcore": false,
+        "vote_average": 5.2,
+        "vote_count": 77,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/3TeGmKJfkik1D1rIoqGb1aR4k9c.jpg",
+        "id": 1893,
+        "title": "Star Wars: Episode I - The Phantom Menace",
+        "original_title": "Star Wars: Episode I - The Phantom Menace",
+        "overview": "Anakin Skywalker, a young slave strong with the Force, is discovered on Tatooine. Meanwhile, the evil Sith have returned, enacting their plot for revenge against the Jedi.",
+        "poster_path": "/6wkfovpn7Eq8dYNKaG5PY3q2oq6.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          12,
+          28,
+          878
+        ],
+        "popularity": 11.3441,
+        "release_date": "1999-05-19",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.582,
+        "vote_count": 16425
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/eVA4ztLIuPEsokkgQ3NRt9rTRVh.jpg",
+        "id": 12180,
+        "title": "Star Wars: The Clone Wars",
+        "original_title": "Star Wars: The Clone Wars",
+        "overview": "As the Clone Wars sweep through the galaxy, Anakin Skywalker and his new Padawan learner Ahsoka Tano plunge into a dangerous mission to rescue the kidnapped son of crime lord Jabba the Hutt.",
+        "poster_path": "/iJQfixW818LUdSXlCDL3JZm0S0g.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          28,
+          878,
+          12
+        ],
+        "popularity": 4.4426,
+        "release_date": "2008-08-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.167,
+        "vote_count": 2315
+      }
+    ],
+    "total_pages": 13,
+    "total_results": 246
+  }
+}

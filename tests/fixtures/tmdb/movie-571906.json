@@ -1,0 +1,45 @@
+{
+  "request": {
+    "path": "/3/movie/571906",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.513Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/o6KXMon0fajbCPScmv0E060PZEx.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 99,
+        "name": "Documentary"
+      }
+    ],
+    "homepage": "",
+    "id": 571906,
+    "imdb_id": "tt4083432",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Time Is But a Window: Ghostbusters 2 and Beyond",
+    "overview": "A retrospective on Ghostbusters 2.",
+    "popularity": 0.4859,
+    "poster_path": "/lzM5Ee1F2dwRFFHq8WOGicqDsO3.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2014-09-16",
+    "revenue": 0,
+    "runtime": 17,
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Released",
+    "tagline": "",
+    "title": "Time Is But a Window: Ghostbusters 2 and Beyond",
+    "video": false,
+    "vote_average": 7.3,
+    "vote_count": 3
+  }
+}

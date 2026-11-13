@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/collection/23026",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:29.018Z",
+  "response": {
+    "id": 23026,
+    "name": "Ghost in the Shell Collection",
+    "original_language": "en",
+    "original_name": "GHOST IN THE SHELL シリーズ",
+    "overview": "Two animated films based on the original manga have been released, both directed by Mamoru Oshii and animated by Production I.G.  Ghost in the Shell was released in 1995 and follows the \"Puppet Master\" storyline from the manga. It was re-released in 2008 as Ghost in the Shell 2.0 with new audio and updated 3D computer graphics in certain scenes.  Innocence, otherwise known as Ghost in the Shell 2: Innocence, was released in 2004, with its story based on a chapter from the first manga.",
+    "poster_path": "/5tGSkNV03Q1Zr779oin11fhnaLD.jpg",
+    "backdrop_path": "/2QMQ9RLB18mICobLaFaYjrfAACr.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/jIpagj2Dud9g3ZVJFvaWikEWsYz.jpg",
+        "genre_ids": [
+          28,
+          16,
+          878
+        ],
+        "id": 9323,
+        "title": "Ghost in the Shell",
+        "original_language": "ja",
+        "original_title": "GHOST IN THE SHELL / 攻殻機動隊",
+        "overview": "In the year 2029, the barriers of our world have been broken down by the net and by cybernetics, but this brings new vulnerability to humans in the form of brain-hacking. When a highly-wanted hacker known as 'The Puppetmaster' begins involving them in politics, Section 9, a group of cybernetically enhanced cops, are called in to investigate and stop the Puppetmaster.",
+        "popularity": 10.1634,
+        "poster_path": "/9gC88zYUBARRSThcG93MvW14sqx.jpg",
+        "release_date": "1995-11-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.931,
+        "vote_count": 4149,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8AGLGUYg9UqcDWXtAH0t7InsBd.jpg",
+        "genre_ids": [
+          16,
+          18,
+          878
+        ],
+        "id": 12140,
+        "title": "Ghost in the Shell 2: Innocence",
+        "original_language": "ja",
+        "original_title": "イノセンス",
+        "overview": "Cyborg detective Batou is assigned to investigate a series of murders committed by gynoids—doll-like cyborgs, which all malfunctioned, killed, then self-destructed afterwards. The brains of the gynoids initialize in order to protect their manufacturer's software, but in one gynoid, which Batou himself neutralized, one file remains: a voice speaking the phrase \"Help me.\"",
+        "popularity": 4.0526,
+        "poster_path": "/1ZJRbLDVr90KLtKdmTT4WZhT26E.jpg",
+        "release_date": "2004-03-06",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.368,
+        "vote_count": 1055,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

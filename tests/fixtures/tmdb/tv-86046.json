@@ -1,0 +1,165 @@
+{
+  "request": {
+    "path": "/3/tv/86046",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:22.243Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/l6bFb6gurrDwja9w7wcyhZPBBpG.jpg",
+    "created_by": [
+      {
+        "id": 2392072,
+        "credit_id": "5f0d83adefe37c0035c6abb8",
+        "name": "Pierre Gauvreau",
+        "original_name": "Pierre Gauvreau",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "1980-10-29",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 86046,
+    "in_production": false,
+    "languages": [
+      "fr"
+    ],
+    "last_air_date": "1986-12-01",
+    "last_episode_to_air": {
+      "id": 2192195,
+      "name": "Episode 13",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1986-12-01",
+      "episode_number": 13,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 6,
+      "show_id": 86046,
+      "still_path": null
+    },
+    "name": "Le temps d'une paix",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 141,
+        "logo_path": "/32OnRA75a9xn30N2fC44IcCzHkC.png",
+        "name": "ICI Radio-Canada Télé",
+        "origin_country": "CA"
+      }
+    ],
+    "number_of_episodes": 135,
+    "number_of_seasons": 6,
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "fr",
+    "original_name": "Le temps d'une paix",
+    "overview": "",
+    "popularity": 7.8584,
+    "poster_path": "/9ohxN0ekXsLzKgOG9op46axpyEY.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1982-12-19",
+        "episode_count": 1,
+        "id": 150072,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/6fXiccNelXTj64RjOQIPgFFyeYd.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1980-10-29",
+        "episode_count": 24,
+        "id": 117161,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/9ohxN0ekXsLzKgOG9op46axpyEY.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1981-10-28",
+        "episode_count": 26,
+        "id": 137758,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/i9c3RY8RYjWkFyURF7eSWiLbbT1.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1982-10-27",
+        "episode_count": 26,
+        "id": 137759,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/eht5DsvVyy6uvcflANksLNawAvv.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1983-10-26",
+        "episode_count": 26,
+        "id": 137760,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/rK6P5C04mVFqXxNwIRIheZg2ZF0.jpg",
+        "season_number": 4,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1985-10-09",
+        "episode_count": 20,
+        "id": 137761,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": "/ognLwxTBJYyhRNfIssmPGpNJzaA.jpg",
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1986-09-08",
+        "episode_count": 13,
+        "id": 137762,
+        "name": "Season 6",
+        "overview": "",
+        "poster_path": "/jxbqWIvvfxEfHCsr3wJLsXCKEcV.jpg",
+        "season_number": 6,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 9,
+    "vote_count": 1
+  }
+}
