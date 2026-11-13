@@ -3,7 +3,8 @@
 //!
 //! Pairing never needs a password typed on the TV: Home Assistant asks to pair, the TV shows a
 //! six-digit code, and the user types it into Home Assistant, which receives a bearer token. Only
-//! SHA-256 digests of tokens are stored. Turning the setting off forgets every paired server.
+//! SHA-256 digests of tokens are stored. Turning the setting off forgets every paired server, but
+//! not how the owner arranged its cameras: that comes back when the same server pairs again.
 //!
 //! The overlay itself is the separate web app `com.ecklf.luma.overlay` (see `overlay/`), whose
 //! transparent `overlay` window type keeps the foreground app playing underneath it. Luma installs
@@ -45,6 +46,8 @@ pub const MAX_CAMERAS: usize = 32;
 /// Remembered entries in the gallery's order and hidden lists, including absent cameras.
 const MAX_ARRANGED: usize = 64;
 const MAX_CLIENTS: usize = 8;
+/// Arrangements kept for servers that are no longer paired; the oldest go first.
+const MAX_PARKED: usize = 16;
 const MAX_URL: usize = 4096;
 const PAIRING_TTL: Duration = Duration::from_secs(120);
 const PAIRING_ATTEMPTS: u8 = 5;
@@ -116,6 +119,8 @@ impl Tv for Live {
 pub enum Event {
     Listening(String),
     PairingCode(String),
+    /// The code expired or was locked out after wrong guesses, without pairing.
+    PairingEnded,
     Paired(String),
     Failed(String),
     /// A translation key to show as a Luma notice.
@@ -152,6 +157,10 @@ pub struct Store {
     pub device_id: String,
     pub clients: Vec<Client>,
     pub gallery: Gallery,
+    /// Fields from a newer Luma, kept so that going back a version and forward again loses
+    /// nothing.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, Value>,
 }
 
 /// How the owner arranged the Cameras gallery, by gallery camera ID: the server's position in
@@ -166,12 +175,122 @@ pub struct Gallery {
     pub snapshots: bool,
     /// The owner's names for cameras, shown instead of Home Assistant's.
     pub names: std::collections::BTreeMap<String, String>,
+    /// Arrangements of servers that were unpaired or forgotten, restored when they pair again.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub parked: Vec<Parked>,
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, Value>,
+}
+
+/// One unpaired server's part of the gallery arrangement, by entity ID (`camera.door`).
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+#[serde(default)]
+pub struct Parked {
+    /// The server's Home Assistant instance ID, when its integration sent one.
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub server: String,
+    pub name: String,
+    pub order: Vec<String>,
+    pub hidden: Vec<String>,
+    pub names: std::collections::BTreeMap<String, String>,
+}
+
+impl Parked {
+    /// Whether this is the arrangement of `client`, which is pairing again. The instance ID
+    /// decides when both have one; an arrangement with a different ID is another server.
+    fn belongs_to(&self, client: &Client) -> bool {
+        if self.server.is_empty() || client.server.is_empty() {
+            self.name == client.name
+        } else {
+            self.server == client.server
+        }
+    }
 }
 
 impl Gallery {
-    /// The server at `index` in pairing order was unpaired: its entries go, and later servers,
-    /// which move up one place, keep theirs.
-    fn unpaired(&mut self, index: usize) {
+    /// Moves the entries of the server at `index` in pairing order to [`Gallery::parked`].
+    /// Later servers keep their places.
+    fn park(&mut self, index: usize, client: &Client) {
+        let prefix = format!("{index}/");
+        let strip = |id: &String| id.strip_prefix(&prefix).map(str::to_owned);
+        let parked = Parked {
+            server: client.server.clone(),
+            name: client.name.clone(),
+            order: self.order.iter().filter_map(strip).collect(),
+            hidden: self.hidden.iter().filter_map(strip).collect(),
+            names: self
+                .names
+                .iter()
+                .filter_map(|(id, name)| Some((strip(id)?, name.clone())))
+                .collect(),
+        };
+        self.order.retain(|id| !id.starts_with(&prefix));
+        self.hidden.retain(|id| !id.starts_with(&prefix));
+        self.names.retain(|id, _| !id.starts_with(&prefix));
+        // The newest arrangement replaces an older one for the same server. Without instance
+        // IDs, two servers can share a name, so both are kept rather than one lost.
+        self.parked
+            .retain(|old| parked.server.is_empty() || old.server != parked.server);
+        if !parked.order.is_empty() || !parked.hidden.is_empty() || !parked.names.is_empty() {
+            self.parked.push(parked);
+        }
+        let excess = self.parked.len().saturating_sub(MAX_PARKED);
+        self.parked.drain(..excess);
+    }
+
+    /// The server just paired at `index` gets back the arrangement it had, if any.
+    fn restore(&mut self, index: usize, client: &Client) {
+        // An instance ID match is certain. A match by name only counts when no other parked
+        // server shares that name, so one server never gets another's arrangement.
+        let by_id = (!client.server.is_empty())
+            .then(|| {
+                self.parked
+                    .iter()
+                    .position(|parked| parked.server == client.server)
+            })
+            .flatten();
+        let position = by_id.or_else(|| {
+            let mut named = self
+                .parked
+                .iter()
+                .enumerate()
+                .filter(|(_, parked)| parked.belongs_to(client));
+            match (named.next(), named.next()) {
+                (Some((position, _)), None) => Some(position),
+                _ => None,
+            }
+        });
+        let Some(position) = position else {
+            return;
+        };
+        let parked = self.parked.remove(position);
+        let id = |entity: &String| format!("{index}/{entity}");
+        for entity in &parked.order {
+            let id = id(entity);
+            if !self.order.contains(&id) {
+                self.order.push(id);
+            }
+        }
+        for entity in &parked.hidden {
+            let id = id(entity);
+            if !self.hidden.contains(&id) {
+                self.hidden.push(id);
+            }
+        }
+        for (entity, name) in &parked.names {
+            self.names.entry(id(entity)).or_insert_with(|| name.clone());
+        }
+        self.order.truncate(MAX_ARRANGED);
+        self.hidden.truncate(MAX_ARRANGED);
+        while self.names.len() > MAX_ARRANGED {
+            self.names.pop_last();
+        }
+    }
+
+    /// The server at `index` in pairing order was unpaired: its entries are parked, and later
+    /// servers, which move up one place, keep theirs.
+    fn unpaired(&mut self, index: usize, client: &Client) {
+        self.park(index, client);
         // An entry's new ID, or none if it belonged to the unpaired server.
         let moved = |id: &str| -> Option<String> {
             let Some((server, entity)) = id.split_once('/') else {
@@ -198,12 +317,18 @@ pub struct Client {
     /// Hex SHA-256 of the bearer token.
     pub token: String,
     pub paired: u64,
+    /// Home Assistant's instance ID, which tells the server apart when it pairs again.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub server: String,
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, Value>,
 }
 
 struct Pairing {
     id: String,
     code: String,
     name: String,
+    server: String,
     expires: Instant,
     attempts: u8,
 }
@@ -433,15 +558,26 @@ impl<T: Tv> Api<T> {
             let _ = self.tv.close_overlay();
             self.end_session();
         }
-        self.pairing = None;
+        if self.pairing.take().is_some() {
+            let _ = self.events.send(Event::PairingEnded);
+        }
         if !self.cameras.is_empty() {
             self.cameras.clear();
             self.send_cameras(false);
         }
-        if !self.store.clients.is_empty() || self.store.gallery != Gallery::default() {
-            self.store.clients.clear();
-            // Gallery IDs name servers by pairing order, which starts over.
-            self.store.gallery = Gallery::default();
+        let before = self.store.clone();
+        // Gallery IDs name servers by pairing order, which starts over; each server's
+        // arrangement is parked until it pairs again.
+        let clients = std::mem::take(&mut self.store.clients);
+        let gallery = &mut self.store.gallery;
+        for (index, client) in clients.iter().enumerate() {
+            gallery.park(index, client);
+        }
+        // Whatever is left belonged to no paired server.
+        gallery.order.clear();
+        gallery.hidden.clear();
+        gallery.names.clear();
+        if self.store != before {
             self.save();
         }
     }
@@ -514,6 +650,7 @@ impl<T: Tv> Api<T> {
         }
         if self.pairing.as_ref().is_some_and(|p| now >= p.expires) {
             self.pairing = None;
+            let _ = self.events.send(Event::PairingEnded);
         }
     }
 
@@ -584,7 +721,7 @@ impl<T: Tv> Api<T> {
                     ("DELETE", "/api/pair") => {
                         let removed = self.store.clients.remove(client);
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
-                        self.store.gallery.unpaired(client);
+                        self.store.gallery.unpaired(client, &removed);
                         self.save();
                         self.send_cameras(false);
                         reply(200, json!({"paired": false}))
@@ -636,6 +773,10 @@ impl<T: Tv> Api<T> {
             Ok(name) => name.unwrap_or_else(|| "Home Assistant".into()),
             Err(reply) => return reply,
         };
+        let server = match text(body, "server", 64) {
+            Ok(server) => server.unwrap_or_default(),
+            Err(reply) => return reply,
+        };
         if self
             .last_pairing
             .is_some_and(|last| now.duration_since(last) < PAIRING_COOLDOWN)
@@ -664,6 +805,7 @@ impl<T: Tv> Api<T> {
             id: id.clone(),
             code,
             name,
+            server,
             expires: now + PAIRING_TTL,
             attempts: 0,
         });
@@ -686,6 +828,7 @@ impl<T: Tv> Api<T> {
         if code != pairing.code {
             if pairing.attempts >= PAIRING_ATTEMPTS {
                 self.pairing = None;
+                let _ = self.events.send(Event::PairingEnded);
                 return error(403, "Too many wrong codes; start again");
             }
             return error(403, "Wrong code");
@@ -697,11 +840,17 @@ impl<T: Tv> Api<T> {
             Ok(token) => token,
             Err(e) => return error(500, &e),
         };
-        self.store.clients.push(Client {
+        let client = Client {
             name: pairing.name.clone(),
             token: digest_hex(&token),
             paired: unix_now(),
-        });
+            server: pairing.server,
+            extra: Default::default(),
+        };
+        self.store
+            .gallery
+            .restore(self.store.clients.len(), &client);
+        self.store.clients.push(client);
         self.save();
         let _ = self.events.send(Event::Paired(pairing.name));
         let _ = self.tv.toast("Home Assistant paired with Luma");

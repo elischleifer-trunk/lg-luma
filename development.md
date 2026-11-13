@@ -419,12 +419,19 @@ every interface, because the TV's address can change, and answers only loopback,
 link-local peers. Requests are small and handled in turn on the service's own thread, with a
 three-second deadline and a 32 KiB body limit, reusing `companion::request`.
 
-Pairing: `POST /api/pair` shows a six-digit code as a system toast (and a Luma notice when Luma is
-in front). `POST /api/pair/confirm` trades it for a 256-bit token. Codes expire after two minutes,
+Pairing: `POST /api/pair` shows a six-digit code as a system toast. In Luma, `Event::PairingCode`
+puts it in the setup dialog in place of the QR code (`State::home_assistant_pairing`), opening the
+dialog when no other dialog is up and returning focus afterwards; otherwise it is a notice.
+`Event::PairingEnded` (expired or locked out) brings the QR code back, and `Event::Paired` shows a
+confirmation in the dialog. `POST /api/pair/confirm` trades it for a 256-bit token. Codes expire after two minutes,
 five wrong codes cancel the request, new requests are rate-limited, and at most eight servers
 pair. `home-assistant.json`, next to the preferences file, stores a stable device ID and SHA-256
 digests of tokens with mode 0600. Turning the setting off closes the listener, closes any overlay
-and forgets every pairing. Requests with an `Origin` header are refused, except the overlay page's
+and forgets every pairing, but not the camera arrangement: each server's entries move to
+`Gallery::parked` (by entity ID) and are restored when the same server pairs again, matched by
+the Home Assistant instance ID the integration sends as `server`, or by its name when either side
+has none and no other parked server shares that name. Unpairing one server parks its entries the same way; at most 16 are kept. Requests with
+an `Origin` header are refused, except the overlay page's
 close report, which must come from loopback with the session's random nonce.
 
 The overlay is a separate web app, `overlay/` (`com.ecklf.luma.overlay`), because only a web app's

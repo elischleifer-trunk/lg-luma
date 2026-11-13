@@ -281,6 +281,12 @@ pub struct State {
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
     pub home_assistant_address: Option<String>,
+    /// The code Home Assistant is waiting for; the setup dialog shows it instead of the QR code.
+    pub home_assistant_code: Option<String>,
+    /// The server that just paired, which the setup dialog confirms.
+    pub home_assistant_paired: Option<String>,
+    /// Focus to return to when the setup dialog opened by itself for a pairing code.
+    pub home_assistant_restore: Option<Target>,
     /// The Cameras app was opened; the main loop asks the Home Assistant service.
     pub show_cameras: bool,
     pub cameras: crate::cameras::Gallery,
@@ -332,6 +338,9 @@ impl State {
             tile_editor: None,
             home_assistant_qr: None,
             home_assistant_address: None,
+            home_assistant_code: None,
+            home_assistant_paired: None,
+            home_assistant_restore: None,
             show_cameras: false,
             cameras: crate::cameras::Gallery::default(),
             update: crate::update::InstallStatus::default(),
@@ -349,9 +358,48 @@ impl State {
         self.home_assistant_qr = Some(crate::companion::qr(
             crate::home_assistant::HACS_LINK.to_owned(),
         ));
+        self.home_assistant_paired = None;
+        self.home_assistant_restore = None;
         self.overlay = Some(Overlay::HomeAssistantSetup);
         self.focus = Target::CloseDialog;
         self.pressed = None;
+    }
+
+    /// Home Assistant asked to pair. The setup dialog shows the code in place of its QR code,
+    /// opening by itself unless another dialog is up. False means the caller should show the
+    /// code as a notice instead.
+    pub fn home_assistant_pairing(&mut self, code: String) -> bool {
+        self.home_assistant_code = Some(code);
+        self.home_assistant_paired = None;
+        self.dirty = true;
+        match self.overlay {
+            Some(Overlay::HomeAssistantSetup) => true,
+            None if self.moving.is_none() => {
+                let restore = self.focus.clone();
+                self.open_home_assistant_setup();
+                self.home_assistant_restore = Some(restore);
+                true
+            }
+            _ => false,
+        }
+    }
+
+    /// The pairing code expired or was refused; the dialog shows its QR code again.
+    pub fn home_assistant_pairing_ended(&mut self) {
+        self.home_assistant_code = None;
+        self.dirty = true;
+    }
+
+    /// A server paired. An open setup dialog says so (true); otherwise the caller shows a notice.
+    pub fn home_assistant_paired_with(&mut self, name: String) -> bool {
+        self.home_assistant_code = None;
+        self.dirty = true;
+        if matches!(self.overlay, Some(Overlay::HomeAssistantSetup)) {
+            self.home_assistant_paired = Some(name);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn notify(&mut self, text: impl Into<String>) {
@@ -2786,11 +2834,14 @@ impl State {
             }
             if matches!(overlay, Overlay::HomeAssistantSetup) {
                 self.home_assistant_qr = None;
-                self.focus = if self.preferences.home_assistant {
-                    Target::HomeAssistantCode
-                } else {
-                    Target::HomeAssistantToggle
-                };
+                self.home_assistant_paired = None;
+                self.focus = self.home_assistant_restore.take().unwrap_or(
+                    if self.preferences.home_assistant {
+                        Target::HomeAssistantCode
+                    } else {
+                        Target::HomeAssistantToggle
+                    },
+                );
                 self.pressed = None;
                 return vec![];
             }

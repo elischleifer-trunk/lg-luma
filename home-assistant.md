@@ -51,15 +51,18 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
    LG webOS TV integration. Otherwise, add **Luma for LG webOS** under **Settings → Devices &
    services** and enter the TV's address. When you already use the LG webOS TV integration, its
    address and name are suggested.
-4. The TV shows a **six-digit pairing code**. Type it into Home Assistant. Codes expire after two
-   minutes, and five wrong codes cancel the request.
+4. The TV shows a **six-digit pairing code**. Type it into Home Assistant. If Luma is on screen,
+   the code replaces the QR code in the **Add to Home Assistant** dialog, which opens by itself
+   if needed, and stays until you pair. Codes expire after two minutes, and five wrong codes
+   cancel the request.
 
 5. To check it works, open the TV under **Settings → Devices & services → Luma for LG webOS** and
    press **Show example camera card** and **Show example toast**. The card closes after 15
    seconds, or press **Back** on the remote.
 
 Turning **Home Assistant** off in Luma closes the port and forgets every paired server. Home
-Assistant then asks you to pair again the next time it is needed. Removing the integration in Home
+Assistant then asks you to pair again the next time it is needed. Your camera names, order and
+hidden cameras are kept, and come back when the same Home Assistant pairs again. Removing the integration in Home
 Assistant also unpairs it from the TV when the TV is on.
 
 ## Camera images
