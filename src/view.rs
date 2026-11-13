@@ -602,7 +602,7 @@ pub fn scene_with_pill(
     }
     let content_start = out.draw.len();
     // The Cameras gallery is opaque and full screen: the page underneath is not drawn.
-    if state.cameras_open() {
+    if state.cameras_visible() {
         cameras_view::render(&mut out, state, assets);
         if let Some((notice, _)) = &state.notice {
             toast(&mut out, state, assets, notice);
@@ -3547,6 +3547,7 @@ fn keyboard(out: &mut Scene, state: &State, assets: &Assets) {
             TextField::Location => language.t("cityPostcode"),
             TextField::Name => language.t("greetingName"),
             TextField::InputName => language.t("inputName"),
+            TextField::CameraName => language.t("cameraName"),
             TextField::Apps => language.t("findApp"),
         },
         Rect::new(389., 324., 1000., 44.),

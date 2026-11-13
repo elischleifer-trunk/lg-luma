@@ -14,7 +14,8 @@
 //! asks it for the address of Home Assistant's HLS stream (the camera's own H.264 video) and the
 //! overlay app plays that full screen with the TV's hardware decoder. The motion-JPEG stream
 //! keeps running underneath: it shows until the video plays, and stays if it cannot.
-use crate::state::{Direction, Effect, Overlay, Rect, State, Target};
+use crate::model::clean_input_name;
+use crate::state::{Direction, Effect, Overlay, Rect, State, Target, TextField};
 use image::{ImageReader, Limits, RgbaImage};
 use serde_json::{Value, json};
 use std::{
@@ -56,6 +57,15 @@ pub struct Camera {
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
     pub hidden: bool,
+    /// The owner's own name for the camera, shown instead of Home Assistant's `name`.
+    pub label: Option<String>,
+}
+
+impl Camera {
+    /// The name the gallery shows.
+    pub fn title(&self) -> &str {
+        self.label.as_deref().unwrap_or(&self.name)
+    }
 }
 
 /// A decoded frame, uploaded to the GPU once per `serial`.
@@ -534,17 +544,16 @@ pub const SHEET_ROW: f32 = 76.8;
 pub const SHEET_TOP: f32 = 152.;
 pub const SHEET_ROWS: usize = 11;
 
-/// Columns for a camera count: one large view, then 2×2, 3×3 and four across.
+/// Columns for a camera count: one large view, then 2×2, then three across.
 pub fn columns(count: usize) -> usize {
     match count {
         0 | 1 => 1,
         2..=4 => 2,
-        5..=9 => 3,
-        _ => 4,
+        _ => 3,
     }
 }
 
-/// Tiles keep 16:9 and are sized so up to three rows fit; more rows scroll.
+/// Tiles keep 16:9 and are sized so two rows fit (one for a lone camera); more rows scroll.
 #[derive(Clone, Copy, Debug)]
 pub struct Layout {
     pub cols: usize,
@@ -558,7 +567,7 @@ impl Layout {
     pub fn new(count: usize) -> Self {
         let cols = columns(count);
         let rows = count.div_ceil(cols).max(1);
-        let visible_rows = rows.min(if cols == 1 { 1 } else { cols.min(3) });
+        let visible_rows = rows.min(if cols == 1 { 1 } else { 2 });
         let widest = (GRID.w - (cols - 1) as f32 * GAP) / cols as f32;
         let tallest = (GRID.h - visible_rows as f32 * CAPTION - (visible_rows - 1) as f32 * GAP)
             / visible_rows as f32;
@@ -600,7 +609,7 @@ impl Layout {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Sheet {
-    /// Hold OK on a camera: Move, Hide, Camera settings.
+    /// Hold OK on a camera: Move, Rename, Reset name, Hide, Camera settings.
     Options(String),
     /// Live video and which cameras are shown.
     Settings,
@@ -631,6 +640,11 @@ pub struct Gallery {
     pub play: Option<(String, String)>,
     /// For the main loop: close the video the overlay app is playing.
     pub stop_video: bool,
+    /// The camera being renamed while the keyboard replaces the gallery's overlay, and the
+    /// gallery's own Back target to restore with it.
+    pub renaming: Option<(String, Target)>,
+    /// The typed name while renaming.
+    pub name_draft: String,
 }
 
 impl Gallery {
@@ -655,6 +669,9 @@ impl Gallery {
             "hidden": self.cameras.iter().filter(|camera| camera.hidden)
                 .map(|camera| &camera.id).collect::<Vec<_>>(),
             "live": self.live,
+            "names": self.cameras.iter()
+                .filter_map(|camera| Some((camera.id.clone(), json!(camera.label.as_ref()?))))
+                .collect::<serde_json::Map<_, _>>(),
         })
     }
 
@@ -663,6 +680,12 @@ impl Gallery {
         let mut options = Vec::new();
         if self.visible().len() > 1 {
             options.push(Target::CameraMove);
+        }
+        options.push(Target::CameraRename);
+        if let Some(Sheet::Options(id)) = &self.sheet
+            && self.camera(id).is_some_and(|camera| camera.label.is_some())
+        {
+            options.push(Target::CameraNameReset);
         }
         options.push(Target::CameraHide);
         options.push(Target::CameraSettings);
@@ -774,11 +797,16 @@ impl State {
         matches!(self.overlay, Some(Overlay::Cameras { .. }))
     }
 
+    /// The gallery is on screen: open, or behind the keyboard renaming one of its cameras.
+    pub fn cameras_visible(&self) -> bool {
+        self.cameras_open() || self.cameras.renaming.is_some()
+    }
+
     /// Home Assistant's cameras, with the saved arrangement applied. `open` comes from the
     /// Cameras app; other lists are fresh URLs or a changed list for an open gallery, which
     /// keeps its arrangement on screen and adds new cameras at the end.
     pub fn camera_list(&mut self, cameras: Vec<Camera>, live: bool, open: bool) {
-        let already_open = self.cameras_open();
+        let already_open = self.cameras_visible();
         let gallery = &mut self.cameras;
         if open {
             if already_open {
@@ -817,6 +845,7 @@ impl State {
             .filter_map(|camera| {
                 let mut next = cameras.iter().find(|c| c.id == camera.id)?.clone();
                 next.hidden = camera.hidden;
+                next.label = camera.label.clone();
                 Some(next)
             })
             .collect();
@@ -886,7 +915,7 @@ impl State {
 
     pub fn camera_update(&mut self, update: Update) {
         // Frames still queued when the gallery closed must not come back with it.
-        if !self.cameras_open() {
+        if !self.cameras_visible() {
             return;
         }
         let gallery = &mut self.cameras;
@@ -912,7 +941,7 @@ impl State {
                     Ok(url) => {
                         let title = gallery
                             .camera(&id)
-                            .map_or_else(String::new, |c| c.name.clone());
+                            .map_or_else(String::new, |c| c.title().to_owned());
                         gallery.video = Video::Playing(id);
                         gallery.play = Some((url, title));
                     }
@@ -960,7 +989,7 @@ impl State {
 
     /// The cameras to fetch frames for: none unless the gallery is open and Luma is seen.
     pub fn camera_watches(&self, visible: bool) -> Vec<Watch> {
-        if visible && self.cameras_open() {
+        if visible && self.cameras_visible() {
             self.cameras.watches()
         } else {
             vec![]
@@ -972,6 +1001,14 @@ impl State {
     }
 
     pub fn close_cameras(&mut self) {
+        if let Some((_, restore)) = self.cameras.renaming.take() {
+            // The keyboard took the gallery's place; it goes with it.
+            self.overlay = None;
+            self.panel_started = None;
+            self.cameras.name_draft.clear();
+            self.focus = restore;
+            self.reconcile_focus();
+        }
         if let Some(Overlay::Cameras { restore }) = self.overlay.take() {
             self.focus = restore;
             self.reconcile_focus();
@@ -1094,6 +1131,20 @@ impl State {
                     self.focus = Target::Camera(id);
                 }
             }
+            Target::CameraRename => {
+                if let Some(Sheet::Options(id)) = gallery.sheet.take() {
+                    self.rename_camera(id);
+                }
+            }
+            Target::CameraNameReset => {
+                if let Some(Sheet::Options(id)) = &gallery.sheet
+                    && let Some(camera) = gallery.cameras.iter_mut().find(|c| &c.id == id)
+                {
+                    camera.label = None;
+                    self.focus = Target::CameraRename;
+                    self.save_cameras();
+                }
+            }
             Target::CameraHide => {
                 if let Some(Sheet::Options(id)) = gallery.sheet.take() {
                     let index = gallery.index(&id).unwrap_or(0);
@@ -1122,6 +1173,41 @@ impl State {
             }
             _ => {}
         }
+        vec![]
+    }
+
+    /// The keyboard takes the gallery's overlay while it is open; the gallery stays drawn
+    /// behind it and comes back when the name is committed.
+    fn rename_camera(&mut self, id: String) {
+        let Some(Overlay::Cameras { restore }) = self.overlay.clone() else {
+            return;
+        };
+        self.cameras.renaming = Some((id, restore));
+        self.open_keyboard(TextField::CameraName);
+    }
+
+    /// Closing the keyboard by any route keeps a typed name. An empty field leaves the name
+    /// unchanged (the TV keyboard cannot start with it); Reset name removes it explicitly.
+    pub(crate) fn commit_camera_name(&mut self) -> Vec<Effect> {
+        let draft = std::mem::take(&mut self.cameras.name_draft);
+        let Some((id, restore)) = self.cameras.renaming.take() else {
+            return vec![];
+        };
+        self.overlay = Some(Overlay::Cameras { restore });
+        self.panel_started = None;
+        self.focus = Target::Camera(id.clone());
+        let name = clean_input_name(&draft);
+        if !name.is_empty()
+            && let Some(camera) = self.cameras.cameras.iter_mut().find(|c| c.id == id)
+        {
+            let label = (name != camera.name).then_some(name);
+            if camera.label != label {
+                camera.label = label;
+                self.save_cameras();
+            }
+        }
+        self.reconcile_camera_focus();
+        self.dirty = true;
         vec![]
     }
 

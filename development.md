@@ -461,7 +461,12 @@ screen, takes the new URLs and adds new cameras at the end, and an empty list cl
 
 The gallery is native (`src/cameras.rs`, drawn by `src/cameras-view.rs`) and opens as the
 opaque full-screen `Overlay::Cameras`. `cameras::Layout` keeps 16:9 tiles in one large view, 2×2,
-3×3 or four across, fitting three rows and scrolling the rest. Each frame is fetched off the SDL
+or three across from five cameras, fitting two rows and scrolling the rest. Hold OK → **Rename**
+opens the keyboard (`TextField::CameraName`) in the overlay's place, with `Gallery::renaming`
+keeping the camera and the gallery's Back target, so the gallery stays drawn and fed behind it
+(`State::cameras_visible`); committing restores `Overlay::Cameras`. Names are saved with the
+arrangement (`names`, by gallery camera ID) in the Home Assistant store and come back as
+`Camera::label`; **Reset name** removes one. Each frame is fetched off the SDL
 thread: `State::camera_watches` lists what is on screen (nothing unless the gallery is open and
 Luma visible), and `cameras::Service::sync` keeps one worker thread per watched camera, keeping a
 worker (and its connected stream) that is watched the same way and only giving it new URLs.

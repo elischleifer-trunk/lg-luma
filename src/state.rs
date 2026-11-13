@@ -100,6 +100,8 @@ pub enum Target {
     Camera(String),
     CameraGear,
     CameraMove,
+    CameraRename,
+    CameraNameReset,
     CameraHide,
     CameraSettings,
     CameraLive,
@@ -192,6 +194,7 @@ pub enum TextField {
     Location,
     Name,
     InputName,
+    CameraName,
 }
 
 #[derive(Clone, Copy)]
@@ -1864,6 +1867,17 @@ impl State {
                 self.dirty = true;
                 return;
             }
+            if self.keyboard_field == TextField::CameraName {
+                let name = &mut self.cameras.name_draft;
+                let length = name.chars().count();
+                name.extend(
+                    text.chars()
+                        .filter(|c| !c.is_control())
+                        .take(INPUT_NAME_LIMIT.saturating_sub(length)),
+                );
+                self.dirty = true;
+                return;
+            }
             if self.keyboard_field == TextField::InputName {
                 let length = self.input_name.chars().count();
                 self.input_name.extend(
@@ -1894,6 +1908,8 @@ impl State {
                 self.greeting_name_draft.pop();
             } else if self.keyboard_field == TextField::InputName {
                 self.input_name.pop();
+            } else if self.keyboard_field == TextField::CameraName {
+                self.cameras.name_draft.pop();
             } else {
                 self.query.pop();
             }
@@ -1930,6 +1946,9 @@ impl State {
                 return vec![Effect::Save];
             }
             return vec![];
+        }
+        if self.keyboard_field == TextField::CameraName {
+            return self.commit_camera_name();
         }
         self.commit_input_name()
     }
@@ -2031,6 +2050,8 @@ impl State {
             self.greeting_name_draft = query;
         } else if self.keyboard_field == TextField::InputName {
             self.input_name = query;
+        } else if self.keyboard_field == TextField::CameraName {
+            self.cameras.name_draft = query;
         } else {
             self.query = query;
             self.scroll = 0.;
@@ -2043,6 +2064,7 @@ impl State {
             TextField::Location => &self.weather.query,
             TextField::Name => &self.greeting_name_draft,
             TextField::InputName => &self.input_name,
+            TextField::CameraName => &self.cameras.name_draft,
             TextField::Apps => &self.query,
         }
     }
@@ -2056,6 +2078,9 @@ impl State {
             // The TV keyboard starts empty, so a new name replaces the old one.
             self.input_name.clear();
         }
+        if field == TextField::CameraName {
+            self.cameras.name_draft.clear();
+        }
         if cfg!(all(
             feature = "webos",
             target_os = "linux",
@@ -2066,6 +2091,7 @@ impl State {
                 TextField::Location => Target::WeatherQuery,
                 TextField::Name => Target::GreetingName,
                 TextField::InputName => Target::InputRename,
+                TextField::CameraName => Target::CameraRename,
                 TextField::Apps => Target::Search,
             };
             self.panel_started = None;
@@ -2094,6 +2120,11 @@ impl State {
             TextField::Location => Target::WeatherSearch,
             TextField::Name => Target::GreetingName,
             TextField::InputName => Target::InputRename,
+            TextField::CameraName => self
+                .cameras
+                .renaming
+                .as_ref()
+                .map_or(Target::CameraGear, |(id, _)| Target::Camera(id.clone())),
             TextField::Apps => Target::Search,
         }
     }
@@ -2653,6 +2684,7 @@ impl State {
                     TextField::Location => self.weather.edit(String::new()),
                     TextField::Name => self.greeting_name_draft.clear(),
                     TextField::InputName => self.input_name.clear(),
+                    TextField::CameraName => self.cameras.name_draft.clear(),
                     TextField::Apps => self.query.clear(),
                 },
                 "Done" => {
