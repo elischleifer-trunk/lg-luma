@@ -542,6 +542,9 @@ def protect_camera(hass: HomeAssistant, entity_id: str = "camera.door") -> str:
         ("binary_sensor", "motion", f"{name}_motion"),
         ("binary_sensor", "smart_obj_person", f"{name}_person_detected"),
         ("binary_sensor", "dark", f"{name}_is_dark"),
+        # Detection settings, on all day while enabled: never marks.
+        ("binary_sensor", "motion_enabled", f"{name}_detections_motion"),
+        ("binary_sensor", "smart_person", f"{name}_detections_person"),
         ("event", "doorbell", f"{name}_doorbell"),
     ):
         registry.async_get_or_create(

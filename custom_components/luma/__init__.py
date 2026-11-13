@@ -83,8 +83,16 @@ HISTORY_DAYS = 31
 MAX_VIDEO = timedelta(minutes=15)
 MAX_EVENTS = timedelta(hours=48)
 MAX_EVENT_COUNT = 2000
-# What a Protect sensor saw, from its own key: the first match names it.
-EVENT_KINDS = ("person", "vehicle", "animal", "package", "doorbell", "motion")
+# What each Protect detection reports, by the entity's own key. Only these: settings sensors such
+# as `motion_enabled` or `smart_person` stay on while a detection is enabled.
+EVENT_KINDS = {
+    "motion": "motion",
+    "smart_obj_person": "person",
+    "smart_obj_vehicle": "vehicle",
+    "smart_obj_animal": "animal",
+    "smart_obj_package": "package",
+    "doorbell": "doorbell",
+}
 # CameraEntityFeature.STREAM; the camera component is imported only when a stream is requested.
 CAMERA_STREAM = 2
 # Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
@@ -446,8 +454,8 @@ def _iso(moment: datetime) -> str:
 
 def sensor_kind(key: str) -> str | None:
     """What a Protect sensor reports, from its own key (`motion`, `smart_obj_person`,
-    `doorbell`…), or None for one that reports nothing the timeline shows (`is_dark`…)."""
-    return next((kind for kind in EVENT_KINDS if kind in key), None)
+    `doorbell`…), or None for one the timeline does not show (`dark`, `motion_enabled`…)."""
+    return EVENT_KINDS.get(key)
 
 
 def _sensor_key(entry: er.RegistryEntry, camera_object_id: str) -> str:

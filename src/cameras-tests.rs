@@ -1068,3 +1068,33 @@ fn up_on_the_live_video_with_nothing_earlier_stays_live() {
     assert_eq!(state.cameras.playback, Playback::Live);
     assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
 }
+
+#[test]
+fn up_on_recorded_video_with_nothing_earlier_stays_in_the_recordings() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Err("no stream".into()),
+    });
+    let now = Instant::now() + Duration::from_secs(600);
+    state.cameras.playback = Playback::Replay {
+        lag: Duration::from_secs(3600),
+        since: now,
+        speed: 1,
+    };
+    state.camera_replay(None, now, UNIX);
+    assert!(state.cameras.play.take().is_some());
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(3600.),
+            key: Some("up".into()),
+            ..Default::default()
+        },
+        now,
+        UNIX,
+    );
+    assert_eq!(state.cameras.lag(now), Duration::from_secs(3600));
+    assert!(state.cameras.resolve.is_none());
+}

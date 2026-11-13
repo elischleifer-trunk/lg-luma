@@ -1720,9 +1720,10 @@ impl State {
             match closed.key.as_deref() {
                 Some("left") => gallery.skip(true, now),
                 Some("right") => gallery.skip(false, now),
-                // Nothing earlier to jump to from the live video: back to it.
+                // Nothing earlier to jump to from the live video: back to it. Recorded video
+                // stays where it was, as the gallery's own Up does.
                 Some("up") => {
-                    if !gallery.jump(true, now, unix) {
+                    if !gallery.jump(true, now, unix) && !recorded {
                         gallery.go_live();
                     }
                 }
