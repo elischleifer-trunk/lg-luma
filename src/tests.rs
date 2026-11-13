@@ -3682,3 +3682,60 @@ fn right_edge_moves_never_jump_to_the_header_search_button() {
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::App(right_column));
 }
+
+#[test]
+fn streaming_keys_row_opens_a_phone_dialog_and_shows_only_whether_keys_are_set() {
+    let mut state = ready();
+    state.preferences.reduced_motion = true;
+    state.open(2);
+    let value = |state: &State, label: &str| {
+        scene(state)
+            .draw
+            .iter()
+            .any(|draw| matches!(draw, crate::renderer::Draw::Text(text, ..) if text == label))
+    };
+    let row = scene(&state)
+        .controls
+        .iter()
+        .find(|control| control.target == Target::Setting(10))
+        .cloned()
+        .expect("Streaming search keys row");
+    assert!(value(&state, "Streaming search keys"));
+    assert!(value(&state, "Not set"));
+    state.streaming_keys = crate::streaming_keys::Status {
+        motn: true,
+        tmdb: false,
+    };
+    assert!(value(&state, "Incomplete"));
+    state.streaming_keys.tmdb = true;
+    assert!(value(&state, "Set"));
+
+    state.focus = row.target.clone();
+    assert!(state.activate().is_empty());
+    assert!(matches!(state.overlay, Some(Overlay::StreamingKeys)));
+    assert_eq!(state.focus, Target::CloseDialog);
+    let dialog = scene(&state);
+    assert!(dialog.modal.is_some());
+    assert!(
+        dialog
+            .controls
+            .iter()
+            .all(|control| control.target == Target::CloseDialog)
+    );
+    assert!(value(&state, "Add keys on phone or computer"));
+    assert!(state.direction(Direction::Up, &dialog.controls).is_empty());
+    assert_eq!(state.focus, Target::CloseDialog);
+    state.key_editor = Some(Err("offline".into()));
+    assert!(value(
+        &state,
+        "Couldn’t start local setup. Check your network connection, then close and reopen this dialog."
+    ));
+    state.back();
+    assert!(state.overlay.is_none());
+    assert!(state.key_editor.is_none());
+    assert_eq!(state.focus, Target::Setting(10));
+    // Right opens it too, like the other rows with a chevron.
+    let controls = scene(&state).controls;
+    state.direction(Direction::Right, &controls);
+    assert!(matches!(state.overlay, Some(Overlay::StreamingKeys)));
+}

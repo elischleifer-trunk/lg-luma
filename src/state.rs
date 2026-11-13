@@ -156,6 +156,8 @@ pub enum Overlay {
     SystemKeyboard,
     WallpaperUpload,
     TileEditor,
+    /// QR dialog for entering streaming search keys on a phone.
+    StreamingKeys,
     HomeAssistantSetup,
     BackgroundOptions {
         id: String,
@@ -272,6 +274,9 @@ pub struct State {
     pub deleting_wallpaper: Option<String>,
     pub wallpaper_upload: Option<Result<crate::wallpapers::Session, String>>,
     pub tile_editor: Option<Result<crate::companion::Session, String>>,
+    pub key_editor: Option<Result<crate::companion::Session, String>>,
+    /// Which streaming search keys are stored (never the keys themselves).
+    pub streaming_keys: crate::streaming_keys::Status,
     /// The HACS install link's QR code, made when its dialog opens.
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
@@ -330,6 +335,8 @@ impl State {
             deleting_wallpaper: None,
             wallpaper_upload: None,
             tile_editor: None,
+            key_editor: None,
+            streaming_keys: Default::default(),
             home_assistant_qr: None,
             home_assistant_address: None,
             home_assistant_code: None,
@@ -1217,7 +1224,12 @@ impl State {
         }
         if matches!(
             self.overlay,
-            Some(Overlay::WallpaperUpload | Overlay::TileEditor | Overlay::HomeAssistantSetup)
+            Some(
+                Overlay::WallpaperUpload
+                    | Overlay::TileEditor
+                    | Overlay::StreamingKeys
+                    | Overlay::HomeAssistantSetup
+            )
         ) {
             return vec![];
         }
@@ -1444,7 +1456,7 @@ impl State {
             }
             if matches!(
                 self.focus,
-                Target::Setting(0 | 1 | 4 | 7 | 9)
+                Target::Setting(0 | 1 | 4 | 7 | 9 | 10)
                     | Target::Widget(_)
                     | Target::InputMode(_)
                     | Target::WeatherLocation
@@ -2497,6 +2509,13 @@ impl State {
                         self.open_home_assistant_setup();
                         return vec![];
                     }
+                    10 => {
+                        self.key_editor = None;
+                        self.overlay = Some(Overlay::StreamingKeys);
+                        self.focus = Target::CloseDialog;
+                        self.pressed = None;
+                        return vec![];
+                    }
                     4 => {
                         self.subpage = Some(Subpage::Language);
                         self.focus = Target::Choice(self.preferences.language.index());
@@ -2830,6 +2849,12 @@ impl State {
             if matches!(overlay, Overlay::TileEditor) {
                 self.tile_editor = None;
                 self.focus = Target::TileEditor;
+                self.pressed = None;
+                return vec![];
+            }
+            if matches!(overlay, Overlay::StreamingKeys) {
+                self.key_editor = None;
+                self.focus = Target::Setting(10);
                 self.pressed = None;
                 return vec![];
             }

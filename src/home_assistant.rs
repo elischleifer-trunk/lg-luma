@@ -1205,7 +1205,8 @@ impl<T: Tv> Api<T> {
     }
 }
 
-fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
+/// Atomically replaces `path` with a file only Luma can read (mode 0600 on Unix).
+pub(crate) fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
     let temporary = path.with_extension(format!("json.new-{}", std::process::id()));
     let mut options = std::fs::OpenOptions::new();
     options.write(true).create(true).truncate(true);
