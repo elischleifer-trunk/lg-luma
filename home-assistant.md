@@ -20,7 +20,8 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
 - **`luma.notify`** and a **Toast** notify entity: a standard webOS toast over any app.
 - **A Cameras app** in Luma: every Home Assistant camera in a full-screen grid. Arrows choose a
   camera, **OK** shows it full screen, **Back** returns to the grid and then closes it. Hold
-  **OK** on a camera to move or hide it; the settings button shows hidden cameras again.
+  **OK** on a camera to move, rename or hide it; the settings button shows hidden cameras again.
+  Five or more cameras show three across and two rows at a time; scroll down for the rest.
 - **Show example camera card** and **Show example toast** buttons: press them on the TV's device
   page to see what each popup looks like, before writing any automation. The example card shows a
   picture of a front door that comes with the integration, so it works without a camera.

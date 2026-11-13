@@ -164,29 +164,31 @@ pub struct Gallery {
     pub hidden: Vec<String>,
     /// Enlarged cameras poll snapshots instead of opening the motion-JPEG stream.
     pub snapshots: bool,
+    /// The owner's names for cameras, shown instead of Home Assistant's.
+    pub names: std::collections::BTreeMap<String, String>,
 }
 
 impl Gallery {
     /// The server at `index` in pairing order was unpaired: its entries go, and later servers,
     /// which move up one place, keep theirs.
     fn unpaired(&mut self, index: usize) {
-        let renumber = |list: &mut Vec<String>| {
-            *list = list
-                .drain(..)
-                .filter_map(|id| {
-                    let Some((server, entity)) = id.split_once('/') else {
-                        return Some(id);
-                    };
-                    match server.parse::<usize>() {
-                        Ok(server) if server == index => None,
-                        Ok(server) if server > index => Some(format!("{}/{entity}", server - 1)),
-                        _ => Some(id),
-                    }
-                })
-                .collect();
+        // An entry's new ID, or none if it belonged to the unpaired server.
+        let moved = |id: &str| -> Option<String> {
+            let Some((server, entity)) = id.split_once('/') else {
+                return Some(id.into());
+            };
+            match server.parse::<usize>() {
+                Ok(server) if server == index => None,
+                Ok(server) if server > index => Some(format!("{}/{entity}", server - 1)),
+                _ => Some(id.into()),
+            }
         };
-        renumber(&mut self.order);
-        renumber(&mut self.hidden);
+        self.order = self.order.iter().filter_map(|id| moved(id)).collect();
+        self.hidden = self.hidden.iter().filter_map(|id| moved(id)).collect();
+        self.names = std::mem::take(&mut self.names)
+            .into_iter()
+            .filter_map(|(id, name)| Some((moved(&id)?, name)))
+            .collect();
     }
 }
 
@@ -863,6 +865,32 @@ impl<T: Tv> Api<T> {
         };
         let order = merge(order, &self.store.gallery.order);
         let hidden = merge(hidden, &self.store.gallery.hidden);
+        let names = match body.get("names") {
+            None | Some(Value::Null) => None,
+            Some(Value::Object(given)) => {
+                let mut names = std::collections::BTreeMap::new();
+                for (id, name) in given {
+                    let Some(name) = name.as_str() else {
+                        return error(400, "names must map camera IDs to text");
+                    };
+                    let name = crate::model::clean_input_name(name);
+                    if id.len() <= 256 && !name.is_empty() {
+                        names.insert(id.clone(), name);
+                    }
+                }
+                // Names for cameras the gallery did not report are kept.
+                for (id, name) in &self.store.gallery.names {
+                    if !known.contains(id) && !names.contains_key(id) {
+                        names.insert(id.clone(), name.clone());
+                    }
+                }
+                if names.len() > MAX_ARRANGED {
+                    return error(400, "too many camera names");
+                }
+                Some(names)
+            }
+            Some(_) => return error(400, "names must be an object"),
+        };
         let snapshots = match body.get("live") {
             None | Some(Value::Null) => None,
             Some(Value::Bool(live)) => Some(!live),
@@ -878,6 +906,9 @@ impl<T: Tv> Api<T> {
         }
         if let Some(snapshots) = snapshots {
             gallery.snapshots = snapshots;
+        }
+        if let Some(names) = names {
+            gallery.names = names;
         }
         if *gallery != before {
             self.save();
@@ -919,6 +950,7 @@ impl<T: Tv> Api<T> {
             .into_iter()
             .map(|(camera, id)| crate::cameras::Camera {
                 hidden: arranged.hidden.contains(&id),
+                label: arranged.names.get(&id).cloned(),
                 id,
                 name: camera.name.clone(),
                 stream: camera.stream.clone(),
