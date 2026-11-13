@@ -3419,6 +3419,36 @@
     "nl": "Momentopnamen",
     "sv": "Stillbilder"
   },
+  "cameraPaused": {
+    "zh-tw": "已暫停",
+    "en": "Paused",
+    "de": "Pausiert",
+    "es": "En pausa",
+    "zh": "已暂停",
+    "pt": "Pausado",
+    "it": "In pausa",
+    "ru": "Пауза",
+    "pl": "Wstrzymano",
+    "fr": "En pause",
+    "vi": "Đã tạm dừng",
+    "nl": "Gepauzeerd",
+    "sv": "Pausad"
+  },
+  "cameraNotRecorded": {
+    "zh-tw": "這個時間沒有錄影",
+    "en": "Nothing recorded at this time",
+    "de": "Zu dieser Zeit wurde nichts aufgezeichnet",
+    "es": "No hay grabación de este momento",
+    "zh": "此时没有录像",
+    "pt": "Nada gravado neste horário",
+    "it": "Nessuna registrazione in questo momento",
+    "ru": "В это время запись не велась",
+    "pl": "Brak nagrania z tego czasu",
+    "fr": "Aucun enregistrement à ce moment",
+    "vi": "Không có bản ghi vào thời điểm này",
+    "nl": "Op dit moment is niets opgenomen",
+    "sv": "Inget inspelat vid den här tiden"
+  },
   "cameraShown": {
     "zh-tw": "顯示",
     "en": "Shown",

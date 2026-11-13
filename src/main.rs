@@ -242,6 +242,24 @@ struct Press {
 
 const SCRIPT_POINTER: u32 = u32::MAX - 1;
 // SDL-webOS's Back scancode is outside rust-sdl2's standard Scancode enum.
+// SDL_SCANCODE_TO_KEYCODE of SDL_SCANCODE_AUDIOREWIND and SDL_SCANCODE_AUDIOFASTFORWARD, which
+// rust-sdl2 does not name.
+const AUDIO_REWIND_KEYCODE: i32 = (1 << 30) | 285;
+const AUDIO_FAST_FORWARD_KEYCODE: i32 = (1 << 30) | 286;
+
+fn media_key(key: Keycode) -> Option<cameras::Media> {
+    Some(match key {
+        Keycode::AudioPlay => cameras::Media::Play,
+        Keycode::Pause | Keycode::AudioStop => cameras::Media::Pause,
+        Keycode::Space => cameras::Media::PlayPause,
+        Keycode::Comma => cameras::Media::Rewind,
+        Keycode::Period => cameras::Media::Forward,
+        key if i32::from(key) == AUDIO_REWIND_KEYCODE => cameras::Media::Rewind,
+        key if i32::from(key) == AUDIO_FAST_FORWARD_KEYCODE => cameras::Media::Forward,
+        _ => return None,
+    })
+}
+
 // Keycode retains the raw value: SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_WEBOS_BACK).
 const WEBOS_BACK_KEYCODE: i32 = (1 << 30) | 482;
 
@@ -1333,8 +1351,8 @@ fn run() -> Result<(), String> {
                     state.camera_list(cameras, live, open);
                     continue;
                 }
-                home_assistant::Event::VideoClosed { failed } => {
-                    state.camera_video_closed(failed);
+                home_assistant::Event::VideoClosed(closed) => {
+                    state.camera_video_closed(closed);
                     continue;
                 }
                 // Sent only when the keys changed, so a reconnect does not repeat the notice.
@@ -1367,6 +1385,16 @@ fn run() -> Result<(), String> {
         camera_service.sync(&state.camera_watches(visible));
         for update in camera_service.receiver.try_iter() {
             state.camera_update(update);
+        }
+        // A paused or rewound enlarged camera shows its picture from that moment: a frame it
+        // kept, or what UniFi Protect recorded.
+        if let Some((id, want)) =
+            state.camera_replay(camera_service.recorded(), Instant::now(), state::unix_now())
+        {
+            camera_service.replay(&id, want);
+        }
+        if let Some((id, url)) = state.cameras.fetch_marks.take() {
+            camera_service.marks(id, url);
         }
         while let Ok(webhook::Response::Done { title, result }) =
             webhook_service.receiver.try_recv()
@@ -1614,6 +1642,16 @@ fn run() -> Result<(), String> {
                         {
                             let length = state.editing_text().len() as i32;
                             state.delete_surrounding_text(-length, length);
+                        }
+                        // The remote's media keys (comma, period and space on a keyboard) on an
+                        // enlarged camera: rewind, fast-forward, play and pause.
+                        key if state.cameras_open()
+                            && state.cameras.enlarged.is_some()
+                            && media_key(key).is_some() =>
+                        {
+                            if let Some(media) = media_key(key) {
+                                state.camera_media(media);
+                            }
                         }
                         // The Cameras gallery is an overlay too; Menu opens a camera's options.
                         Keycode::M | Keycode::Menu

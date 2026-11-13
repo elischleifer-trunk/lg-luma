@@ -3,7 +3,11 @@
 // shows one doorbell-style card, or (mode "video") an enlarged camera from Luma's Cameras app as
 // Home Assistant's HLS video, full screen, decoded by the TV. A card given an HLS playlist plays
 // it too, muted, over its motion-JPEG feed once the video is playing. OK on a card expands it to
-// full screen, video and all, and stops its countdown.
+// full screen, video and all, and stops its countdown. The Cameras video keeps its last two
+// minutes: Left and Right scrub through them, OK pauses and plays, Back closes. Scrubbing back
+// past them, or Up and Down to what UniFi Protect saw, hands over to Luma's own timeline. In
+// mode "recorded" it plays what UniFi Protect recorded, from a moment Luma chose; any key the
+// Cameras app handles closes it and tells Luma where it was, so Luma carries on from there.
 (function () {
   'use strict';
   var logic = window.LumaOverlay;
@@ -15,6 +19,8 @@
   var player = document.getElementById('player');
   var videoCover = document.getElementById('video-cover');
   var videoLive = document.getElementById('video-live');
+  var videoScrub = document.getElementById('video-scrub');
+  var videoTrack = videoScrub.querySelector('.scrub-track');
   var cardVideo = document.getElementById('card-video');
   // A video that shows nothing by then gives the screen back to the motion-JPEG stream.
   var VIDEO_WAIT_MS = 15000;
@@ -24,6 +30,9 @@
   var VIDEO_SETTLE_S = 0.3;
   // Cover snapshots load back to back, at most this often.
   var COVER_GAP_MS = 250;
+  // The Cameras video keeps this much behind its playhead to rewind into; Left and Right skip.
+  var REWIND_S = 120;
+  var SKIP_S = 5;
   var video = null;
   var cardPlayback = null;
   var current = null;
@@ -73,8 +82,14 @@
   // Tell Luma the overlay closed so it can resume paused playback. Opaque "no-cors" requests
   // need no CORS reply; Luma accepts this endpoint only from the TV itself with this nonce.
   // `failed`: a camera video could not play, so the Cameras app keeps its own stream on screen.
-  function report(settings, failed) {
-    send(settings, logic.closedUrl(settings && settings.port), { failed: failed === true });
+  function report(settings, failed, handOff) {
+    var fields = { failed: failed === true };
+    if (handOff) {
+      fields.key = handOff.key;
+      fields.behind = handOff.behind;
+      fields.paused = handOff.paused;
+    }
+    send(settings, logic.closedUrl(settings && settings.port), fields);
   }
 
   function send(settings, url, extra) {
@@ -96,7 +111,13 @@
     }
   }
 
-  function dismiss(failed) {
+  // Closes, telling the Cameras app the key and how far behind live the video was, so it
+  // carries on from there in its own timeline.
+  function handOff(key, behind, paused) {
+    dismiss(false, { key: key, behind: Math.max(0, behind), paused: paused === true });
+  }
+
+  function dismiss(failed, handed) {
     if (closing) return;
     closing = true;
     clearTimers();
@@ -105,7 +126,7 @@
     card.hidden = true;
     expanded = false;
     stopVideo();
-    report(current, failed);
+    report(current, failed, handed);
     closeTimer = setTimeout(function () {
       window.close();
     }, 150);
@@ -264,7 +285,18 @@
           return;
         }
         element.removeAttribute('src');
-        playback.hls = new Hls({ lowLatencyMode: true, backBufferLength: 10, maxBufferLength: 10 });
+        // To rewind, the video keeps what it played, and keeps loading while paused or behind,
+        // since Home Assistant's playlist only lists the newest few seconds.
+        playback.hls = new Hls(
+          options.rewind
+            ? {
+                lowLatencyMode: true,
+                backBufferLength: REWIND_S,
+                maxBufferLength: REWIND_S + 10,
+                maxMaxBufferLength: REWIND_S + 10,
+              }
+            : { lowLatencyMode: true, backBufferLength: 10, maxBufferLength: 10 }
+        );
         playback.hls.on(Hls.Events.ERROR, function (_event, data) {
           if (!data || !data.fatal) return;
           playback.hls.destroy();
@@ -306,7 +338,11 @@
       var position = element.currentTime;
       var still = 0;
       playback.watch = setInterval(function () {
-        if (element.currentTime !== position) {
+        // Paused on purpose (scrubbing the Cameras video) is not a stall.
+        if (element.paused) {
+          position = element.currentTime;
+          still = 0;
+        } else if (element.currentTime !== position) {
           position = element.currentTime;
           still = 0;
         } else if ((still += 1000) >= VIDEO_STALL_MS) {
@@ -335,6 +371,74 @@
 
   // ---- Camera video (Cameras app) ----------------------------------------------------------
 
+  // The seconds of video kept, oldest to newest.
+  function kept() {
+    var ranges = player.buffered;
+    if (!ranges || !ranges.length) return null;
+    return { start: ranges.start(0), end: ranges.end(ranges.length - 1) };
+  }
+
+  function playing() {
+    return !!video && videoView.className.indexOf('playing') >= 0;
+  }
+
+  function goLive() {
+    var range = kept();
+    var edge = video && video.hls && video.hls.liveSyncPosition;
+    if (range) player.currentTime = edge || Math.max(range.start, range.end - 1);
+    start(player);
+  }
+
+  // Left and Right: SKIP_S back or forward, playing or paused as it was; forward to the newest
+  // video goes live and plays.
+  // The live video's lag behind real time is about its own live delay on top of what it shows.
+  var LIVE_DELAY_S = 2;
+
+  function behindLive() {
+    var range = kept();
+    return range ? range.end - player.currentTime + LIVE_DELAY_S : 0;
+  }
+
+  function scrub(step) {
+    var range = kept();
+    if (!range) return;
+    // Back past what the video kept: Luma's timeline (and Protect's recordings) go further.
+    if (step < 0 && player.currentTime + step < range.start - 0.5 && current.history) {
+      handOff('left', range.end - range.start + LIVE_DELAY_S, player.paused);
+      return;
+    }
+    var next = logic.seek(player.currentTime, range.start, range.end, step);
+    if (next === null) goLive();
+    else player.currentTime = next;
+    showScrub();
+  }
+
+  function togglePause() {
+    if (player.paused) start(player);
+    else player.pause();
+    showScrub();
+  }
+
+  function showScrub() {
+    if (!playing()) return;
+    var range = kept();
+    var span = range ? range.end - range.start : 0;
+    var lag = range ? logic.behind(player.currentTime, range.end) : 0;
+    var live = lag === 0 && !player.paused;
+    videoScrub.hidden = span < 1;
+    videoView.className = 'video playing' + (span < 1 ? '' : ' scrubbing');
+    videoLive.className = 'video-badge' + (live ? ' live-badge' : '');
+    videoLive.textContent = live ? 'Live' : player.paused ? 'Paused' : logic.clock(lag);
+    if (span < 1) return;
+    var played = Math.min(1, Math.max(0, (player.currentTime - range.start) / span));
+    var percent = played * 100 + '%';
+    videoTrack.className = 'scrub-track' + (live ? ' live' : '');
+    document.getElementById('video-played').style.width = percent;
+    document.getElementById('video-knob').style.left = percent;
+    document.getElementById('video-position').textContent = live ? 'Live' : logic.clock(lag);
+    document.getElementById('video-window').textContent = logic.clock(span);
+  }
+
   function stopVideo() {
     if (video) {
       video.stop();
@@ -344,23 +448,28 @@
     videoCover.removeAttribute('src');
     videoView.hidden = true;
     videoView.className = 'video';
+    videoScrub.hidden = true;
+    videoLive.className = 'video-badge live-badge';
+    videoLive.textContent = 'Live';
   }
 
-  // The camera's snapshots, refreshed, over the video until it plays.
-  function cover(settings) {
+  // The camera's snapshots, refreshed, over the video until it plays. `once`: a picture of a
+  // fixed moment (recorded video), which loads once rather than again and again.
+  function cover(settings, once) {
     if (!settings.snapshot) return;
     function next() {
-      if (closing || current !== settings || videoView.className === 'video playing') return;
+      if (closing || current !== settings || playing()) return;
       var started = Date.now();
       var image = new Image();
       image.onload = function () {
-        if (current !== settings || videoView.className === 'video playing') return;
+        if (current !== settings || playing()) return;
         videoCover.src = image.src;
         videoCover.hidden = false;
+        if (once) return;
         timers.push(setTimeout(next, Math.max(0, COVER_GAP_MS - (Date.now() - started))));
       };
       image.onerror = function () {
-        timers.push(setTimeout(next, 1000));
+        if (!once) timers.push(setTimeout(next, 1000));
       };
       image.src = logic.frameUrl(settings.snapshot, Date.now());
     }
@@ -387,11 +496,13 @@
         videoView.className = 'video playing';
         videoCover.hidden = true;
         videoLive.hidden = false;
+        showScrub();
+        timers.push(setInterval(showScrub, 250));
       },
       function () {
         dismiss(true);
       },
-      { hlsFirst: true, settle: true }
+      { hlsFirst: true, settle: true, rewind: true }
     );
   }
 
@@ -460,7 +571,102 @@
     }, settings.duration * 1000);
   }
 
+  // ---- Recorded video (Cameras app) --------------------------------------------------------
+
+  // Plays UniFi Protect's recording piece by piece through Luma, which redirects each piece to
+  // Home Assistant with the camera's current token. Fails (and Luma shows recorded pictures
+  // instead) when nothing plays within VIDEO_WAIT_MS or a piece cannot load.
+  function playRecorded(settings) {
+    cancelClose();
+    clearTimers();
+    stopFeed();
+    stopCardVideo();
+    stopVideo();
+    card.hidden = true;
+    closing = false;
+    current = settings;
+    document.getElementById('video-title').textContent = settings.title;
+    videoLive.hidden = true;
+    videoLive.className = 'video-badge';
+    videoView.hidden = false;
+    var part = null;
+    var wait = null;
+    cover(settings, true);
+    var playback = {
+      recorded: true,
+      stop: function () {
+        clearTimeout(wait);
+        player.onplaying = null;
+        player.onended = null;
+        player.onerror = null;
+        player.pause();
+        player.removeAttribute('src');
+        try {
+          player.load();
+        } catch (_error) {
+          // Nothing was loading.
+        }
+      },
+    };
+    playback.position = function () {
+      return part ? part.start + (player.currentTime || 0) : settings.start;
+    };
+    function load(from, first) {
+      part = logic.piece(settings, from, Date.now() / 1000, first);
+      if (!part) {
+        handOff('live', 0, false);
+        return;
+      }
+      clearTimeout(wait);
+      wait = setTimeout(function () {
+        dismiss(true);
+      }, VIDEO_WAIT_MS);
+      player.src = part.url;
+      start(player);
+    }
+    player.onplaying = function () {
+      clearTimeout(wait);
+      videoView.className = 'video playing';
+      videoCover.hidden = true;
+      videoLive.hidden = false;
+    };
+    player.onended = function () {
+      load(part.end, false);
+    };
+    player.onerror = function () {
+      dismiss(true);
+    };
+    video = playback;
+    load(settings.start, true);
+    timers.push(
+      setInterval(function () {
+        videoLive.textContent = new Date(playback.position() * 1000).toLocaleTimeString();
+      }, 250)
+    );
+  }
+
+  function recordedBehind() {
+    return Date.now() / 1000 - video.position();
+  }
+
+  // Keys on recorded video: each goes to Luma's timeline with where the video was.
+  var RECORDED_KEYS = {
+    13: 'ok',
+    19: 'ok',
+    37: 'left',
+    39: 'right',
+    38: 'up',
+    40: 'down',
+    412: 'rewind',
+    417: 'forward',
+  };
+
   function apply(params) {
+    var past = logic.recorded(params);
+    if (past) {
+      playRecorded(past);
+      return;
+    }
     var enlarged = logic.video(params);
     if (enlarged) {
       playVideo(enlarged);
@@ -474,10 +680,52 @@
     show(settings);
   }
 
+  // The remote's keys on a playing camera video: OK and the media keys play and pause, Left,
+  // Right, rewind and fast-forward scrub.
+  var VIDEO_KEYS = {
+    13: togglePause,
+    415: function () {
+      if (player.paused) togglePause();
+    },
+    19: function () {
+      if (!player.paused) togglePause();
+    },
+    37: function () {
+      scrub(-SKIP_S);
+    },
+    412: function () {
+      scrub(-SKIP_S);
+    },
+    39: function () {
+      scrub(SKIP_S);
+    },
+    417: function () {
+      scrub(SKIP_S);
+    },
+  };
+
   document.addEventListener('keydown', function (event) {
+    if (video && video.recorded && RECORDED_KEYS[event.keyCode]) {
+      event.preventDefault();
+      // The video was playing: the gallery applies the key (OK pauses) from there.
+      handOff(RECORDED_KEYS[event.keyCode], recordedBehind(), false);
+      return;
+    }
+    // Up on the live video: back to what UniFi Protect last saw, in Luma's timeline (which
+    // comes back to live when there is nothing). Down has nothing later than live.
+    if (playing() && current.history && event.keyCode === 38) {
+      event.preventDefault();
+      handOff('up', behindLive(), player.paused);
+      return;
+    }
+    if (playing() && VIDEO_KEYS[event.keyCode]) {
+      event.preventDefault();
+      VIDEO_KEYS[event.keyCode]();
+      return;
+    }
     // 461 is the webOS remote's Back key; Escape helps when testing in a desktop browser.
-    // OK also closes a camera video, as it does an enlarged camera in Luma. On a doorbell card,
-    // OK first shows it full screen.
+    // OK also closes a camera video that is not playing yet. On a doorbell card, OK first shows
+    // it full screen.
     var ok = event.keyCode === 13;
     var full = !videoView.hidden || expanded;
     if (event.keyCode === 461 || event.keyCode === 27 || (full && ok)) {

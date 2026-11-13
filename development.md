@@ -497,6 +497,44 @@ GPU texture per camera, re-uploaded only for a newer frame; damage tracking comp
 pointer, so a new frame redraws only its tile. The main loop wakes every 16 ms while the gallery
 is open.
 
+The enlarged camera can be rewound. Its worker (`Watch::record`) keeps every frame as the camera
+sent it, undecoded, for `cameras::REWIND` (two minutes, at most 48 MB) in the service's
+`Recording`; it is dropped once no camera is enlarged. A camera Home Assistant's UniFi Protect
+integration records arrives with `history_url` (`Camera::history`) and reaches `HISTORY` (24 h)
+back. `Playback::Replay { lag, since, speed }` is the position: `lag` behind live at `since`,
+moving at `speed` (0 paused, 1 normal, ±2…64 from the media keys, `Gallery::faster`). Left/Right
+(`Gallery::skip`) step 10 s, growing while held (`step`: a minute after 1 s, five after 3 s, half
+an hour after 6 s; presses within `HOLD_GAP` continue a hold); OK pauses and plays; Up/Down
+(`Gallery::jump`) go to 2 s before the previous or next `Mark`. Fast-forward stops at live and
+rewind at the oldest moment. Each tick `State::camera_replay` hands the main loop a `Want`: a kept
+frame (`Want::Kept`) within the kept span, else Protect's picture (`Want::Recorded`,
+`history_url&at=<unix>&width=1280`). One replay thread loads it, newest ask first and not again
+for the same frame, as `Update::Replay` under its own texture key; `None` means nothing was
+recorded then (**Nothing recorded at this time**). Every `EVENTS_REFRESH` the gallery asks
+`history_url&events=1&start=&end=` for the last day's marks (`Update::Marks`), drawn on the bar
+by kind. Playing at normal speed in the recordings, once scrubbing has settled for `SETTLE`,
+hands over to the overlay app (`Video::Recorded`, `VideoRequest::recorded`), which plays Protect's
+MP4 a piece at a time (60 s, then 300 s) from `GET /api/overlay/recorded`: loopback only, checked
+against the session's nonce, it redirects to `history_url&start=&end=` with the camera's current
+token. Any timeline key there closes it with `key`, `behind` (seconds behind live) and `paused`
+in its `closed` report (`cameras::Closed`), and the gallery carries on from that moment with the
+key; a video that fails puts the camera in `recorded_failed`, which replays pictures instead.
+The live HLS video hands over the same way: Left past what it kept, or Up (back to live when no
+mark is earlier), when the camera has history (`VideoRequest::history`). While recorded video
+plays, no pictures load behind it; a camera without history paused past its oldest kept frame
+keeps the picture it has. Leaving live closes nothing; going live again asks for the
+HLS video again.
+
+The integration's `HistoryView` (`/api/luma/history/<entity>`) checks the camera's access token
+like `StreamView`, finds the camera's UniFi Protect config entry in the entity registry, and
+redirects `at` and `start`/`end` (at most 15 minutes, within 31 days) to the UniFi Protect
+integration's snapshot and video views with a path `async_sign_path` signs for a minute as Home
+Assistant's content user, passing the camera's entity ID (those views look a camera up by Protect
+ID, then entity ID). `events` answers from the Recorder's history of the camera device's Protect
+motion and detection binary sensors and doorbell event entity (`event_spans`), told apart by each
+entity's own key (its unique ID after the MAC address), never by entity IDs that carry the device
+name.
+
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the
 integration adds `hls_url` to every camera with the stream feature while the `stream`
@@ -514,7 +552,11 @@ couple of seconds and stays close to live. The TV's own HLS player is the fallba
 started after about 12 s on a TV. HLS views allow any origin, so the `file://` page may fetch
 them. webOS shows hardware video on a plane behind the page, black until the first frame
 decodes, so the page covers it with the camera's snapshots (the `snapshot` parameter,
-refreshed back to back) and uncovers it once playback has advanced 0.3 s. Back or OK closes it
+refreshed back to back) and uncovers it once playback has advanced 0.3 s. hls.js keeps two minutes
+behind the playhead and keeps loading while paused or behind (Home Assistant's playlist lists only
+the newest few seconds), so Left/Right (and rewind/fast-forward) scrub through what the TV has
+buffered and OK (and play/pause) pauses and plays, with the same bar as Luma's; a user pause is not
+a stall. Back closes it (OK too, before it plays)
 and reports closing, which also leaves the enlarged camera (`Event::VideoClosed`); a stream that
 fails, or shows nothing within 15 s, reports `failed`, and that camera stays on the motion-JPEG
 stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma

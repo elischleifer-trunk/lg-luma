@@ -1,4 +1,5 @@
 use super::*;
+use crate::cameras::Closed;
 use std::sync::Mutex;
 
 #[derive(Default)]
@@ -74,6 +75,7 @@ impl Harness {
             &Request {
                 method,
                 path,
+                query: "",
                 authorization: authorization.as_deref(),
                 origin: None,
                 peer: LAN,
@@ -201,6 +203,7 @@ fn protected_endpoints_need_a_paired_token_and_reject_browsers_and_remote_peers(
     let request = |origin, peer| Request {
         method: "POST",
         path: "/api/overlay",
+        query: "",
         authorization: Some(&authorization),
         origin,
         peer,
@@ -339,6 +342,7 @@ fn pausing_resumes_once_when_the_overlay_reports_closing() {
             &Request {
                 method: "POST",
                 path: "/api/overlay/closed",
+                query: "",
                 authorization: None,
                 origin: Some("null"),
                 peer,
@@ -352,6 +356,7 @@ fn pausing_resumes_once_when_the_overlay_reports_closing() {
         &Request {
             method: "POST",
             path: "/api/overlay/closed",
+            query: "",
             authorization: None,
             origin: Some("null"),
             peer: LOOPBACK,
@@ -942,6 +947,8 @@ fn settings_from_a_newer_luma_survive_a_save() {
 
 fn video(url: &str) -> crate::cameras::VideoRequest {
     crate::cameras::VideoRequest {
+        recorded: None,
+        history: false,
         url: url.into(),
         title: "Door".into(),
         snapshot: Some("http://ha/s".into()),
@@ -993,6 +1000,7 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
             &Request {
                 method: "POST",
                 path: "/api/overlay/closed",
+                query: "",
                 authorization: None,
                 origin: Some("null"),
                 peer: LOOPBACK,
@@ -1015,7 +1023,13 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     assert_eq!(params["title"], "Door");
     assert_eq!(params["snapshot"], "http://ha/s");
     assert_eq!(closed(&mut h, &params, true).body, json!({"ended": true}));
-    assert_eq!(h.events.try_recv(), Ok(Event::VideoClosed { failed: true }));
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::VideoClosed(Closed {
+            failed: true,
+            ..Default::default()
+        }))
+    );
 
     // Home Assistant's dismiss closes doorbell cards, never a camera being watched.
     h.api.show_video(&video("http://ha/x.m3u8"), h.now);
@@ -1030,7 +1044,7 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     closed(&mut h, &params, false);
     assert_eq!(
         h.events.try_recv(),
-        Ok(Event::VideoClosed { failed: false })
+        Ok(Event::VideoClosed(Closed::default()))
     );
 
     // A doorbell card replaces the video; the gallery leaves the camera.
@@ -1038,7 +1052,7 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     h.call("POST", "/api/overlay", Some(&token), camera());
     assert_eq!(
         h.events.try_recv(),
-        Ok(Event::VideoClosed { failed: false })
+        Ok(Event::VideoClosed(Closed::default()))
     );
 
     // The gallery closing the video closes the overlay and resumes what the card had paused.
@@ -1059,7 +1073,13 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     // Without the overlay app installed yet, the gallery hears at once that it failed.
     h.api.overlay_ready.store(false, Ordering::Release);
     h.api.show_video(&video("http://ha/x.m3u8"), h.now);
-    assert_eq!(h.events.try_recv(), Ok(Event::VideoClosed { failed: true }));
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::VideoClosed(Closed {
+            failed: true,
+            ..Default::default()
+        }))
+    );
 }
 
 #[test]
@@ -1083,6 +1103,7 @@ fn ok_on_a_doorbell_card_keeps_it_full_screen_until_closed() {
             &Request {
                 method: "POST",
                 path,
+                query: "",
                 authorization: None,
                 origin: Some("null"),
                 peer,
@@ -1110,6 +1131,139 @@ fn ok_on_a_doorbell_card_keeps_it_full_screen_until_closed() {
         true
     );
     assert!(h.tv.calls().iter().any(|call| call == "resume _media1"));
+}
+
+#[test]
+fn recorded_video_loads_piece_by_piece_with_the_cameras_current_token() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let send = |h: &mut Harness, token: &str, history: &str| {
+        h.call(
+            "POST",
+            "/api/cameras",
+            Some(token),
+            json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/s",
+                "history_url": history}]}),
+        )
+    };
+    assert_eq!(
+        send(
+            &mut h,
+            &token,
+            "http://ha/api/luma/history/camera.door?token=a"
+        )
+        .status,
+        200
+    );
+    assert_eq!(send(&mut h, &token, "file:///etc/passwd").status, 400);
+    send(
+        &mut h,
+        &token,
+        "http://ha/api/luma/history/camera.door?token=a",
+    );
+    assert_eq!(
+        h.api.gallery()[0].history.as_deref(),
+        Some("http://ha/api/luma/history/camera.door?token=a")
+    );
+    h.api.show_video(
+        &crate::cameras::VideoRequest {
+            url: String::new(),
+            recorded: Some(("0/camera.door".into(), 1_800_000_000)),
+            history: true,
+            title: "Door".into(),
+            snapshot: None,
+        },
+        h.now,
+    );
+    let calls = h.tv.calls();
+    let launch = calls
+        .iter()
+        .rev()
+        .find(|c| c.starts_with("launch "))
+        .unwrap();
+    let params: Value = serde_json::from_str(&launch["launch ".len()..]).unwrap();
+    assert_eq!(params["mode"], "recorded");
+    assert_eq!(params["start"], 1_800_000_000u64);
+    let piece = |h: &mut Harness, query: String| {
+        h.api.handle(
+            &Request {
+                method: "GET",
+                path: "/api/overlay/recorded",
+                query: &query,
+                authorization: None,
+                origin: None,
+                peer: LOOPBACK,
+                body: b"",
+            },
+            h.now,
+        )
+    };
+    let auth = format!(
+        "session={}&nonce={}",
+        params["session"].as_str().unwrap(),
+        params["nonce"].as_str().unwrap()
+    );
+    // The token rotates between pieces: each redirect carries the current one.
+    send(
+        &mut h,
+        &token,
+        "http://ha/api/luma/history/camera.door?token=b",
+    );
+    let reply = piece(&mut h, format!("{auth}&start=100&end=400"));
+    assert_eq!(reply.status, 302);
+    assert_eq!(
+        reply.location.as_deref(),
+        Some("http://ha/api/luma/history/camera.door?token=b&start=100&end=400")
+    );
+    assert_eq!(
+        piece(&mut h, format!("{auth}&start=100&end=10000")).status,
+        400
+    );
+    assert_eq!(piece(&mut h, format!("{auth}&start=x&end=400")).status, 400);
+    assert_eq!(
+        piece(&mut h, "session=x&nonce=y&start=1&end=2".into()).status,
+        403
+    );
+    // Only from the TV itself.
+    let remote = h.api.handle(
+        &Request {
+            method: "GET",
+            path: "/api/overlay/recorded",
+            query: &format!("{auth}&start=100&end=400"),
+            authorization: None,
+            origin: None,
+            peer: LAN,
+            body: b"",
+        },
+        h.now,
+    );
+    assert_eq!(remote.status, 403);
+
+    // Left in the player: the gallery carries on from where it was.
+    let body = json!({"session": params["session"], "nonce": params["nonce"], "behind": 3600.5,
+        "key": "left", "paused": true})
+    .to_string();
+    h.api.handle(
+        &Request {
+            method: "POST",
+            path: "/api/overlay/closed",
+            query: "",
+            authorization: None,
+            origin: Some("null"),
+            peer: LOOPBACK,
+            body: body.as_bytes(),
+        },
+        h.now,
+    );
+    assert_eq!(
+        h.events.try_iter().last(),
+        Some(Event::VideoClosed(Closed {
+            failed: false,
+            behind: Some(3600.5),
+            key: Some("left".into()),
+            paused: true,
+        }))
+    );
 }
 
 #[test]

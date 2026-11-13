@@ -659,7 +659,7 @@ pub fn scene_with_pill(
     let content_start = out.draw.len();
     // The Cameras gallery is opaque and full screen: the page underneath is not drawn.
     if state.cameras_visible() {
-        cameras_view::render(&mut out, state, assets);
+        cameras_view::render(&mut out, state, assets, now);
         if let Some((notice, _)) = &state.notice {
             toast(&mut out, state, assets, notice);
         }

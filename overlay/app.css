@@ -21,7 +21,8 @@ body {
 .card[hidden],
 .video[hidden],
 .video-cover[hidden],
-.video-badge[hidden] {
+.video-badge[hidden],
+.scrub[hidden] {
   display: none;
 }
 
@@ -261,6 +262,75 @@ h1 {
   font-weight: 600;
 }
 
-.video:not(.playing) .video-title {
+.video:not(.playing) .video-title,
+.video:not(.playing) .scrub {
   display: none;
+}
+
+/* The kept video as a bar along the bottom: the oldest at the left, live at the right. Left and
+   Right scrub, OK pauses and plays. */
+.video.scrubbing .video-title {
+  bottom: 110px;
+}
+
+.video-title,
+.video-badge {
+  z-index: 1;
+}
+
+.scrub {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 260px;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.72));
+}
+
+.scrub-times {
+  position: absolute;
+  right: 96px;
+  bottom: 82px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  color: rgba(245, 245, 245, 0.56);
+}
+
+#video-position {
+  margin-right: 24px;
+  color: #fff;
+}
+
+.scrub-track {
+  position: absolute;
+  right: 96px;
+  bottom: 54px;
+  left: 96px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.scrub-track i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.scrub-track.live i {
+  background: #ff453a;
+}
+
+.scrub-track b {
+  position: absolute;
+  top: -8px;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  border-radius: 12px;
+  background: #fff;
 }

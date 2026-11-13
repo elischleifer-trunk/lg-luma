@@ -99,6 +99,7 @@ fn camera(id: &str) -> Camera {
         stream: Some(format!("http://ha/stream/{id}")),
         snapshot: Some(format!("http://ha/snap/{id}")),
         hls: None,
+        history: None,
         hidden: false,
         label: None,
     }
@@ -146,7 +147,7 @@ fn the_gallery_opens_on_the_first_camera_and_arrows_follow_the_grid() {
     assert_eq!(state.focus, Target::CameraGear);
     state.direction(Direction::Down, &[]);
     assert_eq!(state.focus, cam("c"));
-    // OK enlarges, OK or Back returns to the grid, Back again closes the app.
+    // OK enlarges, Back returns to the grid, Back again closes the app.
     state.activate();
     assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.c"));
     assert_eq!(state.camera_watches(true).len(), 1);
@@ -374,6 +375,7 @@ fn the_service_keeps_a_worker_while_a_camera_is_watched_the_same_way() {
             }
         },
         size: (640, 360),
+        record: false,
     };
     service.sync(&[watch("a", false), watch("b", false)]);
     assert_eq!(service.watched(), ["a", "b"]);
@@ -449,6 +451,8 @@ fn an_enlarged_camera_plays_home_assistants_hls_video_over_the_mjpeg_stream() {
     assert_eq!(
         state.cameras.play.take(),
         Some(VideoRequest {
+            recorded: None,
+            history: false,
             url: "http://ha:8123/api/hls/x/master_playlist.m3u8".into(),
             title: "a".into(),
             // The overlay shows the camera's snapshots until the video plays.
@@ -461,7 +465,7 @@ fn an_enlarged_camera_plays_home_assistants_hls_video_over_the_mjpeg_stream() {
         Source::Stream { .. }
     ));
     // Back in the overlay app leaves the enlarged camera too.
-    state.camera_video_closed(false);
+    state.camera_video_closed(Closed::default());
     assert_eq!(state.cameras.enlarged, None);
     assert_eq!(state.cameras.video, Video::Off);
     assert!(!state.cameras.stop_video);
@@ -492,7 +496,10 @@ fn a_camera_whose_video_fails_stays_on_the_mjpeg_stream() {
         result: Ok("http://ha/x.m3u8".into()),
     });
     // The overlay app could not play it: the enlarged camera stays, on the motion-JPEG stream.
-    state.camera_video_closed(true);
+    state.camera_video_closed(Closed {
+        failed: true,
+        ..Default::default()
+    });
     assert_eq!(state.cameras.enlarged.as_deref(), Some(id.as_str()));
     assert!(matches!(
         state.camera_watches(true)[0].source,
@@ -575,7 +582,489 @@ fn a_late_close_report_leaves_the_next_cameras_video_alone() {
     state.activate();
     assert_eq!(state.cameras.video, Video::Resolving("0/camera.b".into()));
     // A report about a's video arriving now changes nothing.
-    state.camera_video_closed(false);
+    state.camera_video_closed(Closed::default());
     assert_eq!(state.cameras.video, Video::Resolving("0/camera.b".into()));
     assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.b"));
+}
+
+#[test]
+fn kept_frames_reach_back_two_minutes_within_their_memory() {
+    let start = Instant::now();
+    let mut recording = Recording::default();
+    for second in 0..200 {
+        recording.push("a", start + Duration::from_secs(second), &[0; 1000]);
+    }
+    let (oldest, newest) = recording.span().unwrap();
+    assert_eq!(newest - oldest, REWIND);
+    assert_eq!(recording.bytes, 121 * 1000);
+    // The frame on screen at a moment is the newest one that had arrived, else the oldest.
+    let at = |offset: f32| {
+        let (taken, _) = recording
+            .at(start + Duration::from_secs_f32(offset))
+            .unwrap();
+        (taken - start).as_secs()
+    };
+    assert_eq!(at(150.5), 150);
+    assert_eq!(at(10.), 79);
+    // Large frames are dropped by memory before time.
+    recording.push("a", newest + Duration::from_secs(1), &vec![0; REWIND_BYTES]);
+    assert_eq!(recording.frames.len(), 1);
+    // Another camera starts afresh.
+    recording.push("b", newest, &[0; 10]);
+    assert_eq!((recording.frames.len(), recording.bytes), (1, 10));
+}
+
+#[test]
+fn the_replay_thread_decodes_the_kept_frame_asked_for() {
+    let mut service = Service::default();
+    let start = Instant::now();
+    {
+        let mut recording = service.replay.lock();
+        recording.push("a", start, &jpeg([255, 0, 0], 8, 8));
+        recording.push(
+            "a",
+            start + Duration::from_secs(1),
+            &jpeg([0, 0, 255], 8, 8),
+        );
+    }
+    assert_eq!(
+        service.recorded(),
+        Some((start, start + Duration::from_secs(1)))
+    );
+    service.replay("a", Want::Kept(start + Duration::from_millis(500)));
+    let Update::Replay {
+        id,
+        frame: Some(frame),
+    } = service
+        .receiver
+        .recv_timeout(Duration::from_secs(5))
+        .unwrap()
+    else {
+        panic!("expected a replayed frame");
+    };
+    assert_eq!(id, "a");
+    assert_eq!(frame.key, replay_key("a"));
+    assert!(frame.pixels.get_pixel(4, 4)[0] > 200);
+    // The same frame is not decoded twice.
+    service.replay("a", Want::Kept(start + Duration::from_millis(900)));
+    assert!(
+        service
+            .receiver
+            .recv_timeout(Duration::from_millis(300))
+            .is_err()
+    );
+    // Closing the enlarged camera frees its kept frames.
+    service.sync(&[]);
+    assert_eq!(service.recorded(), None);
+}
+
+fn protect(ids: &[&str]) -> State {
+    let mut state = State::new(Preferences::default());
+    state.preferences.home_assistant = true;
+    state.sync_custom_tiles();
+    let cameras = ids
+        .iter()
+        .map(|id| Camera {
+            hls: Some(format!("http://ha/api/luma/stream/camera.{id}?token=t")),
+            history: Some(format!("http://ha/api/luma/history/camera.{id}?token=t")),
+            ..camera(id)
+        })
+        .collect();
+    state.camera_list(cameras, true, true);
+    state
+}
+
+const UNIX: u64 = 1_800_000_000;
+
+#[test]
+fn left_right_and_ok_scrub_through_the_tvs_kept_frames() {
+    let mut state = open(&["a", "b"]);
+    state.activate();
+    assert!(state.camera_watches(true)[0].record);
+    let now = Instant::now() + Duration::from_secs(600);
+    let gallery = &mut state.cameras;
+    // Nothing kept yet: Left stays live.
+    gallery.skip(true, now);
+    assert_eq!(gallery.playback, Playback::Live);
+    gallery.recorded = Some((now - Duration::from_secs(90), now));
+    gallery.skip(true, now);
+    assert_eq!(gallery.lag(now), Duration::from_secs(10));
+    // Playing behind live keeps that distance.
+    let later = now + Duration::from_secs(3);
+    gallery.recorded = Some((later - Duration::from_secs(90), later));
+    let (want, changed) = gallery.replay_position(later, UNIX);
+    assert!(changed);
+    assert_eq!(want, Some(Want::Kept(later - Duration::from_secs(10))));
+    // OK pauses there; time passing leaves it further behind live.
+    gallery.toggle_pause(later);
+    let paused = later + Duration::from_secs(20);
+    assert_eq!(gallery.lag(paused), Duration::from_secs(30));
+    // Held Left steps further the longer it is held, never past the oldest kept frame.
+    let mut held = paused;
+    for _ in 0..7 {
+        gallery.skip(true, held);
+        held += Duration::from_millis(200);
+    }
+    held -= Duration::from_millis(200);
+    assert_eq!(gallery.lag(held), gallery.kept(held));
+    // OK plays from there; Right up to the newest frame goes live.
+    gallery.toggle_pause(paused);
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: 1, .. }
+    ));
+    let right = paused + Duration::from_secs(5);
+    for step in 0..12 {
+        gallery.skip(false, right + Duration::from_secs(step));
+    }
+    assert_eq!(gallery.playback, Playback::Live);
+    // Pausing live holds the newest frame; leaving the camera goes back to live.
+    gallery.toggle_pause(paused);
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: 0, .. }
+    ));
+    state.back();
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert!(state.cameras.scrub.is_none());
+    assert!(!state.camera_watches(true)[0].record);
+}
+
+#[test]
+fn held_scrubbing_speeds_up_and_fast_playback_ends_at_live() {
+    assert_eq!(step(Duration::ZERO), Duration::from_secs(10));
+    assert_eq!(step(Duration::from_secs(2)), Duration::from_secs(60));
+    assert_eq!(step(Duration::from_secs(4)), Duration::from_secs(300));
+    assert_eq!(step(Duration::from_secs(9)), Duration::from_secs(1800));
+    let mut state = protect(&["a"]);
+    state.activate();
+    let now = Instant::now() + Duration::from_secs(600);
+    let gallery = &mut state.cameras;
+    // Protect's recordings reach a day back, whatever the TV kept.
+    let mut at = now;
+    for _ in 0..40 {
+        gallery.skip(true, at);
+        at += Duration::from_millis(200);
+    }
+    // 10 s for the first second, a minute for two more, then five minutes, then half hours.
+    assert_eq!(
+        gallery.lag(at),
+        Duration::from_secs(5 * 10 + 10 * 60 + 15 * 300 + 10 * 1800)
+    );
+    // Rewind and fast-forward step through the speeds; OK plays at normal speed again.
+    gallery.faster(true, at);
+    gallery.faster(true, at);
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: -4, .. }
+    ));
+    gallery.faster(false, at);
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: 2, .. }
+    ));
+    for _ in 0..8 {
+        gallery.faster(false, at);
+    }
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: 64, .. }
+    ));
+    // At 64× it catches up 63 s a second, then it is live.
+    let lag = gallery.lag(at).as_secs_f64();
+    assert_eq!(
+        gallery.lag(at + Duration::from_secs(60)).as_secs_f64(),
+        lag - 63. * 60.
+    );
+    gallery.replay_position(at + Duration::from_secs(400), UNIX);
+    assert_eq!(gallery.playback, Playback::Live);
+    // Rewinding stops at the oldest moment, paused.
+    gallery.faster(true, at);
+    gallery.replay_position(at + Duration::from_secs(48 * 3600), UNIX);
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: 0, .. }
+    ));
+    assert_eq!(gallery.lag(at + Duration::from_secs(48 * 3600)), HISTORY);
+}
+
+#[test]
+fn beyond_the_kept_frames_protect_shows_recorded_pictures_and_plays_recorded_video() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let now = Instant::now() + Duration::from_secs(600);
+    let history = "http://ha/api/luma/history/camera.a?token=t";
+    // Home Assistant could not start the live video (so it shows the motion-JPEG stream).
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Err("no stream".into()),
+    });
+    // Enlarging asks what Protect saw over the last day.
+    state.camera_replay(None, now, UNIX);
+    assert_eq!(
+        state.cameras.fetch_marks.take(),
+        Some((
+            "0/camera.a".into(),
+            format!("{history}&events=1&start={}&end={UNIX}", UNIX - 86400)
+        ))
+    );
+    // Paused an hour back: Protect's picture from then.
+    let gallery = &mut state.cameras;
+    gallery.recorded = Some((now - Duration::from_secs(60), now));
+    gallery.playback = Playback::Replay {
+        lag: Duration::from_secs(3600),
+        since: now,
+        speed: 0,
+    };
+    let want = state.camera_replay(Some((now - Duration::from_secs(60), now)), now, UNIX);
+    assert_eq!(
+        want,
+        Some((
+            "0/camera.a".into(),
+            Want::Recorded(format!("{history}&at={}&width=1280", UNIX - 3600))
+        ))
+    );
+    assert!(state.cameras.play.is_none());
+    // Playing at normal speed: the overlay app plays Protect's video from there.
+    state.cameras.toggle_pause(now);
+    state.camera_replay(Some((now - Duration::from_secs(60), now)), now, UNIX);
+    let video = state.cameras.play.take().unwrap();
+    assert_eq!(video.recorded, Some(("0/camera.a".into(), UNIX - 3600)));
+    assert_eq!(state.cameras.video, Video::Recorded("0/camera.a".into()));
+    // Left there closes it, reporting where it was; the gallery carries on 10 s earlier and
+    // waits for scrubbing to settle before playing video again.
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(3500.),
+            key: Some("left".into()),
+            ..Default::default()
+        },
+        now,
+        UNIX,
+    );
+    assert_eq!(state.cameras.video, Video::Off);
+    assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.a"));
+    assert_eq!(state.cameras.lag(now), Duration::from_secs(3510));
+    state.camera_replay(None, now + Duration::from_millis(500), UNIX);
+    assert!(state.cameras.play.is_none());
+    state.camera_replay(None, now + Duration::from_secs(2), UNIX);
+    assert!(state.cameras.play.take().is_some());
+    // Video Protect cannot play: pictures instead for the rest of the visit.
+    state.camera_video_closed_at(
+        Closed {
+            failed: true,
+            ..Default::default()
+        },
+        now,
+        UNIX,
+    );
+    assert_eq!(state.cameras.recorded_failed, ["0/camera.a"]);
+    state.camera_replay(None, now + Duration::from_secs(5), UNIX);
+    assert!(state.cameras.play.is_none());
+    assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.a"));
+}
+
+#[test]
+fn up_and_down_jump_between_what_protect_saw() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let now = Instant::now();
+    let mark = |ago: u64, kind| Mark {
+        start: UNIX - ago,
+        end: UNIX - ago + 20,
+        kind,
+    };
+    state.camera_update(Update::Marks {
+        id: "0/camera.a".into(),
+        marks: vec![mark(7200, Kind::Person), mark(600, Kind::Doorbell)],
+    });
+    let gallery = &mut state.cameras;
+    assert_eq!(gallery.marks.len(), 2);
+    // Up from live: to just before the doorbell, playing; again: the person.
+    gallery.jump(true, now, UNIX);
+    assert_eq!(gallery.lag(now), Duration::from_secs(602));
+    assert!(matches!(
+        gallery.playback,
+        Playback::Replay { speed: 1, .. }
+    ));
+    gallery.jump(true, now, UNIX);
+    assert_eq!(gallery.lag(now), Duration::from_secs(7202));
+    gallery.jump(true, now, UNIX);
+    assert_eq!(gallery.lag(now), Duration::from_secs(7202));
+    // Down: the doorbell, then live.
+    gallery.jump(false, now, UNIX);
+    assert_eq!(gallery.lag(now), Duration::from_secs(602));
+    gallery.jump(false, now, UNIX);
+    assert_eq!(gallery.playback, Playback::Live);
+    // Marks for a camera no longer enlarged are dropped.
+    state.camera_update(Update::Marks {
+        id: "0/camera.b".into(),
+        marks: vec![],
+    });
+    assert_eq!(state.cameras.marks.len(), 2);
+    assert_eq!(
+        parse_marks(br#"{"events": [{"start": 20, "end": 30, "kind": "vehicle"}, {"start": 10, "kind": "ring"}, {"end": 1}]}"#)
+            .unwrap(),
+        [
+            Mark { start: 10, end: 10, kind: Kind::Doorbell },
+            Mark { start: 20, end: 30, kind: Kind::Vehicle },
+        ]
+    );
+}
+
+#[test]
+fn the_live_video_hands_scrubbing_past_its_buffer_to_the_gallery() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/a.m3u8".into()),
+    });
+    let now = Instant::now();
+    // Left at the start of what the HLS video kept: the gallery goes on from 2 minutes back.
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(120.),
+            key: Some("left".into()),
+            paused: true,
+            ..Default::default()
+        },
+        now,
+        UNIX,
+    );
+    assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.a"));
+    assert_eq!(state.cameras.lag(now), Duration::from_secs(130));
+    assert!(matches!(
+        state.cameras.playback,
+        Playback::Replay { speed: 0, .. }
+    ));
+    // The live video waits until the camera is live again.
+    assert!(state.cameras.resolve.is_none());
+    state.cameras.jump(false, now, UNIX);
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
+}
+
+#[test]
+fn replayed_pictures_show_only_while_the_enlarged_camera_is_rewound() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let replay = |id: &str, frame: bool| Update::Replay {
+        id: id.into(),
+        frame: frame.then(|| Arc::new(Frame::new(&replay_key(id), RgbaImage::new(1, 1), false))),
+    };
+    state.camera_update(replay("0/camera.a", true));
+    assert!(state.cameras.replay.is_none());
+    state.cameras.skip(true, Instant::now());
+    state.camera_update(replay("0/camera.b", true));
+    assert!(state.cameras.replay.is_none());
+    state.camera_update(replay("0/camera.a", true));
+    assert!(state.cameras.replay.is_some());
+    // Nothing recorded then: the last picture stays, marked.
+    state.camera_update(replay("0/camera.a", false));
+    assert!(state.cameras.replay.is_some() && state.cameras.not_recorded);
+    assert_eq!(clock(Duration::from_millis(65_900)), "-1:05");
+    assert_eq!(clock(Duration::from_secs(86400)), "-24:00:00");
+    assert_eq!(speed_label(-8), "-8\u{d7}");
+}
+
+#[test]
+fn ok_on_recorded_video_pauses_and_back_resets_the_camera() {
+    let mut state = protect(&["a", "b"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Err("no stream".into()),
+    });
+    let now = Instant::now() + Duration::from_secs(600);
+    state.cameras.playback = Playback::Replay {
+        lag: Duration::from_secs(3600),
+        since: now,
+        speed: 1,
+    };
+    state.camera_replay(None, now, UNIX);
+    assert!(state.cameras.play.take().is_some());
+    // While the recorded video plays, no pictures load behind it.
+    assert_eq!(state.camera_replay(None, now, UNIX), None);
+    // OK in the recorded video (which was playing): paused there, and it stays closed.
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(3600.),
+            key: Some("ok".into()),
+            ..Default::default()
+        },
+        now,
+        UNIX,
+    );
+    assert!(matches!(
+        state.cameras.playback,
+        Playback::Replay { speed: 0, .. }
+    ));
+    state.camera_replay(None, now + Duration::from_secs(5), UNIX);
+    assert!(state.cameras.play.is_none());
+    // Back in the recorded video leaves the camera with nothing of where it was.
+    state.cameras.toggle_pause(now + Duration::from_secs(5));
+    state.camera_replay(None, now + Duration::from_secs(5), UNIX);
+    assert!(state.cameras.play.take().is_some());
+    state.cameras.marks = vec![Mark {
+        start: UNIX,
+        end: UNIX,
+        kind: Kind::Person,
+    }];
+    state.camera_video_closed_at(Closed::default(), now, UNIX);
+    assert_eq!(state.cameras.enlarged, None);
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert!(state.cameras.marks.is_empty() && state.cameras.replay.is_none());
+    // A failure lasts only this visit.
+    state.cameras.recorded_failed.push("0/camera.a".into());
+    let cameras = state.cameras.cameras.clone();
+    state.back();
+    state.camera_list(cameras, true, true);
+    assert!(state.cameras.recorded_failed.is_empty());
+}
+
+#[test]
+fn a_camera_paused_past_its_oldest_kept_frame_stays_still() {
+    let mut state = open(&["a"]);
+    state.activate();
+    let now = Instant::now() + Duration::from_secs(600);
+    let gallery = &mut state.cameras;
+    gallery.recorded = Some((now - Duration::from_secs(60), now));
+    gallery.skip(true, now);
+    gallery.toggle_pause(now);
+    gallery.replay = Some(Arc::new(Frame::new("x", RgbaImage::new(1, 1), false)));
+    // Still within the kept frames: the frame from then.
+    assert!(matches!(
+        gallery.replay_position(now, UNIX).0,
+        Some(Want::Kept(_))
+    ));
+    // Two minutes later the frame it paused on is gone: the picture stays as it was.
+    let later = now + Duration::from_secs(120);
+    gallery.recorded = Some((later - Duration::from_secs(60), later));
+    assert_eq!(gallery.replay_position(later, UNIX).0, None);
+}
+
+#[test]
+fn up_on_the_live_video_with_nothing_earlier_stays_live() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/a.m3u8".into()),
+    });
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(2.),
+            key: Some("up".into()),
+            ..Default::default()
+        },
+        Instant::now(),
+        UNIX,
+    );
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
 }
