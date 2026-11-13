@@ -195,6 +195,7 @@ fn price_cents(amount: &str) -> u64 {
 }
 
 /// Parses a `/shows/search/title` or `/shows/search/filters` reply.
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn parse_search(reply: &serde_json::Value) -> Result<Vec<Show>, String> {
     // Title search returns an array; filter search wraps it in {"shows": [...], "hasMore", ...}.
     let shows = reply.get("shows").unwrap_or(reply);
@@ -219,22 +220,54 @@ pub struct Request {
     pub query: String,
 }
 
+/// A search result with a title, which the provisional prefix filter matches against.
+pub trait Titled: Clone {
+    fn title(&self) -> &str;
+}
+
+impl Titled for Show {
+    fn title(&self) -> &str {
+        &self.title
+    }
+}
+
+impl Titled for Ranked {
+    fn title(&self) -> &str {
+        &self.show.title
+    }
+}
+
 /// Search-as-you-type: waits for a pause in typing, never sends short queries, answers repeats
 /// from a small cache and drops replies for text the user has since changed.
-#[derive(Debug, Default)]
-pub struct Incremental {
+#[derive(Debug)]
+pub struct Incremental<T = Show> {
     query: String,
     changed_at: Option<Instant>,
     generation: u64,
-    cache: VecDeque<(String, Vec<Show>)>,
-    pub results: Vec<Show>,
+    cache: VecDeque<(String, Vec<T>)>,
+    pub results: Vec<T>,
     /// The results are a local filter of an earlier, shorter query while the real reply loads.
     pub provisional: bool,
     pub searching: bool,
     pub error: Option<String>,
 }
 
-impl Incremental {
+impl<T> Default for Incremental<T> {
+    fn default() -> Self {
+        Self {
+            query: String::new(),
+            changed_at: None,
+            generation: 0,
+            cache: VecDeque::new(),
+            results: Vec::new(),
+            provisional: false,
+            searching: false,
+            error: None,
+        }
+    }
+}
+
+impl<T: Titled> Incremental<T> {
     pub fn query(&self) -> &str {
         &self.query
     }
@@ -273,7 +306,7 @@ impl Incremental {
             let query = &self.query;
             self.results = shows
                 .iter()
-                .filter(|s| s.title.to_lowercase().contains(query.as_str()))
+                .filter(|s| s.title().to_lowercase().contains(query.as_str()))
                 .cloned()
                 .collect();
             self.provisional = true;
@@ -299,7 +332,7 @@ impl Incremental {
     }
 
     /// Accepts a worker reply. Returns whether the visible results changed.
-    pub fn accept(&mut self, request: &Request, reply: Result<Vec<Show>, String>) -> bool {
+    pub fn accept(&mut self, request: &Request, reply: Result<Vec<T>, String>) -> bool {
         let current = request.generation == self.generation;
         match reply {
             Ok(shows) => {
@@ -327,7 +360,7 @@ impl Incremental {
         true
     }
 
-    fn cached(&self, query: &str) -> Option<&[Show]> {
+    fn cached(&self, query: &str) -> Option<&[T]> {
         self.cache
             .iter()
             .find(|(q, _)| q == query)

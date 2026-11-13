@@ -48,6 +48,7 @@ pub struct Status {
 }
 
 impl Status {
+    #[allow(dead_code)]
     pub fn complete(self) -> bool {
         self.motn && self.tmdb
     }

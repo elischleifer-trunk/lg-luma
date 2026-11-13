@@ -21,6 +21,8 @@ pub const INVENTORY_RETRY_DELAY: Duration = Duration::from_secs(2);
 pub const HOME_COLUMNS: usize = 6;
 pub const HOME_TILE_WIDTH: f32 = 256.;
 pub const HOME_TILE_PITCH: f32 = 281.6;
+/// Movie and show results under the Apps grid, three wide cards per row.
+pub const TITLE_COLUMNS: usize = 3;
 pub const BACKGROUND_FADE: f32 = 0.4;
 pub const CYCLE_FADE: f32 = 1.6;
 
@@ -55,6 +57,8 @@ pub enum Target {
     ClearFilter,
     Search,
     ClearSearch,
+    /// A movie or show result under the Apps grid, by index into the streaming results.
+    Title(usize),
     Sidebar(usize),
     Setting(usize),
     Widget(usize),
@@ -220,6 +224,11 @@ pub enum Effect {
     /// Refresh apps: read the inventory and every app icon again.
     Reload,
     Launch(String),
+    /// Open a movie or show: its app, with launch parameters for the title when known.
+    LaunchTitle {
+        app: String,
+        params: Option<serde_json::Value>,
+    },
     Uninstall(String),
     DeleteWallpaper(String),
     Recent {
@@ -282,6 +291,8 @@ pub struct State {
     pub key_editor: Option<Result<crate::companion::Session, String>>,
     /// Which streaming search keys are stored (never the keys themselves).
     pub streaming_keys: crate::streaming_keys::Status,
+    /// Movies and shows matching the Apps search, once a Movie of the Night key is stored.
+    pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
     /// The HACS install link's QR code, made when its dialog opens.
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
@@ -343,6 +354,7 @@ impl State {
             tile_editor: None,
             key_editor: None,
             streaming_keys: Default::default(),
+            titles: Default::default(),
             home_assistant_qr: None,
             home_assistant_address: None,
             home_assistant_code: None,
@@ -933,7 +945,11 @@ impl State {
                 .apps()
                 .first()
                 .map(|app| Target::App(app.id.clone()))
-                .unwrap_or(Target::Filter(1)),
+                .unwrap_or(if self.titles.results.is_empty() {
+                    Target::Filter(1)
+                } else {
+                    Target::Title(0)
+                }),
             Page::Settings => Target::Sidebar(0),
         }
     }
@@ -1633,6 +1649,11 @@ impl State {
                                 apps[(index + APPS_COLUMNS).min(apps.len() - 1)].id.clone(),
                             ))
                         }
+                        // The movie and show results continue below the last row of apps.
+                        Direction::Down if !self.titles.results.is_empty() => Some(Target::Title(
+                            (index % APPS_COLUMNS * TITLE_COLUMNS / APPS_COLUMNS)
+                                .min(self.titles.results.len() - 1),
+                        )),
                         _ => None,
                     };
                     if let Some(next) = next {
@@ -1640,6 +1661,35 @@ impl State {
                     }
                     return vec![];
                 }
+            }
+            if self.page == Page::Apps
+                && let Target::Title(index) = self.focus
+                && matches!(direction, Direction::Up | Direction::Down)
+            {
+                let count = self.titles.results.len();
+                let next = match direction {
+                    Direction::Up if index < TITLE_COLUMNS => {
+                        let apps = self.apps();
+                        Some(if apps.is_empty() {
+                            Target::Search
+                        } else {
+                            // The app in the last row closest to this card's column.
+                            let last_row = (apps.len() - 1) / APPS_COLUMNS * APPS_COLUMNS;
+                            let column = index * APPS_COLUMNS / TITLE_COLUMNS;
+                            let app = (last_row + column).min(apps.len() - 1);
+                            Target::App(apps[app].id.clone())
+                        })
+                    }
+                    Direction::Up => Some(Target::Title(index - TITLE_COLUMNS)),
+                    Direction::Down if (index / TITLE_COLUMNS + 1) * TITLE_COLUMNS < count => {
+                        Some(Target::Title((index + TITLE_COLUMNS).min(count - 1)))
+                    }
+                    _ => None,
+                };
+                if let Some(next) = next {
+                    self.focus(next, controls);
+                }
+                return vec![];
             }
             if let Target::Background(index) = self.focus {
                 match direction {
@@ -2240,6 +2290,77 @@ impl State {
         }
     }
 
+    /// The TV's apps as streaming search ranks them: installed, recently used, favorites.
+    pub fn streaming_services(&self) -> crate::streaming::Services {
+        let installed: Vec<String> = self.inventory.apps.iter().map(|a| a.id.clone()).collect();
+        let recent: Vec<String> = self
+            .recents
+            .entries
+            .iter()
+            .map(|entry| entry.app.id.clone())
+            .collect();
+        let favorites = self.preferences.favorites(&self.inventory.apps);
+        crate::streaming::Services::new(&installed, &recent, &favorites)
+    }
+
+    /// Follows the Apps search text. Returns a search for the worker once typing pauses.
+    pub fn sync_titles(&mut self, now: Instant) -> Option<crate::streaming::Request> {
+        let text = if self.streaming_keys.motn {
+            self.query.as_str()
+        } else {
+            ""
+        };
+        if crate::streaming::normalize(text) != self.titles.query() {
+            self.titles.set_text(text, now);
+            self.reconcile_title_focus();
+            self.dirty = true;
+        }
+        let request = self.titles.due(now)?;
+        self.dirty = true;
+        Some(request)
+    }
+
+    /// A reply from the search worker.
+    pub fn accept_titles(
+        &mut self,
+        request: &crate::streaming::Request,
+        reply: Result<Vec<crate::streaming::Ranked>, String>,
+    ) {
+        if self.titles.accept(request, reply) {
+            self.reconcile_title_focus();
+            self.dirty = true;
+        }
+    }
+
+    /// Keeps focus on a result that still exists after the results change.
+    fn reconcile_title_focus(&mut self) {
+        if let Target::Title(index) = self.focus {
+            let count = self.titles.results.len();
+            if index >= count {
+                self.focus = if count > 0 {
+                    Target::Title(count - 1)
+                } else {
+                    self.first_content()
+                };
+            }
+        }
+    }
+
+    fn launch_title(&mut self, index: usize) -> Vec<Effect> {
+        let Some(result) = self.titles.results.get(index) else {
+            return vec![];
+        };
+        let Some(pick) = &result.pick else {
+            self.notify(self.preferences.language.t("titleNotOnApps"));
+            return vec![];
+        };
+        let params = crate::deeplink::launch(&pick.service_id, &pick.link).map(|l| l.params);
+        vec![Effect::LaunchTitle {
+            app: pick.app_id.clone(),
+            params,
+        }]
+    }
+
     pub fn activate(&mut self) -> Vec<Effect> {
         if self.recents_open() {
             use crate::recents::Command;
@@ -2289,6 +2410,7 @@ impl State {
                     return vec![Effect::Launch(id)];
                 }
             }
+            Target::Title(index) if !self.launching => return self.launch_title(index),
             Target::App(_) if self.page == Page::Apps && !self.launching => self.options(),
             Target::App(id) if !self.launching => {
                 return vec![Effect::Launch(id)];

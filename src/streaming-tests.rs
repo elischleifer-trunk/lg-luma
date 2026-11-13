@@ -205,7 +205,7 @@ fn unknown_option_types_and_unknown_fields_do_not_break_parsing() {
 #[test]
 fn incremental_search_waits_for_three_characters_and_a_pause() {
     let start = Instant::now();
-    let mut search = Incremental::default();
+    let mut search = Incremental::<Show>::default();
     search.set_text("gh", start);
     assert_eq!(search.deadline(), None);
     assert_eq!(search.due(start + DEBOUNCE * 2), None);
@@ -225,7 +225,7 @@ fn incremental_search_waits_for_three_characters_and_a_pause() {
 #[test]
 fn stale_replies_are_cached_but_not_shown() {
     let now = Instant::now();
-    let mut search = Incremental::default();
+    let mut search = Incremental::<Show>::default();
     search.set_text("gho", now);
     let old = search.due(now + DEBOUNCE).unwrap();
     search.set_text("ghostb", now + DEBOUNCE);
@@ -246,7 +246,7 @@ fn stale_replies_are_cached_but_not_shown() {
 #[test]
 fn longer_text_filters_a_cached_prefix_until_its_own_reply_arrives() {
     let now = Instant::now();
-    let mut search = Incremental::default();
+    let mut search = Incremental::<Show>::default();
     search.set_text("gho", now);
     let first = search.due(now + DEBOUNCE).unwrap();
     search.accept(

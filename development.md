@@ -1078,6 +1078,15 @@ failure retries after five minutes. Unit changes convert unrounded cached Celsiu
 Removing a city clears its cache. The `.weather.json` sidecar uses Unix-seconds timestamps.
 Mock servers accept only literal loopback HTTP origins and are refused in TV builds.
 
+Movie and show search follows the Apps search text once a Movie of the Night key is stored.
+`streaming::Incremental` waits for three characters and a 350 ms pause, answers repeats from
+memory and drops replies for text that has since changed. `streaming_search::Service` runs each
+search on its own worker thread, reading `streaming-keys.json` per search so new keys apply at
+once, and caches every API reply under `streaming-cache/` beside the preferences. OK launches the
+picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Scripted
+captures can wait with `await-titles`. Pre-filling `streaming-cache/` from
+`tests/fixtures/streaming` with a placeholder key renders results without network access.
+
 `assets/messages.json` supplies Dutch, English, French, German, Italian, Polish, Portuguese (Brazil),
 Russian, Simplified Chinese, Spanish, Swedish, Traditional Chinese and Vietnamese, including locale formatting
 and weather labels. App/device names and saved city names remain real data. No geolocation,

@@ -283,6 +283,8 @@ impl Enrichment {
         }
     }
 
+    // The relevance tests build enrichment from series fixtures.
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn add_series(&mut self, details: &TvSeriesDetailsResponse) {
         if let Some(id) = details.id {
             self.signals

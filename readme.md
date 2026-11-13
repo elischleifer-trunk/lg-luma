@@ -264,6 +264,18 @@ The round search button at the right of the header opens LG's own search, for co
 the TV's apps and voice search. From the tabs, press **Right** on **Settings** to reach it, then
 **OK**. It appears only when the TV has LG's search app; which one Luma picked is named in its log.
 
+### Movies and shows
+
+With a Movie of the Night key stored (see [streaming search keys](home-assistant.md#streaming-search-keys),
+or **Settings → System → Streaming search keys**), the Apps search also finds movies and shows.
+After three letters and a short pause, a **Movies & shows** section appears under the matching
+apps. Each card names the app on your TV that carries the title and what it costs there:
+included, an add-on channel, or rent or buy with the price. A TMDB token puts well-known US titles
+first. Titles on none of your TV's apps are dimmed at the end. Press **Down** past the last row of
+apps to reach the results, then **OK** to open the title in its app. Links straight to a title are
+not yet confirmed on a TV, so an app may open on its home screen instead. Replies are cached
+beside the preferences, so repeating a search makes no API calls.
+
 ### Recent app switching
 
 Press **Back** on Home, or hold **Back** for 0.6 seconds from any page, to open Recent apps.

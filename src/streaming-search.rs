@@ -13,21 +13,23 @@ use crate::motn_api::{self, GetShowParams, SearchShowsByTitleParams, Show};
 use crate::openapi::Error;
 use crate::relevance::{self, Enrichment, Kind, Signals, match_tier, tmdb_id};
 use crate::search_cache::{DiskCache, ttl};
-use crate::streaming::{self, Ranked, Services};
-use crate::streaming_keys::Keys;
+use crate::streaming::{self, Ranked, Request, Services};
+use crate::streaming_keys::{self, Keys};
 use crate::tmdb_api::{
     self, CollectionDetailsParams, CollectionDetailsResponse, MovieDetailsParams,
     MovieDetailsResponse, SearchMultiParams, SearchMultiResponseResult, TvSeriesDetailsParams,
     TvSeriesDetailsResponse,
 };
 use serde::{Serialize, de::DeserializeOwned};
-use std::{collections::HashSet, time::SystemTime};
+use std::{collections::HashSet, path::PathBuf, sync::mpsc, time::SystemTime};
 
 /// Movie of the Night title search returns at most 20 shows; details for all of them.
 pub const DETAILS_LIMIT: usize = 20;
 /// Franchise films fetched from Movie of the Night per search, at one metered call each.
 pub const EXPANSION_LIMIT: usize = 4;
 const LANGUAGE: &str = "en-US";
+/// Ranking is tuned for US commercial work, so searches ask about US availability.
+pub const COUNTRY: &str = "us";
 
 /// Where search data comes from: the live APIs behind the disk cache, or fixtures in tests.
 pub trait Source: Sync {
@@ -309,6 +311,53 @@ impl Source for Live {
                 })
             },
         )
+    }
+}
+
+/// One search for the worker: the query and the TV's apps at the time it was typed.
+pub struct Job {
+    pub request: Request,
+    pub services: Services,
+}
+
+pub type Reply = (Request, Result<Vec<Ranked>, String>);
+
+/// The search worker: keeps network and disk off the SDL thread. Keys are read from disk for
+/// each search, so keys entered on a phone or pushed by Home Assistant apply at once.
+pub struct Service {
+    sender: mpsc::Sender<Job>,
+    pub receiver: mpsc::Receiver<Reply>,
+}
+
+impl Service {
+    pub fn new(keys: PathBuf, cache: DiskCache) -> Self {
+        let (sender, jobs) = mpsc::channel::<Job>();
+        let (replies, receiver) = mpsc::channel();
+        std::thread::spawn(move || {
+            while let Ok(mut job) = jobs.recv() {
+                // Typing outpaced the network: only the newest query is still wanted.
+                while let Ok(next) = jobs.try_recv() {
+                    job = next;
+                }
+                let keys = streaming_keys::load(&keys);
+                let result = match Live::new(&keys, cache.clone()) {
+                    Some(live) => search(&live, &job.request.query, COUNTRY, &job.services)
+                        .map_err(|error| {
+                            eprintln!("Luma streaming search: {error}");
+                            error.to_string()
+                        }),
+                    None => Err("No Movie of the Night key".into()),
+                };
+                if replies.send((job.request, result)).is_err() {
+                    break;
+                }
+            }
+        });
+        Self { sender, receiver }
+    }
+
+    pub fn send(&self, job: Job) {
+        let _ = self.sender.send(job);
     }
 }
 

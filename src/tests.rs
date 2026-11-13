@@ -16,6 +16,9 @@ mod wallpaper_tests;
 #[path = "input-refresh-tests.rs"]
 mod input_refresh_tests;
 
+#[path = "streaming-ui-tests.rs"]
+mod streaming_ui_tests;
+
 fn ready() -> State {
     let mut state = State::new(Preferences::default());
     state.set_inventory(demo_inventory(), None);
