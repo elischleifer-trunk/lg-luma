@@ -48,6 +48,8 @@
       nonce: typeof params.nonce === 'string' ? params.nonce : '',
       port: clamp(params.port, 1, 65535, 5862),
       url: url,
+      // Shown over the video until it plays.
+      snapshot: http(params.snapshot),
       title: typeof params.title === 'string' ? params.title.slice(0, 80) : '',
     };
   }
