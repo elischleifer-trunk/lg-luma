@@ -1666,6 +1666,10 @@ impl State {
             .iter()
             .filter(|candidate| candidate.target != self.focus)
             .filter_map(|candidate| {
+                // The header search button is reached only by Right from the last tab.
+                if candidate.target == Target::LgSearch {
+                    return None;
+                }
                 // Header controls never steal an Up route from the active tab.
                 if self.overlay.is_none()
                     && matches!(direction, Direction::Up)

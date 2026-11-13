@@ -100,10 +100,10 @@ that HDMI row, and the Background gallery to Background in the sidebar. Back fro
 focuses the Settings tab, then returns Home. The header holds Home, Apps and Settings, and at
 the right margin a search button (`Target::LgSearch`) that launches LG's own search app. It is
 shown only when `listApps` reports one: `platform::lg_search_app` takes the first known ID
-(`com.webos.app.search`, `…searchapp`, `…lgsearch`, `…searchviewer`, then `com.webos.app.voice`)
-or else any LG system app with "search" in its ID, and the inventory log names the choice and
-every search/voice app seen. Right from the Settings tab focuses it; Left and Back return to the
-current tab, Down to the page's content.
+(`com.webos.app.search`, `…searchapp`, `…lgsearch`, `…searchviewer`), else any LG system app
+with "search" in its ID, else `com.webos.app.voice`; the inventory log names the choice and
+every search/voice app seen. Only Right from the Settings tab focuses it (geometric moves skip
+it); Left and Back return to the current tab, Down to the page's content.
 **System** in the sidebar groups the update card, **TV settings** (`Target::TvSettings`, which
 launches `com.palm.app.settings`), **Refresh apps & inputs** and the vector power-icon **Quit app**
 action separately from General preferences.

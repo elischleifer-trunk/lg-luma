@@ -3606,3 +3606,17 @@ fn header_search_button_hands_off_to_lg_search() {
     state.direction(Direction::Right, &controls(&state));
     assert_ne!(state.focus, Target::LgSearch);
 }
+
+#[test]
+fn right_edge_moves_never_jump_to_the_header_search_button() {
+    let mut state = ready();
+    state.open(1);
+    // Right from the empty search field keeps its existing route into the grid.
+    state.focus = Target::Search;
+    state.direction(Direction::Right, &controls(&state));
+    assert_ne!(state.focus, Target::LgSearch);
+    let right_column = state.apps()[crate::state::APPS_COLUMNS - 1].id.clone();
+    state.focus = Target::App(right_column.clone());
+    state.direction(Direction::Right, &controls(&state));
+    assert_eq!(state.focus, Target::App(right_column));
+}

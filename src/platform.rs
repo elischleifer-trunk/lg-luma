@@ -904,18 +904,20 @@ fn title(value: Option<&str>, fallback: &str) -> String {
 }
 
 /// LG's own search app IDs, most specific first. The ID differs between webOS versions, so the
-/// installed app list decides; the voice app last, as older firmware runs search through it.
-const LG_SEARCH_IDS: [&str; 5] = [
+/// installed app list decides.
+const LG_SEARCH_IDS: [&str; 4] = [
     "com.webos.app.search",
     "com.webos.app.searchapp",
     "com.webos.app.lgsearch",
     "com.webos.app.searchviewer",
-    "com.webos.app.voice",
 ];
 
-/// LG's search app from the raw `listApps` reply, hidden system apps included. A known ID wins;
-/// otherwise any LG system app with "search" in its ID. Every search or voice app seen is
-/// logged, so the right ID for a new firmware can be read from the TV's log.
+/// The voice app, the last resort: older firmware runs search through it.
+const LG_VOICE_ID: &str = "com.webos.app.voice";
+
+/// LG's search app from the raw `listApps` reply, hidden system apps included. A known search ID
+/// wins, then any LG system app with "search" in its ID, then the voice app. Every search or
+/// voice app seen is logged, so the right ID for a new firmware can be read from the TV's log.
 pub fn lg_search_app(raw: &Value) -> Option<String> {
     let ids: Vec<&str> = raw
         .as_array()?
@@ -933,18 +935,18 @@ pub fn lg_search_app(raw: &Value) -> Option<String> {
     }
     LG_SEARCH_IDS
         .iter()
+        .copied()
         .find(|known| ids.contains(known))
-        .map(|id| (*id).to_owned())
         .or_else(|| {
-            ids.iter()
-                .find(|id| {
-                    ["com.webos.", "com.lge.", "com.palm."]
-                        .iter()
-                        .any(|prefix| id.starts_with(prefix))
-                        && id.contains("search")
-                })
-                .map(|id| (*id).to_owned())
+            ids.iter().copied().find(|id| {
+                ["com.webos.", "com.lge.", "com.palm."]
+                    .iter()
+                    .any(|prefix| id.starts_with(prefix))
+                    && id.contains("search")
+            })
         })
+        .or_else(|| ids.contains(&LG_VOICE_ID).then_some(LG_VOICE_ID))
+        .map(str::to_owned)
 }
 
 pub fn normalize_apps(raw: &Value) -> Result<Vec<App>, String> {
@@ -1190,13 +1192,17 @@ mod lg_search_tests {
         );
     }
     #[test]
-    fn falls_back_to_voice_then_any_lg_search_app() {
+    fn unknown_lg_search_app_wins_over_voice() {
         let voice = json!([{"id": "com.webos.app.voice"}]);
         assert_eq!(
             lg_search_app(&voice).as_deref(),
             Some("com.webos.app.voice")
         );
-        let other = json!([{"id": "com.lge.app.newsearch"}, {"id": "com.example.search"}]);
+        let other = json!([
+            {"id": "com.webos.app.voice"},
+            {"id": "com.lge.app.newsearch"},
+            {"id": "com.example.search"},
+        ]);
         assert_eq!(
             lg_search_app(&other).as_deref(),
             Some("com.lge.app.newsearch")
