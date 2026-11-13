@@ -3568,5 +3568,20 @@
     "fr": "Permet à Home Assistant de contrôler Luma sur ce téléviseur",
     "vi": "Cho phép Home Assistant điều khiển Luma trên TV này",
     "sv": "Låter Home Assistant styra Luma på den här tv:n"
+  },
+  "updateInstallFailed": {
+    "zh-tw": "更新失敗",
+    "nl": "Update mislukt",
+    "en": "Update failed",
+    "de": "Update fehlgeschlagen",
+    "es": "Error en la actualización",
+    "zh": "更新失败",
+    "pt": "Falha na atualização",
+    "it": "Aggiornamento non riuscito",
+    "ru": "Сбой обновления",
+    "pl": "Aktualizacja nie powiodła się",
+    "fr": "Échec de la mise à jour",
+    "vi": "Cập nhật thất bại",
+    "sv": "Uppdateringen misslyckades"
   }
 }

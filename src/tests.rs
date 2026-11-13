@@ -1126,6 +1126,24 @@ fn general_shows_updates_as_one_line_with_a_check_now_button() {
         draw,
         crate::renderer::Draw::Text(label, ..) if label.starts_with("test · Checked ")
     )));
+    // The scene's clock is the Unix epoch (Thursday, 1 January 1970, 12:00 AM).
+    state.update_checked = Some(crate::state::unix_now() - 3 * 86_400);
+    let stale = scene(&state);
+    let line = stale
+        .draw
+        .iter()
+        .find_map(|draw| match draw {
+            crate::renderer::Draw::Text(label, ..) if label.starts_with("test · Checked ") => {
+                Some(label.clone())
+            }
+            _ => None,
+        })
+        .unwrap();
+    assert!(line.ends_with(" 12:00 AM"), "{line}");
+    assert_ne!(
+        line, "test · Checked 12:00 AM",
+        "an older check names its day"
+    );
 }
 
 #[test]
@@ -3498,6 +3516,9 @@ fn update_card_shows_progress_restores_retry_and_ignores_presses_while_busy() {
     assert!(state.activate().is_empty());
     state.pressed = Some(Target::InstallUpdate);
     state.install_response(Response::Finished(Err("disk full".into())));
+    assert!(scene(&state).draw.iter().any(|draw| {
+        matches!(draw, crate::renderer::Draw::Text(text, ..) if text == "test · Update failed")
+    }));
     assert_eq!(state.focus, Target::CheckUpdates);
     assert!(state.pressed.is_none());
     assert!(state.available_update.is_none());
@@ -3505,8 +3526,13 @@ fn update_card_shows_progress_restores_retry_and_ignores_presses_while_busy() {
     state.activate();
     assert_eq!(state.update_status, Status::Checking);
     assert_eq!(state.update, InstallStatus::Idle);
+    state.update_checked = Some(crate::state::unix_now());
     state.install_response(Response::Finished(Ok(())));
     assert_eq!(state.update_status, Status::Unchecked);
+    // The running build may be the old one: never claim it was just checked.
+    assert!(scene(&state).draw.iter().any(|draw| {
+        matches!(draw, crate::renderer::Draw::Text(text, ..) if text == "test · Not checked yet")
+    }));
 }
 
 #[test]

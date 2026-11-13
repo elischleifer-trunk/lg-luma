@@ -2687,23 +2687,25 @@ fn update_row(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTi
     settings_surface(out, rect, 20.);
     let version = assets.version.trim();
     let status = if matches!(state.update, InstallStatus::Failed(_)) {
-        language.t("updateCheckFailed").to_owned()
+        language.t("updateInstallFailed").to_owned()
     } else if let Some(latest) = &state.available_update {
         language.format("updateReady", &[("latest", latest)])
     } else {
         match (state.update_status, state.update_checked) {
             (Status::Checking, _) => language.t("checkingUpdates").to_owned(),
             (Status::Failed, _) => language.t("updateCheckFailed").to_owned(),
-            (_, Some(checked)) => {
+            (Status::Checked, Some(checked)) => {
                 let ago = crate::state::unix_now().saturating_sub(checked);
                 let at = now - time::Duration::seconds(ago.min(i64::MAX as u64) as i64);
-                language.format(
-                    "lastChecked",
-                    &[(
-                        "time",
-                        &language.clock(at, state.preferences.hour_24, false),
-                    )],
-                )
+                let mut when = language.clock(at, state.preferences.hour_24, false);
+                // A launcher can run for days; name the day once it is not today.
+                if at.date() != now.date() {
+                    when = format!(
+                        "{} {when}",
+                        state.preferences.date_format.format(language, at)
+                    );
+                }
+                language.format("lastChecked", &[("time", &when)])
             }
             _ => language.t("notChecked").to_owned(),
         }
