@@ -64,6 +64,8 @@ HLS_VIEW_URL = "/api/luma/stream/{entity_id}"
 CAMERA_STREAM = 2
 # Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
 CAMERAS_PUSH_DELAY = 2.0
+# A doorbell card waits at most this long for Home Assistant to start a camera's HLS stream.
+HLS_START_TIMEOUT = 5.0
 MAX_CAMERAS = 32
 # Luma keeps cameras in memory only; this often, check whether a restarted TV needs the list.
 CAMERAS_CHECK_INTERVAL = timedelta(minutes=1)
@@ -202,7 +204,7 @@ SHOW_CAMERA_SCHEMA = vol.All(
             vol.Optional(ATTR_CAMERA): cv.entity_id,
             vol.Optional(ATTR_STREAM_URL): cv.url,
             vol.Optional(ATTR_SNAPSHOT_URL): cv.url,
-            vol.Optional(ATTR_MODE, default="stream"): vol.In(["stream", "snapshot"]),
+            vol.Optional(ATTR_MODE, default="video"): vol.In(["video", "stream", "snapshot"]),
             vol.Optional(ATTR_BASE_URL): cv.url,
             vol.Optional("title"): vol.All(cv.string, vol.Length(max=80)),
             vol.Optional("message"): vol.All(cv.string, vol.Length(max=200)),
@@ -275,6 +277,29 @@ def _proxy_urls(base_url: str, entity_id: str, token: str) -> tuple[str, str]:
         f"{base_url}/api/camera_proxy_stream/{entity_id}?token={token}",
         f"{base_url}/api/camera_proxy/{entity_id}?token={token}",
     )
+
+
+async def card_hls_url(hass: HomeAssistant, data: dict[str, Any]) -> str | None:
+    """In video mode, start the camera's HLS stream and return its absolute address.
+
+    The card plays it at the camera's full frame rate and keeps the MJPEG and snapshot URLs as
+    fallbacks, so a camera that cannot stream (or no stream integration) just shows those.
+    """
+    camera = data.get(ATTR_CAMERA)
+    if data[ATTR_MODE] != "video" or not camera or "stream" not in hass.config.components:
+        return None
+    state = hass.states.get(camera)
+    if state is None or not int(state.attributes.get("supported_features", 0)) & CAMERA_STREAM:
+        return None
+    base_url = local_url(hass, data.get(ATTR_BASE_URL))
+    # The stream is a bonus: however it fails or however slow it is, the card still goes out.
+    try:
+        async with asyncio.timeout(HLS_START_TIMEOUT):
+            path = await _request_stream(hass, camera)
+    except Exception as err:
+        _LOGGER.debug("No HLS stream for %s, showing motion-JPEG: %r", camera, err)
+        return None
+    return f"{base_url}{path}"
 
 
 def overlay_payload(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
@@ -385,7 +410,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         hass.http.register_view(StreamView(hass))
 
     async def show_camera(call: ServiceCall) -> None:
-        payload = overlay_payload(hass, dict(call.data))
+        data = dict(call.data)
+        payload = overlay_payload(hass, data)
+        if hls := await card_hls_url(hass, data):
+            payload["hls_url"] = hls
         await _each(hass, _targets(hass, call), lambda client: client.show(payload))
 
     async def dismiss(call: ServiceCall) -> None:

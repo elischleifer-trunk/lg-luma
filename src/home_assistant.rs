@@ -697,12 +697,15 @@ impl<T: Tv> Api<T> {
         let parsed = (|| {
             let stream = camera_url(body, "stream_url")?;
             let snapshot = camera_url(body, "snapshot_url")?;
+            // Optional HLS playlist; the card shows the MJPEG or snapshots until it plays.
+            let hls = camera_url(body, "hls_url")?;
             if stream.is_none() && snapshot.is_none() {
                 return Err(error(400, "stream_url or snapshot_url is required"));
             }
             Ok((
                 stream,
                 snapshot,
+                hls,
                 text(body, "title", 80)?,
                 text(body, "message", 200)?,
                 number(body, "duration", 30., 5., 600.)?,
@@ -720,7 +723,7 @@ impl<T: Tv> Api<T> {
                 },
             ))
         })();
-        let (stream, snapshot, title, message, duration, refresh, position, size, pause) =
+        let (stream, snapshot, hls, title, message, duration, refresh, position, size, pause) =
             match parsed {
                 Ok(parsed) => parsed,
                 Err(reply) => return reply,
@@ -755,6 +758,7 @@ impl<T: Tv> Api<T> {
             "port": PORT,
             "stream": stream,
             "snapshot": snapshot,
+            "hls": hls,
             "refresh": refresh,
             "title": title,
             "message": message,

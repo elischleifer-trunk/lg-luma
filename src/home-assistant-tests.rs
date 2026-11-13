@@ -242,6 +242,8 @@ fn overlay_requests_are_validated_before_anything_reaches_the_tv() {
         json!({"snapshot_url":"http://ha/s.jpg","pause":"yes"}),
         json!({"snapshot_url":"http://ha/s.jpg","title":"x".repeat(81)}),
         json!({"snapshot_url":"http://ha/s.jpg","title":"line\nbreak"}),
+        json!({"snapshot_url":"http://ha/s.jpg","hls_url":"javascript:alert(1)"}),
+        json!({"hls_url":"http://ha/api/hls/x/master_playlist.m3u8"}),
     ] {
         let reply = h.call("POST", "/api/overlay", Some(&token), body.clone());
         assert_eq!(reply.status, 400, "{body} → {:?}", reply.body);
@@ -270,7 +272,34 @@ fn showing_launches_the_overlay_with_defaults_and_a_session_nonce() {
     assert_eq!(params["size"], "medium");
     assert_eq!(params["duration"], 30.);
     assert!(params["snapshot"].is_null());
+    assert!(params["hls"].is_null());
     assert!(!h.tv.calls().contains(&"pause".to_owned()));
+}
+
+#[test]
+fn a_card_with_an_hls_playlist_passes_it_to_the_overlay() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let mut body = camera();
+    body["hls_url"] = json!("http://ha.local:8123/api/hls/abc/master_playlist.m3u8");
+    let reply = h.call("POST", "/api/overlay", Some(&token), body);
+    assert_eq!(reply.status, 200, "{:?}", reply.body);
+    let launch =
+        h.tv.calls()
+            .into_iter()
+            .find_map(|call| call.strip_prefix("launch ").map(str::to_owned))
+            .unwrap();
+    let params: Value = serde_json::from_str(&launch).unwrap();
+    assert_eq!(
+        params["hls"],
+        "http://ha.local:8123/api/hls/abc/master_playlist.m3u8"
+    );
+    // The motion-JPEG stays as the card's picture until the video plays.
+    assert_eq!(
+        params["stream"],
+        "http://ha.local:8123/api/camera_proxy_stream/camera.door?token=abc"
+    );
+    assert!(params.get("mode").is_none());
 }
 
 #[test]
