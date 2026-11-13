@@ -494,7 +494,7 @@ fails, or shows nothing within 15 s, reports `failed`, and that camera stays on 
 stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma
 closes it (`Service::close_video`).
 
-A doorbell card can play HLS too. `luma.show_camera` with `mode: video` and a camera entity
+A doorbell card can play HLS too. `luma.show_camera` with a camera entity (`mode: video`, the default)
 starts the stream in Home Assistant (`card_hls_url`, the same `async_request_stream` as
 `StreamView`) and adds the absolute playlist URL as `hls_url`; a camera that cannot stream just
 leaves it out. `POST /api/overlay` validates it like the other camera URLs and passes it to the

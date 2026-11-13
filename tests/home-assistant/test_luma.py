@@ -202,8 +202,14 @@ async def test_video_mode_sends_the_cameras_hls_playlist_with_mjpeg_fallbacks(
 ) -> None:
     await setup(hass, aioclient_mock)
     hass.config.internal_url = "http://192.168.1.10:8123"
-    hass.states.async_set("camera.door", "idle", {"access_token": "d1", "friendly_name": "Door"})
-    hass.states.async_set("camera.still", "idle", {"access_token": "s1", "friendly_name": "Still"})
+    hass.config.components.add("stream")
+    streams = {"supported_features": 2}
+    door = {"access_token": "d1", "friendly_name": "Door", **streams}
+    hass.states.async_set("camera.door", "idle", door)
+    hass.states.async_set(
+        "camera.still", "idle", {"access_token": "s1", "friendly_name": "Still", **streams}
+    )
+    hass.states.async_set("camera.yard", "idle", {"access_token": "y1", "friendly_name": "Yard"})
     requested = []
 
     async def request_stream(hass_: HomeAssistant, entity_id: str) -> str:
@@ -235,10 +241,17 @@ async def test_video_mode_sends_the_cameras_hls_playlist_with_mjpeg_fallbacks(
     assert "hls_url" not in payload
     assert payload["stream_url"].startswith("http://192.168.1.10:8123/api/camera_proxy_stream/")
 
-    # Stream mode never starts an HLS stream.
+    # Video is the default; stream mode never starts an HLS stream.
     await hass.services.async_call(DOMAIN, "show_camera", {"camera": "camera.door"}, blocking=True)
+    assert "hls_url" in aioclient_mock.mock_calls[-1][2]
+    await hass.services.async_call(
+        DOMAIN, "show_camera", {"camera": "camera.door", "mode": "stream"}, blocking=True
+    )
     assert "hls_url" not in aioclient_mock.mock_calls[-1][2]
-    assert requested == ["camera.door", "camera.still"]
+    # A camera without the stream feature never asks for one.
+    await hass.services.async_call(DOMAIN, "show_camera", {"camera": "camera.yard"}, blocking=True)
+    assert "hls_url" not in aioclient_mock.mock_calls[-1][2]
+    assert requested == ["camera.door", "camera.still", "camera.door"]
 
 
 async def test_show_camera_rejects_non_cameras_and_missing_sources(

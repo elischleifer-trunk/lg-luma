@@ -202,7 +202,7 @@ SHOW_CAMERA_SCHEMA = vol.All(
             vol.Optional(ATTR_CAMERA): cv.entity_id,
             vol.Optional(ATTR_STREAM_URL): cv.url,
             vol.Optional(ATTR_SNAPSHOT_URL): cv.url,
-            vol.Optional(ATTR_MODE, default="stream"): vol.In(["video", "stream", "snapshot"]),
+            vol.Optional(ATTR_MODE, default="video"): vol.In(["video", "stream", "snapshot"]),
             vol.Optional(ATTR_BASE_URL): cv.url,
             vol.Optional("title"): vol.All(cv.string, vol.Length(max=80)),
             vol.Optional("message"): vol.All(cv.string, vol.Length(max=200)),
@@ -284,7 +284,10 @@ async def card_hls_url(hass: HomeAssistant, data: dict[str, Any]) -> str | None:
     fallbacks, so a camera that cannot stream (or no stream integration) just shows those.
     """
     camera = data.get(ATTR_CAMERA)
-    if data[ATTR_MODE] != "video" or not camera:
+    if data[ATTR_MODE] != "video" or not camera or "stream" not in hass.config.components:
+        return None
+    state = hass.states.get(camera)
+    if state is None or not int(state.attributes.get("supported_features", 0)) & CAMERA_STREAM:
         return None
     base_url = local_url(hass, data.get(ATTR_BASE_URL))
     try:

@@ -77,10 +77,11 @@ The TV loads camera images itself, so the address must be reachable from the TV.
   snapshot_url: http://192.168.1.10:1984/api/frame.jpeg?src=front_door
   ```
 
-By default the card shows motion-JPEG and JPEG only, so the TV's video decoder stays with the show
-you are watching. For a camera entity, `mode: video` plays Home Assistant's HLS stream instead:
-the camera's own video at its full frame rate, muted, decoded by the TV, a second or two behind
-real time (see [Live video in the card](#live-video-in-the-card)).
+For a camera entity, the card plays Home Assistant's HLS stream: the camera's own video at its
+full frame rate, muted, decoded by the TV, a second or two behind real time (see
+[Live video in the card](#live-video-in-the-card)). Otherwise it shows motion-JPEG or JPEG;
+`mode: stream` keeps a camera entity on motion-JPEG, so the TV's video decoder stays with the show
+you are watching.
 
 ## Cameras app
 
@@ -126,8 +127,6 @@ automation:
       - action: luma.show_camera
         data:
           camera: camera.front_door_medium_resolution_channel
-          # Full-frame-rate video; leave out for motion-JPEG.
-          mode: video
           message: Someone is at the door
           duration: 45
           position: top-right
@@ -151,7 +150,7 @@ editor.
 | ---------------------------- | ----------- | -------------------------------------------------------- |
 | `camera`                     |             | A camera entity; or give `stream_url` / `snapshot_url`.  |
 | `stream_url`, `snapshot_url` |             | Absolute `http(s)` URLs the TV can load.                 |
-| `mode`                       | `stream`    | `video` (HLS), `stream` (motion-JPEG) or `snapshot`.     |
+| `mode`                       | `video`     | `video` (HLS), `stream` (motion-JPEG) or `snapshot`.     |
 | `refresh`                    | `1`         | Seconds between snapshots, 0.25–30.                      |
 | `title`, `message`           | camera name | Up to 80 and 200 characters.                             |
 | `duration`                   | `30`        | Seconds, 5–600.                                          |
@@ -161,7 +160,7 @@ editor.
 
 ### Live video in the card
 
-With `mode: video` and a camera entity that can stream (most RTSP cameras, including UniFi
+With a camera entity that can stream (most RTSP cameras, including UniFi
 Protect), Home Assistant starts the camera's HLS stream when the card is requested. The card shows
 the motion-JPEG while the video starts, which usually takes a few seconds, then switches to the
 video. A camera that cannot stream, a video that does not play within 15 seconds, or one that
@@ -169,8 +168,8 @@ stops, keeps or goes back to the motion-JPEG. Like the Cameras app, this needs H
 **Stream** integration. The video is muted.
 
 The card's video uses the TV's video decoder while something else is playing. Whether the show
-underneath keeps playing smoothly depends on the TV model and firmware; `pause: true` avoids the
-question. Please report what works on yours.
+underneath keeps playing smoothly depends on the TV model and firmware. If it does not, use
+`mode: stream`, or `pause: true`. Please report what works on yours.
 
 To peek at a camera any time, as if the doorbell rang, call the same action from a script and put
 it on a dashboard:
@@ -184,7 +183,6 @@ script:
       - action: luma.show_camera
         data:
           camera: camera.front_door_medium_resolution_channel
-          mode: video
           message: Live view
 ```
 
