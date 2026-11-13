@@ -15,6 +15,17 @@ pub fn render(out: &mut Scene, state: &State, assets: &Assets) {
     }
     header(out, state, assets);
     grid(out, state);
+    if let Some((id, _)) = &gallery.renaming {
+        // The keyboard is modal: only its keys take the pointer.
+        out.controls.clear();
+        if matches!(state.overlay, Some(Overlay::Keyboard)) {
+            out.shape(Rect::new(0., 0., 1920., 1080.), 0., c(0x080b12, 0.6));
+            keyboard(out, state, assets);
+        } else {
+            rename(out, state, id);
+        }
+        return;
+    }
     // Like Luma's other popups, a sheet takes every pointer target: hovering the grid does not
     // move focus out of it, and a click outside it closes it.
     if gallery.sheet.is_some() {
@@ -136,7 +147,7 @@ fn grid(out: &mut Scene, state: &State) {
             out.ring(frame, RADIUS);
         }
         out.text(
-            &camera.name,
+            camera.title(),
             Rect::new(frame.x + 4., frame.y + frame.h + 12., frame.w - 8., 28.),
             text(22.4, if focused { 600 } else { 500 }, 0.),
             if focused { WHITE } else { c(0xeeeeee, 0.73) },
@@ -222,7 +233,7 @@ fn enlarged(out: &mut Scene, state: &State, assets: &Assets, id: &str) {
     };
     if let Some(camera) = gallery.camera(id) {
         let style = text(25.6, 600, 0.);
-        pill(out, &camera.name, 96., 1080. - 54. - 52., style, false);
+        pill(out, camera.title(), 96., 1080. - 54. - 52., style, false);
     }
     if let Some(picture) = picture {
         let label = language.t(if picture.live {
@@ -329,11 +340,13 @@ fn sheet_row(out: &mut Scene, state: &State, assets: &Assets, row: SheetRow<'_>)
 
 fn options(out: &mut Scene, state: &State, assets: &Assets, id: &str) {
     let language = state.preferences.language;
-    let name = state.cameras.camera(id).map_or(id, |camera| &camera.name);
+    let name = state.cameras.camera(id).map_or(id, |camera| camera.title());
     sheet(out, name);
     for (index, target) in state.cameras.options().into_iter().enumerate() {
         let (label, icon) = match target {
             Target::CameraMove => (language.t("move"), "grid"),
+            Target::CameraRename => (language.t("cameraRename"), "type"),
+            Target::CameraNameReset => (language.t("cameraNameReset"), "refresh"),
             Target::CameraHide => (language.t("cameraHide"), "eye-off"),
             _ => (language.t("cameraSettings"), "settings"),
         };
@@ -380,7 +393,7 @@ fn settings(out: &mut Scene, state: &State, assets: &Assets) {
                     continue;
                 };
                 SheetRow {
-                    label: &camera.name,
+                    label: camera.title(),
                     icon: None,
                     value: Some(if camera.hidden {
                         (language.t("hiddenLabel"), false)
@@ -405,4 +418,39 @@ fn settings(out: &mut Scene, state: &State, assets: &Assets) {
         };
         sheet_row(out, state, assets, row);
     }
+}
+
+/// Renaming with the TV's own keyboard: a sheet shows the name as it is typed.
+fn rename(out: &mut Scene, state: &State, id: &str) {
+    let language = state.preferences.language;
+    let gallery = &state.cameras;
+    sheet(out, language.t("cameraName"));
+    let field = Rect::new(SHEET.x + 32., SHEET_TOP, SHEET.w - 128., 67.2);
+    out.shape(field, 12., c(0xffffff, 0.96));
+    let style = text(20.8, 600, -0.02);
+    let height = style.size * style.line_height;
+    let draft = &gallery.name_draft;
+    let (label, color) = if draft.is_empty() {
+        (
+            gallery
+                .camera(id)
+                .map_or(id, |camera| camera.title())
+                .to_owned(),
+            c(0x242424, 0.45),
+        )
+    } else {
+        (format!("{draft}|"), c(0x242424, 1.))
+    };
+    out.text(
+        label,
+        Rect::new(
+            field.x + 24.,
+            field.y + (field.h - height) / 2.,
+            field.w - 48.,
+            height,
+        ),
+        style,
+        color,
+        false,
+    );
 }
