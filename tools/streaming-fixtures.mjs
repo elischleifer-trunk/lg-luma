@@ -6,8 +6,10 @@
 //   pnpm fixtures:streaming --only search-title-star-wars
 //
 // The key comes from MOTN_API_KEY in the environment or in the gitignored `.env` at the repo root
-// (see `.env.example`). It is sent only to the RapidAPI host below and never written to disk:
-// captured files hold the request (path + query) and the response body, not headers.
+// (see `.env.example`). Keys from the Movie of the Night Developers Platform (`motn-key-...`) go
+// to api.movieofthenight.com/v4 as X-API-Key; RapidAPI keys go to the RapidAPI host, matching the
+// official client's rule. The key is never written to disk: captured files hold the request
+// (path + query) and the response body, not headers.
 //
 // Output: tests/fixtures/streaming/<name>.json plus index.json listing every capture. Tests and
 // the desktop preview read these files; they must never call the real API.
@@ -18,7 +20,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'tests/fixtures/streaming');
-const HOST = 'streaming-availability.p.rapidapi.com';
+const MOTN_BASE = 'https://api.movieofthenight.com/v4';
+const RAPIDAPI_HOST = 'streaming-availability.p.rapidapi.com';
 const COUNTRY = 'us';
 
 // One entry per captured request. Keep names stable: tests refer to them.
@@ -95,14 +98,24 @@ async function exists(file) {
   );
 }
 
+// See https://docs.movieofthenight.com/guide/authentication
+function endpoint(key) {
+  return key.startsWith('motn-key-')
+    ? { base: MOTN_BASE, headers: { 'X-API-Key': key } }
+    : {
+        base: `https://${RAPIDAPI_HOST}`,
+        headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': RAPIDAPI_HOST },
+      };
+}
+
 async function capture(request, key) {
-  const url = new URL(request.path, `https://${HOST}`);
+  const { base, headers } = endpoint(key);
+  const url = new URL(base + request.path);
   for (const [k, v] of Object.entries(request.query)) url.searchParams.set(k, v);
-  const response = await fetch(url, {
-    headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': HOST },
-    redirect: 'error',
-  });
-  const remaining = response.headers.get('x-ratelimit-requests-remaining');
+  const response = await fetch(url, { headers, redirect: 'error' });
+  const remaining =
+    response.headers.get('x-ratelimit-requests-remaining') ??
+    response.headers.get('x-ratelimit-remaining');
   const text = await response.text();
   if (!response.ok) {
     throw new Error(`${request.name}: HTTP ${response.status} ${text.slice(0, 300)}`);
@@ -134,7 +147,7 @@ async function main() {
     if (!key) {
       throw new Error('Set MOTN_API_KEY in the environment or in .env (see .env.example).');
     }
-    console.log(`Fetching ${pending.length} of ${selected.length} fixtures from ${HOST}`);
+    console.log(`Fetching ${pending.length} of ${selected.length} fixtures from ${endpoint(key).base}`);
     // Sequential on purpose: free plans are rate limited per second.
     for (const { request, file } of pending) {
       const { body, remaining } = await capture(request, key);

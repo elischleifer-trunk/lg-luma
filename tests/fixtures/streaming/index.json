@@ -1,0 +1,178 @@
+[
+  {
+    "name": "countries-us",
+    "path": "/countries/us",
+    "query": {
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "genres",
+    "path": "/genres",
+    "query": {
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-gho",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "gho",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-star-wars",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "star wars",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-the-office",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "the office",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-dune",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "dune",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-amelie",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "amélie",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-bluey",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "bluey",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-the",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "the",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-no-results",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "zzqxjvw",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-star-wars-movies",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "star wars",
+      "show_type": "movie",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "popular-netflix",
+    "path": "/shows/search/filters",
+    "query": {
+      "country": "us",
+      "catalogs": "netflix",
+      "order_by": "popularity_1week",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "popular-prime",
+    "path": "/shows/search/filters",
+    "query": {
+      "country": "us",
+      "catalogs": "prime.subscription",
+      "order_by": "popularity_1week",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "popular-disney",
+    "path": "/shows/search/filters",
+    "query": {
+      "country": "us",
+      "catalogs": "disney",
+      "order_by": "popularity_1week",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "popular-hbo",
+    "path": "/shows/search/filters",
+    "query": {
+      "country": "us",
+      "catalogs": "hbo",
+      "order_by": "popularity_1week",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "popular-apple",
+    "path": "/shows/search/filters",
+    "query": {
+      "country": "us",
+      "catalogs": "apple",
+      "order_by": "popularity_1week",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "show-movie-godfather",
+    "path": "/shows/tt0068646",
+    "query": {
+      "country": "us"
+    }
+  },
+  {
+    "name": "show-series-the-office",
+    "path": "/shows/tt0386676",
+    "query": {
+      "country": "us",
+      "series_granularity": "episode",
+      "output_language": "en"
+    }
+  }
+]
