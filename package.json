@@ -35,6 +35,7 @@
     "assets:brands": "node tools/brand-assets.mjs",
     "assets:fonts": "node tools/font-assets.mjs",
     "fixtures:streaming": "node tools/streaming-fixtures.mjs",
+    "deeplink:probe": "node tools/deeplink-probe.mjs",
     "runtime": "node tools/webos-runtime.mjs",
     "sdk": "node tools/setup-webos-sdk.mjs",
     "test:weather": "node tests/weather-smoke.mjs",

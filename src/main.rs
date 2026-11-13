@@ -9,6 +9,9 @@ mod cameras;
 mod clock;
 mod companion;
 mod damage;
+// Not wired into the UI yet; remove once the search screen uses it.
+#[allow(dead_code)]
+mod deeplink;
 mod diagnostics;
 mod egl_damage;
 mod font;
