@@ -24,7 +24,7 @@
     "test:overlay": "node --test tests/overlay.test.mjs",
     "test:smoke": "node tests/smoke.mjs && node tests/brands-smoke.mjs && node tests/weather-smoke.mjs && node tests/translations-smoke.mjs",
     "test:brands": "node tests/brands-smoke.mjs",
-    "check": "pnpm version:check && pnpm lint && cargo clippy --locked --workspace --all-targets --all-features -- -D warnings",
+    "check": "pnpm version:check && pnpm openapi --check && pnpm lint && cargo clippy --locked --workspace --all-targets --all-features -- -D warnings",
     "lint": "oxlint --deny-warnings .",
     "lint:fix": "oxlint --fix --deny-warnings .",
     "format": "cargo fmt --all && oxfmt --write .",
@@ -35,6 +35,7 @@
     "assets:brands": "node tools/brand-assets.mjs",
     "assets:fonts": "node tools/font-assets.mjs",
     "fixtures:streaming": "node tools/streaming-fixtures.mjs",
+    "openapi": "node tools/openapi.mjs",
     "deeplink:probe": "node tools/deeplink-probe.mjs",
     "runtime": "node tools/webos-runtime.mjs",
     "sdk": "node tools/setup-webos-sdk.mjs",
@@ -49,6 +50,7 @@
     "acorn": "8.18.0",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
-    "sharp": "0.35.5"
+    "sharp": "0.35.5",
+    "yaml": "2.9.1"
   }
 }

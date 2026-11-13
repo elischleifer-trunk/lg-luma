@@ -35,10 +35,18 @@ mod state;
 mod storage;
 // Not wired into the UI yet; remove once the search screen uses it.
 #[allow(dead_code)]
+#[path = "motn-api.rs"]
+mod motn_api;
+#[allow(dead_code)]
+mod openapi;
+#[allow(dead_code)]
 mod streaming;
 mod text_rendering;
 #[path = "tile-editor.rs"]
 mod tile_editor;
+#[allow(dead_code)]
+#[path = "tmdb-api.rs"]
+mod tmdb_api;
 mod update;
 mod vector;
 mod view;

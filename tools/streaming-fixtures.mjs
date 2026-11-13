@@ -147,7 +147,9 @@ async function main() {
     if (!key) {
       throw new Error('Set MOTN_API_KEY in the environment or in .env (see .env.example).');
     }
-    console.log(`Fetching ${pending.length} of ${selected.length} fixtures from ${endpoint(key).base}`);
+    console.log(
+      `Fetching ${pending.length} of ${selected.length} fixtures from ${endpoint(key).base}`,
+    );
     // Sequential on purpose: free plans are rate limited per second.
     for (const { request, file } of pending) {
       const { body, remaining } = await capture(request, key);
