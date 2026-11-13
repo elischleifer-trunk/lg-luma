@@ -19,11 +19,12 @@ show_camera:
         text:
           type: url
     mode:
-      default: stream
+      default: video
       selector:
         select:
           translation_key: mode
           options:
+            - video
             - stream
             - snapshot
     refresh:
