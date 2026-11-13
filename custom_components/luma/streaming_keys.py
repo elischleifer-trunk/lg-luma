@@ -9,13 +9,14 @@ changed on its own QR page. A key left empty here is never sent, so it never era
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from typing import Any
 
 import aiohttp
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import LumaClient, LumaError
+from .api import LumaApiError, LumaClient, LumaError
 from .const import CONF_MOTN_KEY, CONF_TMDB_TOKEN
 
 _LOGGER = logging.getLogger(__name__)
@@ -79,12 +80,19 @@ def needs_push(options: dict[str, Any], status: dict[str, Any]) -> bool:
     )
 
 
-async def push(client: LumaClient, options: dict[str, Any]) -> None:
-    """Send the keys held here; best effort, the TV may be off."""
+async def push(
+    client: LumaClient, options: dict[str, Any], missing_endpoint: Callable[[], None]
+) -> None:
+    """Send the keys held here; best effort, the TV may be off. `missing_endpoint` is called
+    when the TV's Luma predates streaming search."""
     motn, tmdb = keys(options)
     if not (motn or tmdb):
         return
     try:
         await client.streaming_keys(motn, tmdb)
+    except LumaApiError as err:
+        if err.status == 404:
+            missing_endpoint()
+        _LOGGER.debug("Could not send streaming keys to %s: %s", client.host, err)
     except LumaError as err:
         _LOGGER.debug("Could not send streaming keys to %s: %s", client.host, err)

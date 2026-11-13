@@ -28,7 +28,11 @@ builds or tests.
 desktop OpenGL and mock weather HTTP. Linux can use `xvfb-run -a pnpm test:smoke`. Tests must not
 contact real weather APIs or a TV. Respect any user instruction to use manual TV verification
 instead of running automated tests. Builds/lint may still be run. Do not claim hardware behavior
-from desktop checks. Leave version bumps to the manual Release workflow,
+from desktop checks. Home Assistant compatibility uses API levels, not release versions: raise
+`API_VERSION` or `MIN_INTEGRATION` in `src/home_assistant.rs`, or `INTEGRATION_API` or
+`MIN_TV_API` in `custom_components/luma/const.py`, only when the other side cannot work without
+the change. A raised minimum makes Home Assistant Repairs (and Luma's Settings) ask the owner to
+update. Leave version bumps to the manual Release workflow,
 which releases the next minor version by default or a major version when chosen. Its
 `pnpm version:bump` command synchronizes `package.json`, `appinfo.json`, the root `Cargo.toml`,
 the `luma` entry in `Cargo.lock` and README IPK examples. Supporting Rust crates retain

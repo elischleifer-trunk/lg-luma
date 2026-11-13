@@ -48,7 +48,7 @@ from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
-from . import streaming_keys
+from . import streaming_keys, versions
 from .api import LumaAuthError, LumaClient, LumaError
 from .const import (
     CONF_TOKEN,
@@ -103,6 +103,7 @@ EXAMPLE_IMAGE = Path(__file__).parent / "example.jpg"
 @dataclass
 class LumaData:
     client: LumaClient
+    compatibility: versions.Compatibility
 
 
 type LumaConfigEntry = ConfigEntry[LumaData]
@@ -115,26 +116,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         entry.data.get(CONF_PORT, DEFAULT_PORT),
         entry.data[CONF_TOKEN],
     )
+    compatibility = versions.Compatibility(hass, entry)
     # The TV may be off; only a definite "not paired" stops setup. Calls fail individually.
     try:
-        await client.status()
+        status = await client.status()
     except LumaAuthError as err:
         raise ConfigEntryAuthFailed("Luma no longer knows this Home Assistant server") from err
     except LumaError as err:
         _LOGGER.debug("Luma at %s is not reachable yet: %s", client.host, err)
-    entry.runtime_data = LumaData(client)
+    else:
+        compatibility.status(status)
+    entry.runtime_data = LumaData(client, compatibility)
     _track_cameras(hass, entry, client)
     # Home Assistant holds the streaming search keys: send them now and whenever they change.
-    entry.async_create_background_task(
-        hass, streaming_keys.push(client, dict(entry.options)), f"{DOMAIN} keys {entry.entry_id}"
-    )
+    entry.async_create_background_task(hass, _push_keys(entry), f"{DOMAIN} keys {entry.entry_id}")
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
 async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
-    await streaming_keys.push(entry.runtime_data.client, dict(entry.options))
+    await _push_keys(entry)
+
+
+async def _push_keys(entry: LumaConfigEntry) -> None:
+    data = entry.runtime_data
+    await streaming_keys.push(data.client, dict(entry.options), data.compatibility.missing_endpoint)
 
 
 def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
@@ -200,19 +207,17 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
 
     async def check(_now) -> None:
         # After the TV or Luma restarts it reports no cameras; send the list again then.
-        # The same status says whether the TV lost or replaced the streaming search keys.
-        cameras = not pending and bool(camera_list(hass))
-        has_keys = any(streaming_keys.keys(entry.options))
-        if not (cameras or has_keys):
-            return
+        # The same status says whether the TV lost or replaced the streaming search keys, and
+        # which Luma it runs: an update shows on the device page, or calls for one in Repairs.
         try:
             status = await client.status()
         except LumaError:
             return
-        if cameras and status.get("cameras") == 0:
+        entry.runtime_data.compatibility.status(status)
+        if not pending and status.get("cameras") == 0 and camera_list(hass):
             schedule()
         if streaming_keys.needs_push(dict(entry.options), status):
-            await streaming_keys.push(client, dict(entry.options))
+            await _push_keys(entry)
 
     entry.async_on_unload(hass.bus.async_listen(EVENT_STATE_CHANGED, changed, is_camera))
     entry.async_on_unload(
@@ -227,6 +232,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> boo
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Tell the TV to forget this server's token; best effort, the TV may be off."""
+    versions.remove(hass, entry)
     client = LumaClient(
         async_get_clientsession(hass),
         entry.data[CONF_HOST],
