@@ -39,14 +39,14 @@
     "step": {
       "init": {
         "title": "Streaming search keys",
-        "description": "Luma's search finds where shows stream with Movie of the Night and ranks them with TMDB. Keys are checked when saved, then sent to the TV, and again if the TV loses them or they are changed on the TV. Clearing a field here does not remove the TV's key.",
+        "description": "Luma's search uses Movie of the Night to find where a show streams and TMDB to rank results. Keys are checked when you submit, then kept in sync with the TV.\n\nLeave a field empty to keep the key already on the TV.",
         "data": {
-          "motn_api_key": "Movie of the Night API key",
-          "tmdb_read_access_token": "TMDB API Read Access Token"
+          "motn_api_key": "Movie of the Night key",
+          "tmdb_read_access_token": "TMDB read access token"
         },
         "data_description": {
-          "motn_api_key": "From movieofthenight.com/about/api (starts with motn-key-), or a RapidAPI key for Streaming Availability.",
-          "tmdb_read_access_token": "The long token under themoviedb.org → Settings → API, not the shorter API key."
+          "motn_api_key": "Get one at [Movie of the Night]({motn_url}). It starts with `motn-key-`. A RapidAPI Streaming Availability key also works.",
+          "tmdb_read_access_token": "The long **API Read Access Token** in your [TMDB API settings]({tmdb_url}), not the short API key."
         }
       }
     },

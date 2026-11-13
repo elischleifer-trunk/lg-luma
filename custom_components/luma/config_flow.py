@@ -242,4 +242,9 @@ class LumaOptionsFlow(OptionsFlow):
                 }
             ),
             errors=errors,
+            # URLs live here, not in the translation strings (hassfest rejects them there).
+            description_placeholders={
+                "motn_url": "https://www.movieofthenight.com/about/api",
+                "tmdb_url": "https://www.themoviedb.org/settings/api",
+            },
         )
