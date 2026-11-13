@@ -721,6 +721,7 @@ fn run() -> Result<(), String> {
         );
         state.available_update = (version != env!("CARGO_PKG_VERSION")).then(|| version.clone());
         state.update_status = update::Status::Checked;
+        state.update_checked = Some(state::unix_now());
     } else if public_update_checks {
         state.update_status = update::Status::Checking;
     }

@@ -215,12 +215,12 @@ try {
     'settings,down,down,enter,up,enter,enter',
   );
   assert.equal(bundledRestored.preferences.background, 'forest');
-  const clock = await scenario('clock', 'settings,click:900:284');
+  const clock = await scenario('clock', 'settings,down,down,down,enter,click:900:200');
   assert.equal(clock.subpage, 'Clock');
   assert.equal(clock.focus, 'ClockFormat');
   assert.ok(clock.ui_text.includes('Clock format'));
   assert.ok(clock.ui_text.includes('Time format'));
-  const inputsPage = 'settings,down,down,down,enter,down,down,down,down,enter';
+  const inputsPage = 'settings,down,down,down,enter,down,down,down,down,down,enter';
   const inputs = await scenario('inputs-page', inputsPage);
   assert.equal(inputs.subpage, 'Inputs');
   assert.deepEqual(inputs.focus, { InputMode: 'com.webos.app.hdmi1' });
@@ -282,11 +282,11 @@ try {
   assert.ok(profiled.render.profile.cpu_submission.mean_ms >= 0);
   const widgetsPage = 'settings,down,down,down,enter';
   const widgets = await scenario('widgets-settings', widgetsPage);
-  assert.deepEqual(widgets.focus, { Widget: 4 });
+  assert.deepEqual(widgets.focus, { Widget: 5 });
   assert.ok(widgets.ui_text.includes('Widgets'));
-  for (const title of ['Date', 'Greeting', 'Weather', 'Shortcuts', 'Inputs'])
+  for (const title of ['Clock', 'Date', 'Greeting', 'Weather', 'Shortcuts', 'Inputs'])
     assert.ok(widgets.ui_text.includes(title));
-  const greetingEditor = `${widgetsPage},down,enter,down,enter`;
+  const greetingEditor = `${widgetsPage},down,down,enter,down,enter`;
   for (const [id, name] of [
     ['Ana', 'Ana'],
     ['Bob', 'Bob'],
@@ -314,12 +314,12 @@ try {
       'Keyboard completion must save without waiting for another SDL input event',
     );
   }
-  const greeting = await scenario('greeting-settings', `${widgetsPage},down,enter,down,down`);
+  const greeting = await scenario('greeting-settings', `${widgetsPage},down,down,enter,down,down`);
   assert.equal(greeting.subpage, 'Greeting');
   assert.equal(greeting.focus, 'GreetingNameClear');
   assert.ok(greeting.ui_text.includes('Clear name'));
 
-  const appNamesEditor = 'settings,down,enter,enter';
+  const appNamesEditor = 'settings,down,down,down,down,right,down,enter';
   const appNames = await scenario('app-name-settings', appNamesEditor);
   assert.equal(appNames.subpage, 'AppNames');
   assert.ok(appNames.ui_text.includes('Show on Home'));
@@ -344,7 +344,7 @@ try {
   assert.equal(renamedInput.focus, 'InputRename');
   assert.equal(renamedInput.preferences.input_names['com.webos.app.hdmi2'], 'Console');
   assert.ok(renamedInput.ui_text.includes('Clear name'));
-  const clockEditor = 'settings,down,enter,down,enter';
+  const clockEditor = 'settings,down,down,down,enter,enter';
   const timeFormat = await scenario('clock-time-format', `${clockEditor},down,enter`);
   assert.equal(timeFormat.subpage, 'TimeFormat');
   assert.deepEqual(timeFormat.focus, { Choice: 0 });
@@ -363,43 +363,40 @@ try {
   assert.deepEqual(clockFocus.focus, { Choice: 1 });
   const system = await scenario(
     'system-settings',
-    'settings,down,down,down,down,right,down,down,down,down',
+    'settings,down,down,down,down,right,down,down,down,down,down,down,down,down',
   );
   assert.deepEqual(system.focus, { Setting: 5 });
+  assert.ok(system.ui_text.includes('Streaming search keys'));
   assert.ok(system.ui_text.includes('Refresh apps & inputs'));
   assert.ok(!system.ui_text.includes('Luma update'));
   assert.ok(system.ui_text.includes('Quit app'));
   assert.ok(system.ui_text.includes('Text rendering'));
-  const updatePreview = await scenario('update-preview', 'settings,down,down,down,down,right', [
+  const updatePreview = await scenario('update-preview', 'settings,down,right', [
     '--test-update-version',
     '99.0.0',
   ]);
   assert.equal(updatePreview.focus, 'InstallUpdate');
-  assert.ok(updatePreview.ui_text.includes('Update available'));
-  assert.ok(updatePreview.ui_text.some((label) => label.includes('Latest: 99.0.0')));
+  assert.ok(updatePreview.ui_text.some((label) => label.endsWith(' · 99.0.0 available')));
   assert.ok(updatePreview.ui_text.includes('Install 99.0.0'));
-  const afterUpdatePreview = await scenario(
-    'update-preview-cleared',
-    'settings,down,down,down,down,right',
-  );
+  const afterUpdatePreview = await scenario('update-preview-cleared', 'settings,down,right');
   assert.equal(afterUpdatePreview.focus, 'CheckUpdates');
-  assert.ok(!afterUpdatePreview.ui_text.includes('Update available'));
+  assert.ok(!afterUpdatePreview.ui_text.some((label) => label.endsWith('available')));
   const currentVersion = JSON.parse(
     await fs.readFile(path.join(root, 'package.json'), 'utf8'),
   ).version;
-  const latestPreview = await scenario(
-    'update-current-preview',
-    'settings,down,down,down,down,right,enter',
-    ['--test-update-version', currentVersion],
-  );
+  const latestPreview = await scenario('update-current-preview', 'settings,down,right,enter', [
+    '--test-update-version',
+    currentVersion,
+  ]);
   assert.equal(latestPreview.focus, 'CheckUpdates');
   assert.equal(latestPreview.update_status, 'checked');
   assert.equal(latestPreview.available_update, null);
-  assert.ok(latestPreview.ui_text.includes('No newer version found'));
-  assert.ok(latestPreview.ui_text.includes('Check again'));
-  assert.ok(latestPreview.ui_text.includes(`Current version: ${currentVersion}`));
+  assert.ok(latestPreview.ui_text.includes('Check now'));
+  assert.ok(
+    latestPreview.ui_text.some((label) => label.startsWith(`${currentVersion} · Checked `)),
+  );
   assert.ok(!latestPreview.ui_text.some((label) => label.startsWith('Luma v')));
-  const textOptions = 'settings,down,down,down,down,right,down,down,down,enter';
+  const textOptions = 'settings,down,down,down,down,right,down,down,down,down,down,down,enter';
   const textRendering = await scenario('text-rendering-options', textOptions);
   assert.equal(textRendering.subpage, 'TextRendering');
   assert.deepEqual(textRendering.focus, { Choice: 0 });
@@ -437,7 +434,7 @@ try {
       favorites: [...beforeShortcut.favorites, 'custom.sandmann'],
     }),
   );
-  const shortcutsPage = `${widgetsPage},down,down,down,enter`;
+  const shortcutsPage = `${widgetsPage},down,down,down,down,enter`;
   const shortcut = await scenario('shortcut-settings', shortcutsPage);
   assert.equal(shortcut.focus, 'TileEditor');
   assert.equal(shortcut.subpage, 'Shortcuts');

@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Add a TV running Luma",
-        "description": "On the TV, open Luma → Settings → General and turn on Home Assistant. Luma shows the address to enter here.",
+        "description": "On the TV, open Luma → Settings → System → Home Assistant and turn it on. Luma shows the address to enter here.",
         "data": { "host": "TV address", "port": "Port" }
       },
       "discovery_confirm": {

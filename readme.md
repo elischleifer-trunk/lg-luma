@@ -8,7 +8,7 @@ A native launcher for rooted LG webOS TVs, inspired by Apple TV.
 > integration (`custom_components/luma`). It lets Home Assistant show a camera, such as a
 > doorbell, in a corner of the TV over whatever is playing, and send notification toasts.
 >
-> The integration needs a TV that already runs Luma with **Settings → General → Home Assistant**
+> The integration needs a TV that already runs Luma with **Settings → System → Home Assistant**
 > turned on. After downloading it in HACS, restart Home Assistant, add **Luma for LG webOS** (it
 > is usually discovered on its own) and type the code shown on the TV.
 > To see what the popups look like, press **Show example camera card** or **Show example toast**
@@ -139,7 +139,7 @@ This fork mirrors every published release to Cloudflare R2; see
 On your computer, replace `TV_IP`:
 
 ```sh
-scp -O dist/com.ecklf.luma_2.25.0_arm.ipk root@TV_IP:/tmp/luma.ipk
+scp -O dist/com.ecklf.luma_2.26.0_arm.ipk root@TV_IP:/tmp/luma.ipk
 ssh root@TV_IP
 ```
 
@@ -285,7 +285,7 @@ the QR code.
 
 Show a camera, such as a UniFi Protect doorbell, in a corner of the screen over whatever is
 playing, with the option to pause the show until it closes, plus notification toasts. Turn on
-**Settings → General → Home Assistant** and scan the QR code with your phone: it opens HACS on
+**Settings → System → Home Assistant** and scan the QR code with your phone: it opens HACS on
 your Home Assistant with the `luma` integration ready to install. Home Assistant then finds the TV
 and asks for the code shown on it. Once paired, a **Cameras** app appears among your apps and
 shows every Home Assistant camera in a full-screen grid. See [Home Assistant](home-assistant.md).
@@ -310,7 +310,7 @@ checksum-pinned SDL-webOS library; both downloads are cached under `.build/`.
 Output:
 
 ```text
-dist/com.ecklf.luma_2.25.0_arm.ipk
+dist/com.ecklf.luma_2.26.0_arm.ipk
 dist/sha256sums
 dist/repo.json
 dist/app-icon-large.png
