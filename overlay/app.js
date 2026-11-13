@@ -4,7 +4,10 @@
 // Home Assistant's HLS video, full screen, decoded by the TV. A card given an HLS playlist plays
 // it too, muted, over its motion-JPEG feed once the video is playing. OK on a card expands it to
 // full screen, video and all, and stops its countdown. The Cameras video keeps its last two
-// minutes: Left and Right scrub through them, OK pauses and plays, Back closes.
+// minutes: Left and Right scrub through them, OK pauses and plays, Back closes. Scrubbing back
+// past them, or Up and Down to what UniFi Protect saw, hands over to Luma's own timeline. In
+// mode "recorded" it plays what UniFi Protect recorded, from a moment Luma chose; any key the
+// Cameras app handles closes it and tells Luma where it was, so Luma carries on from there.
 (function () {
   'use strict';
   var logic = window.LumaOverlay;
@@ -79,8 +82,14 @@
   // Tell Luma the overlay closed so it can resume paused playback. Opaque "no-cors" requests
   // need no CORS reply; Luma accepts this endpoint only from the TV itself with this nonce.
   // `failed`: a camera video could not play, so the Cameras app keeps its own stream on screen.
-  function report(settings, failed) {
-    send(settings, logic.closedUrl(settings && settings.port), { failed: failed === true });
+  function report(settings, failed, handOff) {
+    var fields = { failed: failed === true };
+    if (handOff) {
+      fields.key = handOff.key;
+      fields.behind = handOff.behind;
+      fields.paused = handOff.paused;
+    }
+    send(settings, logic.closedUrl(settings && settings.port), fields);
   }
 
   function send(settings, url, extra) {
@@ -102,7 +111,13 @@
     }
   }
 
-  function dismiss(failed) {
+  // Closes, telling the Cameras app the key and how far behind live the video was, so it
+  // carries on from there in its own timeline.
+  function handOff(key, behind, paused) {
+    dismiss(false, { key: key, behind: Math.max(0, behind), paused: paused === true });
+  }
+
+  function dismiss(failed, handed) {
     if (closing) return;
     closing = true;
     clearTimers();
@@ -111,7 +126,7 @@
     card.hidden = true;
     expanded = false;
     stopVideo();
-    report(current, failed);
+    report(current, failed, handed);
     closeTimer = setTimeout(function () {
       window.close();
     }, 150);
@@ -376,9 +391,22 @@
 
   // Left and Right: SKIP_S back or forward, playing or paused as it was; forward to the newest
   // video goes live and plays.
+  // The live video's lag behind real time is about its own live delay on top of what it shows.
+  var LIVE_DELAY_S = 2;
+
+  function behindLive() {
+    var range = kept();
+    return range ? range.end - player.currentTime + LIVE_DELAY_S : 0;
+  }
+
   function scrub(step) {
     var range = kept();
     if (!range) return;
+    // Back past what the video kept: Luma's timeline (and Protect's recordings) go further.
+    if (step < 0 && player.currentTime + step < range.start - 0.5 && current.history) {
+      handOff('left', range.end - range.start + LIVE_DELAY_S, player.paused);
+      return;
+    }
     var next = logic.seek(player.currentTime, range.start, range.end, step);
     if (next === null) goLive();
     else player.currentTime = next;
@@ -541,7 +569,102 @@
     }, settings.duration * 1000);
   }
 
+  // ---- Recorded video (Cameras app) --------------------------------------------------------
+
+  // Plays UniFi Protect's recording piece by piece through Luma, which redirects each piece to
+  // Home Assistant with the camera's current token. Fails (and Luma shows recorded pictures
+  // instead) when nothing plays within VIDEO_WAIT_MS or a piece cannot load.
+  function playRecorded(settings) {
+    cancelClose();
+    clearTimers();
+    stopFeed();
+    stopCardVideo();
+    stopVideo();
+    card.hidden = true;
+    closing = false;
+    current = settings;
+    document.getElementById('video-title').textContent = settings.title;
+    videoLive.hidden = true;
+    videoLive.className = 'video-badge';
+    videoView.hidden = false;
+    cover(settings);
+    var part = null;
+    var wait = null;
+    var playback = {
+      recorded: true,
+      stop: function () {
+        clearTimeout(wait);
+        player.onplaying = null;
+        player.onended = null;
+        player.onerror = null;
+        player.pause();
+        player.removeAttribute('src');
+        try {
+          player.load();
+        } catch (_error) {
+          // Nothing was loading.
+        }
+      },
+    };
+    playback.position = function () {
+      return part ? part.start + (player.currentTime || 0) : settings.start;
+    };
+    function load(from, first) {
+      part = logic.piece(settings, from, Date.now() / 1000, first);
+      if (!part) {
+        handOff('live', 0, false);
+        return;
+      }
+      clearTimeout(wait);
+      wait = setTimeout(function () {
+        dismiss(true);
+      }, VIDEO_WAIT_MS);
+      player.src = part.url;
+      start(player);
+    }
+    player.onplaying = function () {
+      clearTimeout(wait);
+      videoView.className = 'video playing';
+      videoCover.hidden = true;
+      videoLive.hidden = false;
+    };
+    player.onended = function () {
+      load(part.end, false);
+    };
+    player.onerror = function () {
+      dismiss(true);
+    };
+    video = playback;
+    load(settings.start, true);
+    timers.push(
+      setInterval(function () {
+        videoLive.textContent = new Date(playback.position() * 1000).toLocaleTimeString();
+      }, 250)
+    );
+  }
+
+  function recordedBehind() {
+    return Date.now() / 1000 - video.position();
+  }
+
+  // Keys on recorded video: each goes to Luma's timeline with where the video was.
+  var RECORDED_KEYS = {
+    13: 'ok',
+    19: 'ok',
+    37: 'left',
+    39: 'right',
+    38: 'up',
+    40: 'down',
+    412: 'rewind',
+    417: 'forward',
+  };
+
   function apply(params) {
+    var past = logic.recorded(params);
+    if (past) {
+      playRecorded(past);
+      return;
+    }
     var enlarged = logic.video(params);
     if (enlarged) {
       playVideo(enlarged);
@@ -580,6 +703,21 @@
   };
 
   document.addEventListener('keydown', function (event) {
+    if (video && video.recorded && RECORDED_KEYS[event.keyCode]) {
+      event.preventDefault();
+      handOff(
+        RECORDED_KEYS[event.keyCode],
+        recordedBehind(),
+        event.keyCode === 13 || event.keyCode === 19
+      );
+      return;
+    }
+    // Up and Down on the live video: to what UniFi Protect saw, in Luma's timeline.
+    if (playing() && current.history && (event.keyCode === 38 || event.keyCode === 40)) {
+      event.preventDefault();
+      handOff(event.keyCode === 38 ? 'up' : 'down', behindLive(), player.paused);
+      return;
+    }
     if (playing() && VIDEO_KEYS[event.keyCode]) {
       event.preventDefault();
       VIDEO_KEYS[event.keyCode]();

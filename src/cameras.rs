@@ -15,9 +15,12 @@
 //! overlay app plays that full screen with the TV's hardware decoder. The motion-JPEG stream
 //! keeps running underneath: it shows until the video plays, and stays if it cannot.
 //!
-//! The enlarged camera's frames are also kept, as the camera sent them, for [`REWIND`]: Left and
-//! Right scrub back and forward through them and OK pauses and plays, with a replay thread
-//! decoding the frame at the position the gallery asks for.
+//! The enlarged camera's frames are also kept, as the camera sent them, for [`REWIND`], and a
+//! camera that UniFi Protect records can be scrubbed back through [`HISTORY`] of its recordings:
+//! pictures from any moment, recorded video (played by the overlay app) and the marks of what
+//! Protect saw. Left and Right scrub, faster the longer they are held; OK pauses and plays; Up and
+//! Down jump between marks; the remote's rewind and fast-forward keys play faster either way.
+//! A replay thread shows the picture at the position the gallery asks for.
 use crate::model::clean_input_name;
 use crate::state::{Direction, Effect, Overlay, Rect, State, Target, TextField};
 use image::{ImageReader, Limits, RgbaImage};
@@ -54,10 +57,40 @@ pub const FULL_SIZE: (u32, u32) = (1920, 1080);
 /// (about two minutes of a 2 fps 1080p motion-JPEG stream).
 pub const REWIND: Duration = Duration::from_secs(120);
 const REWIND_BYTES: usize = 48 * 1024 * 1024;
-/// Left and Right skip this far through the enlarged camera's recent frames.
-pub const SKIP: Duration = Duration::from_secs(5);
 /// Closer than this to the newest frame counts as live.
 const LIVE_EDGE: Duration = Duration::from_secs(1);
+/// How far back a camera UniFi Protect records can be scrubbed.
+pub const HISTORY: Duration = Duration::from_secs(24 * 60 * 60);
+/// Recorded pictures are fetched this wide, so scrubbing stays quick.
+const HISTORY_WIDTH: u32 = 1280;
+/// What Protect saw is fetched again this often while a camera is enlarged.
+const EVENTS_REFRESH: Duration = Duration::from_secs(60);
+/// Recorded video starts once scrubbing has stopped for this long.
+const SETTLE: Duration = Duration::from_millis(1500);
+/// A Left or Right within this of the last continues a hold.
+const HOLD_GAP: Duration = Duration::from_millis(500);
+/// Faster playback, forward or (negated) backward.
+pub const SPEEDS: [i32; 6] = [2, 4, 8, 16, 32, 64];
+
+/// Scrubbing steps grow the longer Left or Right is held.
+fn step(held: Duration) -> Duration {
+    Duration::from_secs(match held.as_millis() {
+        0..1000 => 10,
+        1000..3000 => 60,
+        3000..6000 => 300,
+        _ => 1800,
+    })
+}
+
+/// The remote's media keys.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Media {
+    Play,
+    Pause,
+    PlayPause,
+    Rewind,
+    Forward,
+}
 
 /// One camera as the gallery shows it. `id` is unique across paired servers.
 #[derive(Clone, Debug, PartialEq)]
@@ -68,6 +101,8 @@ pub struct Camera {
     pub snapshot: Option<String>,
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
+    /// The integration's endpoint into what UniFi Protect recorded of this camera.
+    pub history: Option<String>,
     pub hidden: bool,
     /// The owner's own name for the camera, shown instead of Home Assistant's `name`.
     pub label: Option<String>,
@@ -143,10 +178,16 @@ pub enum Update {
     Frame(Arc<Frame>),
     /// The camera could not be loaded; its last frame, if any, stays on screen.
     Unavailable(String),
-    /// A frame from the enlarged camera's recent past, for the replay position asked for.
+    /// A picture from the enlarged camera's past, for the replay position asked for; none when
+    /// nothing was recorded then.
     Replay {
         id: String,
-        frame: Arc<Frame>,
+        frame: Option<Arc<Frame>>,
+    },
+    /// What UniFi Protect saw on a camera.
+    Marks {
+        id: String,
+        marks: Vec<Mark>,
     },
     /// The address of a camera's HLS stream, or why there is none.
     Video {
@@ -158,8 +199,12 @@ pub enum Update {
 /// A camera video for the overlay app to play.
 #[derive(Clone, Debug, PartialEq)]
 pub struct VideoRequest {
-    /// Home Assistant's HLS playlist.
+    /// Home Assistant's HLS playlist; empty for recorded video.
     pub url: String,
+    /// Recorded video from this Unix time instead, of this gallery camera.
+    pub recorded: Option<(String, u64)>,
+    /// UniFi Protect records the camera: scrubbing past the live video goes on in the gallery.
+    pub history: bool,
     pub title: String,
     /// Shown over the video until it plays, hiding the TV's black video plane meanwhile.
     pub snapshot: Option<String>,
@@ -175,6 +220,80 @@ pub enum Video {
     /// Handed to the overlay app, which shows it once it plays; until then, and if it cannot,
     /// the motion-JPEG stream shows from underneath.
     Playing(String),
+    /// The overlay app plays what Protect recorded, from the replay position.
+    Recorded(String),
+}
+
+/// How the overlay app's camera video closed. A video left by a key the gallery handles
+/// reports how far behind live it was (and whether paused) and the key, so the gallery carries
+/// on from there; Back reports neither and leaves the camera.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Closed {
+    pub failed: bool,
+    pub behind: Option<f64>,
+    pub key: Option<String>,
+    pub paused: bool,
+}
+
+/// What UniFi Protect saw, as Unix seconds.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Mark {
+    pub start: u64,
+    pub end: u64,
+    pub kind: Kind,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Kind {
+    Motion,
+    Person,
+    Vehicle,
+    Animal,
+    Package,
+    Doorbell,
+}
+
+impl Kind {
+    fn parse(kind: &str) -> Self {
+        match kind {
+            "person" => Self::Person,
+            "vehicle" => Self::Vehicle,
+            "animal" => Self::Animal,
+            "package" => Self::Package,
+            "doorbell" | "ring" => Self::Doorbell,
+            _ => Self::Motion,
+        }
+    }
+}
+
+/// The integration's answer about what Protect saw, newest last.
+pub fn parse_marks(bytes: &[u8]) -> Result<Vec<Mark>, String> {
+    let reply: Value = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+    let events = reply["events"].as_array().ok_or("no events")?;
+    let mut marks: Vec<Mark> = events
+        .iter()
+        .filter_map(|event| {
+            let start = event["start"].as_u64()?;
+            let end = event["end"].as_u64().unwrap_or(start).max(start);
+            Some(Mark {
+                start,
+                end,
+                kind: Kind::parse(event["kind"].as_str().unwrap_or_default()),
+            })
+        })
+        .take(4000)
+        .collect();
+    marks.sort_by_key(|mark| mark.start);
+    Ok(marks)
+}
+
+/// The picture the replay thread should show.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Want {
+    /// The kept frame that had arrived by then.
+    Kept(Instant),
+    /// A picture UniFi Protect recorded, at this URL.
+    Recorded(String),
 }
 
 /// `http://host:port` of a URL.
@@ -191,8 +310,8 @@ struct Recording {
     id: String,
     frames: VecDeque<(Instant, Arc<[u8]>)>,
     bytes: usize,
-    /// The replay position the gallery last asked for, taken by the replay thread.
-    wanted: Option<Instant>,
+    /// The picture the gallery last asked for (and its camera), taken by the replay thread.
+    wanted: Option<(String, Want)>,
     stop: bool,
 }
 
@@ -328,10 +447,10 @@ impl Service {
         self.replay.lock().span()
     }
 
-    /// Shows the enlarged camera's kept frame from `at` (as [`Update::Replay`]); a frame already
-    /// shown is not decoded again.
-    pub fn replay(&mut self, at: Instant) {
-        self.replay.lock().wanted = Some(at);
+    /// Shows a picture from the enlarged camera's past (as [`Update::Replay`]); one already
+    /// shown is not loaded again.
+    pub fn replay(&mut self, id: &str, want: Want) {
+        self.replay.lock().wanted = Some((id.to_owned(), want));
         self.replay.wake.notify_all();
         if self.replaying {
             return;
@@ -343,6 +462,25 @@ impl Service {
         match spawned {
             Ok(_) => self.replaying = true,
             Err(error) => eprintln!("Luma cameras: {error}"),
+        }
+    }
+
+    /// Asks the integration what UniFi Protect saw, answering with [`Update::Marks`].
+    pub fn marks(&self, id: String, url: String) {
+        let sender = self.sender.clone();
+        let spawned =
+            thread::Builder::new()
+                .name("camera-marks".into())
+                .spawn(
+                    move || match fetch(&agent(), &url).and_then(|b| parse_marks(&b)) {
+                        Ok(marks) => {
+                            let _ = sender.send(Update::Marks { id, marks });
+                        }
+                        Err(error) => eprintln!("Luma cameras {id}: no recorded events: {error}"),
+                    },
+                );
+        if let Err(error) = spawned {
+            eprintln!("Luma cameras: {error}");
         }
     }
 
@@ -424,21 +562,38 @@ impl Drop for Service {
     }
 }
 
-/// The replay thread: decodes the kept frame at each position the gallery asks for.
+/// What the replay thread shows next: a kept frame's bytes, or a recorded picture's URL.
+enum Next {
+    Kept(Arc<[u8]>),
+    Recorded(String),
+}
+
+/// The replay thread: shows the picture at each position the gallery asks for, the newest ask
+/// first, so a slow answer skips positions rather than falling behind.
 fn play(replay: &Replay, sender: &mpsc::Sender<Update>, gate: &Gate) {
-    let mut shown: Option<(String, Instant)> = None;
+    let agent = agent();
+    // What is on screen: the camera and the kept frame's arrival or the recorded picture's URL.
+    let mut shown: Option<(String, Want)> = None;
     loop {
-        let (id, taken, bytes) = {
+        let (id, next) = {
             let mut recording = replay.lock();
             loop {
                 if recording.stop {
                     return;
                 }
-                if let Some(at) = recording.wanted.take() {
-                    if let Some((taken, bytes)) = recording.at(at) {
-                        let next = (recording.id.clone(), taken);
-                        if shown.as_ref() != Some(&next) {
-                            break (next.0, taken, bytes);
+                if let Some((id, want)) = recording.wanted.take() {
+                    let found = match &want {
+                        Want::Kept(at) if recording.id == id => recording
+                            .at(*at)
+                            .map(|(taken, bytes)| (Want::Kept(taken), Next::Kept(bytes))),
+                        Want::Kept(_) => None,
+                        Want::Recorded(url) => Some((want.clone(), Next::Recorded(url.clone()))),
+                    };
+                    if let Some((key, next)) = found {
+                        let key = (id, key);
+                        if shown.as_ref() != Some(&key) {
+                            shown = Some(key.clone());
+                            break (key.0, next);
                         }
                     }
                     continue;
@@ -449,15 +604,21 @@ fn play(replay: &Replay, sender: &mpsc::Sender<Update>, gate: &Gate) {
                     .unwrap_or_else(|e| e.into_inner());
             }
         };
-        shown = Some((id.clone(), taken));
-        match gate.run(|| decode(&bytes, FULL_SIZE)) {
-            Some(pixels) => {
-                let frame = Arc::new(Frame::new(&replay_key(&id), pixels, false));
-                if sender.send(Update::Replay { id, frame }).is_err() {
-                    return;
-                }
+        let bytes = match next {
+            Next::Kept(bytes) => Ok(bytes.to_vec()),
+            Next::Recorded(url) => fetch(&agent, &url),
+        };
+        let frame = match bytes {
+            Ok(bytes) => gate
+                .run(|| decode(&bytes, FULL_SIZE))
+                .map(|pixels| Arc::new(Frame::new(&replay_key(&id), pixels, false))),
+            Err(error) => {
+                eprintln!("Luma cameras {id}: no recorded picture: {error}");
+                None
             }
-            None => eprintln!("Luma cameras {id}: a kept frame could not be decoded"),
+        };
+        if sender.send(Update::Replay { id, frame }).is_err() {
+            return;
         }
     }
 }
@@ -795,33 +956,53 @@ pub enum Sheet {
     Settings,
 }
 
-/// Where the enlarged camera is in its kept frames.
+/// Where the enlarged camera is: live, or behind it in its kept frames and recordings.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum Playback {
     #[default]
     Live,
-    /// Stopped on the frame from this moment.
-    Paused(Instant),
-    /// Playing this far behind live.
-    Behind(Duration),
+    /// `lag` behind live at `since`, moving at `speed`: 0 is paused, 1 normal, negative
+    /// backward.
+    Replay {
+        lag: Duration,
+        since: Instant,
+        speed: i32,
+    },
 }
 
-/// The scrubber under the enlarged camera, in whole quarter seconds: how far back the kept
-/// frames reach, and how far behind live the camera shows.
+/// The scrubber under the enlarged camera: how far back it reaches (to whole seconds), how far
+/// behind live it shows (to a quarter second), how much of that the TV keeps itself, the speed,
+/// and the Unix second it was worked out at.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Scrub {
     pub window: Duration,
     pub lag: Duration,
+    pub kept: Duration,
+    pub speed: i32,
+    pub unix: u64,
 }
 
 fn quarters(duration: Duration) -> Duration {
     Duration::from_millis(duration.as_millis() as u64 / 250 * 250)
 }
 
-/// `-m:ss` behind live.
+/// `-m:ss` (or `-h:mm:ss`) behind live.
 pub fn clock(lag: Duration) -> String {
     let seconds = lag.as_secs();
+    if seconds >= 3600 {
+        return format!(
+            "-{}:{:02}:{:02}",
+            seconds / 3600,
+            seconds / 60 % 60,
+            seconds % 60
+        );
+    }
     format!("-{}:{:02}", seconds / 60, seconds % 60)
+}
+
+/// `4×`, `-8×`: a speed other than normal.
+pub fn speed_label(speed: i32) -> String {
+    format!("{speed}\u{d7}")
 }
 
 #[derive(Default)]
@@ -858,9 +1039,23 @@ pub struct Gallery {
     pub playback: Playback,
     /// When the enlarged camera's oldest and newest kept frames arrived, from the main loop.
     pub recorded: Option<(Instant, Instant)>,
-    /// The kept frame shown while not live.
+    /// The past picture shown while not live.
     pub replay: Option<Arc<Frame>>,
+    /// Protect recorded nothing at the position shown.
+    pub not_recorded: bool,
     pub scrub: Option<Scrub>,
+    /// What UniFi Protect saw on the enlarged camera, oldest first.
+    pub marks: Vec<Mark>,
+    /// When marks were last asked for.
+    pub marks_asked: Option<Instant>,
+    /// For the main loop: ask what Protect saw (id, URL).
+    pub fetch_marks: Option<(String, String)>,
+    /// Cameras whose recorded video could not be played: they replay pictures instead.
+    pub recorded_failed: Vec<String>,
+    /// Left or Right being held: back, when the hold started, and the latest press.
+    held: Option<(bool, Instant, Instant)>,
+    /// The latest scrubbing key: recorded video waits until scrubbing settles.
+    scrubbed: Option<Instant>,
 }
 
 impl Gallery {
@@ -945,13 +1140,22 @@ impl Gallery {
     /// Leaves the enlarged camera, closing its video.
     fn shrink(&mut self) {
         self.enlarged = None;
-        if matches!(std::mem::take(&mut self.video), Video::Playing(_)) {
+        if matches!(
+            std::mem::take(&mut self.video),
+            Video::Playing(_) | Video::Recorded(_)
+        ) {
             self.stop_video = true;
         }
         self.resolve = None;
         self.playback = Playback::Live;
         self.replay = None;
+        self.not_recorded = false;
         self.scrub = None;
+        self.marks.clear();
+        self.marks_asked = None;
+        self.fetch_marks = None;
+        self.held = None;
+        self.scrubbed = None;
     }
 
     /// With live video on, asks for Home Assistant's HLS stream of the enlarged camera; the
@@ -970,38 +1174,56 @@ impl Gallery {
         }
     }
 
-    /// How far behind live the enlarged camera shows at `now`, within its kept frames.
-    fn lag(&self, now: Instant) -> Duration {
-        let lag = match self.playback {
-            Playback::Live => return Duration::ZERO,
-            Playback::Paused(at) => now.saturating_duration_since(at),
-            Playback::Behind(lag) => lag,
-        };
-        self.recorded.map_or(lag, |(oldest, _)| {
-            lag.min(now.saturating_duration_since(oldest))
+    /// The enlarged camera's endpoint into what Protect recorded.
+    fn history(&self) -> Option<&str> {
+        let id = self.enlarged.as_deref()?;
+        self.camera(id)?.history.as_deref()
+    }
+
+    /// How far back the TV's own kept frames reach at `now`.
+    fn kept(&self, now: Instant) -> Duration {
+        self.recorded.map_or(Duration::ZERO, |(oldest, _)| {
+            now.saturating_duration_since(oldest)
         })
+    }
+
+    /// How far back the enlarged camera can go: Protect's recordings, or the kept frames.
+    fn reach(&self, now: Instant) -> Duration {
+        if self.history().is_some() {
+            HISTORY
+        } else {
+            self.kept(now)
+        }
+    }
+
+    /// How far behind live the enlarged camera shows at `now`.
+    fn lag(&self, now: Instant) -> Duration {
+        let Playback::Replay { lag, since, speed } = self.playback else {
+            return Duration::ZERO;
+        };
+        let moved = now.saturating_duration_since(since).as_secs_f64() * f64::from(1 - speed);
+        Duration::from_secs_f64((lag.as_secs_f64() + moved).max(0.)).min(self.reach(now))
+    }
+
+    fn speed(&self) -> i32 {
+        match self.playback {
+            Playback::Live => 1,
+            Playback::Replay { speed, .. } => speed,
+        }
     }
 
     /// Back to live: the HLS video, when there is one, takes over again.
     fn go_live(&mut self) {
         self.playback = Playback::Live;
         self.replay = None;
+        self.not_recorded = false;
         self.request_video();
     }
 
-    /// Left or Right on the enlarged camera: [`SKIP`] back or forward through its kept frames,
-    /// playing or paused as it was; forward to the newest frame goes live.
-    pub fn skip(&mut self, back: bool, now: Instant) {
-        let Some((oldest, _)) = self.recorded else {
-            return;
-        };
-        let lag = self.lag(now);
-        let lag = if back {
-            (lag + SKIP).min(now.saturating_duration_since(oldest))
-        } else {
-            lag.saturating_sub(SKIP)
-        };
-        if lag < LIVE_EDGE && !matches!(self.playback, Playback::Paused(_) if back) {
+    /// Shows the camera `lag` behind live at `speed`; at the live edge going forward, live.
+    fn seek(&mut self, lag: Duration, speed: i32, now: Instant) {
+        let lag = lag.min(self.reach(now));
+        if lag < LIVE_EDGE && speed >= 1 {
             if self.playback != Playback::Live {
                 self.go_live();
             }
@@ -1010,33 +1232,110 @@ impl Gallery {
         if self.playback == Playback::Live {
             self.hold_frame();
         }
-        self.playback = match self.playback {
-            Playback::Paused(_) => Playback::Paused(now - lag),
-            _ => Playback::Behind(lag),
+        self.playback = Playback::Replay {
+            lag,
+            since: now,
+            speed,
         };
     }
 
-    /// OK on the enlarged camera: pause, or play from where it paused.
+    /// Left or Right on the enlarged camera: back or forward, by more the longer it is held,
+    /// playing or paused as it was; forward to the newest frame goes live.
+    pub fn skip(&mut self, back: bool, now: Instant) {
+        let start = match self.held {
+            Some((was_back, start, last))
+                if was_back == back && now.saturating_duration_since(last) < HOLD_GAP =>
+            {
+                start
+            }
+            _ => now,
+        };
+        self.held = Some((back, start, now));
+        self.scrubbed = Some(now);
+        let step = step(now.saturating_duration_since(start));
+        let lag = self.lag(now);
+        let lag = if back {
+            lag + step
+        } else {
+            lag.saturating_sub(step)
+        };
+        if back && self.reach(now) < LIVE_EDGE {
+            return;
+        }
+        self.seek(lag, self.speed(), now);
+    }
+
+    /// OK on the enlarged camera: pause, or play at normal speed.
     pub fn toggle_pause(&mut self, now: Instant) {
-        self.playback = match self.playback {
+        match self.playback {
             Playback::Live => {
+                // The picture on screen is the newest kept frame.
+                let lag = self.recorded.map_or(Duration::ZERO, |(_, newest)| {
+                    now.saturating_duration_since(newest)
+                });
                 self.hold_frame();
-                // The frame on screen is the newest kept one.
-                Playback::Paused(self.recorded.map_or(now, |(_, newest)| newest))
+                self.playback = Playback::Replay {
+                    lag,
+                    since: now,
+                    speed: 0,
+                };
             }
-            Playback::Paused(_) => {
-                let lag = self.lag(now);
-                if lag < LIVE_EDGE || self.recorded.is_none() {
-                    self.go_live();
-                    return;
-                }
-                Playback::Behind(lag)
-            }
-            Playback::Behind(lag) => Playback::Paused(now - lag),
-        };
+            Playback::Replay { speed: 1, .. } => self.seek(self.lag(now), 0, now),
+            Playback::Replay { .. } => self.seek(self.lag(now), 1, now),
+        }
     }
 
-    /// Leaving live keeps the frame on screen until the replay thread decodes the kept one.
+    /// The remote's play and pause keys.
+    pub fn set_paused(&mut self, paused: bool, now: Instant) {
+        if paused != (self.speed() == 0) || (!paused && self.speed() != 1) {
+            if paused || self.playback != Playback::Live {
+                self.seek(self.lag(now), if paused { 0 } else { 1 }, now);
+            }
+            if paused && self.playback == Playback::Live {
+                self.toggle_pause(now);
+            }
+        }
+    }
+
+    /// Fast-forward or rewind: the next faster speed that way.
+    pub fn faster(&mut self, back: bool, now: Instant) {
+        let speed = self.speed();
+        let next = if back {
+            if speed >= -1 {
+                -SPEEDS[0]
+            } else {
+                -*SPEEDS.iter().find(|s| **s > -speed).unwrap_or(&SPEEDS[5])
+            }
+        } else if speed <= 1 {
+            SPEEDS[0]
+        } else {
+            *SPEEDS.iter().find(|s| **s > speed).unwrap_or(&SPEEDS[5])
+        };
+        if !back && self.playback == Playback::Live {
+            return;
+        }
+        self.seek(self.lag(now), next, now);
+    }
+
+    /// Up or Down: to the moment just before the previous or next thing Protect saw; Down past
+    /// the last one goes live.
+    pub fn jump(&mut self, earlier: bool, now: Instant, unix: u64) {
+        self.scrubbed = Some(now);
+        let at = unix.saturating_sub(self.lag(now).as_secs());
+        let mark = if earlier {
+            self.marks.iter().rev().find(|mark| mark.start + 3 < at)
+        } else {
+            self.marks.iter().find(|mark| mark.start > at + 3)
+        };
+        let speed = self.speed().max(1);
+        match mark.map(|mark| unix.saturating_sub(mark.start.saturating_sub(2))) {
+            Some(lag) => self.seek(Duration::from_secs(lag), speed, now),
+            None if !earlier => self.seek(Duration::ZERO, 1, now),
+            None => {}
+        }
+    }
+
+    /// Leaving live keeps the frame on screen until the replay thread shows the past one.
     fn hold_frame(&mut self) {
         if self.replay.is_none() {
             self.replay = self
@@ -1047,23 +1346,79 @@ impl Gallery {
         }
     }
 
-    /// The moment of the kept frame to show at `now`, when not live, and the scrubber to draw.
-    /// True when the scrubber changed.
-    pub fn replay_position(&mut self, now: Instant) -> (Option<Instant>, bool) {
-        if self.enlarged.is_none() {
+    /// The main loop's tick: the picture to show at `now` when not live (`unix` is the same
+    /// moment as a Unix time), and whether the scrubber changed. Ends a fast-forward at live and a
+    /// rewind at the oldest moment, asks for Protect's marks now and then, and hands normal-speed
+    /// playback of recordings to the overlay app.
+    pub fn replay_position(&mut self, now: Instant, unix: u64) -> (Option<Want>, bool) {
+        let Some(id) = self.enlarged.clone() else {
             return (None, false);
+        };
+        let history = self.history().map(str::to_owned);
+        if let Some(history) = &history
+            && self
+                .marks_asked
+                .is_none_or(|asked| now.saturating_duration_since(asked) >= EVENTS_REFRESH)
+        {
+            self.marks_asked = Some(now);
+            let start = unix.saturating_sub(HISTORY.as_secs());
+            self.fetch_marks = Some((
+                id.clone(),
+                format!("{history}&events=1&start={start}&end={unix}"),
+            ));
         }
-        let scrub = self.recorded.map(|(oldest, _)| Scrub {
-            window: quarters(now.saturating_duration_since(oldest)),
-            lag: quarters(self.lag(now)),
+        let lag = self.lag(now);
+        let speed = self.speed();
+        if let Playback::Replay { .. } = self.playback {
+            if speed > 1 && lag < LIVE_EDGE {
+                self.go_live();
+            } else if speed < 0 && lag >= self.reach(now) {
+                self.seek(lag, 0, now);
+            }
+        }
+        let kept = self.kept(now);
+        let scrub = (self.reach(now) >= Duration::from_secs(1)).then(|| Scrub {
+            window: Duration::from_secs(self.reach(now).as_secs()),
+            lag: quarters(lag),
+            kept,
+            speed: self.speed(),
+            unix,
         });
         let changed = scrub != self.scrub;
         self.scrub = scrub;
-        let at = match self.playback {
-            Playback::Live => None,
-            _ => now.checked_sub(self.lag(now)),
+        if self.playback == Playback::Live {
+            return (None, changed);
+        }
+        let want = match (&history, now.checked_sub(lag)) {
+            (Some(history), _) if lag > kept => {
+                let at = unix.saturating_sub(lag.as_secs());
+                // Normal speed in the recordings: the overlay app plays the recorded video.
+                if self.speed() == 1
+                    && lag > kept + Duration::from_secs(3)
+                    && self.video == Video::Off
+                    && !self.recorded_failed.contains(&id)
+                    && self
+                        .scrubbed
+                        .is_none_or(|at| now.saturating_duration_since(at) >= SETTLE)
+                {
+                    let title = self
+                        .camera(&id)
+                        .map_or_else(String::new, |c| c.title().to_owned());
+                    self.video = Video::Recorded(id.clone());
+                    self.play = Some(VideoRequest {
+                        url: String::new(),
+                        recorded: Some((id.clone(), at)),
+                        history: true,
+                        title,
+                        snapshot: Some(format!("{history}&at={at}&width={HISTORY_WIDTH}")),
+                    });
+                }
+                Want::Recorded(format!("{history}&at={at}&width={HISTORY_WIDTH}"))
+            }
+            (_, Some(at)) => Want::Kept(at),
+            (_, None) => return (None, changed),
         };
-        (at, changed)
+        (Some(want), changed)
     }
 
     pub fn watches(&self) -> Vec<Watch> {
@@ -1271,7 +1626,16 @@ impl State {
                 {
                     return;
                 }
-                gallery.replay = Some(frame);
+                gallery.not_recorded = frame.is_none();
+                if frame.is_some() {
+                    gallery.replay = frame;
+                }
+            }
+            Update::Marks { id, marks } => {
+                if gallery.enlarged.as_deref() != Some(id.as_str()) {
+                    return;
+                }
+                gallery.marks = marks;
             }
             Update::Video { id, result } => {
                 // Only for the camera still enlarged and waiting for it.
@@ -1286,8 +1650,11 @@ impl State {
                             .camera(&id)
                             .map_or_else(String::new, |c| c.title().to_owned());
                         let snapshot = gallery.camera(&id).and_then(|c| c.snapshot.clone());
+                        let history = gallery.camera(&id).is_some_and(|c| c.history.is_some());
                         gallery.video = Video::Playing(id);
                         gallery.play = Some(VideoRequest {
+                            recorded: None,
+                            history,
                             url,
                             title,
                             snapshot,
@@ -1306,18 +1673,70 @@ impl State {
 
     /// The overlay app's video closed. Back there also leaves the enlarged camera; a video that
     /// could not play leaves the motion-JPEG stream on screen for the rest of this visit.
-    pub fn camera_video_closed(&mut self, failed: bool) {
+    pub fn camera_video_closed(&mut self, closed: Closed) {
+        self.camera_video_closed_at(closed, Instant::now(), crate::state::unix_now());
+    }
+
+    fn camera_video_closed_at(&mut self, closed: Closed, now: Instant, unix: u64) {
         let gallery = &mut self.cameras;
         // Only a video being played can close; a camera whose stream is still starting is not
         // affected by a late report about an earlier one.
-        let Video::Playing(id) = gallery.video.clone() else {
-            return;
+        let (id, recorded) = match gallery.video.clone() {
+            Video::Playing(id) => (id, false),
+            Video::Recorded(id) => (id, true),
+            _ => return,
         };
         gallery.video = Video::Off;
-        if failed {
-            gallery.video_failed.push(id);
-        } else if gallery.enlarged.as_deref() == Some(id.as_str()) {
+        self.dirty = true;
+        if closed.failed {
+            if recorded {
+                gallery.recorded_failed.push(id.clone());
+            } else {
+                gallery.video_failed.push(id.clone());
+            }
+        }
+        if gallery.enlarged.as_deref() != Some(id.as_str()) {
+            return;
+        }
+        // A key the gallery handles: carry on from where the video was.
+        if let Some(behind) = closed.behind.filter(|b| b.is_finite() && *b >= 0.) {
+            gallery.hold_frame();
+            gallery.playback = Playback::Replay {
+                lag: Duration::from_secs_f64(behind).min(gallery.reach(now)),
+                since: now,
+                speed: if closed.paused { 0 } else { 1 },
+            };
+            match closed.key.as_deref() {
+                Some("left") => gallery.skip(true, now),
+                Some("right") => gallery.skip(false, now),
+                Some("up") => gallery.jump(true, now, unix),
+                Some("down") => gallery.jump(false, now, unix),
+                Some("ok") => gallery.toggle_pause(now),
+                Some("rewind") => gallery.faster(true, now),
+                Some("forward") => gallery.faster(false, now),
+                Some("live") => gallery.go_live(),
+                _ => {}
+            }
+            return;
+        }
+        if !closed.failed {
             gallery.enlarged = None;
+        }
+    }
+
+    /// The remote's media keys on the enlarged camera.
+    pub fn camera_media(&mut self, key: Media) {
+        let gallery = &mut self.cameras;
+        if gallery.enlarged.is_none() {
+            return;
+        }
+        let now = Instant::now();
+        match key {
+            Media::Play => gallery.set_paused(false, now),
+            Media::Pause => gallery.set_paused(true, now),
+            Media::PlayPause => gallery.toggle_pause(now),
+            Media::Rewind => gallery.faster(true, now),
+            Media::Forward => gallery.faster(false, now),
         }
         self.dirty = true;
     }
@@ -1341,16 +1760,17 @@ impl State {
         &mut self,
         recorded: Option<(Instant, Instant)>,
         now: Instant,
-    ) -> Option<Instant> {
+        unix: u64,
+    ) -> Option<(String, Want)> {
         if !self.cameras_visible() {
             return None;
         }
         self.cameras.recorded = recorded;
-        let (at, changed) = self.cameras.replay_position(now);
+        let (want, changed) = self.cameras.replay_position(now, unix);
         if changed {
             self.dirty = true;
         }
-        at
+        Some((self.cameras.enlarged.clone()?, want?))
     }
 
     /// The cameras to fetch frames for: none unless the gallery is open and Luma is seen.
@@ -1393,10 +1813,20 @@ impl State {
     pub fn camera_direction(&mut self, direction: Direction) -> Vec<Effect> {
         let gallery = &mut self.cameras;
         if gallery.enlarged.is_some() {
-            if matches!(direction, Direction::Left | Direction::Right) {
-                gallery.skip(matches!(direction, Direction::Left), Instant::now());
-                self.dirty = true;
+            let now = Instant::now();
+            match direction {
+                Direction::Left | Direction::Right => {
+                    gallery.skip(matches!(direction, Direction::Left), now);
+                }
+                Direction::Up | Direction::Down => {
+                    gallery.jump(
+                        matches!(direction, Direction::Up),
+                        now,
+                        crate::state::unix_now(),
+                    );
+                }
             }
+            self.dirty = true;
             return vec![];
         }
         let gallery = &self.cameras;

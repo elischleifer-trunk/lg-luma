@@ -132,11 +132,9 @@ pub enum Event {
         live: bool,
         open: bool,
     },
-    /// The camera video closed: Back, a doorbell card replacing it, or (`failed`) the stream
-    /// could not be played, so the gallery keeps showing the motion-JPEG stream.
-    VideoClosed {
-        failed: bool,
-    },
+    /// The camera video closed: Back, a doorbell card replacing it, a key the gallery carries on
+    /// with, or (`failed`) the video could not be played, so the gallery keeps its own picture.
+    VideoClosed(crate::cameras::Closed),
 }
 
 /// One Home Assistant camera, with URLs the TV can load directly.
@@ -148,6 +146,8 @@ pub struct Camera {
     pub snapshot: Option<String>,
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
+    /// The integration's endpoint into what UniFi Protect recorded of this camera.
+    pub history: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -340,11 +340,15 @@ struct Session {
     ends: Instant,
     /// A camera video from the Cameras app rather than a doorbell card.
     video: bool,
+    /// Recorded video of this gallery camera, which the overlay app loads piece by piece.
+    recorded: Option<String>,
 }
 
 pub struct Request<'a> {
     pub method: &'a str,
     pub path: &'a str,
+    /// The query string, without `?`.
+    pub query: &'a str,
     pub authorization: Option<&'a str>,
     pub origin: Option<&'a str>,
     pub peer: IpAddr,
@@ -355,11 +359,27 @@ pub struct Request<'a> {
 pub struct Reply {
     pub status: u16,
     pub body: Value,
+    /// Where a 302 redirects.
+    pub location: Option<String>,
 }
 
 fn reply(status: u16, body: Value) -> Reply {
-    Reply { status, body }
+    Reply {
+        status,
+        body,
+        location: None,
+    }
 }
+
+/// A query parameter's value (no percent-decoding: only numbers and hex are expected).
+fn query<'a>(query: &'a str, key: &str) -> Option<&'a str> {
+    query
+        .split('&')
+        .find_map(|pair| pair.strip_prefix(key)?.strip_prefix('='))
+}
+
+/// The longest piece of recorded video the overlay app may ask for.
+const MAX_RECORDED_PIECE: u64 = 15 * 60;
 
 fn error(status: u16, message: &str) -> Reply {
     reply(status, json!({"error": message}))
@@ -620,16 +640,16 @@ impl<T: Tv> Api<T> {
 
     /// Resumes paused media and clears the session once the overlay is gone.
     fn end_session(&mut self) {
-        self.finish_session(false);
+        self.finish_session(crate::cameras::Closed::default());
     }
 
-    /// Ends the session; a camera video tells the gallery whether it `failed` to play.
-    fn finish_session(&mut self, failed: bool) {
+    /// Ends the session; a camera video tells the gallery how it closed.
+    fn finish_session(&mut self, closed: crate::cameras::Closed) {
         let Some(session) = self.session.take() else {
             return;
         };
         if session.video {
-            let _ = self.events.send(Event::VideoClosed { failed });
+            let _ = self.events.send(Event::VideoClosed(closed));
         }
         if let Some(media) = session.media
             && let Err(error) = self.tv.resume_media(&media)
@@ -658,7 +678,10 @@ impl<T: Tv> Api<T> {
         if !companion::local_peer(request.peer) {
             return error(403, "Only devices on the TV's local network may connect");
         }
-        let closed = matches!(request.path, "/api/overlay/closed" | "/api/overlay/expand");
+        let closed = matches!(
+            request.path,
+            "/api/overlay/closed" | "/api/overlay/expand" | "/api/overlay/recorded"
+        );
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
         if request.origin.is_some() && !(closed && request.peer.is_loopback()) {
@@ -709,9 +732,28 @@ impl<T: Tv> Api<T> {
                         && body["nonce"] == session.nonce.as_str()
                 });
                 if matches {
-                    self.finish_session(body["failed"] == true);
+                    let key = body["key"].as_str().filter(|key| {
+                        matches!(
+                            *key,
+                            "ok" | "left" | "right" | "up" | "down" | "rewind" | "forward" | "live"
+                        )
+                    });
+                    self.finish_session(crate::cameras::Closed {
+                        failed: body["failed"] == true,
+                        behind: body["behind"].as_f64().filter(|_| key.is_some()),
+                        key: key.map(str::to_owned),
+                        paused: body["paused"] == true,
+                    });
                 }
                 reply(200, json!({"ended": matches}))
+            }
+            // The overlay app's recorded video, a piece at a time: redirected to the camera's
+            // history endpoint with its current token, which Home Assistant rotates.
+            ("GET", "/api/overlay/recorded") => {
+                if !request.peer.is_loopback() {
+                    return error(403, "Only the overlay app loads recorded video");
+                }
+                self.recorded_piece(request.query)
             }
             (method, path) => {
                 let Some(client) = self.authorized(request) else {
@@ -904,7 +946,9 @@ impl<T: Tv> Api<T> {
         // it replaces is over, so the gallery leaves its enlarged camera.
         let replaced = self.session.take();
         if replaced.as_ref().is_some_and(|session| session.video) {
-            let _ = self.events.send(Event::VideoClosed { failed: false });
+            let _ = self
+                .events
+                .send(Event::VideoClosed(crate::cameras::Closed::default()));
         }
         let mut media = replaced.and_then(|session| session.media);
         if pause && media.is_none() {
@@ -938,6 +982,7 @@ impl<T: Tv> Api<T> {
             media,
             ends: now + Duration::from_secs_f64(duration) + SESSION_GRACE,
             video: false,
+            recorded: None,
         });
         if let Err(e) = self.tv.launch_overlay(&params) {
             self.end_session();
@@ -971,6 +1016,7 @@ impl<T: Tv> Api<T> {
                 let stream = camera_url(entry, "stream_url")?;
                 let snapshot = camera_url(entry, "snapshot_url")?;
                 let hls = camera_url(entry, "hls_url")?;
+                let history = camera_url(entry, "history_url")?;
                 if stream.is_none() && snapshot.is_none() {
                     return Err(error(400, "stream_url or snapshot_url is required"));
                 }
@@ -981,6 +1027,7 @@ impl<T: Tv> Api<T> {
                     stream,
                     snapshot,
                     hls,
+                    history,
                 })
             })();
             match parsed {
@@ -1125,8 +1172,53 @@ impl<T: Tv> Api<T> {
                 stream: camera.stream.clone(),
                 snapshot: camera.snapshot.clone(),
                 hls: camera.hls.clone(),
+                history: camera.history.clone(),
             })
             .collect()
+    }
+
+    /// A gallery camera (`0/camera.door`) as Home Assistant last sent it.
+    fn gallery_camera(&self, id: &str) -> Option<Camera> {
+        let (server, entity) = id.split_once('/')?;
+        let server: usize = server.parse().ok()?;
+        let owner = &self.store.clients.get(server)?.token;
+        self.cameras
+            .iter()
+            .find(|(key, _)| key == owner)?
+            .1
+            .iter()
+            .find(|camera| camera.id == entity)
+            .cloned()
+    }
+
+    /// Redirects a piece of the session's recorded video to the camera's history endpoint.
+    fn recorded_piece(&self, request: &str) -> Reply {
+        let Some(session) = self.session.as_ref().filter(|session| {
+            query(request, "session") == Some(session.id.as_str())
+                && query(request, "nonce") == Some(session.nonce.as_str())
+        }) else {
+            return error(403, "No such camera video");
+        };
+        let number = |key| query(request, key).and_then(|value| value.parse::<u64>().ok());
+        let (Some(start), Some(end)) = (number("start"), number("end")) else {
+            return error(400, "start and end are required");
+        };
+        if end <= start || end - start > MAX_RECORDED_PIECE {
+            return error(400, "At most 15 minutes of video at once");
+        }
+        let Some(history) = session
+            .recorded
+            .as_deref()
+            .and_then(|id| self.gallery_camera(id))
+            .and_then(|camera| camera.history)
+        else {
+            return error(404, "This camera has no recordings");
+        };
+        Reply {
+            status: 302,
+            body: json!({}),
+            location: Some(format!("{history}&start={start}&end={end}")),
+        }
     }
 
     fn send_cameras(&self, open: bool) {
@@ -1141,7 +1233,10 @@ impl<T: Tv> Api<T> {
     /// Whatever happens, the gallery hears back through [`Event::VideoClosed`].
     pub fn show_video(&mut self, video: &crate::cameras::VideoRequest, now: Instant) {
         let failed = |api: &mut Self| {
-            let _ = api.events.send(Event::VideoClosed { failed: true });
+            let _ = api.events.send(Event::VideoClosed(crate::cameras::Closed {
+                failed: true,
+                ..Default::default()
+            }));
         };
         if !self.overlay_ready.load(Ordering::Acquire) {
             self.prepare();
@@ -1154,16 +1249,30 @@ impl<T: Tv> Api<T> {
         };
         // A doorbell card still up is replaced; keep the media it paused.
         let media = self.session.take().and_then(|session| session.media);
-        let params = json!({
-            "mode": "video",
-            "session": id,
-            "nonce": nonce,
-            "port": PORT,
-            "url": video.url,
-            "title": video.title,
-            "snapshot": video.snapshot,
-        });
+        // Recorded video: the page loads it a piece at a time through `/api/overlay/recorded`.
+        let params = match &video.recorded {
+            Some((_, start)) => json!({
+                "mode": "recorded",
+                "session": id,
+                "nonce": nonce,
+                "port": PORT,
+                "start": start,
+                "title": video.title,
+                "snapshot": video.snapshot,
+            }),
+            None => json!({
+                "mode": "video",
+                "session": id,
+                "nonce": nonce,
+                "port": PORT,
+                "url": video.url,
+                "title": video.title,
+                "snapshot": video.snapshot,
+                "history": video.history,
+            }),
+        };
         self.session = Some(Session {
+            recorded: video.recorded.as_ref().map(|(camera, _)| camera.clone()),
             id,
             nonce,
             media,
@@ -1172,7 +1281,10 @@ impl<T: Tv> Api<T> {
         });
         if let Err(error) = self.tv.launch_overlay(&params) {
             eprintln!("Luma Home Assistant video: {error}");
-            self.finish_session(true);
+            self.finish_session(crate::cameras::Closed {
+                failed: true,
+                ..Default::default()
+            });
         }
     }
 
@@ -1396,11 +1508,15 @@ fn serve<T: Tv>(api: &mut Api<T>, mut stream: TcpStream, peer: SocketAddr) {
             .map_err(|e| (400, e))?;
         let mut body = vec![0; request.length];
         companion::read_exact(&mut stream, &mut body, &valid, deadline).map_err(|e| (400, e))?;
-        let path = request.target.split('?').next().unwrap_or_default();
+        let (path, query) = request
+            .target
+            .split_once('?')
+            .unwrap_or((&request.target, ""));
         Ok(api.handle(
             &Request {
                 method: &request.method,
                 path,
+                query,
                 authorization: request.headers.get("authorization").map(String::as_str),
                 origin: request.headers.get("origin").map(String::as_str),
                 peer: peer.ip(),
@@ -1410,6 +1526,14 @@ fn serve<T: Tv>(api: &mut Api<T>, mut stream: TcpStream, peer: SocketAddr) {
         ))
     })();
     let reply = result.unwrap_or_else(|(status, message)| error(status, &message));
+    if let (302, Some(location)) = (reply.status, &reply.location) {
+        use std::io::Write;
+        let _ = write!(
+            stream,
+            "HTTP/1.1 302 Found\r\nLocation: {location}\r\nContent-Length: 0\r\nConnection: close\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\n\r\n"
+        );
+        return;
+    }
     let status = match reply.status {
         200 => "200 OK",
         400 => "400 Bad Request",

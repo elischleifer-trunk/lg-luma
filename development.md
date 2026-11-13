@@ -499,14 +499,37 @@ is open.
 
 The enlarged camera can be rewound. Its worker (`Watch::record`) keeps every frame as the camera
 sent it, undecoded, for `cameras::REWIND` (two minutes, at most 48 MB) in the service's
-`Recording`; it is dropped once no camera is enlarged. Left and Right skip `SKIP` (5 s) back or
-forward and OK pauses and plays (`Gallery::skip`, `Gallery::toggle_pause`, `Playback`); Back
-still leaves the camera. Each tick the main loop hands `State::camera_replay` the span of kept
-frames and, while not live, asks `Service::replay` for the frame at the position; one replay
-thread decodes it (not again for the same frame) as `Update::Replay`, drawn under its own texture
-key. A bar along the bottom shows the kept span, live at the right, and the badge reads
-**Paused** or how far behind live the picture is. Right up to the newest frame goes live, which
-also asks for the HLS video again if one was answered while rewound.
+`Recording`; it is dropped once no camera is enlarged. A camera Home Assistant's UniFi Protect
+integration records arrives with `history_url` (`Camera::history`) and reaches `HISTORY` (24 h)
+back. `Playback::Replay { lag, since, speed }` is the position: `lag` behind live at `since`,
+moving at `speed` (0 paused, 1 normal, ±2…64 from the media keys, `Gallery::faster`). Left/Right
+(`Gallery::skip`) step 10 s, growing while held (`step`: a minute after 1 s, five after 3 s, half
+an hour after 6 s; presses within `HOLD_GAP` continue a hold); OK pauses and plays; Up/Down
+(`Gallery::jump`) go to 2 s before the previous or next `Mark`. Fast-forward stops at live and
+rewind at the oldest moment. Each tick `State::camera_replay` hands the main loop a `Want`: a kept
+frame (`Want::Kept`) within the kept span, else Protect's picture (`Want::Recorded`,
+`history_url&at=<unix>&width=1280`). One replay thread loads it, newest ask first and not again
+for the same frame, as `Update::Replay` under its own texture key; `None` means nothing was
+recorded then (**Nothing recorded at this time**). Every `EVENTS_REFRESH` the gallery asks
+`history_url&events=1&start=&end=` for the last day's marks (`Update::Marks`), drawn on the bar
+by kind. Playing at normal speed in the recordings, once scrubbing has settled for `SETTLE`,
+hands over to the overlay app (`Video::Recorded`, `VideoRequest::recorded`), which plays Protect's
+MP4 a piece at a time (60 s, then 300 s) from `GET /api/overlay/recorded`: loopback only, checked
+against the session's nonce, it redirects to `history_url&start=&end=` with the camera's current
+token. Any timeline key there closes it with `key`, `behind` (seconds behind live) and `paused`
+in its `closed` report (`cameras::Closed`), and the gallery carries on from that moment with the
+key; a video that fails puts the camera in `recorded_failed`, which replays pictures instead.
+The live HLS video hands over the same way: Left past what it kept, or Up/Down, when the camera
+has history (`VideoRequest::history`). Leaving live closes nothing; going live again asks for the
+HLS video again.
+
+The integration's `HistoryView` (`/api/luma/history/<entity>`) checks the camera's access token
+like `StreamView`, finds the camera's UniFi Protect config entry in the entity registry, and
+redirects `at` and `start`/`end` (at most 15 minutes, within 31 days) to the UniFi Protect
+integration's snapshot and video views with a path `async_sign_path` signs for a minute as Home
+Assistant's content user, passing the camera's entity ID (those views look a camera up by Protect
+ID, then entity ID). `events` answers from the Recorder's history of the camera device's Protect
+motion and detection binary sensors and doorbell event entity (`event_spans`).
 
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the

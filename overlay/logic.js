@@ -51,6 +51,49 @@
       // Shown over the video until it plays.
       snapshot: http(params.snapshot),
       title: typeof params.title === 'string' ? params.title.slice(0, 80) : '',
+      // UniFi Protect records the camera: scrubbing past the live video goes on in Luma.
+      history: params.history === true,
+    };
+  }
+
+  // Recorded video from the Cameras app: UniFi Protect's recording of a camera from `start` (Unix
+  // seconds), which the page loads from Luma a piece at a time.
+  function recorded(params) {
+    params = params && typeof params === 'object' ? params : {};
+    var start = Number(params.start);
+    if (params.mode !== 'recorded' || !isFinite(start) || start <= 0) return null;
+    return {
+      session: typeof params.session === 'string' ? params.session : '',
+      nonce: typeof params.nonce === 'string' ? params.nonce : '',
+      port: clamp(params.port, 1, 65535, 5862),
+      start: Math.floor(start),
+      snapshot: http(params.snapshot),
+      title: typeof params.title === 'string' ? params.title.slice(0, 80) : '',
+    };
+  }
+
+  // The first piece is short so the video starts quickly; later ones are longer.
+  var FIRST_PIECE_S = 60;
+  var PIECE_S = 300;
+
+  // A piece of recorded video from `start`, never past `now`; null once that is live.
+  function piece(settings, start, now, first) {
+    if (start > now - 10) return null;
+    var end = Math.min(start + (first ? FIRST_PIECE_S : PIECE_S), Math.floor(now));
+    return {
+      start: start,
+      end: end,
+      url:
+        'http://127.0.0.1:' +
+        settings.port +
+        '/api/overlay/recorded?session=' +
+        encodeURIComponent(settings.session) +
+        '&nonce=' +
+        encodeURIComponent(settings.nonce) +
+        '&start=' +
+        start +
+        '&end=' +
+        end,
     };
   }
 
@@ -94,6 +137,8 @@
   var api = {
     settings: settings,
     video: video,
+    recorded: recorded,
+    piece: piece,
     seek: seek,
     behind: behind,
     clock: clock,

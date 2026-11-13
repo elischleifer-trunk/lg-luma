@@ -514,3 +514,198 @@ async def test_the_stream_view_starts_hls_only_with_the_camera_token(
     assert (await client.get("/api/luma/stream/light.porch?token=new")).status == 404
     assert (await client.get("/api/luma/stream/camera.still?token=new")).status == 404
     assert len(requested) == 3
+
+
+def protect_camera(hass: HomeAssistant, entity_id: str = "camera.door") -> str:
+    """Registers a UniFi Protect camera (and its sensors) as the Protect integration would."""
+    from homeassistant.helpers import device_registry as dr
+    from homeassistant.helpers import entity_registry as er
+
+    protect = MockConfigEntry(domain="unifiprotect", title="UNVR")
+    protect.add_to_hass(hass)
+    hass.config.components.add("unifiprotect")
+    device = dr.async_get(hass).async_get_or_create(
+        config_entry_id=protect.entry_id, identifiers={("unifiprotect", "aa:bb")}
+    )
+    registry = er.async_get(hass)
+    name = entity_id.split(".")[1]
+    registry.async_get_or_create(
+        "camera",
+        "unifiprotect",
+        "aabb_high",
+        suggested_object_id=name,
+        config_entry=protect,
+        device_id=device.id,
+    )
+    for domain, object_id in (
+        ("binary_sensor", f"{name}_motion"),
+        ("binary_sensor", f"{name}_person_detected"),
+        ("binary_sensor", f"{name}_is_dark"),
+        ("event", f"{name}_doorbell"),
+    ):
+        registry.async_get_or_create(
+            domain,
+            "unifiprotect",
+            object_id,
+            suggested_object_id=object_id,
+            config_entry=protect,
+            device_id=device.id,
+        )
+    return protect.entry_id
+
+
+async def test_unifi_protect_cameras_get_a_history_url_signed_with_their_token(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    protect_camera(hass)
+    hass.states.async_set("camera.door", "idle", {"access_token": "d1", "friendly_name": "Door"})
+    hass.states.async_set("camera.yard", "idle", {"access_token": "y1", "friendly_name": "Yard"})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 2})
+    await setup(hass, aioclient_mock)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    push = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/cameras")
+    door, yard = push[2]["cameras"]
+    assert door["history_url"] == "http://192.168.1.10:8123/api/luma/history/camera.door?token=d1"
+    # Only Protect records a camera.
+    assert "history_url" not in yard
+
+
+async def test_the_history_view_redirects_to_protect_with_a_signed_path(
+    hass: HomeAssistant, hass_client_no_auth, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from aiohttp import web
+    from homeassistant.components.http import HomeAssistantView
+    from homeassistant.setup import async_setup_component
+
+    assert await async_setup_component(hass, "http", {})
+    assert await async_setup_component(hass, DOMAIN, {})
+    nvr = protect_camera(hass)
+
+    class Camera:
+        access_tokens = ("t",)
+
+    monkeypatch.setattr(
+        "custom_components.luma._camera",
+        lambda _hass, entity_id: Camera() if entity_id in ("camera.door", "camera.yard") else None,
+    )
+    seen = []
+
+    class Protect(HomeAssistantView):
+        """Stands in for the UniFi Protect integration's views, which need Home Assistant auth."""
+
+        url = "/api/unifiprotect/{kind}/{nvr}/{camera}/{rest:.*}"
+        name = "test:protect"
+        requires_auth = True
+
+        async def get(self, request: web.Request, **parts: str) -> web.Response:
+            seen.append((parts, dict(request.query)))
+            return web.Response(body=b"ok")
+
+    hass.http.register_view(Protect())
+    client = await hass_client_no_auth()
+    now = int(dt_util.utcnow().timestamp())
+    moment = dt_util.utc_from_timestamp(now - 3600).isoformat()
+
+    response = await client.get(f"/api/luma/history/camera.door?token=t&at={now - 3600}&width=1280")
+    assert response.status == 200
+    parts, query = seen[-1]
+    assert parts == {"kind": "snapshot", "nvr": nvr, "camera": "camera.door", "rest": moment}
+    # The TV picks the size; Home Assistant's signature covers the rest.
+    assert query["width"] == "1280" and "authSig" in query
+
+    response = await client.get(
+        f"/api/luma/history/camera.door?token=t&start={now - 600}&end={now - 300}"
+    )
+    assert response.status == 200
+    assert seen[-1][0]["kind"] == "video"
+    assert seen[-1][0]["rest"].count("+00:00") == 2
+
+    def status(query: str, camera: str = "camera.door"):
+        return client.get(f"/api/luma/history/{camera}?{query}", allow_redirects=False)
+
+    redirect = await status(f"token=t&at={now}")
+    assert redirect.status == 302
+    assert redirect.headers["Cache-Control"] == "no-store"
+    assert (await status(f"token=guess&at={now}")).status == 403
+    assert (await status(f"token=t&at={now}", "camera.yard")).status == 404
+    assert (await status("token=t&at=yesterday")).status == 400
+    assert (await status(f"token=t&at={now - 40 * 86400}")).status == 400
+    assert (await status(f"token=t&start={now - 3600}&end={now}")).status == 400
+    assert (await status(f"token=t&start={now}&end={now - 60}")).status == 400
+    # Without the signature, Protect's views turn the TV away.
+    assert (await client.get(f"/api/unifiprotect/snapshot/{nvr}/camera.door/x")).status == 401
+
+
+async def test_history_events_come_from_the_cameras_protect_sensors(
+    hass: HomeAssistant, hass_client_no_auth, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from homeassistant.core import State
+    from homeassistant.setup import async_setup_component
+
+    from custom_components.luma import event_spans, protect_sensors
+
+    assert await async_setup_component(hass, "http", {})
+    assert await async_setup_component(hass, DOMAIN, {})
+    protect_camera(hass)
+    assert protect_sensors(hass, "camera.door") == [
+        "binary_sensor.door_motion",
+        "binary_sensor.door_person_detected",
+        "event.door_doorbell",
+    ]
+    start = dt_util.utcnow() - timedelta(hours=1)
+    end = dt_util.utcnow()
+
+    def at(minutes: int):
+        return start + timedelta(minutes=minutes)
+
+    def state(entity_id: str, value: str, minutes: int) -> State:
+        return State(entity_id, value, last_changed=at(minutes), last_updated=at(minutes))
+
+    history = {
+        # On before the window: the span starts with the window.
+        "binary_sensor.door_motion": [
+            state("binary_sensor.door_motion", "on", 0),
+            state("binary_sensor.door_motion", "off", 2),
+            state("binary_sensor.door_motion", "on", 50),
+        ],
+        "binary_sensor.door_person_detected": [
+            state("binary_sensor.door_person_detected", "off", 0),
+            state("binary_sensor.door_person_detected", "on", 10),
+            state("binary_sensor.door_person_detected", "off", 11),
+        ],
+        "event.door_doorbell": [
+            state("event.door_doorbell", "unknown", 0),
+            state("event.door_doorbell", at(30).isoformat(), 30),
+        ],
+    }
+    spans = event_spans(history, start, end)
+    seconds = lambda minutes: int(at(minutes).timestamp())  # noqa: E731
+    assert spans == [
+        {"start": seconds(0), "end": seconds(2), "kind": "motion"},
+        {"start": seconds(10), "end": seconds(11), "kind": "person"},
+        {"start": seconds(30), "end": seconds(30), "kind": "doorbell"},
+        # Still on: until the end of the window.
+        {"start": seconds(50), "end": int(end.timestamp()), "kind": "motion"},
+    ]
+
+    class Camera:
+        access_tokens = ("t",)
+
+    asked = []
+
+    async def sensor_history(_hass, entity_ids, start_, end_):
+        asked.append(entity_ids)
+        return history
+
+    monkeypatch.setattr("custom_components.luma._camera", lambda _hass, _entity_id: Camera())
+    monkeypatch.setattr("custom_components.luma._sensor_history", sensor_history)
+    client = await hass_client_no_auth()
+    first, last = int(start.timestamp()), int(end.timestamp())
+    response = await client.get(
+        f"/api/luma/history/camera.door?token=t&events=1&start={first}&end={last}"
+    )
+    assert response.status == 200
+    assert len((await response.json())["events"]) == 4
+    assert asked == [protect_sensors(hass, "camera.door")]

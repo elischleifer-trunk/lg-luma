@@ -106,6 +106,38 @@ starting or if it cannot play, show Home Assistant's motion-JPEG stream, which f
 types is only about two pictures a second. Its badge says **Live** or **Snapshots**: if that
 stream fails or freezes, Luma switches to snapshots, several a second.
 
+### Rewinding and history
+
+A full-screen camera can be rewound. A bar along the bottom shows how far back you can go, with
+live at the right end:
+
+| Key                                                  | What it does                                                                                             |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Left** / **Right**                                 | 10 seconds back or forward; hold to go faster (a minute, then five minutes, then half an hour at a time) |
+| **OK**                                               | Pause, and play again                                                                                    |
+| **Up** / **Down**                                    | The previous or next thing UniFi Protect saw (UniFi Protect cameras)                                     |
+| **Rewind** / **Fast-forward**                        | Play backward or forward at 2×, 4×… up to 64×                                                            |
+| **Right** to the end, or **Down** past the last mark | Back to live                                                                                             |
+| **Back**                                             | Back to the grid                                                                                         |
+
+The TV keeps the last two minutes of every camera you watch. **UniFi Protect cameras go back 24
+hours**, into what Protect recorded, including before you opened the camera. Scrubbing shows
+Protect's picture from each moment, and pressing **OK** (or stopping on a moment while playing)
+plays Protect's recorded video. Coloured marks on the bar show what Protect saw: people (blue),
+vehicles (orange), animals (green), packages (purple), doorbell rings (bright green) and other
+motion (grey). A camera set to record only on motion has gaps; **Nothing recorded at this time**
+shows there.
+
+This needs Home Assistant's **UniFi Protect** integration and, for the marks, Home Assistant's
+**Recorder** (part of `default_config`), which keeps the history of the camera's motion and
+detection sensors. Nothing else needs setting up: the Luma integration gives the TV a link per
+camera that checks the camera's access token, then hands the TV a short-lived link that Home
+Assistant signs for the UniFi Protect integration's own recording views, the same way Home
+Assistant's media browser plays Protect recordings. The TV never holds Home Assistant or Protect
+credentials.
+
+### Arranging the grid
+
 To arrange the grid, hold **OK** on a camera: **Move** lets you move it with the arrows (**OK**
 when done), **Hide camera** takes it off the grid, and **Camera settings** opens settings, which
 the settings button at the top right also opens (press **Up** from the first row). There you can
