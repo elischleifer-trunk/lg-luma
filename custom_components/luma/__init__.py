@@ -83,8 +83,8 @@ HISTORY_DAYS = 31
 MAX_VIDEO = timedelta(minutes=15)
 MAX_EVENTS = timedelta(hours=48)
 MAX_EVENT_COUNT = 2000
-# What a Protect sensor saw, from its entity ID: the first match names it.
-EVENT_KINDS = ("person", "vehicle", "animal", "package", "ring", "doorbell", "motion")
+# What a Protect sensor saw, from its own key: the first match names it.
+EVENT_KINDS = ("person", "vehicle", "animal", "package", "doorbell", "motion")
 # CameraEntityFeature.STREAM; the camera component is imported only when a stream is requested.
 CAMERA_STREAM = 2
 # Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
@@ -444,34 +444,48 @@ def _iso(moment: datetime) -> str:
     return moment.replace(microsecond=0).isoformat()
 
 
-def event_kind(entity_id: str) -> str:
-    return next((kind for kind in EVENT_KINDS if kind in entity_id), "motion")
+def sensor_kind(key: str) -> str | None:
+    """What a Protect sensor reports, from its own key (`motion`, `smart_obj_person`,
+    `doorbell`…), or None for one that reports nothing the timeline shows (`is_dark`…)."""
+    return next((kind for kind in EVENT_KINDS if kind in key), None)
 
 
-def protect_sensors(hass: HomeAssistant, entity_id: str) -> list[str]:
-    """The camera's Protect motion and detection sensors and doorbell events."""
+def _sensor_key(entry: er.RegistryEntry, camera_object_id: str) -> str:
+    """A Protect entity's own key, without the device's name, which may contain any word:
+    the unique ID after the device's MAC address, else the entity ID after the camera's name."""
+    if entry.unique_id and "_" in entry.unique_id:
+        return entry.unique_id.split("_", 1)[1].lower()
+    object_id = entry.entity_id.split(".", 1)[1]
+    return object_id.removeprefix(f"{camera_object_id}_")
+
+
+def protect_sensors(hass: HomeAssistant, entity_id: str) -> dict[str, str]:
+    """The camera's Protect motion and detection sensors and doorbell event, with what each
+    reports."""
     registry = er.async_get(hass)
     camera = registry.async_get(entity_id)
     if camera is None or camera.device_id is None:
-        return []
-    return sorted(
-        entry.entity_id
-        for entry in er.async_entries_for_device(registry, camera.device_id)
-        if entry.platform == PROTECT
-        and (
-            (entry.domain == "binary_sensor" and any(k in entry.entity_id for k in EVENT_KINDS))
-            or (entry.domain == "event" and "doorbell" in entry.entity_id)
-        )
-    )
+        return {}
+    camera_object_id = entity_id.split(".", 1)[1]
+    sensors = {}
+    for entry in er.async_entries_for_device(registry, camera.device_id):
+        if entry.platform != PROTECT or entry.domain not in ("binary_sensor", "event"):
+            continue
+        kind = sensor_kind(_sensor_key(entry, camera_object_id))
+        if kind is not None and (entry.domain == "binary_sensor" or kind == "doorbell"):
+            sensors[entry.entity_id] = kind
+    return dict(sorted(sensors.items()))
 
 
 def event_spans(
-    history: dict[str, list[Any]], start: datetime, end: datetime
+    history: dict[str, list[Any]], kinds: dict[str, str], start: datetime, end: datetime
 ) -> list[dict[str, Any]]:
     """Times each sensor was on (a doorbell event entity: each press), as Unix seconds."""
     events = []
     for entity_id, states in history.items():
-        kind = event_kind(entity_id)
+        kind = kinds.get(entity_id)
+        if kind is None:
+            continue
         if entity_id.startswith("event."):
             # An event entity's state is the moment it fired.
             for state in states:
@@ -561,8 +575,8 @@ class HistoryView(HomeAssistantView):
             if end - start > MAX_EVENTS:
                 return self.json_message("At most 48 hours of events at once", 400)
             sensors = protect_sensors(self.hass, entity_id)
-            history = await _sensor_history(self.hass, sensors, start, end)
-            return self.json({"events": event_spans(history, start, end)})
+            history = await _sensor_history(self.hass, list(sensors), start, end)
+            return self.json({"events": event_spans(history, sensors, start, end)})
         if end - start > MAX_VIDEO:
             return self.json_message("At most 15 minutes of video at once", 400)
         path = PROTECT_VIDEO.format(nvr=nvr, camera=entity_id, start=_iso(start), end=_iso(end))

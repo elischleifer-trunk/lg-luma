@@ -969,3 +969,102 @@ fn replayed_pictures_show_only_while_the_enlarged_camera_is_rewound() {
     assert_eq!(clock(Duration::from_secs(86400)), "-24:00:00");
     assert_eq!(speed_label(-8), "-8\u{d7}");
 }
+
+#[test]
+fn ok_on_recorded_video_pauses_and_back_resets_the_camera() {
+    let mut state = protect(&["a", "b"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Err("no stream".into()),
+    });
+    let now = Instant::now() + Duration::from_secs(600);
+    state.cameras.playback = Playback::Replay {
+        lag: Duration::from_secs(3600),
+        since: now,
+        speed: 1,
+    };
+    state.camera_replay(None, now, UNIX);
+    assert!(state.cameras.play.take().is_some());
+    // While the recorded video plays, no pictures load behind it.
+    assert_eq!(state.camera_replay(None, now, UNIX), None);
+    // OK in the recorded video (which was playing): paused there, and it stays closed.
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(3600.),
+            key: Some("ok".into()),
+            ..Default::default()
+        },
+        now,
+        UNIX,
+    );
+    assert!(matches!(
+        state.cameras.playback,
+        Playback::Replay { speed: 0, .. }
+    ));
+    state.camera_replay(None, now + Duration::from_secs(5), UNIX);
+    assert!(state.cameras.play.is_none());
+    // Back in the recorded video leaves the camera with nothing of where it was.
+    state.cameras.toggle_pause(now + Duration::from_secs(5));
+    state.camera_replay(None, now + Duration::from_secs(5), UNIX);
+    assert!(state.cameras.play.take().is_some());
+    state.cameras.marks = vec![Mark {
+        start: UNIX,
+        end: UNIX,
+        kind: Kind::Person,
+    }];
+    state.camera_video_closed_at(Closed::default(), now, UNIX);
+    assert_eq!(state.cameras.enlarged, None);
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert!(state.cameras.marks.is_empty() && state.cameras.replay.is_none());
+    // A failure lasts only this visit.
+    state.cameras.recorded_failed.push("0/camera.a".into());
+    let cameras = state.cameras.cameras.clone();
+    state.back();
+    state.camera_list(cameras, true, true);
+    assert!(state.cameras.recorded_failed.is_empty());
+}
+
+#[test]
+fn a_camera_paused_past_its_oldest_kept_frame_stays_still() {
+    let mut state = open(&["a"]);
+    state.activate();
+    let now = Instant::now() + Duration::from_secs(600);
+    let gallery = &mut state.cameras;
+    gallery.recorded = Some((now - Duration::from_secs(60), now));
+    gallery.skip(true, now);
+    gallery.toggle_pause(now);
+    gallery.replay = Some(Arc::new(Frame::new("x", RgbaImage::new(1, 1), false)));
+    // Still within the kept frames: the frame from then.
+    assert!(matches!(
+        gallery.replay_position(now, UNIX).0,
+        Some(Want::Kept(_))
+    ));
+    // Two minutes later the frame it paused on is gone: the picture stays as it was.
+    let later = now + Duration::from_secs(120);
+    gallery.recorded = Some((later - Duration::from_secs(60), later));
+    assert_eq!(gallery.replay_position(later, UNIX).0, None);
+}
+
+#[test]
+fn up_on_the_live_video_with_nothing_earlier_stays_live() {
+    let mut state = protect(&["a"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/a.m3u8".into()),
+    });
+    state.camera_video_closed_at(
+        Closed {
+            behind: Some(2.),
+            key: Some("up".into()),
+            ..Default::default()
+        },
+        Instant::now(),
+        UNIX,
+    );
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
+}

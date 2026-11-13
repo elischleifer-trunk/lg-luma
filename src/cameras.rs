@@ -1318,8 +1318,8 @@ impl Gallery {
     }
 
     /// Up or Down: to the moment just before the previous or next thing Protect saw; Down past
-    /// the last one goes live.
-    pub fn jump(&mut self, earlier: bool, now: Instant, unix: u64) {
+    /// the last one goes live. False when Up finds nothing earlier.
+    pub fn jump(&mut self, earlier: bool, now: Instant, unix: u64) -> bool {
         self.scrubbed = Some(now);
         let at = unix.saturating_sub(self.lag(now).as_secs());
         let mark = if earlier {
@@ -1331,8 +1331,9 @@ impl Gallery {
         match mark.map(|mark| unix.saturating_sub(mark.start.saturating_sub(2))) {
             Some(lag) => self.seek(Duration::from_secs(lag), speed, now),
             None if !earlier => self.seek(Duration::ZERO, 1, now),
-            None => {}
+            None => return false,
         }
+        true
     }
 
     /// Leaving live keeps the frame on screen until the replay thread shows the past one.
@@ -1387,6 +1388,15 @@ impl Gallery {
         let changed = scrub != self.scrub;
         self.scrub = scrub;
         if self.playback == Playback::Live {
+            return (None, changed);
+        }
+        // The overlay app's recorded video covers the screen: no pictures behind it.
+        if matches!(self.video, Video::Recorded(_)) {
+            return (None, changed);
+        }
+        // Paused or rewinding at the oldest kept frame: that frame is evicted as new ones
+        // arrive, so the picture on screen stays rather than following the oldest one.
+        if history.is_none() && self.speed() <= 0 && lag >= kept && self.replay.is_some() {
             return (None, changed);
         }
         let want = match (&history, now.checked_sub(lag)) {
@@ -1508,6 +1518,7 @@ impl State {
             gallery.live = live;
             gallery.unavailable.clear();
             gallery.video_failed.clear();
+            gallery.recorded_failed.clear();
             gallery.shrink();
             gallery.sheet = None;
             gallery.moving = false;
@@ -1709,8 +1720,15 @@ impl State {
             match closed.key.as_deref() {
                 Some("left") => gallery.skip(true, now),
                 Some("right") => gallery.skip(false, now),
-                Some("up") => gallery.jump(true, now, unix),
-                Some("down") => gallery.jump(false, now, unix),
+                // Nothing earlier to jump to from the live video: back to it.
+                Some("up") => {
+                    if !gallery.jump(true, now, unix) {
+                        gallery.go_live();
+                    }
+                }
+                Some("down") => {
+                    gallery.jump(false, now, unix);
+                }
                 Some("ok") => gallery.toggle_pause(now),
                 Some("rewind") => gallery.faster(true, now),
                 Some("forward") => gallery.faster(false, now),
@@ -1719,8 +1737,9 @@ impl State {
             }
             return;
         }
+        // Back: leave the camera, resetting everything about where it was.
         if !closed.failed {
-            gallery.enlarged = None;
+            gallery.shrink();
         }
     }
 
@@ -1819,7 +1838,7 @@ impl State {
                     gallery.skip(matches!(direction, Direction::Left), now);
                 }
                 Direction::Up | Direction::Down => {
-                    gallery.jump(
+                    let _ = gallery.jump(
                         matches!(direction, Direction::Up),
                         now,
                         crate::state::unix_now(),

@@ -519,8 +519,10 @@ against the session's nonce, it redirects to `history_url&start=&end=` with the 
 token. Any timeline key there closes it with `key`, `behind` (seconds behind live) and `paused`
 in its `closed` report (`cameras::Closed`), and the gallery carries on from that moment with the
 key; a video that fails puts the camera in `recorded_failed`, which replays pictures instead.
-The live HLS video hands over the same way: Left past what it kept, or Up/Down, when the camera
-has history (`VideoRequest::history`). Leaving live closes nothing; going live again asks for the
+The live HLS video hands over the same way: Left past what it kept, or Up (back to live when no
+mark is earlier), when the camera has history (`VideoRequest::history`). While recorded video
+plays, no pictures load behind it; a camera without history paused past its oldest kept frame
+keeps the picture it has. Leaving live closes nothing; going live again asks for the
 HLS video again.
 
 The integration's `HistoryView` (`/api/luma/history/<entity>`) checks the camera's access token
@@ -529,7 +531,9 @@ redirects `at` and `start`/`end` (at most 15 minutes, within 31 days) to the Uni
 integration's snapshot and video views with a path `async_sign_path` signs for a minute as Home
 Assistant's content user, passing the camera's entity ID (those views look a camera up by Protect
 ID, then entity ID). `events` answers from the Recorder's history of the camera device's Protect
-motion and detection binary sensors and doorbell event entity (`event_spans`).
+motion and detection binary sensors and doorbell event entity (`event_spans`), told apart by each
+entity's own key (its unique ID after the MAC address), never by entity IDs that carry the device
+name.
 
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the

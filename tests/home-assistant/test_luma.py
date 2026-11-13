@@ -537,16 +537,17 @@ def protect_camera(hass: HomeAssistant, entity_id: str = "camera.door") -> str:
         config_entry=protect,
         device_id=device.id,
     )
-    for domain, object_id in (
-        ("binary_sensor", f"{name}_motion"),
-        ("binary_sensor", f"{name}_person_detected"),
-        ("binary_sensor", f"{name}_is_dark"),
-        ("event", f"{name}_doorbell"),
+    # Protect's unique IDs are the device's MAC address and the entity's own key.
+    for domain, key, object_id in (
+        ("binary_sensor", "motion", f"{name}_motion"),
+        ("binary_sensor", "smart_obj_person", f"{name}_person_detected"),
+        ("binary_sensor", "dark", f"{name}_is_dark"),
+        ("event", "doorbell", f"{name}_doorbell"),
     ):
         registry.async_get_or_create(
             domain,
             "unifiprotect",
-            object_id,
+            f"aabb_{key}",
             suggested_object_id=object_id,
             config_entry=protect,
             device_id=device.id,
@@ -649,11 +650,11 @@ async def test_history_events_come_from_the_cameras_protect_sensors(
     assert await async_setup_component(hass, "http", {})
     assert await async_setup_component(hass, DOMAIN, {})
     protect_camera(hass)
-    assert protect_sensors(hass, "camera.door") == [
-        "binary_sensor.door_motion",
-        "binary_sensor.door_person_detected",
-        "event.door_doorbell",
-    ]
+    assert protect_sensors(hass, "camera.door") == {
+        "binary_sensor.door_motion": "motion",
+        "binary_sensor.door_person_detected": "person",
+        "event.door_doorbell": "doorbell",
+    }
     start = dt_util.utcnow() - timedelta(hours=1)
     end = dt_util.utcnow()
 
@@ -680,7 +681,7 @@ async def test_history_events_come_from_the_cameras_protect_sensors(
             state("event.door_doorbell", at(30).isoformat(), 30),
         ],
     }
-    spans = event_spans(history, start, end)
+    spans = event_spans(history, protect_sensors(hass, "camera.door"), start, end)
     seconds = lambda minutes: int(at(minutes).timestamp())  # noqa: E731
     assert spans == [
         {"start": seconds(0), "end": seconds(2), "kind": "motion"},
@@ -708,7 +709,21 @@ async def test_history_events_come_from_the_cameras_protect_sensors(
     )
     assert response.status == 200
     assert len((await response.json())["events"]) == 4
-    assert asked == [protect_sensors(hass, "camera.door")]
+    assert asked == [list(protect_sensors(hass, "camera.door"))]
+
+
+async def test_a_doorbell_cameras_own_name_does_not_make_every_sensor_a_doorbell(
+    hass: HomeAssistant,
+) -> None:
+    from custom_components.luma import protect_sensors
+
+    protect_camera(hass, "camera.front_doorbell")
+    # Sensors are told apart by their own keys, not the device name in their entity IDs.
+    assert protect_sensors(hass, "camera.front_doorbell") == {
+        "binary_sensor.front_doorbell_motion": "motion",
+        "binary_sensor.front_doorbell_person_detected": "person",
+        "event.front_doorbell_doorbell": "doorbell",
+    }
 
 
 MOTN = "motn-key-0123456789abcdef"

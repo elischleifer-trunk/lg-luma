@@ -453,8 +453,9 @@
     videoLive.textContent = 'Live';
   }
 
-  // The camera's snapshots, refreshed, over the video until it plays.
-  function cover(settings) {
+  // The camera's snapshots, refreshed, over the video until it plays. `once`: a picture of a
+  // fixed moment (recorded video), which loads once rather than again and again.
+  function cover(settings, once) {
     if (!settings.snapshot) return;
     function next() {
       if (closing || current !== settings || playing()) return;
@@ -464,10 +465,11 @@
         if (current !== settings || playing()) return;
         videoCover.src = image.src;
         videoCover.hidden = false;
+        if (once) return;
         timers.push(setTimeout(next, Math.max(0, COVER_GAP_MS - (Date.now() - started))));
       };
       image.onerror = function () {
-        timers.push(setTimeout(next, 1000));
+        if (!once) timers.push(setTimeout(next, 1000));
       };
       image.src = logic.frameUrl(settings.snapshot, Date.now());
     }
@@ -587,9 +589,9 @@
     videoLive.hidden = true;
     videoLive.className = 'video-badge';
     videoView.hidden = false;
-    cover(settings);
     var part = null;
     var wait = null;
+    cover(settings, true);
     var playback = {
       recorded: true,
       stop: function () {
@@ -705,17 +707,15 @@
   document.addEventListener('keydown', function (event) {
     if (video && video.recorded && RECORDED_KEYS[event.keyCode]) {
       event.preventDefault();
-      handOff(
-        RECORDED_KEYS[event.keyCode],
-        recordedBehind(),
-        event.keyCode === 13 || event.keyCode === 19
-      );
+      // The video was playing: the gallery applies the key (OK pauses) from there.
+      handOff(RECORDED_KEYS[event.keyCode], recordedBehind(), false);
       return;
     }
-    // Up and Down on the live video: to what UniFi Protect saw, in Luma's timeline.
-    if (playing() && current.history && (event.keyCode === 38 || event.keyCode === 40)) {
+    // Up on the live video: back to what UniFi Protect last saw, in Luma's timeline (which
+    // comes back to live when there is nothing). Down has nothing later than live.
+    if (playing() && current.history && event.keyCode === 38) {
       event.preventDefault();
-      handOff(event.keyCode === 38 ? 'up' : 'down', behindLive(), player.paused);
+      handOff('up', behindLive(), player.paused);
       return;
     }
     if (playing() && VIDEO_KEYS[event.keyCode]) {
