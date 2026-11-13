@@ -594,6 +594,7 @@ fn asset_loading_and_unknown_app_cards_do_not_require_collected_artwork() {
             crate::model::Inventory {
                 apps: vec![App::new("com.example.regional", "Regional App")],
                 inputs: vec![],
+                search: None,
             },
             None,
         );
@@ -3557,4 +3558,51 @@ fn cameras_app_is_listed_only_while_home_assistant_is_on_and_opens_the_gallery()
     state.preferences.home_assistant = false;
     state.sync_custom_tiles();
     assert!(!listed(&state));
+}
+
+#[test]
+fn header_search_button_hands_off_to_lg_search() {
+    let mut state = ready();
+    let search = state.inventory.search.clone().expect("demo has LG search");
+    for page in [0, 1, 2] {
+        state.open(page);
+        assert!(
+            controls(&state)
+                .iter()
+                .any(|c| c.target == Target::LgSearch),
+            "page {page} shows the button"
+        );
+    }
+    // Right past the last tab reaches it without changing page; Left and Back return.
+    state.open(2);
+    state.focus = Target::Nav(2);
+    state.direction(Direction::Right, &controls(&state));
+    assert_eq!(state.focus, Target::LgSearch);
+    assert_eq!(state.page, Page::Settings);
+    state.direction(Direction::Left, &controls(&state));
+    assert_eq!(state.focus, Target::Nav(2));
+    state.focus = Target::LgSearch;
+    state.back();
+    assert_eq!(state.focus, Target::Nav(2));
+    state.open(0);
+    state.focus = Target::LgSearch;
+    state.direction(Direction::Down, &controls(&state));
+    assert_eq!(state.focus, state.first_content());
+    state.open(2);
+
+    state.focus = Target::LgSearch;
+    assert!(matches!(&state.activate()[..], [Effect::Launch(id)] if *id == search));
+
+    // A TV without LG search shows no button, and Right never lands on it.
+    let mut inventory = demo_inventory();
+    inventory.search = None;
+    state.set_inventory(inventory, None);
+    assert_eq!(state.focus, Target::Nav(2));
+    assert!(
+        !controls(&state)
+            .iter()
+            .any(|c| c.target == Target::LgSearch)
+    );
+    state.direction(Direction::Right, &controls(&state));
+    assert_ne!(state.focus, Target::LgSearch);
 }
