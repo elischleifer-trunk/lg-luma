@@ -88,8 +88,9 @@ fn results_replace_the_no_apps_empty_state_and_take_focus_from_the_search_field(
     state.focus = Target::Search;
     state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Title(TITLE_COLUMNS - 1));
-    state.direction(Direction::Left, &controls(&state));
-    state.direction(Direction::Left, &controls(&state));
+    for _ in 1..TITLE_COLUMNS {
+        state.direction(Direction::Left, &controls(&state));
+    }
     assert_eq!(state.focus, Target::Title(0));
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::Title(1));
@@ -192,4 +193,45 @@ fn search_failures_are_shown_without_dropping_the_field() {
         &state,
         "Movie and show search is unavailable right now."
     ));
+}
+
+#[test]
+fn posters_are_requested_once_per_result_and_dropped_with_it() {
+    let mut state = typed("dune");
+    assert!(state.poster_requests().is_none(), "nothing to load yet");
+    answer(&mut state, "dune");
+    let requests = state
+        .poster_requests()
+        .expect("posters for the new results");
+    assert_eq!(requests.len(), state.titles.results.len());
+    assert!(
+        requests
+            .iter()
+            .all(|r| r.url.starts_with("https://cdn.movieofthenight.com/"))
+    );
+    assert!(state.poster_requests().is_none(), "already loading");
+
+    // A loaded poster replaces the plain title card.
+    let first = state.titles.results[0].show.id.clone();
+    let poster = std::sync::Arc::new(crate::cameras::Frame {
+        key: crate::posters::texture_key(&first),
+        serial: 1,
+        pixels: image::RgbaImage::new(2, 3),
+        live: false,
+    });
+    state.accept_poster(&first, Some(poster));
+    let posters = scene(&state)
+        .draw
+        .iter()
+        .filter(|draw| matches!(draw, Draw::Camera(frame, ..) if frame.key == format!("poster:{first}")))
+        .count();
+    assert_eq!(posters, 1);
+    // A late poster for a show no longer listed is ignored.
+    state.accept_poster("gone", None);
+    assert!(!state.posters.contains_key("gone"));
+
+    state.query.clear();
+    state.sync_titles(Instant::now());
+    assert_eq!(state.poster_requests().map(|r| r.len()), Some(0));
+    assert!(state.posters.is_empty(), "decoded posters are freed");
 }

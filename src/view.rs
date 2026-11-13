@@ -1768,8 +1768,9 @@ fn titles_shown(state: &State) -> bool {
     state.streaming_keys.motn && !state.titles.query().is_empty()
 }
 
-const TITLE_CARD: (f32, f32) = (568., 120.);
-const TITLE_GAP: f32 = 24.;
+/// Posters line up with the app grid's columns; captions sit below like app names.
+const TITLE_POSTER: (f32, f32) = (270., 405.);
+const TITLE_ROW: f32 = 405. + 16. + 29.12 + 2. + 25.76 + 38.4;
 
 /// Shortens `value` with an ellipsis to fit `width` on one line.
 fn ellipsize(assets: &Assets, value: &str, style: TextStyle, width: f32) -> String {
@@ -1788,7 +1789,8 @@ fn ellipsize(assets: &Assets, value: &str, style: TextStyle, width: f32) -> Stri
 }
 
 /// The Movies & shows section under the Apps grid: a heading with the search status, then
-/// three cards per row. Each card shows the app the title opens in, with what it costs there.
+/// a poster grid in the app grid's columns. Under each poster: the title, then its year and the
+/// app it opens in, with what it costs there.
 fn streaming_titles(out: &mut Scene, state: &State, assets: &Assets, top: f32) {
     use crate::streaming::{Access, MIN_QUERY_CHARS, year};
     let language = state.preferences.language;
@@ -1833,22 +1835,28 @@ fn streaming_titles(out: &mut Scene, state: &State, assets: &Assets, top: f32) {
             );
         }
     }
-    let (width, height) = TITLE_CARD;
+    let (width, height) = TITLE_POSTER;
+    let detail_style = text(18.4, 550, -0.01).leading(1.4);
     let columns = crate::state::TITLE_COLUMNS;
     for (index, ranked) in titles.results.iter().enumerate() {
         let (column, row) = ((index % columns) as f32, (index / columns) as f32);
         let rect = Rect::new(
-            84. + column * (width + TITLE_GAP),
-            top + 56. + row * (height + TITLE_GAP) - s,
+            84. + column * GRID_PITCH,
+            top + 56. + row * TITLE_ROW - s,
             width,
             height,
         );
-        out.control(Target::Title(index), rect, true);
-        if rect.y + rect.h < 0. || rect.y > 1054. {
+        let target = Target::Title(index);
+        out.control(
+            target.clone(),
+            Rect::new(rect.x, rect.y, rect.w, TITLE_ROW - 38.4),
+            true,
+        );
+        if rect.y + TITLE_ROW < 0. || rect.y > 1054. {
             continue;
         }
-        let target = Target::Title(index);
         let focused = state.focus == target;
+        let show = &ranked.show;
         let start = out.draw.len();
         out.shadow(
             rect,
@@ -1857,64 +1865,69 @@ fn streaming_titles(out: &mut Scene, state: &State, assets: &Assets, top: f32) {
             if focused { 14. } else { 9. },
             if focused { 0.4 } else { 0.165 },
         );
-        out.shape(
-            rect,
-            19.2,
-            if focused {
-                c(0x303438, 1.)
-            } else {
-                c(0x171c20, 0.72)
-            },
-        );
-        out.border(rect, 19.2, 1., c(0xffffff, 0.07));
-        let face = Rect::new(rect.x + 18., rect.y + (height - 84.) / 2., 147., 84.);
-        let pick = ranked.pick.as_ref();
-        let app = pick.and_then(|p| state.inventory.apps.iter().find(|a| a.id == p.app_id));
-        match app {
-            Some(app) => {
-                app_face(out, assets, app, face, language, 12.);
-            }
-            None => {
-                out.shape(face, 12., c(0xffffff, 0.06));
-                out.icon(assets, "tv", face.inset(24.), c(0xeeeeee, 0.45));
-            }
-        }
-        let x = face.x + face.w + 20.;
-        let available = rect.x + rect.w - 20. - x;
-        let title_style = text(24., if focused { 650 } else { 600 }, -0.02).leading(1.3);
-        out.text(
-            ellipsize(assets, &ranked.show.title, title_style, available),
-            Rect::new(x, rect.y + 16., available, 31.2),
-            title_style,
-            c(0xffffff, if focused { 1. } else { 0.92 }),
-            false,
-        );
-        let show = &ranked.show;
-        let kind = language.t(match show.show_type {
-            crate::motn_api::ShowType::Series => "titleSeries",
-            _ => "titleMovie",
-        });
         let years = match (year(show), show.last_air_year) {
             (Some(first), Some(last)) if last > first => format!("{first}–{last}"),
             (Some(first), _) => first.to_string(),
             _ => String::new(),
         };
-        let detail_style = text(18.4, 550, -0.01).leading(1.4);
-        let meta = if years.is_empty() {
-            kind.to_owned()
-        } else {
-            format!("{kind} · {years}")
-        };
+        match state.posters.get(&show.id) {
+            Some(Some(poster)) => {
+                out.draw
+                    .push(Draw::Camera(poster.clone(), rect, 19.2, false, WHITE))
+            }
+            // Loading or no poster: the title on a plain card.
+            _ => {
+                out.shape(rect, 19.2, c(0x2a2f35, 0.92));
+                out.border(rect, 19.2, 1., c(0xffffff, 0.07));
+                out.text(
+                    show.title.as_str(),
+                    Rect::new(rect.x + 20., rect.y + 140., rect.w - 40., 96.),
+                    text(24., 650, -0.02).leading(1.3),
+                    c(0xffffff, 0.85),
+                    true,
+                );
+                let kind = language.t(match show.show_type {
+                    crate::motn_api::ShowType::Series => "titleSeries",
+                    _ => "titleMovie",
+                });
+                out.text(
+                    if years.is_empty() {
+                        kind.to_owned()
+                    } else {
+                        format!("{kind} · {years}")
+                    },
+                    Rect::new(rect.x + 20., rect.y + 248., rect.w - 40., 25.76),
+                    detail_style,
+                    c(0xeeeeee, 0.55),
+                    true,
+                );
+            }
+        }
+        if focused {
+            out.ring(rect, 19.2);
+        }
+        let caption = rect.w - 8.;
+        let title_style = text(20.8, if focused { 600 } else { 550 }, -0.02).leading(1.4);
         out.text(
-            ellipsize(assets, &meta, detail_style, available),
-            Rect::new(x, rect.y + 50., available, 25.76),
-            detail_style,
-            c(0xeeeeee, 0.6),
+            ellipsize(assets, &show.title, title_style, caption),
+            Rect::new(rect.x + 4., rect.y + rect.h + 16., caption, 29.12),
+            title_style,
+            if focused {
+                c(0xffffff, 1.)
+            } else {
+                c(0xececec, 0.8)
+            },
             false,
         );
+        let pick = ranked.pick.as_ref();
         let place = match pick {
             Some(pick) => {
-                let app = app.map_or(pick.service_id.as_str(), |app| app.title.as_str());
+                let app = state
+                    .inventory
+                    .apps
+                    .iter()
+                    .find(|a| a.id == pick.app_id)
+                    .map_or(pick.service_id.as_str(), |app| app.title.as_str());
                 let key = match pick.access {
                     Access::Included => "titleOn",
                     Access::Addon => "titleAddon",
@@ -1929,18 +1942,20 @@ fn streaming_titles(out: &mut Scene, state: &State, assets: &Assets, top: f32) {
             }
             None => language.t("titleNotOnApps").to_owned(),
         };
+        let detail = if years.is_empty() {
+            place
+        } else {
+            format!("{years} · {place}")
+        };
         out.text(
-            ellipsize(assets, &place, detail_style, available),
-            Rect::new(x, rect.y + 77., available, 25.76),
+            ellipsize(assets, &detail, detail_style, caption),
+            Rect::new(rect.x + 4., rect.y + rect.h + 47., caption, 25.76),
             detail_style,
-            c(0xeeeeee, if pick.is_some() { 0.85 } else { 0.5 }),
+            c(0xeeeeee, 0.6),
             false,
         );
-        if focused {
-            out.ring(rect, 19.2);
-        }
         if pick.is_none() {
-            out.fade(start, 0.6, 1.);
+            out.fade(start, 0.55, 1.);
         }
         if state.pressed.as_ref() == Some(&target) {
             out.fade(start, 1., 0.85);

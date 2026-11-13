@@ -23,6 +23,7 @@ mod key_editor;
 mod luna;
 mod model;
 mod platform;
+mod posters;
 mod raster;
 mod recents;
 mod renderer;
@@ -780,6 +781,7 @@ fn run() -> Result<(), String> {
         keys_path.clone(),
         search_cache::DiskCache::beside(&preferences_path),
     );
+    let posters = posters::Service::new(search_cache::DiskCache::posters_beside(&preferences_path));
     let mut key_editor_service =
         key_editor::Service::new(keys_path, !webos && !options.script.is_empty())?;
     if options.test_extra_apps > 0 {
@@ -1949,6 +1951,15 @@ fn run() -> Result<(), String> {
         }
         for (request, reply) in streaming_search.receiver.try_iter() {
             state.accept_titles(&request, reply);
+        }
+        if let Some(requests) = state.poster_requests() {
+            posters.want(state.titles.results.iter().map(|r| r.show.id.as_str()));
+            for request in requests {
+                posters.send(request);
+            }
+        }
+        for (show_id, poster) in posters.receiver.try_iter() {
+            state.accept_poster(&show_id, poster);
         }
         // SDL-webOS disables text input when its own panel is dismissed, even
         // if it did not forward a Back/Return key to the application.

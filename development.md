@@ -1083,7 +1083,12 @@ Movie and show search follows the Apps search text once a Movie of the Night key
 memory and drops replies for text that has since changed. `streaming_search::Service` runs each
 search on its own worker thread, reading `streaming-keys.json` per search so new keys apply at
 once, and caches every API reply under `streaming-cache/` beside the preferences. OK launches the
-picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Scripted
+picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Posters come
+from the signed `cdn.movieofthenight.com` links in each result (no other host is fetched): three
+`posters` workers fetch them with the weather rules (timeout, no redirects or proxy, 1 MiB limit),
+keep the JPEG under `streaming-posters/` (48 MiB cap) keyed by the link without its signature,
+and decode it to card size. The renderer uploads each like a camera frame; State keeps decoded
+posters only for the current results. Scripted
 captures can wait with `await-titles`. Pre-filling `streaming-cache/` from
 `tests/fixtures/streaming` with a placeholder key renders results without network access.
 

@@ -21,8 +21,8 @@ pub const INVENTORY_RETRY_DELAY: Duration = Duration::from_secs(2);
 pub const HOME_COLUMNS: usize = 6;
 pub const HOME_TILE_WIDTH: f32 = 256.;
 pub const HOME_TILE_PITCH: f32 = 281.6;
-/// Movie and show results under the Apps grid, three wide cards per row.
-pub const TITLE_COLUMNS: usize = 3;
+/// Movie and show posters under the Apps grid, lined up with its six columns.
+pub const TITLE_COLUMNS: usize = 6;
 pub const BACKGROUND_FADE: f32 = 0.4;
 pub const CYCLE_FADE: f32 = 1.6;
 
@@ -293,6 +293,8 @@ pub struct State {
     pub streaming_keys: crate::streaming_keys::Status,
     /// Movies and shows matching the Apps search, once a Movie of the Night key is stored.
     pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
+    /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
+    pub posters: std::collections::HashMap<String, Option<std::sync::Arc<crate::cameras::Frame>>>,
     /// The HACS install link's QR code, made when its dialog opens.
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
@@ -355,6 +357,7 @@ impl State {
             key_editor: None,
             streaming_keys: Default::default(),
             titles: Default::default(),
+            posters: Default::default(),
             home_assistant_qr: None,
             home_assistant_address: None,
             home_assistant_code: None,
@@ -2328,6 +2331,41 @@ impl State {
     ) {
         if self.titles.accept(request, reply) {
             self.reconcile_title_focus();
+            self.dirty = true;
+        }
+    }
+
+    /// Posters to fetch for the current results, or None when nothing changed. Posters of shows
+    /// no longer listed are dropped, so only the visible results hold decoded images.
+    pub fn poster_requests(&mut self) -> Option<Vec<crate::posters::Request>> {
+        let before = self.posters.len();
+        let titles = &self.titles.results;
+        self.posters
+            .retain(|id, _| titles.iter().any(|result| &result.show.id == id));
+        let mut requests = Vec::new();
+        for result in titles {
+            let show = &result.show;
+            if self.posters.contains_key(&show.id) {
+                continue;
+            }
+            self.posters.insert(show.id.clone(), None);
+            if let Some(url) = crate::posters::url(show) {
+                requests.push(crate::posters::Request {
+                    show_id: show.id.clone(),
+                    url: url.to_owned(),
+                });
+            }
+        }
+        (self.posters.len() != before || !requests.is_empty()).then_some(requests)
+    }
+
+    pub fn accept_poster(
+        &mut self,
+        show_id: &str,
+        poster: Option<std::sync::Arc<crate::cameras::Frame>>,
+    ) {
+        if let Some(slot) = self.posters.get_mut(show_id) {
+            *slot = poster;
             self.dirty = true;
         }
     }
