@@ -1,6 +1,6 @@
 # lg-luma
 
-Release notes after 2.19.0 are on the [GitHub releases page](https://github.com/EliSchleifer/lg-luma/releases).
+Release notes after 2.19.0 are on the [GitHub releases page](https://github.com/elischleifer-trunk/lg-luma/releases).
 
 ## 2.19.0
 
