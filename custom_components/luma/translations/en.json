@@ -44,7 +44,13 @@
     "notify": { "toast": { "name": "Toast" } }
   },
   "selector": {
-    "mode": { "options": { "stream": "Live (MJPEG)", "snapshot": "Snapshots" } },
+    "mode": {
+      "options": {
+        "video": "Live video (HLS)",
+        "stream": "Live (MJPEG)",
+        "snapshot": "Snapshots"
+      }
+    },
     "position": {
       "options": {
         "top-right": "Top right",
@@ -78,7 +84,7 @@
         },
         "mode": {
           "name": "Mode",
-          "description": "Live motion-JPEG (falls back to snapshots), or snapshots only."
+          "description": "Live video plays a camera entity's HLS stream at its full frame rate (shows motion-JPEG until it plays, or if it cannot). Live motion-JPEG falls back to snapshots. Or snapshots only."
         },
         "refresh": {
           "name": "Snapshot interval",

@@ -494,6 +494,16 @@ fails, or shows nothing within 15 s, reports `failed`, and that camera stays on 
 stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma
 closes it (`Service::close_video`).
 
+A doorbell card can play HLS too. `luma.show_camera` with `mode: video` and a camera entity
+starts the stream in Home Assistant (`card_hls_url`, the same `async_request_stream` as
+`StreamView`) and adds the absolute playlist URL as `hls_url`; a camera that cannot stream just
+leaves it out. `POST /api/overlay` validates it like the other camera URLs and passes it to the
+page as `hls`, still requiring `stream_url` or `snapshot_url` as the card's picture. The page
+plays both through `playHls` (native HLS, then hls.js, 15 s to show a frame): the card's muted
+`<video>` stays invisible over the motion-JPEG until it plays, then the motion-JPEG stops; a video
+that fails before playing leaves the motion-JPEG, and one that fails later restarts it. Older
+Luma builds ignore `hls_url`.
+
 Holding OK (or a long pointer press, or Menu) on a tile opens **Move** (arrows move it, OK or Back
 ends), **Hide camera** and **Camera settings**; the settings button at the top right, reached
 with Up from the first row, opens the same settings: **Live video** (off makes enlarged cameras

@@ -24,6 +24,7 @@ show_camera:
         select:
           translation_key: mode
           options:
+            - video
             - stream
             - snapshot
     refresh:
