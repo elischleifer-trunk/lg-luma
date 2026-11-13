@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 from datetime import timedelta
 
 import pytest
@@ -518,6 +519,8 @@ async def test_the_stream_view_starts_hls_only_with_the_camera_token(
 
 MOTN = "motn-key-0123456789abcdef"
 TMDB_KEY = "eyJhbGciOiJIUzI1NiJ9.e30.signature"
+# The TV's short SHA-256s of the keys above (see src/streaming-keys.rs).
+TMDB_PRINT = hashlib.sha256(TMDB_KEY.encode()).hexdigest()[:16]
 MOTN_CHECK = "https://api.movieofthenight.com/v4/genres"
 TMDB_CHECK = "https://api.themoviedb.org/3/find/tt0087332?external_source=imdb_id"
 
@@ -603,6 +606,28 @@ async def test_a_cleared_key_is_not_sent_and_unchanged_keys_are_not_checked_agai
         ({"motn": True, "tmdb": True, "home_assistant": False}, True),
         # A Luma without streaming search reports nothing and is left alone.
         (None, False),
+        # The TV holds exactly these keys.
+        (
+            {
+                "motn": True,
+                "tmdb": True,
+                "home_assistant": True,
+                "motn_fingerprint": "88592acfb89561c3",
+                "tmdb_fingerprint": TMDB_PRINT,
+            },
+            False,
+        ),
+        # The TMDB token was rotated here while the TV was off: the TV holds an older one.
+        (
+            {
+                "motn": True,
+                "tmdb": True,
+                "home_assistant": True,
+                "motn_fingerprint": "88592acfb89561c3",
+                "tmdb_fingerprint": "0000000000000000",
+            },
+            True,
+        ),
     ],
 )
 async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
@@ -629,3 +654,20 @@ async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert (len(key_pushes(aioclient_mock)) > before) is pushed
+
+
+async def test_a_malformed_key_is_caught_in_the_form_without_asking_the_service(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    config = await setup(hass, aioclient_mock)
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {"motn_api_key": "motn-key short", "tmdb_read_access_token": "abc"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"motn_api_key": "malformed", "tmdb_read_access_token": "malformed"}
+    # Neither service was asked about keys that cannot be valid.
+    services = [call for call in aioclient_mock.mock_calls if call[1].host != HOST]
+    assert services == []
+    assert key_pushes(aioclient_mock) == []

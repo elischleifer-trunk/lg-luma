@@ -261,14 +261,17 @@ fn worker(
                         desired.load(Ordering::Acquire) == generation && Instant::now() < deadline
                     };
                     let host = address.to_string();
-                    let store = |keys: &Keys| {
+                    // Re-reads under the shared lock, so a key Home Assistant pushed while
+                    // this request was checking keys is kept.
+                    let store = |change: &Change| {
                         if !valid() {
                             return Err("Session ended".to_owned());
                         }
-                        streaming_keys::save(path, keys)?;
+                        let (_, saved) = streaming_keys::update(path, |keys| apply(keys, change))?;
                         sender
-                            .send(Event::Saved(keys.status()))
-                            .map_err(|_| "Launcher stopped".to_owned())
+                            .send(Event::Saved(saved.status()))
+                            .map_err(|_| "Launcher stopped".to_owned())?;
+                        Ok(saved)
                     };
                     if let Err(error) = serve(&mut stream, &host, &token, path, valid, store) {
                         eprintln!("Luma key editor: {error}");
@@ -299,14 +302,15 @@ fn json(stream: &mut TcpStream, status: &str, body: &serde_json::Value) -> Resul
     )
 }
 
-/// Serves one request. Saved keys are written by `store` before the success reply.
+/// Serves one request. `store` applies the change to the freshly read keys and saves them
+/// before the success reply; the slow API checks run before it, outside its lock.
 fn serve(
     stream: &mut TcpStream,
     host: &str,
     token: &str,
     path: &Path,
     valid: impl Fn() -> bool,
-    store: impl FnOnce(&Keys) -> Result<(), String>,
+    store: impl FnOnce(&Change) -> Result<Keys, String>,
 ) -> Result<(), String> {
     stream
         .set_read_timeout(Some(Duration::from_millis(100)))
@@ -398,8 +402,8 @@ fn serve(
     if !valid() {
         return Err("Session ended".into());
     }
-    store(&next)?;
-    let mut body = listing(&next);
+    let saved = store(&change)?;
+    let mut body = listing(&saved);
     body["warnings"] = serde_json::json!(warnings);
     // Saved even if the phone disconnects before receiving its reply.
     let _ = json(stream, "200 OK", &body);

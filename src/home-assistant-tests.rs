@@ -1155,7 +1155,13 @@ fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
     let status = h.call("GET", "/api/status", Some(&token), json!({}));
     assert_eq!(
         status.body["streaming_keys"],
-        json!({"motn": true, "tmdb": true, "home_assistant": true})
+        json!({
+            "motn": true,
+            "tmdb": true,
+            "home_assistant": true,
+            "motn_fingerprint": crate::streaming_keys::fingerprint(motn),
+            "tmdb_fingerprint": crate::streaming_keys::fingerprint(tmdb),
+        })
     );
     assert!(!status.body.to_string().contains("0123456789"));
 
@@ -1178,5 +1184,18 @@ fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
         );
     }
     assert_eq!(crate::streaming_keys::load(&keys_path), stored);
+
+    // A malformed key is refused without blocking the valid one beside it.
+    let rotated = "eyJhbGciOiJIUzI1NiJ9.e30.rotated";
+    let mixed = h.call(
+        "PUT",
+        "/api/streaming-keys",
+        Some(&token),
+        json!({"motn": "bad key", "tmdb": rotated}),
+    );
+    assert_eq!(mixed.status, 400);
+    assert!(mixed.body["error"].as_str().unwrap().starts_with("motn:"));
+    let kept = crate::streaming_keys::load(&keys_path);
+    assert_eq!((kept.motn.as_str(), kept.tmdb.as_str()), (motn, rotated));
     std::fs::remove_dir_all(&dir).unwrap();
 }

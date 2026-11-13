@@ -128,29 +128,69 @@ pub fn clean(key: &str) -> Result<String, &'static str> {
     Ok(key.to_owned())
 }
 
-/// Applies a Home Assistant push: each non-empty key replaces the stored one, and an empty or
-/// missing key keeps it, so clearing a field in Home Assistant never erases the TV's key.
+/// Applies a Home Assistant push: each valid non-empty key replaces the stored one, and an
+/// empty or missing key keeps it, so clearing a field in Home Assistant never erases the TV's
+/// key. A malformed key is reported without blocking the other one.
 pub fn merge_from_home_assistant(
     keys: &Keys,
     motn: Option<&str>,
     tmdb: Option<&str>,
-) -> Result<Keys, String> {
+) -> (Keys, Vec<String>) {
     let mut next = keys.clone();
     let mut changed = false;
+    let mut errors = Vec::new();
     for (name, value, slot) in [
         ("motn", motn, &mut next.motn),
         ("tmdb", tmdb, &mut next.tmdb),
     ] {
-        let value = clean(value.unwrap_or_default()).map_err(|e| format!("{name}: {e}"))?;
-        if !value.is_empty() {
-            *slot = value;
-            changed = true;
+        match clean(value.unwrap_or_default()) {
+            Ok(value) if !value.is_empty() => {
+                *slot = value;
+                changed = true;
+            }
+            Ok(_) => {}
+            Err(error) => errors.push(format!("{name}: {error}")),
         }
     }
     if changed {
         next.home_assistant = true;
     }
-    Ok(next)
+    (next, errors)
+}
+
+/// A short SHA-256 of a key, so Home Assistant can tell whether the TV holds its current key
+/// without the key itself ever being sent back. Empty for no key.
+pub fn fingerprint(key: &str) -> String {
+    if key.is_empty() {
+        return String::new();
+    }
+    ring::digest::digest(&ring::digest::SHA256, key.as_bytes())
+        .as_ref()
+        .iter()
+        .take(8)
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+/// Serializes every read-change-write of the keys file: the QR page and Home Assistant write
+/// it from different threads.
+static WRITE: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+/// Re-reads the stored keys, applies `change` and saves the result when it differs. Returns
+/// the keys before and after.
+pub fn update(
+    path: &Path,
+    change: impl FnOnce(&Keys) -> Result<Keys, String>,
+) -> Result<(Keys, Keys), String> {
+    let _guard = WRITE
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let current = load(path);
+    let next = change(&current)?;
+    if next != current {
+        save(path, &next)?;
+    }
+    Ok((current, next))
 }
 
 pub fn path(preferences: &Path) -> PathBuf {
@@ -245,15 +285,63 @@ mod tests {
             tmdb: "eyJhbGciOiJIUzI1NiJ9.e30.oldtoken".into(),
             home_assistant: false,
         };
-        let next = merge_from_home_assistant(&stored, None, Some("  ")).unwrap();
-        assert_eq!(next, stored, "empty push changed nothing");
-        let next =
-            merge_from_home_assistant(&stored, Some(""), Some("eyJhbGciOiJIUzI1NiJ9.e30.newtoken"))
-                .unwrap();
+        let (next, errors) = merge_from_home_assistant(&stored, None, Some("  "));
+        assert_eq!(
+            (next, errors),
+            (stored.clone(), vec![]),
+            "empty push changes nothing"
+        );
+        let (next, errors) =
+            merge_from_home_assistant(&stored, Some(""), Some("eyJhbGciOiJIUzI1NiJ9.e30.newtoken"));
+        assert!(errors.is_empty());
         assert_eq!(next.motn, stored.motn);
         assert_eq!(next.tmdb, "eyJhbGciOiJIUzI1NiJ9.e30.newtoken");
         assert!(next.home_assistant);
-        assert!(merge_from_home_assistant(&stored, Some("bad key"), None).is_err());
+        // A malformed key is reported, and the valid one beside it still lands.
+        let (next, errors) = merge_from_home_assistant(
+            &stored,
+            Some("bad key"),
+            Some("eyJhbGciOiJIUzI1NiJ9.e30.third"),
+        );
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].starts_with("motn:"), "{errors:?}");
+        assert_eq!(next.motn, stored.motn);
+        assert_eq!(next.tmdb, "eyJhbGciOiJIUzI1NiJ9.e30.third");
+    }
+
+    #[test]
+    fn fingerprints_identify_a_key_without_revealing_it() {
+        let key = "motn-key-0123456789abcdef";
+        let print = fingerprint(key);
+        assert_eq!(print.len(), 16);
+        assert!(!key.contains(&print) && !print.contains("0123"));
+        assert_eq!(fingerprint(key), print);
+        assert_ne!(fingerprint("motn-key-0123456789abcdeg"), print);
+        assert_eq!(fingerprint(""), "");
+    }
+
+    #[test]
+    fn concurrent_updates_never_lose_a_change() {
+        let dir = std::env::temp_dir().join(format!("luma-keys-race-{}", std::process::id()));
+        let file = path(&dir.join("preferences.json"));
+        std::thread::scope(|scope| {
+            for (motn, tmdb) in [
+                (Some("motn-key-0123456789abcdef"), None),
+                (None, Some("eyJhbGciOiJIUzI1NiJ9.e30.signature")),
+            ] {
+                let file = &file;
+                scope.spawn(move || {
+                    update(file, |keys| {
+                        Ok(merge_from_home_assistant(keys, motn, tmdb).0)
+                    })
+                    .unwrap();
+                });
+            }
+        });
+        let keys = load(&file);
+        assert_eq!(keys.motn, "motn-key-0123456789abcdef");
+        assert_eq!(keys.tmdb, "eyJhbGciOiJIUzI1NiJ9.e30.signature");
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

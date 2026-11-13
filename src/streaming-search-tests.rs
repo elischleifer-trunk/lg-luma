@@ -8,6 +8,8 @@ struct Fixtures {
     calls: Mutex<Vec<String>>,
     tmdb_down: bool,
     no_tmdb: bool,
+    /// TMDB search works but every details request fails (a timeout or 429).
+    details_down: bool,
 }
 
 fn missing() -> Error {
@@ -71,9 +73,18 @@ impl Source for Fixtures {
         )
     }
     fn movie(&self, id: i64) -> Result<MovieDetailsResponse, Error> {
+        if self.details_down {
+            return Err(Error::Status {
+                status: 429,
+                message: "Too many requests".into(),
+            });
+        }
         self.read("tmdb", &format!("movie-{id}"))
     }
     fn series(&self, id: i64) -> Result<TvSeriesDetailsResponse, Error> {
+        if self.details_down {
+            return Err(Error::Network("timeout".into()));
+        }
         self.read("tmdb", &format!("tv-{id}"))
     }
     fn collection(&self, id: i64) -> Result<CollectionDetailsResponse, Error> {
@@ -212,4 +223,30 @@ fn generated_types_survive_the_cache_round_trip() {
         serde_json::from_slice(&serde_json::to_vec(&movie).unwrap()).unwrap();
     assert_eq!(shows_again, shows);
     assert_eq!(movie_again, movie);
+}
+
+#[test]
+fn titles_whose_details_fail_are_kept_after_the_ranked_ones() {
+    let source = Fixtures {
+        details_down: true,
+        ..Default::default()
+    };
+    let results = search(&source, "the office", "us", &Services::default()).unwrap();
+    let shows = source.search("the office", "us").unwrap();
+    let summary: Vec<String> = source
+        .tmdb_search("the office")
+        .unwrap()
+        .unwrap()
+        .iter()
+        .filter_map(|r| Some(format!("{}/{}", r.media_type.as_deref()?, r.id?)))
+        .collect();
+    let undescribed: Vec<&str> = shows
+        .iter()
+        .map(|show| show.tmdb_id.as_str())
+        .filter(|id| !summary.iter().any(|known| known == id))
+        .collect();
+    assert!(!undescribed.is_empty());
+    let found = ids(&results);
+    // Every title TMDB could not describe is still offered, at the end in API order.
+    assert_eq!(found[found.len() - undescribed.len()..], undescribed[..]);
 }

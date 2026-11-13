@@ -203,13 +203,14 @@ entity before `luma.show_camera`.
 
 ## Streaming search keys
 
-Luma's streaming search uses a Movie of the Night key (where shows stream) and a TMDB API Read
-Access Token (how prominent they are). Enter them once in Home Assistant: **Settings → Devices &
-services → Luma → Configure**. Each new key is checked with its service when you save, then sent
-to the TV. Home Assistant is their source of truth: it sends them again if the TV loses them, for
-example after a reset, or if they were changed on the TV. Clearing a field in Home Assistant
-leaves the TV's key in place. Without Home Assistant, enter them on the TV under **Settings →
-System → Streaming search keys**, which shows a QR code for your phone.
+Luma's upcoming streaming search, not on the TV yet, will use a Movie of the Night key (where shows
+stream) and a TMDB API Read Access Token (how prominent they are). Enter them once in Home
+Assistant: **Settings → Devices & services → Luma → Configure**. Each new key is checked with its
+service when you save, then sent to the TV. Home Assistant is their source of truth: it sends them
+again if the TV loses them (after a reset), holds an older key (one rotated here while the TV was
+off), or had them changed on the TV. Clearing a field in Home Assistant leaves the TV's key in
+place. Without Home Assistant, enter them on the TV under **Settings → System → Streaming search
+keys**, which shows a QR code for your phone.
 
 ## While the card is showing
 

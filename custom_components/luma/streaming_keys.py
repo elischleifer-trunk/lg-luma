@@ -8,6 +8,7 @@ changed on its own QR page. A key left empty here is never sent, so it never era
 
 from __future__ import annotations
 
+import hashlib
 import logging
 from typing import Any
 
@@ -24,6 +25,18 @@ MOTN_URL = "https://api.movieofthenight.com/v4/genres"
 MOTN_RAPIDAPI_HOST = "streaming-availability.p.rapidapi.com"
 # Ghostbusters (1984): any title works, this one is certain to exist on TMDB.
 TMDB_URL = "https://api.themoviedb.org/3/find/tt0087332?external_source=imdb_id"
+
+
+def fingerprint(key: str) -> str:
+    """The TV's short SHA-256 of a key (src/streaming-keys.rs): says whether the TV holds this
+    exact key without the key ever being sent back."""
+    return hashlib.sha256(key.encode()).hexdigest()[:16] if key else ""
+
+
+def well_formed(key: str) -> bool:
+    """The TV's own rule (`clean` in src/streaming-keys.rs): 16-1024 printable ASCII characters
+    and no spaces. A key failing it would be refused by the TV, so it is caught in the form."""
+    return 16 <= len(key) <= 1024 and all(33 <= ord(c) <= 126 for c in key)
 
 
 def keys(options: dict[str, Any]) -> tuple[str, str]:
@@ -54,29 +67,39 @@ async def _refused(hass: HomeAssistant, url: str, headers: dict[str, str]) -> bo
 
 
 async def check(hass: HomeAssistant, motn: str, tmdb: str) -> dict[str, str]:
-    """Form errors for keys their service refuses; empty keys are not checked."""
+    """Form errors for malformed keys and keys their service refuses; empty keys are skipped."""
     errors = {}
-    if motn and await _refused(hass, *_motn_request(motn)):
+    if motn and not well_formed(motn):
+        errors[CONF_MOTN_KEY] = "malformed"
+    elif motn and await _refused(hass, *_motn_request(motn)):
         errors[CONF_MOTN_KEY] = "motn_refused"
-    if tmdb and await _refused(hass, TMDB_URL, {"Authorization": f"Bearer {tmdb}"}):
+    if tmdb and not well_formed(tmdb):
+        errors[CONF_TMDB_TOKEN] = "malformed"
+    elif tmdb and await _refused(hass, TMDB_URL, {"Authorization": f"Bearer {tmdb}"}):
         errors[CONF_TMDB_TOKEN] = "tmdb_refused"
     return errors
 
 
 def needs_push(options: dict[str, Any], status: dict[str, Any]) -> bool:
-    """Whether a TV's status shows it lacks a key Home Assistant holds, or its keys were last
-    set on the TV itself. TVs without streaming search report nothing and are left alone."""
+    """Whether a TV lacks a key Home Assistant holds, holds a different one (rotated here while
+    the TV was off, or changed on the TV), or had its keys last set on the TV itself. TVs
+    without streaming search report nothing and are left alone."""
     held = status.get("streaming_keys")
     if not isinstance(held, dict):
         return False
     motn, tmdb = keys(options)
     if not (motn or tmdb):
         return False
-    return (
-        (bool(motn) and not held.get("motn"))
-        or (bool(tmdb) and not held.get("tmdb"))
-        or not held.get("home_assistant")
-    )
+    for name, key in (("motn", motn), ("tmdb", tmdb)):
+        if not key:
+            continue
+        if not held.get(name):
+            return True
+        # Older Luma builds report presence only.
+        on_tv = held.get(f"{name}_fingerprint")
+        if on_tv is not None and on_tv != fingerprint(key):
+            return True
+    return not held.get("home_assistant")
 
 
 async def push(client: LumaClient, options: dict[str, Any]) -> None:

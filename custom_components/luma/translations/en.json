@@ -39,7 +39,7 @@
     "step": {
       "init": {
         "title": "Streaming search keys",
-        "description": "Luma's search finds where shows stream with Movie of the Night and ranks them with TMDB. Keys are checked when saved, then sent to the TV, and again if the TV loses them or they are changed on the TV. Clearing a field here does not remove the TV's key.",
+        "description": "For Luma's upcoming streaming search, which will find where shows stream with Movie of the Night and rank them with TMDB. Keys are checked when saved, then sent to the TV, and again if the TV loses them or they are changed on the TV. Clearing a field here does not remove the TV's key.",
         "data": {
           "motn_api_key": "Movie of the Night API key",
           "tmdb_read_access_token": "TMDB API Read Access Token"
@@ -51,6 +51,7 @@
       }
     },
     "error": {
+      "malformed": "This doesn't look like a complete key: keys are at least 16 characters with no spaces.",
       "motn_refused": "Movie of the Night refused this key. Check it is complete and the subscription is active.",
       "tmdb_refused": "TMDB refused this token. Use the API Read Access Token, not the API key."
     }

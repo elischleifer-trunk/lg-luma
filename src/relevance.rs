@@ -390,6 +390,13 @@ pub fn rank(
     let Some(enrichment) = enrichment else {
         return streaming::rank(shows, country, services);
     };
+    // Titles TMDB could not describe (a failed details request, or no TMDB ID) are not
+    // dropped: only TMDB data that is present can rule a title out. They follow the ranked
+    // titles in Movie of the Night's order.
+    let unknown: Vec<&Show> = shows
+        .iter()
+        .filter(|show| enrichment.get(show).is_none())
+        .collect();
     let mut candidates: Vec<Candidate> = shows
         .iter()
         .filter_map(|show| {
@@ -477,10 +484,12 @@ pub fn rank(
 
     ordered
         .into_iter()
-        .map(|candidate| {
-            let (pick, also_included) = streaming::pick(&candidate.show, country, services);
+        .map(|candidate| candidate.show)
+        .chain(unknown.into_iter().cloned())
+        .map(|show| {
+            let (pick, also_included) = streaming::pick(&show, country, services);
             Ranked {
-                show: candidate.show,
+                show,
                 pick,
                 also_included,
             }

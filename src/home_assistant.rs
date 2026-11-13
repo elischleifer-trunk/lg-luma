@@ -742,11 +742,18 @@ impl<T: Tv> Api<T> {
                             // Assistant set them, so it pushes its keys again after a reset or
                             // a change on the TV. Never the keys themselves.
                             "streaming_keys": self.streaming_keys_path().map(|path| {
-                                let status = crate::streaming_keys::load(&path).status();
+                                let keys = crate::streaming_keys::load(&path);
+                                let status = keys.status();
                                 json!({
                                     "motn": status.motn,
                                     "tmdb": status.tmdb,
                                     "home_assistant": status.home_assistant,
+                                    // Short SHA-256s, so a key rotated while the TV was off
+                                    // is noticed and sent again.
+                                    "motn_fingerprint":
+                                        crate::streaming_keys::fingerprint(&keys.motn),
+                                    "tmdb_fingerprint":
+                                        crate::streaming_keys::fingerprint(&keys.tmdb),
                                 })
                             }),
                         }),
@@ -993,17 +1000,26 @@ impl<T: Tv> Api<T> {
             (Ok(motn), Ok(tmdb)) => (motn, tmdb),
             (Err(reply), _) | (_, Err(reply)) => return reply,
         };
-        let current = crate::streaming_keys::load(&path);
-        let next = match crate::streaming_keys::merge_from_home_assistant(&current, motn, tmdb) {
-            Ok(next) => next,
-            Err(message) => return error(400, &message),
-        };
-        if next != current {
-            if let Err(message) = crate::streaming_keys::save(&path, &next) {
+        let mut errors = Vec::new();
+        let result = crate::streaming_keys::update(&path, |current| {
+            let (next, invalid) =
+                crate::streaming_keys::merge_from_home_assistant(current, motn, tmdb);
+            errors = invalid;
+            Ok(next)
+        });
+        let (current, next) = match result {
+            Ok(keys) => keys,
+            Err(message) => {
                 eprintln!("Luma Home Assistant: could not save streaming keys: {message}");
                 return error(500, "Could not save the keys");
             }
+        };
+        if next != current {
             let _ = self.events.send(Event::StreamingKeys(next.status()));
+        }
+        // Valid keys are saved even when the other one is malformed.
+        if !errors.is_empty() {
+            return error(400, &errors.join("; "));
         }
         let status = next.status();
         reply(200, json!({"motn": status.motn, "tmdb": status.tmdb}))
@@ -1259,7 +1275,13 @@ impl<T: Tv> Api<T> {
 
 /// Atomically replaces `path` with a file only Luma can read (mode 0600 on Unix).
 pub(crate) fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
-    let temporary = path.with_extension(format!("json.new-{}", std::process::id()));
+    // Unique per call: the keys file has writers on more than one thread.
+    static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+    let temporary = path.with_extension(format!(
+        "json.new-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
     let mut options = std::fs::OpenOptions::new();
     options.write(true).create(true).truncate(true);
     #[cfg(unix)]
