@@ -20,6 +20,7 @@ body {
 
 .card[hidden],
 .video[hidden],
+.video-cover[hidden],
 .video-badge[hidden] {
   display: none;
 }
@@ -172,6 +173,18 @@ h1 {
 
 .video.playing video {
   opacity: 1;
+}
+
+/* The camera's latest snapshot over the video until it plays: webOS shows hardware video on a
+   plane behind the page, which is black until the first frame decodes. */
+.video-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
 }
 
 .video-badge {

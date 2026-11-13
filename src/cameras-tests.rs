@@ -371,10 +371,12 @@ fn an_enlarged_camera_plays_home_assistants_hls_video_over_the_mjpeg_stream() {
     assert_eq!(state.cameras.video, Video::Playing("0/camera.a".into()));
     assert_eq!(
         state.cameras.play.take(),
-        Some((
-            "http://ha:8123/api/hls/x/master_playlist.m3u8".into(),
-            "a".into()
-        ))
+        Some(VideoRequest {
+            url: "http://ha:8123/api/hls/x/master_playlist.m3u8".into(),
+            title: "a".into(),
+            // The overlay shows the camera's snapshots until the video plays.
+            snapshot: Some("http://ha/snap/a".into()),
+        })
     );
     // The stream keeps running underneath: it shows until the overlay's video plays.
     assert!(matches!(

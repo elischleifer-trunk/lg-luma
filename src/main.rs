@@ -1276,8 +1276,8 @@ fn run() -> Result<(), String> {
         if let Some((id, endpoint)) = state.cameras.resolve.take() {
             camera_service.resolve(id, endpoint);
         }
-        if let Some((url, title)) = state.cameras.play.take() {
-            home_assistant.show_video(url, title);
+        if let Some(video) = state.cameras.play.take() {
+            home_assistant.show_video(video);
         }
         if std::mem::take(&mut state.cameras.stop_video) {
             home_assistant.close_video();

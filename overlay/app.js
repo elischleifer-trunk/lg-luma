@@ -11,10 +11,14 @@
   var bar = document.getElementById('bar');
   var videoView = document.getElementById('video');
   var player = document.getElementById('player');
-  var videoStatus = document.getElementById('video-status');
+  var videoCover = document.getElementById('video-cover');
   var videoLive = document.getElementById('video-live');
   // A video that shows nothing by then gives the screen back to Luma's motion-JPEG stream.
   var VIDEO_WAIT_MS = 15000;
+  // The cover comes off once the video has played this long, so its first frames are on screen.
+  var VIDEO_SETTLE_S = 0.3;
+  // Cover snapshots load back to back, at most this often.
+  var COVER_GAP_MS = 250;
   var hls = null;
   var current = null;
   var timers = [];
@@ -124,7 +128,10 @@
       hls = null;
     }
     player.onplaying = null;
+    player.ontimeupdate = null;
     player.onerror = null;
+    videoCover.hidden = true;
+    videoCover.removeAttribute('src');
     player.pause();
     player.removeAttribute('src');
     try {
@@ -160,23 +167,70 @@
     document.head.appendChild(script);
   }
 
-  // hls.js plays HLS through Media Source Extensions where the TV's own player cannot.
-  function playWithHlsJs(settings) {
+  function nativeHls() {
+    return !!(player.canPlayType && player.canPlayType('application/vnd.apple.mpegurl'));
+  }
+
+  // The TV's own player: it may ignore Home Assistant's low-latency parts and wait for whole
+  // segments, so it is the fallback.
+  function playNative(settings, isPlaying) {
+    player.onerror = function () {
+      player.onerror = null;
+      dismiss(true);
+    };
+    if (isPlaying()) return;
+    player.src = settings.url;
+    start();
+  }
+
+  // hls.js first: it reads Home Assistant's low-latency HLS parts, so the video starts within a
+  // couple of seconds and stays close to live. It plays through Media Source Extensions.
+  function playWithHlsJs(settings, isPlaying) {
     loadHls(function (Hls) {
       if (closing || current !== settings) return;
       if (!Hls || !Hls.isSupported()) {
-        dismiss(true);
+        if (nativeHls()) playNative(settings, isPlaying);
+        else dismiss(true);
         return;
       }
-      player.removeAttribute('src');
-      hls = new Hls({ lowLatencyMode: true, backBufferLength: 10 });
+      hls = new Hls({
+        lowLatencyMode: true,
+        backBufferLength: 10,
+        maxBufferLength: 10,
+      });
       hls.on(Hls.Events.ERROR, function (_event, data) {
-        if (data && data.fatal) dismiss(true);
+        if (!data || !data.fatal) return;
+        hls.destroy();
+        hls = null;
+        // Before anything played, the TV's own player gets a try.
+        if (!isPlaying() && nativeHls()) playNative(settings, isPlaying);
+        else dismiss(true);
       });
       hls.on(Hls.Events.MANIFEST_PARSED, start);
       hls.loadSource(settings.url);
       hls.attachMedia(player);
     });
+  }
+
+  // The camera's snapshots, refreshed, over the video until it plays.
+  function cover(settings) {
+    if (!settings.snapshot) return;
+    function next() {
+      if (closing || current !== settings || videoView.className === 'video playing') return;
+      var started = Date.now();
+      var image = new Image();
+      image.onload = function () {
+        if (current !== settings || videoView.className === 'video playing') return;
+        videoCover.src = image.src;
+        videoCover.hidden = false;
+        timers.push(setTimeout(next, Math.max(0, COVER_GAP_MS - (Date.now() - started))));
+      };
+      image.onerror = function () {
+        timers.push(setTimeout(next, 1000));
+      };
+      image.src = logic.frameUrl(settings.snapshot, Date.now());
+    }
+    next();
   }
 
   function playVideo(settings) {
@@ -187,34 +241,31 @@
     closing = false;
     current = settings;
     document.getElementById('video-title').textContent = settings.title;
-    videoStatus.hidden = false;
     videoLive.hidden = true;
     videoView.hidden = false;
     var playing = false;
-    player.onplaying = function () {
+    var startedAt = null;
+    // Shown once the video has advanced a little past its first frame, so the cover never
+    // gives way to the black video plane.
+    player.ontimeupdate = function () {
+      if (playing) return;
+      if (startedAt === null) startedAt = player.currentTime;
+      if (player.currentTime - startedAt < VIDEO_SETTLE_S) return;
       playing = true;
       videoView.className = 'video playing';
-      videoStatus.hidden = true;
+      videoCover.hidden = true;
       videoLive.hidden = false;
     };
+    function isPlaying() {
+      return playing;
+    }
     timers.push(
       setTimeout(function () {
         if (!playing) dismiss(true);
       }, VIDEO_WAIT_MS)
     );
-    // The TV's own player first, where it says it plays HLS; hls.js otherwise or if it fails.
-    var native = player.canPlayType && player.canPlayType('application/vnd.apple.mpegurl');
-    if (native) {
-      player.onerror = function () {
-        player.onerror = null;
-        if (playing) dismiss(true);
-        else playWithHlsJs(settings);
-      };
-      player.src = settings.url;
-      start();
-    } else {
-      playWithHlsJs(settings);
-    }
+    cover(settings);
+    playWithHlsJs(settings, isPlaying);
   }
 
   function show(settings) {

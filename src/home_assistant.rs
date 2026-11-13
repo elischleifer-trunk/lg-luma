@@ -938,7 +938,7 @@ impl<T: Tv> Api<T> {
 
     /// Plays a camera's HLS stream full screen in the overlay app, above the Cameras gallery.
     /// Whatever happens, the gallery hears back through [`Event::VideoClosed`].
-    pub fn show_video(&mut self, url: &str, title: &str, now: Instant) {
+    pub fn show_video(&mut self, video: &crate::cameras::VideoRequest, now: Instant) {
         let failed = |api: &mut Self| {
             let _ = api.events.send(Event::VideoClosed { failed: true });
         };
@@ -958,8 +958,9 @@ impl<T: Tv> Api<T> {
             "session": id,
             "nonce": nonce,
             "port": PORT,
-            "url": url,
-            "title": title,
+            "url": video.url,
+            "title": video.title,
+            "snapshot": video.snapshot,
         });
         self.session = Some(Session {
             id,
@@ -1027,7 +1028,7 @@ enum Command {
     Disable,
     ShowCameras,
     Arrange(Value),
-    Video { url: String, title: String },
+    Video(crate::cameras::VideoRequest),
     CloseVideo,
 }
 
@@ -1063,9 +1064,9 @@ impl Service {
     }
 
     /// Plays a camera's HLS stream in the overlay app; the result is [`Event::VideoClosed`].
-    pub fn show_video(&self, url: String, title: String) {
+    pub fn show_video(&self, video: crate::cameras::VideoRequest) {
         if self.enabled {
-            let _ = self.commands.send(Command::Video { url, title });
+            let _ = self.commands.send(Command::Video(video));
         }
     }
 
@@ -1143,7 +1144,7 @@ fn run<T: Tv>(
                 api.forget();
             }
             Some(Command::ShowCameras) => api.show_cameras(),
-            Some(Command::Video { url, title }) => api.show_video(&url, &title, Instant::now()),
+            Some(Command::Video(video)) => api.show_video(&video, Instant::now()),
             Some(Command::CloseVideo) => api.close_video(),
             Some(Command::Arrange(arrangement)) => {
                 let saved = api.arrange(&arrangement);

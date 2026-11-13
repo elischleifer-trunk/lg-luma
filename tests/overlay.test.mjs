@@ -78,6 +78,7 @@ test('a camera video needs an http(s) playlist and keeps its session for reporti
       video({
         mode: 'video',
         url: 'http://ha:8123/api/hls/x/master_playlist.m3u8',
+        snapshot: 'http://ha:8123/api/camera_proxy/camera.door?token=t',
         title: 'Front door',
         session: 's',
         nonce: 'n',
@@ -89,8 +90,14 @@ test('a camera video needs an http(s) playlist and keeps its session for reporti
       nonce: 'n',
       port: 5862,
       url: 'http://ha:8123/api/hls/x/master_playlist.m3u8',
+      snapshot: 'http://ha:8123/api/camera_proxy/camera.door?token=t',
       title: 'Front door',
     },
+  );
+  // A cover snapshot that is not http(s) is left out.
+  assert.equal(
+    video({ mode: 'video', url: 'http://ha/x.m3u8', snapshot: 'javascript:alert(1)' }).snapshot,
+    null,
   );
   assert.equal(video({ mode: 'video', url: 'javascript:alert(1)' }), null);
   assert.equal(video({ url: 'http://ha/x.m3u8' }), null);

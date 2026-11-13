@@ -485,10 +485,14 @@ camera with **Live video** on sets `cameras::Video::Resolving`; `cameras::Servic
 that endpoint off the SDL thread, and the answer makes the Home Assistant thread launch the
 overlay app with `mode: "video"` (`Api::show_video`); the motion-JPEG worker keeps running
 underneath. `luma.dismiss` (`DELETE /api/overlay`) closes only a doorbell card, never a camera video.
-The page plays the playlist in a `<video>` with the TV's own HLS support, or with the bundled
-hls.js light build (1.5.20, ES5, Apache-2.0, `overlay/vendor/`) through Media Source
-Extensions; HLS views allow any origin, so the `file://` page may fetch them. It stays
-transparent until the video plays, so Luma's own picture shows meanwhile. Back or OK closes it
+The page plays the playlist with the bundled hls.js light build (1.5.20, ES5, Apache-2.0,
+`overlay/vendor/`) through Media Source Extensions: it reads Home Assistant's low-latency HLS
+parts (about 1 s) instead of waiting for whole segments (about 6 s), so the video starts in a
+couple of seconds and stays close to live. The TV's own HLS player is the fallback; it
+started after about 12 s on a TV. HLS views allow any origin, so the `file://` page may fetch
+them. webOS shows hardware video on a plane behind the page, black until the first frame
+decodes, so the page covers it with the camera's snapshots (the `snapshot` parameter,
+refreshed back to back) and uncovers it once playback has advanced 0.3 s. Back or OK closes it
 and reports closing, which also leaves the enlarged camera (`Event::VideoClosed`); a stream that
 fails, or shows nothing within 15 s, reports `failed`, and that camera stays on the motion-JPEG
 stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma
