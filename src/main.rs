@@ -1265,7 +1265,7 @@ fn run() -> Result<(), String> {
             };
             state.notify(notice);
         }
-        if !state.preferences.home_assistant && state.cameras_open() {
+        if !state.preferences.home_assistant && state.cameras_visible() {
             state.close_cameras();
         }
         if let Some(arrangement) = state.cameras.save.take() {
@@ -1993,7 +1993,7 @@ fn run() -> Result<(), String> {
             || assets.artwork.pending()
         {
             8
-        } else if state.cameras_open() {
+        } else if state.cameras_visible() {
             // Camera frames arrive from worker threads, not as SDL events.
             16
         } else if !prewarm.is_empty() {
