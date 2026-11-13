@@ -827,12 +827,25 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
         h.api.store().gallery.parked[0].names["camera.door"],
         "Front"
     );
-    // Turning Home Assistant off forgets every pairing but parks the arrangement.
+    // Turning Home Assistant off forgets every pairing but parks the arrangement. Both servers
+    // paired as "HA" without an instance ID, so both arrangements are kept, not one lost.
     h.api.forget();
     let gallery = &h.api.store().gallery;
     assert!(gallery.order.is_empty() && gallery.hidden.is_empty() && gallery.names.is_empty());
-    assert_eq!(gallery.parked.len(), 1);
-    assert_eq!(gallery.parked[0].hidden, ["camera.door"]);
+    assert_eq!(gallery.parked.len(), 2);
+    assert_eq!(gallery.parked[1].hidden, ["camera.door"]);
+    // Which "HA" pairs again cannot be told, so it gets neither arrangement rather than
+    // possibly the other server's.
+    let token = pair_as(&mut h, "HA", None);
+    h.call(
+        "POST",
+        "/api/cameras",
+        Some(&token),
+        json!({"cameras": [{"id": "camera.door", "snapshot_url": "http://ha/door"}]}),
+    );
+    assert_eq!(h.api.gallery()[0].label, None);
+    assert!(!h.api.gallery()[0].hidden);
+    assert_eq!(h.api.store().gallery.parked.len(), 2);
 }
 
 /// Pairs as the server `name`, optionally with a Home Assistant instance ID.

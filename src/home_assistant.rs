@@ -195,13 +195,15 @@ pub struct Parked {
     pub names: std::collections::BTreeMap<String, String>,
 }
 
-/// Whether two pairings are the same Home Assistant server: by instance ID when both sent one,
-/// otherwise by the name it pairs under.
-fn same_server(server: &str, name: &str, other_server: &str, other_name: &str) -> bool {
-    if server.is_empty() || other_server.is_empty() {
-        name == other_name
-    } else {
-        server == other_server
+impl Parked {
+    /// Whether this is the arrangement of `client`, which is pairing again. The instance ID
+    /// decides when both have one; an arrangement with a different ID is another server.
+    fn belongs_to(&self, client: &Client) -> bool {
+        if self.server.is_empty() || client.server.is_empty() {
+            self.name == client.name
+        } else {
+            self.server == client.server
+        }
     }
 }
 
@@ -225,9 +227,10 @@ impl Gallery {
         self.order.retain(|id| !id.starts_with(&prefix));
         self.hidden.retain(|id| !id.starts_with(&prefix));
         self.names.retain(|id, _| !id.starts_with(&prefix));
-        // The newest arrangement replaces an older one for the same server.
+        // The newest arrangement replaces an older one for the same server. Without instance
+        // IDs, two servers can share a name, so both are kept rather than one lost.
         self.parked
-            .retain(|old| !same_server(&old.server, &old.name, &parked.server, &parked.name));
+            .retain(|old| parked.server.is_empty() || old.server != parked.server);
         if !parked.order.is_empty() || !parked.hidden.is_empty() || !parked.names.is_empty() {
             self.parked.push(parked);
         }
@@ -237,9 +240,27 @@ impl Gallery {
 
     /// The server just paired at `index` gets back the arrangement it had, if any.
     fn restore(&mut self, index: usize, client: &Client) {
-        let Some(position) = self.parked.iter().position(|parked| {
-            same_server(&parked.server, &parked.name, &client.server, &client.name)
-        }) else {
+        // An instance ID match is certain. A match by name only counts when no other parked
+        // server shares that name, so one server never gets another's arrangement.
+        let by_id = (!client.server.is_empty())
+            .then(|| {
+                self.parked
+                    .iter()
+                    .position(|parked| parked.server == client.server)
+            })
+            .flatten();
+        let position = by_id.or_else(|| {
+            let mut named = self
+                .parked
+                .iter()
+                .enumerate()
+                .filter(|(_, parked)| parked.belongs_to(client));
+            match (named.next(), named.next()) {
+                (Some((position, _)), None) => Some(position),
+                _ => None,
+            }
+        });
+        let Some(position) = position else {
             return;
         };
         let parked = self.parked.remove(position);

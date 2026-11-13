@@ -424,7 +424,7 @@ pub struct Preferences {
 
 /// Settings older builds saved and Luma no longer uses. They are dropped when preferences are
 /// read rather than kept as settings from a newer Luma. Add a key here when removing a field.
-const RETIRED_SETTINGS: &[&str] = &["wallpaper_skip"];
+const RETIRED_SETTINGS: &[&str] = &["show_names", "wallpaper_skip"];
 
 fn deserialize_extra<'de, D: serde::Deserializer<'de>>(
     deserializer: D,

@@ -3571,6 +3571,7 @@ fn preferences_keep_settings_from_a_newer_luma() {
         "input_modes": {"com.webos.app.hdmi1": "On"},
         "apps_only_inputs": ["com.webos.app.hdmi2"],
         "a_future_setting": {"on": true},
+        "show_names": true,
     }))
     .unwrap();
     preferences.sanitize();

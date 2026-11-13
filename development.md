@@ -426,7 +426,7 @@ digests of tokens with mode 0600. Turning the setting off closes the listener, c
 and forgets every pairing, but not the camera arrangement: each server's entries move to
 `Gallery::parked` (by entity ID) and are restored when the same server pairs again, matched by
 the Home Assistant instance ID the integration sends as `server`, or by its name when either side
-has none. Unpairing one server parks its entries the same way; at most 16 are kept. Requests with
+has none and no other parked server shares that name. Unpairing one server parks its entries the same way; at most 16 are kept. Requests with
 an `Origin` header are refused, except the overlay page's
 close report, which must come from loopback with the session's random nonce.
 
