@@ -139,7 +139,7 @@ This fork mirrors every published release to Cloudflare R2; see
 On your computer, replace `TV_IP`:
 
 ```sh
-scp -O dist/com.ecklf.luma_2.26.0_arm.ipk root@TV_IP:/tmp/luma.ipk
+scp -O dist/com.ecklf.luma_2.27.0_arm.ipk root@TV_IP:/tmp/luma.ipk
 ssh root@TV_IP
 ```
 
@@ -310,7 +310,7 @@ checksum-pinned SDL-webOS library; both downloads are cached under `.build/`.
 Output:
 
 ```text
-dist/com.ecklf.luma_2.26.0_arm.ipk
+dist/com.ecklf.luma_2.27.0_arm.ipk
 dist/sha256sums
 dist/repo.json
 dist/app-icon-large.png
