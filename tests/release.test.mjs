@@ -112,7 +112,7 @@ test('release bumps default to the next minor version and synchronize every file
 });
 
 test("R2 mirror rewrites only this release's asset URLs", () => {
-  const gh = 'https://github.com/EliSchleifer/lg-luma/releases/download/v2.16.2';
+  const gh = 'https://github.com/elischleifer-trunk/lg-luma/releases/download/v2.16.2';
   const feed = {
     packages: [
       {
