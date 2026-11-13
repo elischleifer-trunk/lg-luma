@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 
 import pytest
@@ -195,6 +196,88 @@ async def test_show_camera_sends_signed_proxy_urls_and_options(
     assert "stream_url" not in payload
     assert payload["snapshot_url"] == "http://nvr:1984/api/frame.jpeg?src=door"
     assert payload["refresh"] == 2.0
+
+
+async def test_video_mode_sends_the_cameras_hls_playlist_with_mjpeg_fallbacks(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    await setup(hass, aioclient_mock)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    hass.config.components.add("stream")
+    streams = {"supported_features": 2}
+    door = {"access_token": "d1", "friendly_name": "Door", **streams}
+    hass.states.async_set("camera.door", "idle", door)
+    hass.states.async_set(
+        "camera.still", "idle", {"access_token": "s1", "friendly_name": "Still", **streams}
+    )
+    hass.states.async_set("camera.yard", "idle", {"access_token": "y1", "friendly_name": "Yard"})
+    requested = []
+
+    # How camera.still fails to start a stream; None makes it too slow instead.
+    still: dict[str, Exception | None] = {
+        "failure": HomeAssistantError("camera.still does not support play stream service")
+    }
+
+    async def request_stream(hass_: HomeAssistant, entity_id: str) -> str:
+        requested.append(entity_id)
+        if entity_id == "camera.still":
+            if still["failure"] is None:
+                await asyncio.sleep(1)
+            else:
+                raise still["failure"]
+        return "/api/hls/abc/master_playlist.m3u8"
+
+    monkeypatch.setattr("custom_components.luma._request_stream", request_stream)
+    monkeypatch.setattr("custom_components.luma.HLS_START_TIMEOUT", 0.05)
+    aioclient_mock.post(f"{TV}/api/overlay", json={"session": "s", "paused": False})
+
+    await hass.services.async_call(
+        DOMAIN, "show_camera", {"camera": "camera.door", "mode": "video"}, blocking=True
+    )
+    payload = aioclient_mock.mock_calls[-1][2]
+    assert payload["hls_url"] == "http://192.168.1.10:8123/api/hls/abc/master_playlist.m3u8"
+    assert payload["stream_url"] == (
+        "http://192.168.1.10:8123/api/camera_proxy_stream/camera.door?token=d1"
+    )
+    assert (
+        payload["snapshot_url"] == "http://192.168.1.10:8123/api/camera_proxy/camera.door?token=d1"
+    )
+
+    # A camera that cannot stream shows its motion-JPEG, as in stream mode.
+    await hass.services.async_call(
+        DOMAIN, "show_camera", {"camera": "camera.still", "mode": "video"}, blocking=True
+    )
+    payload = aioclient_mock.mock_calls[-1][2]
+    assert "hls_url" not in payload
+    assert payload["stream_url"].startswith("http://192.168.1.10:8123/api/camera_proxy_stream/")
+
+    # Any other failure, or a stream that takes too long to start, never holds back the card.
+    for failure in (OSError("camera cloud unreachable"), None):
+        still["failure"] = failure
+        await hass.services.async_call(
+            DOMAIN, "show_camera", {"camera": "camera.still", "mode": "video"}, blocking=True
+        )
+        payload = aioclient_mock.mock_calls[-1][2]
+        assert "hls_url" not in payload
+        assert payload["stream_url"].startswith("http://192.168.1.10:8123/")
+
+    # Video is the default; stream mode never starts an HLS stream.
+    await hass.services.async_call(DOMAIN, "show_camera", {"camera": "camera.door"}, blocking=True)
+    assert "hls_url" in aioclient_mock.mock_calls[-1][2]
+    await hass.services.async_call(
+        DOMAIN, "show_camera", {"camera": "camera.door", "mode": "stream"}, blocking=True
+    )
+    assert "hls_url" not in aioclient_mock.mock_calls[-1][2]
+    # A camera without the stream feature never asks for one.
+    await hass.services.async_call(DOMAIN, "show_camera", {"camera": "camera.yard"}, blocking=True)
+    assert "hls_url" not in aioclient_mock.mock_calls[-1][2]
+    assert requested == [
+        "camera.door",
+        "camera.still",
+        "camera.still",
+        "camera.still",
+        "camera.door",
+    ]
 
 
 async def test_show_camera_rejects_non_cameras_and_missing_sources(

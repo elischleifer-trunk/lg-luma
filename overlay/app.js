@@ -1,7 +1,8 @@
 // Luma's camera overlay: a transparent webOS "overlay" window, so the app underneath keeps
 // playing. Luma launches (or relaunches) it with the camera details as launch parameters and
 // shows one doorbell-style card, or (mode "video") an enlarged camera from Luma's Cameras app as
-// Home Assistant's HLS video, full screen, decoded by the TV.
+// Home Assistant's HLS video, full screen, decoded by the TV. A card given an HLS playlist plays
+// it too, muted, over its motion-JPEG feed once the video is playing.
 (function () {
   'use strict';
   var logic = window.LumaOverlay;
@@ -13,15 +14,22 @@
   var player = document.getElementById('player');
   var videoCover = document.getElementById('video-cover');
   var videoLive = document.getElementById('video-live');
-  // A video that shows nothing by then gives the screen back to Luma's motion-JPEG stream.
+  var cardVideo = document.getElementById('card-video');
+  // A video that shows nothing by then gives the screen back to the motion-JPEG stream.
   var VIDEO_WAIT_MS = 15000;
-  // The cover comes off once the video has played this long, so its first frames are on screen.
+  // A playing video whose picture stops moving this long has stalled for good.
+  var VIDEO_STALL_MS = 10000;
+  // The Cameras video's cover comes off once it has played this long, so its first frames show.
   var VIDEO_SETTLE_S = 0.3;
   // Cover snapshots load back to back, at most this often.
   var COVER_GAP_MS = 250;
-  var hls = null;
+  var video = null;
+  var cardPlayback = null;
   var current = null;
   var timers = [];
+  var feedTimer = null;
+  // Bumped by stopFeed, so snapshot frames still loading from an earlier feed are dropped.
+  var feedRun = 0;
   var closing = false;
   var closeTimer = null;
 
@@ -84,7 +92,8 @@
     if (closing) return;
     closing = true;
     clearTimers();
-    feed.removeAttribute('src');
+    stopFeed();
+    stopCardVideo();
     card.hidden = true;
     stopVideo();
     report(current, failed);
@@ -101,55 +110,70 @@
 
   function snapshots(settings) {
     var loading = false;
+    var run = feedRun;
     function next() {
       if (loading) return;
       loading = true;
       var image = new Image();
       image.onload = function () {
+        if (run !== feedRun) return;
         loading = false;
         feed.src = image.src;
         showStatus('');
       };
       image.onerror = function () {
+        if (run !== feedRun) return;
         loading = false;
         showStatus('Camera unavailable');
       };
       image.src = logic.frameUrl(settings.snapshot, Date.now());
     }
     next();
-    timers.push(setInterval(next, settings.refresh * 1000));
+    feedTimer = setInterval(next, settings.refresh * 1000);
   }
 
-  // ---- Camera video (Cameras app) ----------------------------------------------------------
-
-  function stopVideo() {
-    if (hls) {
-      hls.destroy();
-      hls = null;
+  // The card's motion-JPEG stream, falling back to snapshots.
+  function startFeed(settings) {
+    stopFeed();
+    showStatus('Connecting to camera…');
+    feed.onload = function () {
+      showStatus('');
+    };
+    feed.onerror = function () {
+      // A motion-JPEG stream that fails falls back to still snapshots when one was given.
+      // Snapshot frames are decoded before being shown, so they never reach this handler.
+      feed.onerror = null;
+      if (settings.stream && settings.snapshot) {
+        snapshots(settings);
+      } else {
+        showStatus('Camera unavailable');
+      }
+    };
+    if (settings.stream) {
+      feed.src = settings.stream;
+    } else {
+      snapshots(settings);
     }
-    player.onplaying = null;
-    player.ontimeupdate = null;
-    player.onerror = null;
-    videoCover.hidden = true;
-    videoCover.removeAttribute('src');
-    player.pause();
-    player.removeAttribute('src');
-    try {
-      player.load();
-    } catch (_error) {
-      // Nothing was loading.
-    }
-    videoView.hidden = true;
-    videoView.className = 'video';
   }
 
-  function start() {
-    var playing = player.play();
+  function stopFeed() {
+    feedRun += 1;
+    clearInterval(feedTimer);
+    feedTimer = null;
+    feed.onload = null;
+    feed.onerror = null;
+    feed.removeAttribute('src');
+  }
+
+  // ---- HLS video ---------------------------------------------------------------------------
+
+  function start(element) {
+    var playing = element.play();
     // Autoplay with sound can be refused; play muted rather than not at all.
     if (playing && playing.catch) {
       playing.catch(function () {
-        player.muted = true;
-        player.play();
+        element.muted = true;
+        element.play();
       });
     }
   }
@@ -167,49 +191,128 @@
     document.head.appendChild(script);
   }
 
-  function nativeHls() {
-    return !!(player.canPlayType && player.canPlayType('application/vnd.apple.mpegurl'));
-  }
-
-  // The TV's own player: it may ignore Home Assistant's low-latency parts and wait for whole
-  // segments, so it is the fallback.
-  function playNative(settings, isPlaying) {
-    player.onerror = function () {
-      player.onerror = null;
-      dismiss(true);
-    };
-    if (isPlaying()) return;
-    player.src = settings.url;
-    start();
-  }
-
-  // hls.js first: it reads Home Assistant's low-latency HLS parts, so the video starts within a
-  // couple of seconds and stays close to live. It plays through Media Source Extensions.
-  function playWithHlsJs(settings, isPlaying) {
-    loadHls(function (Hls) {
-      if (closing || current !== settings) return;
-      if (!Hls || !Hls.isSupported()) {
-        if (nativeHls()) playNative(settings, isPlaying);
-        else dismiss(true);
-        return;
+  // Plays an HLS playlist in a <video>: the TV's own player first, where it says it plays HLS;
+  // hls.js through Media Source Extensions otherwise or if that fails. With `options.hlsFirst`,
+  // hls.js goes first instead: it reads Home Assistant's low-latency parts, so video starts
+  // within a couple of seconds, where the TV's player may wait for whole segments. `onPlaying`
+  // runs once, when the first frame shows (with `options.settle`, once the video has advanced
+  // VIDEO_SETTLE_S); `onFail(wasPlaying)` once, when it cannot play, ends, stalls for
+  // VIDEO_STALL_MS, or shows nothing within VIDEO_WAIT_MS. `stop()` ends it without calling either.
+  function playHls(element, url, onPlaying, onFail, options) {
+    options = options || {};
+    var playback = { stopped: false, playing: false, hls: null, wait: null, watch: null };
+    var native = !!(element.canPlayType && element.canPlayType('application/vnd.apple.mpegurl'));
+    function fail() {
+      if (playback.stopped) return;
+      var wasPlaying = playback.playing;
+      playback.stop();
+      onFail(wasPlaying);
+    }
+    function withNative() {
+      element.onerror = function () {
+        element.onerror = null;
+        if (playback.playing || options.hlsFirst) fail();
+        else withHlsJs();
+      };
+      element.src = url;
+      start(element);
+    }
+    // hls.js going first hands over to the TV's player if it cannot play before anything shows.
+    function nativeFallback() {
+      if (options.hlsFirst && native && !playback.playing) withNative();
+      else fail();
+    }
+    function withHlsJs() {
+      loadHls(function (Hls) {
+        if (playback.stopped) return;
+        if (!Hls || !Hls.isSupported()) {
+          nativeFallback();
+          return;
+        }
+        element.removeAttribute('src');
+        playback.hls = new Hls({ lowLatencyMode: true, backBufferLength: 10, maxBufferLength: 10 });
+        playback.hls.on(Hls.Events.ERROR, function (_event, data) {
+          if (!data || !data.fatal) return;
+          playback.hls.destroy();
+          playback.hls = null;
+          nativeFallback();
+        });
+        playback.hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          start(element);
+        });
+        playback.hls.loadSource(url);
+        playback.hls.attachMedia(element);
+      });
+    }
+    playback.stop = function () {
+      playback.stopped = true;
+      clearTimeout(playback.wait);
+      clearInterval(playback.watch);
+      if (playback.hls) {
+        playback.hls.destroy();
+        playback.hls = null;
       }
-      hls = new Hls({
-        lowLatencyMode: true,
-        backBufferLength: 10,
-        maxBufferLength: 10,
-      });
-      hls.on(Hls.Events.ERROR, function (_event, data) {
-        if (!data || !data.fatal) return;
-        hls.destroy();
-        hls = null;
-        // Before anything played, the TV's own player gets a try.
-        if (!isPlaying() && nativeHls()) playNative(settings, isPlaying);
-        else dismiss(true);
-      });
-      hls.on(Hls.Events.MANIFEST_PARSED, start);
-      hls.loadSource(settings.url);
-      hls.attachMedia(player);
-    });
+      element.onplaying = null;
+      element.ontimeupdate = null;
+      element.onerror = null;
+      element.onended = null;
+      element.pause();
+      element.removeAttribute('src');
+      try {
+        element.load();
+      } catch (_error) {
+        // Nothing was loading.
+      }
+    };
+    function began() {
+      if (playback.playing) return;
+      playback.playing = true;
+      clearTimeout(playback.wait);
+      // A live stream that stops updating freezes on its last frame without an error event.
+      var position = element.currentTime;
+      var still = 0;
+      playback.watch = setInterval(function () {
+        if (element.currentTime !== position) {
+          position = element.currentTime;
+          still = 0;
+        } else if ((still += 1000) >= VIDEO_STALL_MS) {
+          fail();
+        }
+      }, 1000);
+      onPlaying();
+    }
+    if (options.settle) {
+      // Shown once the video has advanced a little past its first frame: webOS shows hardware
+      // video on a plane behind the page that is black until frames decode.
+      var startedAt = null;
+      element.ontimeupdate = function () {
+        if (playback.playing) return;
+        if (startedAt === null) startedAt = element.currentTime;
+        if (element.currentTime - startedAt >= VIDEO_SETTLE_S) began();
+      };
+    } else {
+      element.onplaying = began;
+    }
+    element.onended = fail;
+    playback.wait = setTimeout(function () {
+      if (!playback.playing) fail();
+    }, VIDEO_WAIT_MS);
+    if (native && !options.hlsFirst) withNative();
+    else withHlsJs();
+    return playback;
+  }
+
+  // ---- Camera video (Cameras app) ----------------------------------------------------------
+
+  function stopVideo() {
+    if (video) {
+      video.stop();
+      video = null;
+    }
+    videoCover.hidden = true;
+    videoCover.removeAttribute('src');
+    videoView.hidden = true;
+    videoView.className = 'video';
   }
 
   // The camera's snapshots, refreshed, over the video until it plays.
@@ -236,6 +339,8 @@
   function playVideo(settings) {
     cancelClose();
     clearTimers();
+    stopFeed();
+    stopCardVideo();
     stopVideo();
     card.hidden = true;
     closing = false;
@@ -243,34 +348,54 @@
     document.getElementById('video-title').textContent = settings.title;
     videoLive.hidden = true;
     videoView.hidden = false;
-    var playing = false;
-    var startedAt = null;
-    // Shown once the video has advanced a little past its first frame, so the cover never
-    // gives way to the black video plane.
-    player.ontimeupdate = function () {
-      if (playing) return;
-      if (startedAt === null) startedAt = player.currentTime;
-      if (player.currentTime - startedAt < VIDEO_SETTLE_S) return;
-      playing = true;
-      videoView.className = 'video playing';
-      videoCover.hidden = true;
-      videoLive.hidden = false;
-    };
-    function isPlaying() {
-      return playing;
-    }
-    timers.push(
-      setTimeout(function () {
-        if (!playing) dismiss(true);
-      }, VIDEO_WAIT_MS)
-    );
     cover(settings);
-    playWithHlsJs(settings, isPlaying);
+    video = playHls(
+      player,
+      settings.url,
+      function () {
+        videoView.className = 'video playing';
+        videoCover.hidden = true;
+        videoLive.hidden = false;
+      },
+      function () {
+        dismiss(true);
+      },
+      { hlsFirst: true, settle: true }
+    );
+  }
+
+  // ---- Doorbell card -----------------------------------------------------------------------
+
+  function stopCardVideo() {
+    if (cardPlayback) {
+      cardPlayback.stop();
+      cardPlayback = null;
+    }
+    card.classList.remove('playing');
+  }
+
+  // Full-frame-rate video in the card, over the motion-JPEG once it plays. The motion-JPEG stays
+  // connected underneath: its URL's camera token may have rotated by the time a long card's video
+  // fails, so reconnecting then could be refused. A video that fails just uncovers it.
+  function playCardVideo(settings) {
+    cardVideo.muted = true;
+    cardPlayback = playHls(
+      cardVideo,
+      settings.hls,
+      function () {
+        card.classList.add('playing');
+      },
+      function () {
+        cardPlayback = null;
+        card.classList.remove('playing');
+      }
+    );
   }
 
   function show(settings) {
     cancelClose();
     clearTimers();
+    stopCardVideo();
     stopVideo();
     closing = false;
     current = settings;
@@ -279,25 +404,8 @@
     var message = document.getElementById('message');
     message.textContent = settings.message;
     message.hidden = !settings.message;
-    showStatus('Connecting to camera…');
-    feed.onload = function () {
-      showStatus('');
-    };
-    feed.onerror = function () {
-      // A motion-JPEG stream that fails falls back to still snapshots when one was given.
-      // Snapshot frames are decoded before being shown, so they never reach this handler.
-      feed.onerror = null;
-      if (settings.stream && settings.snapshot) {
-        snapshots(settings);
-      } else {
-        showStatus('Camera unavailable');
-      }
-    };
-    if (settings.stream) {
-      feed.src = settings.stream;
-    } else {
-      snapshots(settings);
-    }
+    startFeed(settings);
+    if (settings.hls) playCardVideo(settings);
     // Restart the countdown animation for a replaced overlay.
     bar.style.transition = 'none';
     bar.style.transform = 'scaleX(1)';
@@ -309,9 +417,9 @@
   }
 
   function apply(params) {
-    var video = logic.video(params);
-    if (video) {
-      playVideo(video);
+    var enlarged = logic.video(params);
+    if (enlarged) {
+      playVideo(enlarged);
       return;
     }
     var settings = logic.settings(params);
@@ -325,8 +433,8 @@
   document.addEventListener('keydown', function (event) {
     // 461 is the webOS remote's Back key; Escape helps when testing in a desktop browser.
     // OK also closes a camera video, as it does an enlarged camera in Luma.
-    var video = !videoView.hidden;
-    if (event.keyCode === 461 || event.keyCode === 27 || (video && event.keyCode === 13)) {
+    var enlarged = !videoView.hidden;
+    if (event.keyCode === 461 || event.keyCode === 27 || (enlarged && event.keyCode === 13)) {
       event.preventDefault();
       dismiss();
     }

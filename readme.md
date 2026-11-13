@@ -13,7 +13,7 @@ A native launcher for rooted LG webOS TVs, inspired by Apple TV.
 > is usually discovered on its own) and type the code shown on the TV.
 > To see what the popups look like, press **Show example camera card** or **Show example toast**
 > on the TV's device page. Setup, actions and automation examples are in the
-> [Home Assistant guide](https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md).
+> [Home Assistant guide](home-assistant.md).
 > The rest of this page is about the TV app.
 
 https://github.com/user-attachments/assets/3d3564d9-5942-4aef-a726-0323f5e86a07
@@ -139,7 +139,7 @@ This fork mirrors every published release to Cloudflare R2; see
 On your computer, replace `TV_IP`:
 
 ```sh
-scp -O dist/com.ecklf.luma_2.22.0_arm.ipk root@TV_IP:/tmp/luma.ipk
+scp -O dist/com.ecklf.luma_2.23.0_arm.ipk root@TV_IP:/tmp/luma.ipk
 ssh root@TV_IP
 ```
 
@@ -304,7 +304,7 @@ checksum-pinned SDL-webOS library; both downloads are cached under `.build/`.
 Output:
 
 ```text
-dist/com.ecklf.luma_2.22.0_arm.ipk
+dist/com.ecklf.luma_2.23.0_arm.ipk
 dist/sha256sums
 dist/repo.json
 dist/app-icon-large.png

@@ -242,6 +242,8 @@ fn overlay_requests_are_validated_before_anything_reaches_the_tv() {
         json!({"snapshot_url":"http://ha/s.jpg","pause":"yes"}),
         json!({"snapshot_url":"http://ha/s.jpg","title":"x".repeat(81)}),
         json!({"snapshot_url":"http://ha/s.jpg","title":"line\nbreak"}),
+        json!({"snapshot_url":"http://ha/s.jpg","hls_url":"javascript:alert(1)"}),
+        json!({"hls_url":"http://ha/api/hls/x/master_playlist.m3u8"}),
     ] {
         let reply = h.call("POST", "/api/overlay", Some(&token), body.clone());
         assert_eq!(reply.status, 400, "{body} → {:?}", reply.body);
@@ -270,7 +272,34 @@ fn showing_launches_the_overlay_with_defaults_and_a_session_nonce() {
     assert_eq!(params["size"], "medium");
     assert_eq!(params["duration"], 30.);
     assert!(params["snapshot"].is_null());
+    assert!(params["hls"].is_null());
     assert!(!h.tv.calls().contains(&"pause".to_owned()));
+}
+
+#[test]
+fn a_card_with_an_hls_playlist_passes_it_to_the_overlay() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let mut body = camera();
+    body["hls_url"] = json!("http://ha.local:8123/api/hls/abc/master_playlist.m3u8");
+    let reply = h.call("POST", "/api/overlay", Some(&token), body);
+    assert_eq!(reply.status, 200, "{:?}", reply.body);
+    let launch =
+        h.tv.calls()
+            .into_iter()
+            .find_map(|call| call.strip_prefix("launch ").map(str::to_owned))
+            .unwrap();
+    let params: Value = serde_json::from_str(&launch).unwrap();
+    assert_eq!(
+        params["hls"],
+        "http://ha.local:8123/api/hls/abc/master_playlist.m3u8"
+    );
+    // The motion-JPEG stays as the card's picture until the video plays.
+    assert_eq!(
+        params["stream"],
+        "http://ha.local:8123/api/camera_proxy_stream/camera.door?token=abc"
+    );
+    assert!(params.get("mode").is_none());
 }
 
 #[test]
@@ -650,6 +679,8 @@ fn the_gallery_arrangement_is_saved_and_applied_to_later_lists() {
         json!({"order": "camera.a"}),
         json!({"hidden": [3]}),
         json!({"live": "no"}),
+        json!({"names": ["x"]}),
+        json!({"names": {"0/camera.a": 3}}),
     ] {
         assert_eq!(h.api.arrange(&bad).status, 400);
     }
@@ -716,6 +747,34 @@ fn the_gallery_arrangement_is_saved_and_applied_to_later_lists() {
     let gallery = &h.api.store().gallery;
     assert_eq!(gallery.order, ["0/camera.c", "0/camera.a"]);
     assert_eq!(gallery.hidden, ["0/camera.b"]);
+
+    // The owner's names are saved, trimmed, and come back as each camera's label.
+    h.api.arrange(&json!({
+        "order": ["0/camera.c", "0/camera.a", "0/camera.b"],
+        "names": {"0/camera.a": "  Porch ", "0/camera.b": "Garage", "0/camera.c": " "},
+    }));
+    let labels: Vec<_> = h
+        .api
+        .gallery()
+        .into_iter()
+        .map(|camera| (camera.id, camera.label))
+        .collect();
+    assert_eq!(
+        labels,
+        [
+            ("0/camera.c".to_owned(), None),
+            ("0/camera.a".to_owned(), Some("Porch".to_owned())),
+            ("0/camera.b".to_owned(), Some("Garage".to_owned())),
+        ]
+    );
+    // A name left out for a reported camera is removed; an unreported camera keeps its own.
+    h.api.arrange(&json!({
+        "order": ["0/camera.c", "0/camera.a"],
+        "names": {},
+    }));
+    let names = &h.api.store().gallery.names;
+    assert_eq!(names.len(), 1);
+    assert_eq!(names["0/camera.b"], "Garage");
 }
 
 #[test]
@@ -733,6 +792,7 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
     h.api.arrange(&json!({
         "order": ["1/camera.door", "0/camera.door"],
         "hidden": ["1/camera.door"],
+        "names": {"0/camera.door": "Front", "1/camera.door": "Back"},
     }));
     let gallery: Vec<_> = h
         .api
@@ -751,6 +811,10 @@ fn two_servers_sharing_an_entity_id_are_arranged_separately() {
     h.call("DELETE", "/api/pair", Some(&first), json!({}));
     assert_eq!(h.api.store().gallery.hidden, ["0/camera.door"]);
     assert_eq!(h.api.store().gallery.order, ["0/camera.door"]);
+    assert_eq!(
+        h.api.store().gallery.names.iter().collect::<Vec<_>>(),
+        [(&"0/camera.door".to_owned(), &"Back".to_owned())]
+    );
     let gallery: Vec<_> = h
         .api
         .gallery()

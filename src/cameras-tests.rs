@@ -83,9 +83,13 @@ fn layouts_keep_sixteen_by_nine_tiles_inside_the_grid() {
         );
     }
     assert_eq!(Layout::new(4).visible_rows, 2);
-    assert_eq!(Layout::new(12).visible_rows, 3);
-    assert_eq!(Layout::new(12).rows, 3);
-    assert_eq!(Layout::new(13).rows, 4);
+    // Five or more: three across, two rows on screen, the rest scroll.
+    assert_eq!(Layout::new(6).cols, 3);
+    assert_eq!(Layout::new(6).visible_rows, 2);
+    assert_eq!(Layout::new(12).cols, 3);
+    assert_eq!(Layout::new(12).visible_rows, 2);
+    assert_eq!(Layout::new(12).rows, 4);
+    assert_eq!(Layout::new(13).rows, 5);
 }
 
 fn camera(id: &str) -> Camera {
@@ -96,6 +100,7 @@ fn camera(id: &str) -> Camera {
         snapshot: Some(format!("http://ha/snap/{id}")),
         hls: None,
         hidden: false,
+        label: None,
     }
 }
 
@@ -188,6 +193,8 @@ fn hold_ok_moves_or_hides_a_camera_and_settings_show_it_again() {
     assert_eq!(state.focus, cam("b"));
     state.hold();
     state.direction(Direction::Down, &[]);
+    assert_eq!(state.focus, Target::CameraRename);
+    state.direction(Direction::Down, &[]);
     assert_eq!(state.focus, Target::CameraHide);
     state.activate();
     assert_eq!(order(&state), ["b*", "c", "a"]);
@@ -229,6 +236,7 @@ fn fresh_urls_keep_the_arrangement_and_a_lone_camera_cannot_move() {
     let mut state = open(&["a", "b"]);
     state.hold();
     state.direction(Direction::Down, &[]);
+    state.direction(Direction::Down, &[]);
     state.activate();
     assert_eq!(order(&state), ["a*", "b"]);
     // Home Assistant rotates tokens and adds a camera: the open gallery keeps its own order and
@@ -269,6 +277,8 @@ fn fresh_urls_keep_the_arrangement_and_a_lone_camera_cannot_move() {
 
     let mut lone = open(&["a"]);
     lone.hold();
+    assert_eq!(lone.focus, Target::CameraRename);
+    lone.direction(Direction::Down, &[]);
     assert_eq!(lone.focus, Target::CameraHide);
     lone.activate();
     // Every camera hidden: the settings button holds focus.
@@ -277,6 +287,73 @@ fn fresh_urls_keep_the_arrangement_and_a_lone_camera_cannot_move() {
     // An empty list closes the gallery.
     lone.camera_list(vec![], true, false);
     assert!(!lone.cameras_open());
+}
+
+#[test]
+fn rename_types_a_name_over_the_gallery_and_reset_restores_home_assistants() {
+    let mut state = open(&["a", "b"]);
+    state.direction(Direction::Right, &[]);
+    state.hold();
+    state.direction(Direction::Down, &[]);
+    assert_eq!(state.focus, Target::CameraRename);
+    state.activate();
+    // The keyboard takes over; the gallery stays drawn and fed behind it.
+    assert!(!state.cameras_open());
+    assert!(state.cameras_visible());
+    assert!(state.text_input_active());
+    assert_eq!(state.camera_watches(true).len(), 2);
+    state.text("  Front door ");
+    state.finish_text_input();
+    assert!(state.cameras_open());
+    assert_eq!(state.cameras.sheet, None);
+    assert_eq!(state.focus, cam("b"));
+    let renamed = state.cameras.camera("0/camera.b").unwrap();
+    assert_eq!(renamed.title(), "Front door");
+    assert_eq!(renamed.name, "b");
+    let saved = state.cameras.save.take().unwrap();
+    assert_eq!(saved["names"], json!({"0/camera.b": "Front door"}));
+
+    // A refreshed list from Home Assistant keeps the name shown.
+    state.camera_list(vec![camera("a"), camera("b")], true, false);
+    assert_eq!(
+        state.cameras.camera("0/camera.b").unwrap().title(),
+        "Front door"
+    );
+
+    // Back with nothing typed keeps the name.
+    state.hold();
+    state.direction(Direction::Down, &[]);
+    state.activate();
+    state.back();
+    assert!(state.cameras_open());
+    assert_eq!(state.focus, cam("b"));
+    assert!(state.cameras.save.is_none());
+
+    // Reset name is offered for a renamed camera and goes back to Home Assistant's.
+    state.hold();
+    assert_eq!(
+        state.cameras.options(),
+        [
+            Target::CameraMove,
+            Target::CameraRename,
+            Target::CameraNameReset,
+            Target::CameraHide,
+            Target::CameraSettings
+        ]
+    );
+    state.direction(Direction::Down, &[]);
+    state.direction(Direction::Down, &[]);
+    state.activate();
+    assert_eq!(state.cameras.camera("0/camera.b").unwrap().title(), "b");
+    assert_eq!(state.focus, Target::CameraRename);
+    assert_eq!(state.cameras.save.take().unwrap()["names"], json!({}));
+
+    // Going Home while renaming closes the keyboard and the gallery together.
+    state.activate();
+    assert!(state.text_input_active());
+    state.return_home();
+    assert!(!state.cameras_visible());
+    assert!(!state.text_input_active());
 }
 
 #[test]

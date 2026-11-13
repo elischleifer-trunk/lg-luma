@@ -461,7 +461,12 @@ screen, takes the new URLs and adds new cameras at the end, and an empty list cl
 
 The gallery is native (`src/cameras.rs`, drawn by `src/cameras-view.rs`) and opens as the
 opaque full-screen `Overlay::Cameras`. `cameras::Layout` keeps 16:9 tiles in one large view, 2×2,
-3×3 or four across, fitting three rows and scrolling the rest. Each frame is fetched off the SDL
+or three across from five cameras, fitting two rows and scrolling the rest. Hold OK → **Rename**
+opens the keyboard (`TextField::CameraName`) in the overlay's place, with `Gallery::renaming`
+keeping the camera and the gallery's Back target, so the gallery stays drawn and fed behind it
+(`State::cameras_visible`); committing restores `Overlay::Cameras`. Names are saved with the
+arrangement (`names`, by gallery camera ID) in the Home Assistant store and come back as
+`Camera::label`; **Reset name** removes one. Each frame is fetched off the SDL
 thread: `State::camera_watches` lists what is on screen (nothing unless the gallery is open and
 Luma visible), and `cameras::Service::sync` keeps one worker thread per watched camera, keeping a
 worker (and its connected stream) that is watched the same way and only giving it new URLs.
@@ -497,6 +502,18 @@ and reports closing, which also leaves the enlarged camera (`Event::VideoClosed`
 fails, or shows nothing within 15 s, reports `failed`, and that camera stays on the motion-JPEG
 stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma
 closes it (`Service::close_video`).
+
+A doorbell card can play HLS too. `luma.show_camera` with a camera entity (`mode: video`, the default)
+starts the stream in Home Assistant (`card_hls_url`, the same `async_request_stream` as
+`StreamView`) and adds the absolute playlist URL as `hls_url`; a camera that cannot stream just
+leaves it out. `POST /api/overlay` validates it like the other camera URLs and passes it to the
+page as `hls`, still requiring `stream_url` or `snapshot_url` as the card's picture. The page
+plays both through `playHls` (the card: native HLS, then hls.js; the Cameras video: hls.js first; 15 s to show a frame; an `ended` video or
+one whose `currentTime` stands still for 10 s fails too): the card's muted `<video>` stays
+invisible over the motion-JPEG until it plays, then covers it. The motion-JPEG stays connected
+underneath, because its camera token may have rotated by the time a long card's video fails, so a
+failed video just uncovers it. Home Assistant gives the stream 5 s to start, and any failure there
+sends the card without `hls_url`. Older Luma builds ignore `hls_url`.
 
 Holding OK (or a long pointer press, or Menu) on a tile opens **Move** (arrows move it, OK or Back
 ends), **Hide camera** and **Camera settings**; the settings button at the top right, reached
