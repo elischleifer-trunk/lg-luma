@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers import instance_id
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
@@ -70,7 +71,11 @@ async def test_user_flow_pairs_with_the_code_shown_on_the_tv(
     )
     assert result["step_id"] == "pair"
     pair_request = next(call for call in aioclient_mock.mock_calls if call[1].path == "/api/pair")
-    assert pair_request[2] == {"name": hass.config.location_name}
+    # The instance ID lets Luma give this server's camera arrangement back if it pairs again.
+    assert pair_request[2] == {
+        "name": hass.config.location_name,
+        "server": await instance_id.async_get(hass),
+    }
 
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"code": "000000"})
     assert result["errors"] == {"base": "invalid_code"}

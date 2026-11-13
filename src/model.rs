@@ -414,6 +414,24 @@ pub struct Preferences {
     pub home_assistant: bool,
     /// Unix seconds of the last automatic or chosen wallpaper change, for the timed modes.
     pub wallpaper_changed: u64,
+    /// Settings this build does not know, from a newer Luma. They are written back unchanged so
+    /// that going back a version and forward again loses nothing; [`RETIRED_SETTINGS`] are
+    /// dropped instead. Keep this field last: the flattened `input_modes` above takes its own
+    /// keys first.
+    #[serde(flatten, deserialize_with = "deserialize_extra")]
+    pub extra: serde_json::Map<String, serde_json::Value>,
+}
+
+/// Settings older builds saved and Luma no longer uses. They are dropped when preferences are
+/// read rather than kept as settings from a newer Luma. Add a key here when removing a field.
+const RETIRED_SETTINGS: &[&str] = &["show_names", "wallpaper_skip"];
+
+fn deserialize_extra<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<serde_json::Map<String, serde_json::Value>, D::Error> {
+    let mut extra = serde_json::Map::deserialize(deserializer)?;
+    extra.retain(|key, _| !RETIRED_SETTINGS.contains(&key.as_str()));
+    Ok(extra)
 }
 
 /// Cable reported present and the TV not reporting "no signal". Firmware without signal
@@ -452,6 +470,7 @@ impl Default for Preferences {
             wallpaper_gradient: true,
             home_assistant: false,
             wallpaper_changed: 0,
+            extra: serde_json::Map::new(),
         }
     }
 }

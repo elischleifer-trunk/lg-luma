@@ -3565,6 +3565,64 @@ fn cameras_app_is_listed_only_while_home_assistant_is_on_and_opens_the_gallery()
 }
 
 #[test]
+fn preferences_keep_settings_from_a_newer_luma() {
+    let mut preferences: Preferences = serde_json::from_value(serde_json::json!({
+        "background": "forest",
+        "input_modes": {"com.webos.app.hdmi1": "On"},
+        "apps_only_inputs": ["com.webos.app.hdmi2"],
+        "a_future_setting": {"on": true},
+        "show_names": true,
+    }))
+    .unwrap();
+    preferences.sanitize();
+    assert_eq!(preferences.background, "forest");
+    assert_eq!(preferences.input_modes.len(), 2);
+    // Only the unknown key is kept aside; known ones, flattened ones included, are not.
+    assert_eq!(
+        preferences.extra.keys().collect::<Vec<_>>(),
+        ["a_future_setting"]
+    );
+    let saved = serde_json::to_value(&preferences).unwrap();
+    assert_eq!(saved["a_future_setting"], serde_json::json!({"on": true}));
+    assert_eq!(saved["input_modes"]["com.webos.app.hdmi1"], "On");
+    assert_eq!(
+        saved["apps_only_inputs"],
+        serde_json::json!(["com.webos.app.hdmi2"])
+    );
+}
+
+#[test]
+fn a_pairing_request_shows_its_code_in_place_of_the_setup_qr_code() {
+    let mut state = ready();
+    let home = state.focus.clone();
+    // Home Assistant asks to pair while Luma is on Home: the setup dialog opens with the code.
+    assert!(state.home_assistant_pairing("123456".into()));
+    assert!(matches!(state.overlay, Some(Overlay::HomeAssistantSetup)));
+    assert_eq!(state.home_assistant_code.as_deref(), Some("123456"));
+    let shows = |state: &State, wanted: &str| {
+        scene(state)
+            .draw
+            .iter()
+            .any(|draw| matches!(draw, crate::renderer::Draw::Text(value, ..) if value == wanted))
+    };
+    assert!(shows(&state, "123 456"));
+    // It lapses: the QR code comes back. Then a new code, and pairing succeeds.
+    state.home_assistant_pairing_ended();
+    assert_eq!(state.home_assistant_code, None);
+    assert!(state.home_assistant_pairing("654321".into()));
+    assert!(state.home_assistant_paired_with("Home".into()));
+    assert_eq!(state.home_assistant_code, None);
+    assert_eq!(state.home_assistant_paired.as_deref(), Some("Home"));
+    // Closing returns focus to where it was, not to a Settings row.
+    state.back();
+    assert!(state.overlay.is_none());
+    assert_eq!(state.focus, home);
+    assert_eq!(state.home_assistant_paired, None);
+    // Without the dialog, a success is left to a notice.
+    assert!(!state.home_assistant_paired_with("Home".into()));
+}
+
+#[test]
 fn header_search_button_hands_off_to_lg_search() {
     let mut state = ready();
     let search = state.inventory.search.clone().expect("demo has LG search");
