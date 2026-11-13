@@ -29,6 +29,7 @@ const REQUESTS = [
 
   // Title search, the core of the search screen.
   ...[
+    ['gho', 'gho'], // 3-character minimum: Ghosts (series) and Ghostbusters (movies)
     ['star-wars', 'star wars'], // many results, movies and series
     ['the-office', 'the office'], // series, US/UK versions
     ['dune', 'dune'], // short query, remakes

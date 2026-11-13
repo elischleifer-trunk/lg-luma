@@ -30,6 +30,9 @@ mod sdl_events;
 mod signal_watch;
 mod state;
 mod storage;
+// Not wired into the UI yet; remove once the search screen uses it.
+#[allow(dead_code)]
+mod streaming;
 mod text_rendering;
 #[path = "tile-editor.rs"]
 mod tile_editor;
