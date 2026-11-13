@@ -157,6 +157,9 @@ impl Console {
 pub struct Inventory {
     pub apps: Vec<App>,
     pub inputs: Vec<Input>,
+    /// LG's own search app, when the TV has one: the header's search button hands off to it.
+    /// It is a hidden system app, so it is never one of `apps`.
+    pub search: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
@@ -800,6 +803,8 @@ pub fn demo_inventory() -> Inventory {
                 device: None,
             },
         ],
+        // Desktop preview of the header's search button; launches are no-ops there.
+        search: Some("com.webos.app.voice".into()),
     };
     // Desktop-only artwork gallery. TV inventory is always read from services.
     for brand in crate::branding::BRANDS {

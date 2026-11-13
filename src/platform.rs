@@ -827,24 +827,32 @@ fn recent_call(command: &crate::recents::Command) -> Result<Value, String> {
 }
 
 fn inventory() -> Result<(Inventory, Option<String>), String> {
-    let apps = normalize_apps(&inventory_read(
-        "luna://com.webos.applicationManager/listApps",
-        "apps",
-    )?)?;
+    let raw = inventory_read("luna://com.webos.applicationManager/listApps", "apps")?;
+    let apps = normalize_apps(&raw)?;
+    let search = lg_search_app(&raw);
     let inputs = input_inventory();
     match inputs {
         Ok(inputs) => {
             eprintln!(
-                "Luma TV inventory: {} apps, {} inputs",
+                "Luma TV inventory: {} apps, {} inputs, LG search {}",
                 apps.len(),
-                inputs.len()
+                inputs.len(),
+                search.as_deref().unwrap_or("not found")
             );
-            Ok((Inventory { apps, inputs }, None))
+            Ok((
+                Inventory {
+                    apps,
+                    inputs,
+                    search,
+                },
+                None,
+            ))
         }
         Err(error) => Ok((
             Inventory {
                 apps,
                 inputs: vec![],
+                search,
             },
             Some(format!("Inputs could not be refreshed: {error}")),
         )),
@@ -893,6 +901,52 @@ fn title(value: Option<&str>, fallback: &str) -> String {
     } else {
         clean.trim().into()
     }
+}
+
+/// LG's own search app IDs, most specific first. The ID differs between webOS versions, so the
+/// installed app list decides.
+const LG_SEARCH_IDS: [&str; 4] = [
+    "com.webos.app.search",
+    "com.webos.app.searchapp",
+    "com.webos.app.lgsearch",
+    "com.webos.app.searchviewer",
+];
+
+/// The voice app, the last resort: older firmware runs search through it.
+const LG_VOICE_ID: &str = "com.webos.app.voice";
+
+/// LG's search app from the raw `listApps` reply, hidden system apps included. A known search ID
+/// wins, then any LG system app with "search" in its ID, then the voice app. Every search or
+/// voice app seen is logged, so the right ID for a new firmware can be read from the TV's log.
+pub fn lg_search_app(raw: &Value) -> Option<String> {
+    let ids: Vec<&str> = raw
+        .as_array()?
+        .iter()
+        .filter_map(|entry| entry.get("id").and_then(Value::as_str))
+        .filter(|id| valid_app_id(id))
+        .collect();
+    let seen: Vec<&str> = ids
+        .iter()
+        .copied()
+        .filter(|id| id.contains("search") || id.contains("voice"))
+        .collect();
+    if !seen.is_empty() {
+        eprintln!("Luma LG search candidates: {}", seen.join(", "));
+    }
+    LG_SEARCH_IDS
+        .iter()
+        .copied()
+        .find(|known| ids.contains(known))
+        .or_else(|| {
+            ids.iter().copied().find(|id| {
+                ["com.webos.", "com.lge.", "com.palm."]
+                    .iter()
+                    .any(|prefix| id.starts_with(prefix))
+                    && id.contains("search")
+            })
+        })
+        .or_else(|| ids.contains(&LG_VOICE_ID).then_some(LG_VOICE_ID))
+        .map(str::to_owned)
 }
 
 pub fn normalize_apps(raw: &Value) -> Result<Vec<App>, String> {
@@ -1113,5 +1167,46 @@ mod home_identity_tests {
     fn both_home_variants_are_hidden_from_application_inventory() {
         let raw = json!([{"id":HOME_ID,"title":"Home","visible":true}, {"id":FULL_HOME_ID,"title":"Home","visible":true}]);
         assert!(normalize_apps(&raw).unwrap().is_empty());
+    }
+}
+
+#[cfg(test)]
+mod lg_search_tests {
+    use super::*;
+    #[test]
+    fn known_search_app_wins_over_voice_and_stays_out_of_the_catalogue() {
+        let raw = json!([
+            {"id": "com.webos.app.voice", "title": "Voice", "visible": false},
+            {"id": "com.webos.app.searchapp", "title": "Search", "visible": false},
+            {"id": "netflix", "title": "Netflix"},
+        ]);
+        assert_eq!(
+            lg_search_app(&raw).as_deref(),
+            Some("com.webos.app.searchapp")
+        );
+        assert!(
+            normalize_apps(&raw)
+                .unwrap()
+                .iter()
+                .all(|app| app.id == "netflix")
+        );
+    }
+    #[test]
+    fn unknown_lg_search_app_wins_over_voice() {
+        let voice = json!([{"id": "com.webos.app.voice"}]);
+        assert_eq!(
+            lg_search_app(&voice).as_deref(),
+            Some("com.webos.app.voice")
+        );
+        let other = json!([
+            {"id": "com.webos.app.voice"},
+            {"id": "com.lge.app.newsearch"},
+            {"id": "com.example.search"},
+        ]);
+        assert_eq!(
+            lg_search_app(&other).as_deref(),
+            Some("com.lge.app.newsearch")
+        );
+        assert_eq!(lg_search_app(&json!([{"id": "com.example.search"}])), None);
     }
 }

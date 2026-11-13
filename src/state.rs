@@ -41,6 +41,8 @@ pub enum Page {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum Target {
     Nav(usize),
+    /// The header's search button, right of the tabs: hands off to LG's own search app.
+    LgSearch,
     TvSettings,
     InstallUpdate,
     CheckUpdates,
@@ -748,6 +750,10 @@ impl State {
     /// Returns whether a newly reported console changed the saved preferences.
     pub fn set_inventory(&mut self, next: Inventory, warning: Option<String>) -> bool {
         self.inventory.apps = next.apps;
+        self.inventory.search = next.search;
+        if self.focus == Target::LgSearch && self.inventory.search.is_none() {
+            self.focus = Target::Nav(self.page_index());
+        }
         self.sync_custom_tiles();
         let mut remembered = false;
         if let Some(warning) = warning {
@@ -892,6 +898,7 @@ impl State {
             if matches!(
                 self.focus,
                 Target::Nav(_)
+                    | Target::LgSearch
                     | Target::Filter(_)
                     | Target::ClearFilter
                     | Target::Search
@@ -1496,6 +1503,27 @@ impl State {
                     _ => {}
                 }
             }
+            if self.focus == Target::LgSearch {
+                match direction {
+                    Direction::Left => self.focus(Target::Nav(self.page_index()), controls),
+                    Direction::Down => {
+                        if self.page == Page::Settings {
+                            self.subpage = None;
+                            self.section = 0;
+                        }
+                        self.focus(self.first_content(), controls);
+                    }
+                    _ => {}
+                }
+                return vec![];
+            }
+            if let Target::Nav(2) = self.focus
+                && matches!(direction, Direction::Right)
+                && self.inventory.search.is_some()
+            {
+                self.focus(Target::LgSearch, controls);
+                return vec![];
+            }
             if let Target::Nav(index) = self.focus {
                 let next = match direction {
                     Direction::Left if index > 0 => Some(index - 1),
@@ -1638,6 +1666,10 @@ impl State {
             .iter()
             .filter(|candidate| candidate.target != self.focus)
             .filter_map(|candidate| {
+                // The header search button is reached only by Right from the last tab.
+                if candidate.target == Target::LgSearch {
+                    return None;
+                }
                 // Header controls never steal an Up route from the active tab.
                 if self.overlay.is_none()
                     && matches!(direction, Direction::Up)
@@ -2173,6 +2205,11 @@ impl State {
                 self.pressed = None;
             }
             Target::TvSettings => return vec![Effect::Launch("com.palm.app.settings".into())],
+            Target::LgSearch if !self.launching => {
+                if let Some(id) = self.inventory.search.clone() {
+                    return vec![Effect::Launch(id)];
+                }
+            }
             Target::App(_) if self.page == Page::Apps && !self.launching => self.options(),
             Target::App(id) if !self.launching => {
                 return vec![Effect::Launch(id)];
@@ -2770,6 +2807,10 @@ impl State {
         }
         if self.page == Page::Settings && self.subpage.is_some() {
             self.close_subpage();
+            return vec![];
+        }
+        if self.focus == Target::LgSearch {
+            self.focus = Target::Nav(self.page_index());
             return vec![];
         }
         if self.page == Page::Settings && !matches!(self.focus, Target::Nav(_)) {

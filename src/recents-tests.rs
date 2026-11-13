@@ -309,11 +309,12 @@ fn home_header_has_only_navigation() {
         .into_iter()
         .filter(|control| control.rect.y < 120.)
         .collect();
-    assert_eq!(header.len(), 3);
+    // The tabs, and the button handing off to LG's search.
+    assert_eq!(header.len(), 4);
     assert!(
         header
             .iter()
-            .all(|control| matches!(control.target, Target::Nav(_)))
+            .all(|control| matches!(control.target, Target::Nav(_) | Target::LgSearch))
     );
 }
 
