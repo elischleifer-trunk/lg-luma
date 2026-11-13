@@ -146,7 +146,7 @@ fn the_gallery_opens_on_the_first_camera_and_arrows_follow_the_grid() {
     assert_eq!(state.focus, Target::CameraGear);
     state.direction(Direction::Down, &[]);
     assert_eq!(state.focus, cam("c"));
-    // OK enlarges, OK or Back returns to the grid, Back again closes the app.
+    // OK enlarges, Back returns to the grid, Back again closes the app.
     state.activate();
     assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.c"));
     assert_eq!(state.camera_watches(true).len(), 1);
@@ -374,6 +374,7 @@ fn the_service_keeps_a_worker_while_a_camera_is_watched_the_same_way() {
             }
         },
         size: (640, 360),
+        record: false,
     };
     service.sync(&[watch("a", false), watch("b", false)]);
     assert_eq!(service.watched(), ["a", "b"]);
@@ -578,4 +579,161 @@ fn a_late_close_report_leaves_the_next_cameras_video_alone() {
     state.camera_video_closed(false);
     assert_eq!(state.cameras.video, Video::Resolving("0/camera.b".into()));
     assert_eq!(state.cameras.enlarged.as_deref(), Some("0/camera.b"));
+}
+
+#[test]
+fn kept_frames_reach_back_two_minutes_within_their_memory() {
+    let start = Instant::now();
+    let mut recording = Recording::default();
+    for second in 0..200 {
+        recording.push("a", start + Duration::from_secs(second), &[0; 1000]);
+    }
+    let (oldest, newest) = recording.span().unwrap();
+    assert_eq!(newest - oldest, REWIND);
+    assert_eq!(recording.bytes, 121 * 1000);
+    // The frame on screen at a moment is the newest one that had arrived, else the oldest.
+    let at = |offset: f32| {
+        let (taken, _) = recording
+            .at(start + Duration::from_secs_f32(offset))
+            .unwrap();
+        (taken - start).as_secs()
+    };
+    assert_eq!(at(150.5), 150);
+    assert_eq!(at(10.), 79);
+    // Large frames are dropped by memory before time.
+    recording.push("a", newest + Duration::from_secs(1), &vec![0; REWIND_BYTES]);
+    assert_eq!(recording.frames.len(), 1);
+    // Another camera starts afresh.
+    recording.push("b", newest, &[0; 10]);
+    assert_eq!((recording.frames.len(), recording.bytes), (1, 10));
+}
+
+#[test]
+fn left_right_and_ok_scrub_through_the_enlarged_cameras_kept_frames() {
+    let mut state = open(&["a", "b"]);
+    state.activate();
+    assert!(state.camera_watches(true)[0].record);
+    let now = Instant::now() + Duration::from_secs(600);
+    let gallery = &mut state.cameras;
+    // Nothing kept yet: Left stays live.
+    gallery.skip(true, now);
+    assert_eq!(gallery.playback, Playback::Live);
+    gallery.recorded = Some((now - Duration::from_secs(60), now));
+    gallery.skip(true, now);
+    gallery.skip(true, now);
+    assert_eq!(gallery.playback, Playback::Behind(SKIP * 2));
+    // Rewound, the camera keeps playing that far behind live.
+    let later = now + Duration::from_secs(3);
+    assert_eq!(gallery.replay_position(later).0, Some(later - SKIP * 2));
+    assert_eq!(gallery.scrub.unwrap().lag, SKIP * 2);
+    // OK pauses on that moment; time passing leaves it there, further behind live.
+    gallery.toggle_pause(later);
+    assert_eq!(gallery.playback, Playback::Paused(later - SKIP * 2));
+    let paused = later + Duration::from_secs(20);
+    assert_eq!(gallery.replay_position(paused).0, Some(later - SKIP * 2));
+    assert_eq!(gallery.scrub.unwrap().lag, Duration::from_secs(30));
+    // Left stays paused, and never goes past the oldest kept frame.
+    gallery.recorded = Some((paused - Duration::from_secs(32), paused));
+    gallery.skip(true, paused);
+    assert_eq!(
+        gallery.playback,
+        Playback::Paused(paused - Duration::from_secs(32))
+    );
+    // OK plays from there.
+    gallery.toggle_pause(paused);
+    assert_eq!(gallery.playback, Playback::Behind(Duration::from_secs(32)));
+    // Right up to the newest frame goes live again.
+    for _ in 0..7 {
+        gallery.skip(false, paused);
+    }
+    assert_eq!(gallery.playback, Playback::Live);
+    assert_eq!(gallery.replay_position(paused).0, None);
+    // Pausing live holds the newest frame; leaving the camera goes back to live.
+    gallery.toggle_pause(paused);
+    assert_eq!(gallery.playback, Playback::Paused(paused));
+    state.back();
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert!(state.cameras.scrub.is_none());
+    assert!(!state.camera_watches(true)[0].record);
+}
+
+#[test]
+fn replayed_frames_show_only_while_the_enlarged_camera_is_rewound() {
+    let mut state = open(&["a"]);
+    state.activate();
+    let replay = |id: &str| Update::Replay {
+        id: id.into(),
+        frame: Arc::new(Frame::new(&replay_key(id), RgbaImage::new(1, 1), false)),
+    };
+    state.camera_update(replay("0/camera.a"));
+    assert!(state.cameras.replay.is_none());
+    let now = Instant::now();
+    state.cameras.recorded = Some((now - Duration::from_secs(30), now));
+    state.cameras.skip(true, now);
+    state.camera_update(replay("0/camera.b"));
+    assert!(state.cameras.replay.is_none());
+    state.camera_update(replay("0/camera.a"));
+    assert!(state.cameras.replay.is_some());
+    assert_eq!(clock(Duration::from_millis(65_900)), "-1:05");
+}
+
+#[test]
+fn a_rewound_camera_plays_its_hls_video_once_live_again() {
+    let mut state = streaming(&["a"]);
+    state.activate();
+    let (id, _) = state.cameras.resolve.take().unwrap();
+    let now = Instant::now();
+    state.cameras.recorded = Some((now - Duration::from_secs(30), now));
+    state.cameras.skip(true, now);
+    state.camera_update(Update::Video {
+        id,
+        result: Ok("http://ha/a.m3u8".into()),
+    });
+    // Rewound meanwhile: the video waits.
+    assert!(state.cameras.play.is_none());
+    assert_eq!(state.cameras.video, Video::Off);
+    state.cameras.skip(false, now);
+    assert_eq!(state.cameras.playback, Playback::Live);
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
+}
+
+#[test]
+fn the_replay_thread_decodes_the_kept_frame_asked_for() {
+    let mut service = Service::default();
+    let start = Instant::now();
+    {
+        let mut recording = service.replay.lock();
+        recording.push("a", start, &jpeg([255, 0, 0], 8, 8));
+        recording.push(
+            "a",
+            start + Duration::from_secs(1),
+            &jpeg([0, 0, 255], 8, 8),
+        );
+    }
+    assert_eq!(
+        service.recorded(),
+        Some((start, start + Duration::from_secs(1)))
+    );
+    service.replay(start + Duration::from_millis(500));
+    let Update::Replay { id, frame } = service
+        .receiver
+        .recv_timeout(Duration::from_secs(5))
+        .unwrap()
+    else {
+        panic!("expected a replayed frame");
+    };
+    assert_eq!(id, "a");
+    assert_eq!(frame.key, replay_key("a"));
+    assert!(frame.pixels.get_pixel(4, 4)[0] > 200);
+    // The same frame is not decoded twice.
+    service.replay(start + Duration::from_millis(900));
+    assert!(
+        service
+            .receiver
+            .recv_timeout(Duration::from_millis(300))
+            .is_err()
+    );
+    // Closing the enlarged camera frees its kept frames.
+    service.sync(&[]);
+    assert_eq!(service.recorded(), None);
 }

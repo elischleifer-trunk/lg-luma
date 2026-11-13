@@ -497,6 +497,17 @@ GPU texture per camera, re-uploaded only for a newer frame; damage tracking comp
 pointer, so a new frame redraws only its tile. The main loop wakes every 16 ms while the gallery
 is open.
 
+The enlarged camera can be rewound. Its worker (`Watch::record`) keeps every frame as the camera
+sent it, undecoded, for `cameras::REWIND` (two minutes, at most 48 MB) in the service's
+`Recording`; it is dropped once no camera is enlarged. Left and Right skip `SKIP` (5 s) back or
+forward and OK pauses and plays (`Gallery::skip`, `Gallery::toggle_pause`, `Playback`); Back
+still leaves the camera. Each tick the main loop hands `State::camera_replay` the span of kept
+frames and, while not live, asks `Service::replay` for the frame at the position; one replay
+thread decodes it (not again for the same frame) as `Update::Replay`, drawn under its own texture
+key. A bar along the bottom shows the kept span, live at the right, and the badge reads
+**Paused** or how far behind live the picture is. Right up to the newest frame goes live, which
+also asks for the HLS video again if one was answered while rewound.
+
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the
 integration adds `hls_url` to every camera with the stream feature while the `stream`
@@ -514,7 +525,11 @@ couple of seconds and stays close to live. The TV's own HLS player is the fallba
 started after about 12 s on a TV. HLS views allow any origin, so the `file://` page may fetch
 them. webOS shows hardware video on a plane behind the page, black until the first frame
 decodes, so the page covers it with the camera's snapshots (the `snapshot` parameter,
-refreshed back to back) and uncovers it once playback has advanced 0.3 s. Back or OK closes it
+refreshed back to back) and uncovers it once playback has advanced 0.3 s. hls.js keeps two minutes
+behind the playhead and keeps loading while paused or behind (Home Assistant's playlist lists only
+the newest few seconds), so Left/Right (and rewind/fast-forward) scrub through what the TV has
+buffered and OK (and play/pause) pauses and plays, with the same bar as Luma's; a user pause is not
+a stall. Back closes it (OK too, before it plays)
 and reports closing, which also leaves the enlarged camera (`Event::VideoClosed`); a stream that
 fails, or shows nothing within 15 s, reports `failed`, and that camera stays on the motion-JPEG
 stream for the rest of the visit. A doorbell card replaces the video; leaving the camera in Luma

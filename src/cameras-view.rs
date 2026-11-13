@@ -1,7 +1,9 @@
 //! The Cameras gallery: a full-screen grid of Home Assistant's cameras, one enlarged camera,
 //! and the options and settings sheets. Layout lives in [`crate::cameras`], shared with focus.
 use super::*;
-use crate::cameras::{CAPTION, GEAR, GRID, Layout, SHEET, SHEET_ROW, SHEET_ROWS, SHEET_TOP, Sheet};
+use crate::cameras::{
+    CAPTION, GEAR, GRID, Layout, Playback, SHEET, SHEET_ROW, SHEET_ROWS, SHEET_TOP, Sheet, clock,
+};
 
 const BACKDROP: u32 = 0x0d1013;
 const RADIUS: f32 = 18.;
@@ -184,7 +186,13 @@ fn enlarged(out: &mut Scene, state: &State, assets: &Assets, id: &str) {
     let gallery = &state.cameras;
     let screen = Rect::new(0., 0., 1920., 1080.);
     out.shape(screen, 0., c(0x000000, 1.));
-    let picture = gallery.frames.get(id);
+    let live = gallery.playback == Playback::Live;
+    // Paused or rewound: the kept frame, or the last live one until it is decoded.
+    let picture = if live {
+        gallery.frames.get(id)
+    } else {
+        gallery.replay.as_ref().or_else(|| gallery.frames.get(id))
+    };
     match picture {
         Some(picture) => out
             .draw
@@ -231,20 +239,89 @@ fn enlarged(out: &mut Scene, state: &State, assets: &Assets, id: &str) {
         );
         rect
     };
+    // Kept frames to scrub through: a bar along the bottom, the title above it.
+    let scrub = gallery
+        .scrub
+        .filter(|scrub| scrub.window >= std::time::Duration::from_secs(1));
+    let title_y = if scrub.is_some() {
+        1080. - 54. - 52. - 56.
+    } else {
+        1080. - 54. - 52.
+    };
+    if let Some(scrub) = scrub {
+        scrubber(out, assets, scrub, live, language);
+    }
     if let Some(camera) = gallery.camera(id) {
         let style = text(25.6, 600, 0.);
-        pill(out, camera.title(), 96., 1080. - 54. - 52., style, false);
+        pill(out, camera.title(), 96., title_y, style, false);
     }
-    if let Some(picture) = picture {
-        let label = language.t(if picture.live {
-            "cameraLive"
+    let style = text(19.2, 650, 0.06);
+    let (label, dot) = match gallery.playback {
+        Playback::Paused(_) => (language.t("cameraPaused").to_owned(), false),
+        Playback::Behind(_) => (clock(gallery.scrub.unwrap_or_default().lag), false),
+        Playback::Live => match picture {
+            Some(picture) if picture.live => (language.t("cameraLive").to_owned(), true),
+            Some(_) => (language.t("cameraSnapshots").to_owned(), false),
+            None => return,
+        },
+    };
+    let width = inner(&label, style, dot) + 40.;
+    pill(out, &label, 1824. - width, 54., style, dot);
+}
+
+/// The enlarged camera's kept frames as a bar: the oldest at the left, live at the right.
+fn scrubber(
+    out: &mut Scene,
+    assets: &Assets,
+    scrub: crate::cameras::Scrub,
+    live: bool,
+    language: crate::i18n::Language,
+) {
+    out.draw.push(Draw::RoundedGradient(
+        Rect::new(0., 820., 1920., 260.),
+        0.,
+        c(0x000000, 0.),
+        c(0x000000, 0.72),
+    ));
+    let track = Rect::new(96., 1080. - 54. - 8., 1728., 8.);
+    let window = scrub.window.as_secs_f32().max(1.);
+    let played = (1. - scrub.lag.as_secs_f32() / window).clamp(0., 1.);
+    let x = (track.x + track.w * played).round();
+    out.shape(track, 4., c(0xffffff, 0.24));
+    out.shape(
+        Rect::new(track.x, track.y, x - track.x, track.h),
+        4.,
+        if live {
+            c(0xff453a, 1.)
         } else {
-            "cameraSnapshots"
-        });
-        let style = text(19.2, 650, 0.06);
-        let width = inner(label, style, picture.live) + 40.;
-        pill(out, label, 1824. - width, 54., style, picture.live);
-    }
+            c(0xffffff, 0.92)
+        },
+    );
+    out.shape(Rect::new(x - 12., track.y - 8., 24., 24.), 12., WHITE);
+    let style = text(19.2, 600, 0.);
+    let height = style.size * style.line_height;
+    let y = track.y - 20. - height;
+    let oldest = clock(scrub.window);
+    out.text(
+        &oldest,
+        Rect::new(track.x + 1728. - 400., y, 400., height),
+        style.right(),
+        c(0xf5f5f5, 0.56),
+        false,
+    );
+    let position = if live {
+        language.t("cameraLive").to_owned()
+    } else {
+        clock(scrub.lag)
+    };
+    let width = assets.width(&oldest, style).ceil();
+    out.text(
+        &position,
+        Rect::new(track.x + 1728. - 400. - width - 24., y, 400., height),
+        style.right(),
+        WHITE,
+        false,
+    );
 }
 
 /// The right-hand sheet both menus use, over the dimmed grid.

@@ -67,9 +67,36 @@
     return 'http://127.0.0.1:' + port + '/api/overlay/expand';
   }
 
+  // The Cameras video's scrubber: seconds of video the TV has kept, oldest to newest. Closer
+  // than this to the newest counts as live.
+  var LIVE_EDGE_S = 3;
+
+  // Where Left or Right (`step` seconds, negative back) lands within what is kept, or null when
+  // that is live.
+  function seek(position, start, end, step) {
+    var next = Math.min(end, Math.max(start, position + step));
+    return end - next < LIVE_EDGE_S ? null : next;
+  }
+
+  // Seconds behind live; 0 when close enough to count as live.
+  function behind(position, end) {
+    var lag = end - position;
+    return lag < LIVE_EDGE_S ? 0 : lag;
+  }
+
+  // `-m:ss` behind live.
+  function clock(seconds) {
+    var whole = Math.floor(Math.max(0, seconds));
+    var rest = whole % 60;
+    return '-' + Math.floor(whole / 60) + ':' + (rest < 10 ? '0' : '') + rest;
+  }
+
   var api = {
     settings: settings,
     video: video,
+    seek: seek,
+    behind: behind,
+    clock: clock,
     frameUrl: frameUrl,
     closedUrl: closedUrl,
     expandUrl: expandUrl,

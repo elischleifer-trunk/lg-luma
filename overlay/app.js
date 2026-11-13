@@ -3,7 +3,8 @@
 // shows one doorbell-style card, or (mode "video") an enlarged camera from Luma's Cameras app as
 // Home Assistant's HLS video, full screen, decoded by the TV. A card given an HLS playlist plays
 // it too, muted, over its motion-JPEG feed once the video is playing. OK on a card expands it to
-// full screen, video and all, and stops its countdown.
+// full screen, video and all, and stops its countdown. The Cameras video keeps its last two
+// minutes: Left and Right scrub through them, OK pauses and plays, Back closes.
 (function () {
   'use strict';
   var logic = window.LumaOverlay;
@@ -15,6 +16,8 @@
   var player = document.getElementById('player');
   var videoCover = document.getElementById('video-cover');
   var videoLive = document.getElementById('video-live');
+  var videoScrub = document.getElementById('video-scrub');
+  var videoTrack = videoScrub.querySelector('.scrub-track');
   var cardVideo = document.getElementById('card-video');
   // A video that shows nothing by then gives the screen back to the motion-JPEG stream.
   var VIDEO_WAIT_MS = 15000;
@@ -24,6 +27,9 @@
   var VIDEO_SETTLE_S = 0.3;
   // Cover snapshots load back to back, at most this often.
   var COVER_GAP_MS = 250;
+  // The Cameras video keeps this much behind its playhead to rewind into; Left and Right skip.
+  var REWIND_S = 120;
+  var SKIP_S = 5;
   var video = null;
   var cardPlayback = null;
   var current = null;
@@ -264,7 +270,18 @@
           return;
         }
         element.removeAttribute('src');
-        playback.hls = new Hls({ lowLatencyMode: true, backBufferLength: 10, maxBufferLength: 10 });
+        // To rewind, the video keeps what it played, and keeps loading while paused or behind,
+        // since Home Assistant's playlist only lists the newest few seconds.
+        playback.hls = new Hls(
+          options.rewind
+            ? {
+                lowLatencyMode: true,
+                backBufferLength: REWIND_S,
+                maxBufferLength: REWIND_S + 10,
+                maxMaxBufferLength: REWIND_S + 10,
+              }
+            : { lowLatencyMode: true, backBufferLength: 10, maxBufferLength: 10 }
+        );
         playback.hls.on(Hls.Events.ERROR, function (_event, data) {
           if (!data || !data.fatal) return;
           playback.hls.destroy();
@@ -306,7 +323,11 @@
       var position = element.currentTime;
       var still = 0;
       playback.watch = setInterval(function () {
-        if (element.currentTime !== position) {
+        // Paused on purpose (scrubbing the Cameras video) is not a stall.
+        if (element.paused) {
+          position = element.currentTime;
+          still = 0;
+        } else if (element.currentTime !== position) {
           position = element.currentTime;
           still = 0;
         } else if ((still += 1000) >= VIDEO_STALL_MS) {
@@ -335,6 +356,61 @@
 
   // ---- Camera video (Cameras app) ----------------------------------------------------------
 
+  // The seconds of video kept, oldest to newest.
+  function kept() {
+    var ranges = player.buffered;
+    if (!ranges || !ranges.length) return null;
+    return { start: ranges.start(0), end: ranges.end(ranges.length - 1) };
+  }
+
+  function playing() {
+    return !!video && videoView.className.indexOf('playing') >= 0;
+  }
+
+  function goLive() {
+    var range = kept();
+    var edge = video && video.hls && video.hls.liveSyncPosition;
+    if (range) player.currentTime = edge || Math.max(range.start, range.end - 1);
+    start(player);
+  }
+
+  // Left and Right: SKIP_S back or forward, playing or paused as it was; forward to the newest
+  // video goes live and plays.
+  function scrub(step) {
+    var range = kept();
+    if (!range) return;
+    var next = logic.seek(player.currentTime, range.start, range.end, step);
+    if (next === null) goLive();
+    else player.currentTime = next;
+    showScrub();
+  }
+
+  function togglePause() {
+    if (player.paused) start(player);
+    else player.pause();
+    showScrub();
+  }
+
+  function showScrub() {
+    if (!playing()) return;
+    var range = kept();
+    var span = range ? range.end - range.start : 0;
+    var lag = range ? logic.behind(player.currentTime, range.end) : 0;
+    var live = lag === 0 && !player.paused;
+    videoScrub.hidden = span < 1;
+    videoView.className = 'video playing' + (span < 1 ? '' : ' scrubbing');
+    videoLive.className = 'video-badge' + (live ? ' live-badge' : '');
+    videoLive.textContent = live ? 'Live' : player.paused ? 'Paused' : logic.clock(lag);
+    if (span < 1) return;
+    var played = Math.min(1, Math.max(0, (player.currentTime - range.start) / span));
+    var percent = played * 100 + '%';
+    videoTrack.className = 'scrub-track' + (live ? ' live' : '');
+    document.getElementById('video-played').style.width = percent;
+    document.getElementById('video-knob').style.left = percent;
+    document.getElementById('video-position').textContent = live ? 'Live' : logic.clock(lag);
+    document.getElementById('video-window').textContent = logic.clock(span);
+  }
+
   function stopVideo() {
     if (video) {
       video.stop();
@@ -344,17 +420,20 @@
     videoCover.removeAttribute('src');
     videoView.hidden = true;
     videoView.className = 'video';
+    videoScrub.hidden = true;
+    videoLive.className = 'video-badge live-badge';
+    videoLive.textContent = 'Live';
   }
 
   // The camera's snapshots, refreshed, over the video until it plays.
   function cover(settings) {
     if (!settings.snapshot) return;
     function next() {
-      if (closing || current !== settings || videoView.className === 'video playing') return;
+      if (closing || current !== settings || playing()) return;
       var started = Date.now();
       var image = new Image();
       image.onload = function () {
-        if (current !== settings || videoView.className === 'video playing') return;
+        if (current !== settings || playing()) return;
         videoCover.src = image.src;
         videoCover.hidden = false;
         timers.push(setTimeout(next, Math.max(0, COVER_GAP_MS - (Date.now() - started))));
@@ -387,11 +466,13 @@
         videoView.className = 'video playing';
         videoCover.hidden = true;
         videoLive.hidden = false;
+        showScrub();
+        timers.push(setInterval(showScrub, 250));
       },
       function () {
         dismiss(true);
       },
-      { hlsFirst: true, settle: true }
+      { hlsFirst: true, settle: true, rewind: true }
     );
   }
 
@@ -474,10 +555,39 @@
     show(settings);
   }
 
+  // The remote's keys on a playing camera video: OK and the media keys play and pause, Left,
+  // Right, rewind and fast-forward scrub.
+  var VIDEO_KEYS = {
+    13: togglePause,
+    415: function () {
+      if (player.paused) togglePause();
+    },
+    19: function () {
+      if (!player.paused) togglePause();
+    },
+    37: function () {
+      scrub(-SKIP_S);
+    },
+    412: function () {
+      scrub(-SKIP_S);
+    },
+    39: function () {
+      scrub(SKIP_S);
+    },
+    417: function () {
+      scrub(SKIP_S);
+    },
+  };
+
   document.addEventListener('keydown', function (event) {
+    if (playing() && VIDEO_KEYS[event.keyCode]) {
+      event.preventDefault();
+      VIDEO_KEYS[event.keyCode]();
+      return;
+    }
     // 461 is the webOS remote's Back key; Escape helps when testing in a desktop browser.
-    // OK also closes a camera video, as it does an enlarged camera in Luma. On a doorbell card,
-    // OK first shows it full screen.
+    // OK also closes a camera video that is not playing yet. On a doorbell card, OK first shows
+    // it full screen.
     var ok = event.keyCode === 13;
     var full = !videoView.hidden || expanded;
     if (event.keyCode === 461 || event.keyCode === 27 || (full && ok)) {

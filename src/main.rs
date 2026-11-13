@@ -1300,6 +1300,10 @@ fn run() -> Result<(), String> {
         for update in camera_service.receiver.try_iter() {
             state.camera_update(update);
         }
+        // A paused or rewound enlarged camera shows its kept frame from that moment.
+        if let Some(at) = state.camera_replay(camera_service.recorded(), Instant::now()) {
+            camera_service.replay(at);
+        }
         while let Ok(webhook::Response::Done { title, result }) =
             webhook_service.receiver.try_recv()
         {

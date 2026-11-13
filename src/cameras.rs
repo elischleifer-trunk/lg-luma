@@ -14,12 +14,16 @@
 //! asks it for the address of Home Assistant's HLS stream (the camera's own H.264 video) and the
 //! overlay app plays that full screen with the TV's hardware decoder. The motion-JPEG stream
 //! keeps running underneath: it shows until the video plays, and stays if it cannot.
+//!
+//! The enlarged camera's frames are also kept, as the camera sent them, for [`REWIND`]: Left and
+//! Right scrub back and forward through them and OK pauses and plays, with a replay thread
+//! decoding the frame at the position the gallery asks for.
 use crate::model::clean_input_name;
 use crate::state::{Direction, Effect, Overlay, Rect, State, Target, TextField};
 use image::{ImageReader, Limits, RgbaImage};
 use serde_json::{Value, json};
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     io::{Cursor, Read},
     sync::{
         Arc, Condvar, Mutex,
@@ -46,6 +50,14 @@ const MAX_FRAME_BYTES: usize = 16 * 1024 * 1024;
 const DECODERS: usize = 2;
 /// The enlarged camera's frames are kept at most at the screen's logical size.
 pub const FULL_SIZE: (u32, u32) = (1920, 1080);
+/// How far back the enlarged camera can be rewound, and the most memory its frames may take
+/// (about two minutes of a 2 fps 1080p motion-JPEG stream).
+pub const REWIND: Duration = Duration::from_secs(120);
+const REWIND_BYTES: usize = 48 * 1024 * 1024;
+/// Left and Right skip this far through the enlarged camera's recent frames.
+pub const SKIP: Duration = Duration::from_secs(5);
+/// Closer than this to the newest frame counts as live.
+const LIVE_EDGE: Duration = Duration::from_secs(1);
 
 /// One camera as the gallery shows it. `id` is unique across paired servers.
 #[derive(Clone, Debug, PartialEq)]
@@ -122,6 +134,8 @@ pub struct Watch {
     pub id: String,
     pub source: Source,
     pub size: (u32, u32),
+    /// Keep the camera's recent frames so it can be rewound (the enlarged camera).
+    pub record: bool,
 }
 
 #[derive(Debug)]
@@ -129,6 +143,11 @@ pub enum Update {
     Frame(Arc<Frame>),
     /// The camera could not be loaded; its last frame, if any, stays on screen.
     Unavailable(String),
+    /// A frame from the enlarged camera's recent past, for the replay position asked for.
+    Replay {
+        id: String,
+        frame: Arc<Frame>,
+    },
     /// The address of a camera's HLS stream, or why there is none.
     Video {
         id: String,
@@ -166,6 +185,70 @@ fn origin(url: &str) -> &str {
         .map_or(url, |end| &url[..start + end])
 }
 
+/// The enlarged camera's recent frames, as the camera sent them, oldest first.
+#[derive(Default)]
+struct Recording {
+    id: String,
+    frames: VecDeque<(Instant, Arc<[u8]>)>,
+    bytes: usize,
+    /// The replay position the gallery last asked for, taken by the replay thread.
+    wanted: Option<Instant>,
+    stop: bool,
+}
+
+impl Recording {
+    fn push(&mut self, id: &str, at: Instant, bytes: &[u8]) {
+        if self.id != id {
+            self.clear();
+            self.id = id.to_owned();
+        }
+        self.bytes += bytes.len();
+        self.frames.push_back((at, bytes.into()));
+        while let Some((first, old)) = self.frames.front() {
+            if self.bytes <= REWIND_BYTES && at.saturating_duration_since(*first) <= REWIND {
+                break;
+            }
+            self.bytes -= old.len();
+            self.frames.pop_front();
+        }
+    }
+
+    fn clear(&mut self) {
+        self.id.clear();
+        self.frames.clear();
+        self.bytes = 0;
+        self.wanted = None;
+    }
+
+    /// When the oldest and newest kept frames arrived.
+    fn span(&self) -> Option<(Instant, Instant)> {
+        Some((self.frames.front()?.0, self.frames.back()?.0))
+    }
+
+    /// The newest frame that arrived at or before `at`, else the oldest.
+    fn at(&self, at: Instant) -> Option<(Instant, Arc<[u8]>)> {
+        let after = self.frames.partition_point(|(taken, _)| *taken <= at);
+        self.frames.get(after.saturating_sub(1)).cloned()
+    }
+}
+
+#[derive(Default)]
+struct Replay {
+    recording: Mutex<Recording>,
+    wake: Condvar,
+}
+
+impl Replay {
+    fn lock(&self) -> std::sync::MutexGuard<'_, Recording> {
+        self.recording.lock().unwrap_or_else(|e| e.into_inner())
+    }
+}
+
+/// The key a replayed frame's texture is kept under, apart from the camera's live frames.
+fn replay_key(id: &str) -> String {
+    format!("{id}\nreplay")
+}
+
 /// Limits concurrent decodes.
 #[derive(Default)]
 struct Gate {
@@ -199,6 +282,9 @@ pub struct Service {
     sender: mpsc::Sender<Update>,
     pub receiver: mpsc::Receiver<Update>,
     gate: Arc<Gate>,
+    replay: Arc<Replay>,
+    /// The replay thread, started the first time the gallery rewinds.
+    replaying: bool,
 }
 
 impl Default for Service {
@@ -209,12 +295,16 @@ impl Default for Service {
             sender,
             receiver,
             gate: Arc::default(),
+            replay: Arc::default(),
+            replaying: false,
         }
     }
 }
 
 fn same_kind(a: &Watch, b: &Watch) -> bool {
-    a.size == b.size && std::mem::discriminant(&a.source) == std::mem::discriminant(&b.source)
+    a.size == b.size
+        && a.record == b.record
+        && std::mem::discriminant(&a.source) == std::mem::discriminant(&b.source)
 }
 
 impl Service {
@@ -233,9 +323,39 @@ impl Service {
         }
     }
 
+    /// When the oldest and newest of the enlarged camera's kept frames arrived.
+    pub fn recorded(&self) -> Option<(Instant, Instant)> {
+        self.replay.lock().span()
+    }
+
+    /// Shows the enlarged camera's kept frame from `at` (as [`Update::Replay`]); a frame already
+    /// shown is not decoded again.
+    pub fn replay(&mut self, at: Instant) {
+        self.replay.lock().wanted = Some(at);
+        self.replay.wake.notify_all();
+        if self.replaying {
+            return;
+        }
+        let (replay, sender, gate) = (self.replay.clone(), self.sender.clone(), self.gate.clone());
+        let spawned = thread::Builder::new()
+            .name("camera-replay".into())
+            .spawn(move || play(&replay, &sender, &gate));
+        match spawned {
+            Ok(_) => self.replaying = true,
+            Err(error) => eprintln!("Luma cameras: {error}"),
+        }
+    }
+
     /// Watches exactly these cameras. A camera already watched the same way keeps its worker
     /// (and a connected stream) and only takes new URLs; the others stop.
     pub fn sync(&mut self, watches: &[Watch]) {
+        // Kept frames are large: they go as soon as no camera is enlarged.
+        if !watches.iter().any(|watch| watch.record) {
+            let mut recording = self.replay.lock();
+            if !recording.frames.is_empty() {
+                recording.clear();
+            }
+        }
         self.workers.retain(|id, worker| {
             let keep = watches
                 .iter()
@@ -268,15 +388,16 @@ impl Service {
                 watch: Arc::new(Mutex::new(watch.clone())),
                 stop: Arc::new(AtomicBool::new(false)),
             };
-            let (shared, stop, sender, gate) = (
+            let (shared, stop, sender, gate, replay) = (
                 worker.watch.clone(),
                 worker.stop.clone(),
                 self.sender.clone(),
                 self.gate.clone(),
+                self.replay.clone(),
             );
             let spawned = thread::Builder::new()
                 .name("camera".into())
-                .spawn(move || run(&shared, &stop, &sender, &gate));
+                .spawn(move || run(&shared, &stop, &sender, &gate, &replay));
             if let Err(error) = spawned {
                 eprintln!("Luma cameras: {error}");
                 continue;
@@ -297,6 +418,46 @@ impl Drop for Service {
     fn drop(&mut self) {
         for worker in self.workers.values() {
             worker.stop.store(true, Ordering::Release);
+        }
+        self.replay.lock().stop = true;
+        self.replay.wake.notify_all();
+    }
+}
+
+/// The replay thread: decodes the kept frame at each position the gallery asks for.
+fn play(replay: &Replay, sender: &mpsc::Sender<Update>, gate: &Gate) {
+    let mut shown: Option<(String, Instant)> = None;
+    loop {
+        let (id, taken, bytes) = {
+            let mut recording = replay.lock();
+            loop {
+                if recording.stop {
+                    return;
+                }
+                if let Some(at) = recording.wanted.take() {
+                    if let Some((taken, bytes)) = recording.at(at) {
+                        let next = (recording.id.clone(), taken);
+                        if shown.as_ref() != Some(&next) {
+                            break (next.0, taken, bytes);
+                        }
+                    }
+                    continue;
+                }
+                recording = replay
+                    .wake
+                    .wait(recording)
+                    .unwrap_or_else(|e| e.into_inner());
+            }
+        };
+        shown = Some((id.clone(), taken));
+        match gate.run(|| decode(&bytes, FULL_SIZE)) {
+            Some(pixels) => {
+                let frame = Arc::new(Frame::new(&replay_key(&id), pixels, false));
+                if sender.send(Update::Replay { id, frame }).is_err() {
+                    return;
+                }
+            }
+            None => eprintln!("Luma cameras {id}: a kept frame could not be decoded"),
         }
     }
 }
@@ -338,7 +499,13 @@ fn pause(stop: &AtomicBool, duration: Duration) -> bool {
     false
 }
 
-fn run(shared: &Mutex<Watch>, stop: &AtomicBool, sender: &mpsc::Sender<Update>, gate: &Gate) {
+fn run(
+    shared: &Mutex<Watch>,
+    stop: &AtomicBool,
+    sender: &mpsc::Sender<Update>,
+    gate: &Gate,
+    replay: &Replay,
+) {
     let agent = agent();
     let watch = || shared.lock().unwrap_or_else(|e| e.into_inner()).clone();
     let id = watch().id;
@@ -348,7 +515,10 @@ fn run(shared: &Mutex<Watch>, stop: &AtomicBool, sender: &mpsc::Sender<Update>, 
         }
     };
     let deliver = |bytes: &[u8], live: bool| {
-        let size = watch().size;
+        let Watch { size, record, .. } = watch();
+        if record && !stop.load(Ordering::Acquire) {
+            replay.lock().push(&id, Instant::now(), bytes);
+        }
         match gate.run(|| decode(bytes, size)) {
             Some(pixels) => send(Update::Frame(Arc::new(Frame::new(&id, pixels, live)))),
             None => eprintln!("Luma cameras {id}: a frame could not be decoded"),
@@ -625,6 +795,35 @@ pub enum Sheet {
     Settings,
 }
 
+/// Where the enlarged camera is in its kept frames.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum Playback {
+    #[default]
+    Live,
+    /// Stopped on the frame from this moment.
+    Paused(Instant),
+    /// Playing this far behind live.
+    Behind(Duration),
+}
+
+/// The scrubber under the enlarged camera, in whole quarter seconds: how far back the kept
+/// frames reach, and how far behind live the camera shows.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Scrub {
+    pub window: Duration,
+    pub lag: Duration,
+}
+
+fn quarters(duration: Duration) -> Duration {
+    Duration::from_millis(duration.as_millis() as u64 / 250 * 250)
+}
+
+/// `-m:ss` behind live.
+pub fn clock(lag: Duration) -> String {
+    let seconds = lag.as_secs();
+    format!("-{}:{:02}", seconds / 60, seconds % 60)
+}
+
 #[derive(Default)]
 pub struct Gallery {
     /// Every camera in the owner's order, hidden ones included.
@@ -655,6 +854,13 @@ pub struct Gallery {
     pub renaming: Option<(String, Target)>,
     /// The typed name while renaming.
     pub name_draft: String,
+    /// Live, paused or rewound: the enlarged camera's place in its kept frames.
+    pub playback: Playback,
+    /// When the enlarged camera's oldest and newest kept frames arrived, from the main loop.
+    pub recorded: Option<(Instant, Instant)>,
+    /// The kept frame shown while not live.
+    pub replay: Option<Arc<Frame>>,
+    pub scrub: Option<Scrub>,
 }
 
 impl Gallery {
@@ -743,6 +949,121 @@ impl Gallery {
             self.stop_video = true;
         }
         self.resolve = None;
+        self.playback = Playback::Live;
+        self.replay = None;
+        self.scrub = None;
+    }
+
+    /// With live video on, asks for Home Assistant's HLS stream of the enlarged camera; the
+    /// motion-JPEG stream shows meanwhile, and instead when there is none.
+    fn request_video(&mut self) {
+        let Some(id) = self.enlarged.clone() else {
+            return;
+        };
+        if self.live
+            && self.video == Video::Off
+            && !self.video_failed.contains(&id)
+            && let Some(endpoint) = self.camera(&id).and_then(|c| c.hls.clone())
+        {
+            self.video = Video::Resolving(id.clone());
+            self.resolve = Some((id, endpoint));
+        }
+    }
+
+    /// How far behind live the enlarged camera shows at `now`, within its kept frames.
+    fn lag(&self, now: Instant) -> Duration {
+        let lag = match self.playback {
+            Playback::Live => return Duration::ZERO,
+            Playback::Paused(at) => now.saturating_duration_since(at),
+            Playback::Behind(lag) => lag,
+        };
+        self.recorded.map_or(lag, |(oldest, _)| {
+            lag.min(now.saturating_duration_since(oldest))
+        })
+    }
+
+    /// Back to live: the HLS video, when there is one, takes over again.
+    fn go_live(&mut self) {
+        self.playback = Playback::Live;
+        self.replay = None;
+        self.request_video();
+    }
+
+    /// Left or Right on the enlarged camera: [`SKIP`] back or forward through its kept frames,
+    /// playing or paused as it was; forward to the newest frame goes live.
+    pub fn skip(&mut self, back: bool, now: Instant) {
+        let Some((oldest, _)) = self.recorded else {
+            return;
+        };
+        let lag = self.lag(now);
+        let lag = if back {
+            (lag + SKIP).min(now.saturating_duration_since(oldest))
+        } else {
+            lag.saturating_sub(SKIP)
+        };
+        if lag < LIVE_EDGE && !matches!(self.playback, Playback::Paused(_) if back) {
+            if self.playback != Playback::Live {
+                self.go_live();
+            }
+            return;
+        }
+        if self.playback == Playback::Live {
+            self.hold_frame();
+        }
+        self.playback = match self.playback {
+            Playback::Paused(_) => Playback::Paused(now - lag),
+            _ => Playback::Behind(lag),
+        };
+    }
+
+    /// OK on the enlarged camera: pause, or play from where it paused.
+    pub fn toggle_pause(&mut self, now: Instant) {
+        self.playback = match self.playback {
+            Playback::Live => {
+                self.hold_frame();
+                // The frame on screen is the newest kept one.
+                Playback::Paused(self.recorded.map_or(now, |(_, newest)| newest))
+            }
+            Playback::Paused(_) => {
+                let lag = self.lag(now);
+                if lag < LIVE_EDGE || self.recorded.is_none() {
+                    self.go_live();
+                    return;
+                }
+                Playback::Behind(lag)
+            }
+            Playback::Behind(lag) => Playback::Paused(now - lag),
+        };
+    }
+
+    /// Leaving live keeps the frame on screen until the replay thread decodes the kept one.
+    fn hold_frame(&mut self) {
+        if self.replay.is_none() {
+            self.replay = self
+                .enlarged
+                .as_deref()
+                .and_then(|id| self.frames.get(id))
+                .cloned();
+        }
+    }
+
+    /// The moment of the kept frame to show at `now`, when not live, and the scrubber to draw.
+    /// True when the scrubber changed.
+    pub fn replay_position(&mut self, now: Instant) -> (Option<Instant>, bool) {
+        if self.enlarged.is_none() {
+            return (None, false);
+        }
+        let scrub = self.recorded.map(|(oldest, _)| Scrub {
+            window: quarters(now.saturating_duration_since(oldest)),
+            lag: quarters(self.lag(now)),
+        });
+        let changed = scrub != self.scrub;
+        self.scrub = scrub;
+        let at = match self.playback {
+            Playback::Live => None,
+            _ => now.checked_sub(self.lag(now)),
+        };
+        (at, changed)
     }
 
     pub fn watches(&self) -> Vec<Watch> {
@@ -768,6 +1089,7 @@ impl Gallery {
                 id: camera.id.clone(),
                 source,
                 size: FULL_SIZE,
+                record: true,
             }];
         }
         let visible = self.visible();
@@ -796,6 +1118,7 @@ impl Gallery {
                     id: camera.id.clone(),
                     source,
                     size: layout.frame_size(),
+                    record: false,
                 })
             })
             .collect()
@@ -942,12 +1265,22 @@ impl State {
                     gallery.unavailable.push(id);
                 }
             }
+            Update::Replay { id, frame } => {
+                if gallery.enlarged.as_deref() != Some(id.as_str())
+                    || gallery.playback == Playback::Live
+                {
+                    return;
+                }
+                gallery.replay = Some(frame);
+            }
             Update::Video { id, result } => {
                 // Only for the camera still enlarged and waiting for it.
                 if gallery.video != Video::Resolving(id.clone()) {
                     return;
                 }
                 match result {
+                    // Rewound meanwhile: the video waits until the camera is live again.
+                    Ok(_) if gallery.playback != Playback::Live => gallery.video = Video::Off,
                     Ok(url) => {
                         let title = gallery
                             .camera(&id)
@@ -1002,6 +1335,24 @@ impl State {
             })
     }
 
+    /// The main loop's tick for the enlarged camera: takes the span of its kept frames and
+    /// answers the moment of the kept frame to show, when it is not live.
+    pub fn camera_replay(
+        &mut self,
+        recorded: Option<(Instant, Instant)>,
+        now: Instant,
+    ) -> Option<Instant> {
+        if !self.cameras_visible() {
+            return None;
+        }
+        self.cameras.recorded = recorded;
+        let (at, changed) = self.cameras.replay_position(now);
+        if changed {
+            self.dirty = true;
+        }
+        at
+    }
+
     /// The cameras to fetch frames for: none unless the gallery is open and Luma is seen.
     pub fn camera_watches(&self, visible: bool) -> Vec<Watch> {
         if visible && self.cameras_visible() {
@@ -1040,10 +1391,15 @@ impl State {
     }
 
     pub fn camera_direction(&mut self, direction: Direction) -> Vec<Effect> {
-        let gallery = &self.cameras;
+        let gallery = &mut self.cameras;
         if gallery.enlarged.is_some() {
+            if matches!(direction, Direction::Left | Direction::Right) {
+                gallery.skip(matches!(direction, Direction::Left), Instant::now());
+                self.dirty = true;
+            }
             return vec![];
         }
+        let gallery = &self.cameras;
         if gallery.sheet.is_some() {
             let rows = match gallery.sheet {
                 Some(Sheet::Settings) => gallery.settings(),
@@ -1120,7 +1476,7 @@ impl State {
         self.dirty = true;
         let gallery = &mut self.cameras;
         if gallery.enlarged.is_some() {
-            gallery.shrink();
+            gallery.toggle_pause(Instant::now());
             return vec![];
         }
         if std::mem::take(&mut gallery.moving) {
@@ -1128,16 +1484,8 @@ impl State {
         }
         match self.focus.clone() {
             Target::Camera(id) if gallery.sheet.is_none() => {
-                // With live video, ask for Home Assistant's HLS stream; the motion-JPEG stream
-                // shows meanwhile, and instead when there is none.
-                if gallery.live
-                    && !gallery.video_failed.contains(&id)
-                    && let Some(endpoint) = gallery.camera(&id).and_then(|c| c.hls.clone())
-                {
-                    gallery.video = Video::Resolving(id.clone());
-                    gallery.resolve = Some((id.clone(), endpoint));
-                }
                 gallery.enlarged = Some(id);
+                gallery.request_video();
             }
             Target::CameraGear => self.open_camera_settings(),
             Target::CameraMove => {

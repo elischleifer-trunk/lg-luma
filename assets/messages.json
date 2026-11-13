@@ -3419,6 +3419,21 @@
     "nl": "Momentopnamen",
     "sv": "Stillbilder"
   },
+  "cameraPaused": {
+    "zh-tw": "已暫停",
+    "en": "Paused",
+    "de": "Pausiert",
+    "es": "En pausa",
+    "zh": "已暂停",
+    "pt": "Pausado",
+    "it": "In pausa",
+    "ru": "Пауза",
+    "pl": "Wstrzymano",
+    "fr": "En pause",
+    "vi": "Đã tạm dừng",
+    "nl": "Gepauzeerd",
+    "sv": "Pausad"
+  },
   "cameraShown": {
     "zh-tw": "顯示",
     "en": "Shown",

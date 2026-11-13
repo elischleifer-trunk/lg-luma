@@ -7,7 +7,8 @@ import { parse } from 'acorn';
 const source = await readFile(new URL('../overlay/logic.js', import.meta.url), 'utf8');
 const context = { window: {} };
 vm.runInNewContext(source, context);
-const { settings, video, frameUrl, closedUrl, expandUrl } = context.window.LumaOverlay;
+const { settings, video, frameUrl, closedUrl, expandUrl, seek, behind, clock } =
+  context.window.LumaOverlay;
 // Values built inside the VM have its own Object prototype; compare them as plain JSON.
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -119,4 +120,16 @@ test("the overlay's scripts parse in webOS 4's Chromium 53, which knows ES2016 a
     const source = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
     assert.doesNotThrow(() => parse(source, { ecmaVersion: 2016, sourceType: 'script' }), file);
   }
+});
+
+test('the camera video scrubs within what the TV kept and goes live at the newest', () => {
+  // Kept from 10 s to 130 s; the playhead 2 s behind the newest counts as live.
+  assert.equal(behind(128, 130), 0);
+  assert.equal(seek(128, 10, 130, -5), 123);
+  assert.equal(seek(12, 10, 130, -5), 10);
+  assert.equal(seek(100, 10, 130, 5), 105);
+  assert.equal(seek(124, 10, 130, 5), null);
+  assert.equal(behind(88, 130), 42);
+  assert.equal(clock(42.9), '-0:42');
+  assert.equal(clock(125), '-2:05');
 });
