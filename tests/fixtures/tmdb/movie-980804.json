@@ -1,0 +1,96 @@
+{
+  "request": {
+    "path": "/3/movie/980804",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.766Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/jhmGJmPcuAhF2ccuKluYlLxnyeP.jpg",
+    "belongs_to_collection": {
+      "id": 1004630,
+      "name": "LEGO Star Wars (Seasonal) Collection",
+      "poster_path": "/jHITUzB6fZVOYZ13YCqVTS06iyw.jpg",
+      "backdrop_path": "/cVYUqWzzUSrkLQwb4jlWAkaFCAX.jpg"
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://www.disneyplus.com/movies/lego-star-wars-summer-vacation/2GoPNDot6BnH",
+    "id": 980804,
+    "imdb_id": "tt20784210",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "LEGO Star Wars Summer Vacation",
+    "overview": "Looking for a much-needed break, Finn arranges a surprise vacation for his friends Rey, Poe, Rose, Chewie, BB-8, R2-D2, and C-3PO, aboard the luxurious Halcyon. However, Finn's plan to have one last hurrah together quickly goes awry.",
+    "popularity": 2.307,
+    "poster_path": "/vUL5UXsL5DaYgGVd2GSeqIvMKfK.jpg",
+    "production_companies": [
+      {
+        "id": 1,
+        "logo_path": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png",
+        "name": "Lucasfilm Ltd.",
+        "origin_country": "US"
+      },
+      {
+        "id": 71739,
+        "logo_path": "/9VhJRP6kUOJWH5QvSTeqMQFWuql.png",
+        "name": "Atomic Cartoons",
+        "origin_country": "CA"
+      },
+      {
+        "id": 299443,
+        "logo_path": "/4B43I3FGlYr83zLGEvhBc0vvJIE.png",
+        "name": "The LEGO Group",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2022-08-05",
+    "revenue": 0,
+    "runtime": 49,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "They're going to need a bigger beach.",
+    "title": "LEGO Star Wars Summer Vacation",
+    "video": false,
+    "vote_average": 6.259,
+    "vote_count": 110
+  }
+}

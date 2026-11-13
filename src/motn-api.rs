@@ -2,7 +2,7 @@
 //! `tools/openapi/motn.json` (trimmed from <https://raw.githubusercontent.com/movieofthenight/streaming-availability-api/main/openapi.yaml>).
 //! Do not edit: change `tools/openapi.mjs` and regenerate. HTTP lives in `openapi.rs`.
 use crate::openapi::{Error, Http, Query, QueryValue, encode_path};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Server URLs from the spec, in spec order.
@@ -216,7 +216,7 @@ impl Client {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum OutputLanguage {
     /// English
     #[serde(rename = "en")]
@@ -263,7 +263,7 @@ pub struct GetCountriesParams {
 
 /// Countries are the primary way to get the supported streaming services and addons (such as
 /// list of available Apple TV and Prime Video channels) in a region.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Country {
     /// [ISO 3166-1 alpha-2 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) of the
     /// country.
@@ -276,7 +276,7 @@ pub struct Country {
 }
 
 /// Details of a streaming service localized according to the parent country.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Service {
     /// Id of the service.
     pub id: String,
@@ -299,7 +299,7 @@ pub struct Service {
 }
 
 /// Image set of a service or an addon.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServiceImageSet {
     /// Link to the logo suitable for light themed background.
     #[serde(rename = "lightThemeImage")]
@@ -313,7 +313,7 @@ pub struct ServiceImageSet {
 }
 
 /// Availability of the streaming option types in the service.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct StreamingOptionTypes {
     /// Whether there are shows available via an addon/channel subscription.
     pub addon: bool,
@@ -328,7 +328,7 @@ pub struct StreamingOptionTypes {
 }
 
 /// Details of an addon.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Addon {
     /// Id of the addon.
     pub id: String,
@@ -367,7 +367,7 @@ pub struct GetGenresParams {
 /// Genres are used to categorize shows. Each genre object contains the id and name of the
 /// genre. When fetching genres via [/genres](#get-all-genres) endpoint, you can pass the
 /// output_language parameter to get the genre names in one of the supported languages.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Genre {
     /// Id of a genre.
     pub id: String,
@@ -375,7 +375,7 @@ pub struct Genre {
     pub name: String,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum GetGranularity {
     /// Do not include season or episode info.
     #[serde(rename = "show")]
@@ -432,7 +432,7 @@ pub struct GetShowParams {
 /// A show object represents a movie or a series. Type of the show is determined by the showType
 /// property, which is either movie or series. Based on this type, some properties are omitted,
 /// for example a movie does not have seasonCount and episodeCount properties.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Show {
     /// Type of the item. Always show.
     #[serde(rename = "itemType")]
@@ -494,7 +494,7 @@ pub struct Show {
 }
 
 /// Type of a show.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum ShowType {
     /// A show that is intended to be watched in a single sitting.
     #[serde(rename = "movie")]
@@ -524,7 +524,7 @@ impl QueryValue for ShowType {
 }
 
 /// Image set of a show.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ShowImageSet {
     /// Horizontal image of a show.
     #[serde(rename = "verticalPoster")]
@@ -541,7 +541,7 @@ pub struct ShowImageSet {
 }
 
 /// Horizontal image of a show.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct VerticalImage {
     /// Link to the 240px wide version of the image.
     pub w240: String,
@@ -556,7 +556,7 @@ pub struct VerticalImage {
 }
 
 /// Horizontal image of a show.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct HorizontalImage {
     /// Link to the 360px wide version of the image.
     pub w360: String,
@@ -571,7 +571,7 @@ pub struct HorizontalImage {
 }
 
 /// A streaming option.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct StreamingOption {
     /// Details of the streaming service localized according to the parent country.
     pub service: ServiceInfo,
@@ -608,7 +608,7 @@ pub struct StreamingOption {
 }
 
 /// Details of the streaming service localized according to the parent country.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServiceInfo {
     /// Id of the service.
     pub id: String,
@@ -626,7 +626,7 @@ pub struct ServiceInfo {
 }
 
 /// Type of the streaming option.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum StreamingOptionType {
     /// Free to watch.
     #[serde(rename = "free")]
@@ -668,7 +668,7 @@ impl QueryValue for StreamingOptionType {
 }
 
 /// Maximum supported video quality of the streaming option.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum StreamingOptionQuality {
     /// Standard Definition
     #[serde(rename = "sd")]
@@ -706,7 +706,7 @@ impl QueryValue for StreamingOptionQuality {
 }
 
 /// A language and optionally an associated region.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Locale {
     /// [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639-2) code of the associated language
     /// with the locale.
@@ -717,7 +717,7 @@ pub struct Locale {
     pub region: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Subtitle {
     /// Whether closed captions are available for the subtitle.
     #[serde(rename = "closedCaptions")]
@@ -727,7 +727,7 @@ pub struct Subtitle {
 }
 
 /// Price of the renting or buying the item.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Price {
     /// Numerical amount of the price.
     pub amount: String,
@@ -738,7 +738,7 @@ pub struct Price {
 }
 
 /// Details of a season.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Season {
     /// Type of the item. Always season.
     #[serde(rename = "itemType")]
@@ -759,7 +759,7 @@ pub struct Season {
 }
 
 /// Details of an episode.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Episode {
     /// Type of the item. Always episode.
     #[serde(rename = "itemType")]
@@ -776,7 +776,7 @@ pub struct Episode {
     pub streaming_options: HashMap<String, Vec<StreamingOption>>,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum GenresRelation {
     /// Only bring results that include all of the given genres.
     #[serde(rename = "and")]
@@ -805,7 +805,7 @@ impl QueryValue for GenresRelation {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum SearchFiltersOrderBy {
     /// Order alphabetically by original titles.
     #[serde(rename = "original_title")]
@@ -854,7 +854,7 @@ impl QueryValue for SearchFiltersOrderBy {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum OrderDirection {
     /// Use ascending order.
     #[serde(rename = "asc")]
@@ -933,7 +933,7 @@ pub struct SearchShowsByFiltersParams {
     pub cursor: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct SearchResult {
     /// Array of shows.
     pub shows: Vec<Show>,
@@ -980,7 +980,7 @@ pub struct GetTopShowsParams {
 }
 
 /// Type of the change.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum ChangeType {
     /// Added recently to the catalog.
     #[serde(rename = "new")]
@@ -1023,7 +1023,7 @@ impl QueryValue for ChangeType {
 }
 
 /// Type of an item.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum ItemType {
     /// Show, either a movie or a series
     #[serde(rename = "show")]
@@ -1107,7 +1107,7 @@ pub struct GetChangesParams {
     pub output_language: Option<OutputLanguage>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ChangesResult {
     /// Array of the changes.
     pub changes: Vec<Change>,
@@ -1125,7 +1125,7 @@ pub struct ChangesResult {
 /// details such as the type of the change (could be past change such as like new, updated,
 /// removed; or a future change such as expiring, upcoming), the affected item type (show,
 /// season or episode), timestamp of the change and more.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Change {
     /// Type of the change.
     #[serde(rename = "changeType")]

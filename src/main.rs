@@ -42,10 +42,18 @@ mod motn_api;
 #[allow(dead_code)]
 mod openapi;
 #[allow(dead_code)]
+mod relevance;
+#[allow(dead_code)]
+#[path = "search-cache.rs"]
+mod search_cache;
+#[allow(dead_code)]
 mod streaming;
 #[allow(dead_code)]
 #[path = "streaming-keys.rs"]
 mod streaming_keys;
+#[allow(dead_code)]
+#[path = "streaming-search.rs"]
+mod streaming_search;
 mod text_rendering;
 #[path = "tile-editor.rs"]
 mod tile_editor;

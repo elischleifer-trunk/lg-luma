@@ -1,0 +1,83 @@
+{
+  "request": {
+    "path": "/3/movie/1314481",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:45.334Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/dRoFlUbH1l51ACmx5oPCI3jfvZq.jpg",
+    "belongs_to_collection": {
+      "id": 1314623,
+      "name": "The Devil Wears Prada Collection",
+      "poster_path": "/nlzKiU0L5Rt3eCsUrN6mDtynEQ9.jpg",
+      "backdrop_path": "/h3EaoLd3ZyYyx5ME9dWTXcmTMCM.jpg"
+    },
+    "budget": 100000000,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.20thcenturystudios.com/movies/the-devil-wears-prada-2",
+    "id": 1314481,
+    "imdb_id": "tt33612209",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Devil Wears Prada 2",
+    "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+    "popularity": 23.2714,
+    "poster_path": "/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
+    "production_companies": [
+      {
+        "id": 127928,
+        "logo_path": "/h0rjX5vjW5r8yEnUBStFarjcLT4.png",
+        "name": "20th Century Studios",
+        "origin_country": "US"
+      },
+      {
+        "id": 412,
+        "logo_path": null,
+        "name": "Wendy Finerman Productions",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2026-04-29",
+    "revenue": 691379651,
+    "runtime": 119,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Italian",
+        "iso_639_1": "it",
+        "name": "Italiano"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Icons reign forever.",
+    "title": "The Devil Wears Prada 2",
+    "video": false,
+    "vote_average": 7.013,
+    "vote_count": 2558
+  }
+}

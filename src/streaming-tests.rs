@@ -1,11 +1,22 @@
 use super::*;
+use crate::motn_api::ShowType;
 use serde_json::{Value, json};
 
-fn option(service: &str, kind: &str, price: Option<&str>) -> Value {
+/// A service as the spec requires it; only the ID matters to ranking.
+fn service(id: &str) -> Value {
+    json!({
+        "id": id, "name": id, "homePage": format!("https://{id}.example"),
+        "themeColorCode": "#000000",
+        "imageSet": {"lightThemeImage": "", "darkThemeImage": "", "whiteImage": ""},
+    })
+}
+
+fn option(service_id: &str, kind: &str, price: Option<&str>) -> Value {
     let mut option = json!({
-        "service": {"id": service, "name": service},
+        "service": service(service_id),
         "type": kind,
-        "link": format!("https://{service}.example/watch"),
+        "link": format!("https://{service_id}.example/watch"),
+        "audios": [], "subtitles": [], "availableSince": 0, "expiresSoon": false,
     });
     if let Some(amount) = price {
         option["price"] =
@@ -20,14 +31,26 @@ fn show(id: &str, title: &str, show_type: &str, options: Vec<Value>) -> Show {
         "showType": show_type,
         "id": id,
         "imdbId": "tt0000000",
+        "tmdbId": format!("movie/{id}"),
         "title": title,
+        "originalTitle": title,
         "overview": "",
+        "genres": [],
+        "cast": [],
         "releaseYear": 1984,
         "rating": 78,
-        "imageSet": {},
+        "imageSet": {"verticalPoster": vertical(), "horizontalPoster": horizontal()},
         "streamingOptions": {"us": options},
     }))
     .unwrap()
+}
+
+fn vertical() -> Value {
+    json!({"w240": "", "w360": "", "w480": "", "w600": "", "w720": ""})
+}
+
+fn horizontal() -> Value {
+    json!({"w360": "", "w480": "", "w720": "", "w1080": "", "w1440": ""})
 }
 
 fn ids(list: &[&str]) -> Vec<String> {
@@ -153,15 +176,19 @@ fn results_rank_included_then_paid_then_unavailable_keeping_relevance_order() {
 
 #[test]
 fn unknown_option_types_and_unknown_fields_do_not_break_parsing() {
-    let reply = json!([
-        {"id": "1", "title": "Ghosts", "showType": "series", "firstAirYear": 2021, "newField": true,
-         "streamingOptions": {"us": [option("netflix", "subscription", None),
-            {"service": {"id": "netflix"}, "type": "something-new", "link": ""}]}},
-        {"title": "missing id is skipped"},
-    ]);
+    let mut new_type = option("netflix", "subscription", None);
+    new_type["type"] = json!("something-new");
+    let ghosts = json!({
+        "itemType": "show", "showType": "series", "id": "1", "imdbId": "tt1", "tmdbId": "tv/1",
+        "title": "Ghosts", "originalTitle": "Ghosts", "overview": "", "genres": [], "cast": [],
+        "firstAirYear": 2021, "rating": 74, "newField": true,
+        "imageSet": {"verticalPoster": vertical(), "horizontalPoster": horizontal()},
+        "streamingOptions": {"us": [option("netflix", "subscription", None), new_type]},
+    });
+    let reply = json!([ghosts, {"title": "missing id is skipped"}]);
     let shows = parse_search(&reply).unwrap();
     assert_eq!(shows.len(), 1);
-    assert_eq!(shows[0].year(), Some(2021));
+    assert_eq!(year(&shows[0]), Some(2021));
     assert_eq!(shows[0].show_type, ShowType::Series);
     assert_eq!(
         pick(&shows[0], "us", &services()).0.unwrap().app_id,

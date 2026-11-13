@@ -1,0 +1,73 @@
+{
+  "request": {
+    "path": "/3/movie/140383",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.009Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/wfH4KecQP5eFlIdpNVu4BeVyhSz.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 140383,
+    "imdb_id": "tt0041710",
+    "origin_country": [
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "Occupe-toi d'Amélie..!",
+    "overview": "A young woman's comfortable life with her boyfriend is disrupted when he leaves for military duty, entrusting her to a playboy friend seeking a fake marriage for inheritance. Complications arise as a prince enters the scene, pursuing her romantically.",
+    "popularity": 0.4908,
+    "poster_path": "/vyHFlsMpWi3P7twhs5RMdNiTy4K.jpg",
+    "production_companies": [
+      {
+        "id": 1679,
+        "logo_path": null,
+        "name": "Lux Film",
+        "origin_country": "IT"
+      },
+      {
+        "id": 12243,
+        "logo_path": "/hztlrOaMK77kKdErDwogso0m2YS.png",
+        "name": "Lux Compagnie Cinématographique de France",
+        "origin_country": "FR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IT",
+        "name": "Italy"
+      },
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "1949-12-16",
+    "revenue": 0,
+    "runtime": 92,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Keep an Eye on Amelia",
+    "video": false,
+    "vote_average": 6.5,
+    "vote_count": 14
+  }
+}

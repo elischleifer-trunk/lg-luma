@@ -1,0 +1,68 @@
+{
+  "request": {
+    "path": "/3/movie/880966",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:24.919Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "",
+    "id": 880966,
+    "imdb_id": null,
+    "origin_country": [
+      "AU",
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Bluey",
+    "overview": "An Aussie Horror Story, is the hilarious comedy flick inspired by the Australian TV shows taking the world by strom",
+    "popularity": 0.0952,
+    "poster_path": null,
+    "production_companies": [
+      {
+        "id": 161985,
+        "logo_path": null,
+        "name": "Bay Rock Films",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "AU",
+        "name": "Australia"
+      }
+    ],
+    "release_date": "2021-01-20",
+    "revenue": 0,
+    "runtime": 3,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Bluey",
+    "video": true,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

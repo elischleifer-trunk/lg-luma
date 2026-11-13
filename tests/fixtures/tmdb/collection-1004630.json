@@ -1,0 +1,90 @@
+{
+  "request": {
+    "path": "/3/collection/1004630",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:47.169Z",
+  "response": {
+    "id": 1004630,
+    "name": "LEGO Star Wars (Seasonal) Collection",
+    "original_language": "en",
+    "original_name": "LEGO Star Wars (Seasonal) Collection",
+    "overview": "A collection of LEGO Stars Wars seasonal specials released on Disney+.",
+    "poster_path": "/jHITUzB6fZVOYZ13YCqVTS06iyw.jpg",
+    "backdrop_path": "/cVYUqWzzUSrkLQwb4jlWAkaFCAX.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/ucEQXe6wPpPhgcJh4oXOAvX1lnb.jpg",
+        "id": 732670,
+        "title": "LEGO Star Wars Holiday Special",
+        "original_title": "LEGO Star Wars Holiday Special",
+        "overview": "As her friends prep for a Life Day holiday celebration, Rey journeys with BB-8 on a quest to gain a deeper knowledge of the Force at a mysterious Jedi Temple. There, she embarks on a cross-timeline adventure through beloved moments in Star Wars history, coming into contact with iconic heroes and villains from all eras of the saga. But will she make it back in time for the Life Day feast?",
+        "poster_path": "/zyzJSI7UZZzz5Toj10rYGF5689z.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10751,
+          878,
+          12,
+          35
+        ],
+        "popularity": 2.3663,
+        "release_date": "2020-11-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.564,
+        "vote_count": 377
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/f53Jujiap580mgfefID0T0g2e17.jpg",
+        "id": 857702,
+        "title": "LEGO Star Wars Terrifying Tales",
+        "original_title": "LEGO Star Wars Terrifying Tales",
+        "overview": "Poe Dameron and BB-8 must face the greedy crime boss Graballa the Hutt, who has purchased Darth Vader’s castle and is renovating it into the galaxy’s first all-inclusive Sith-inspired luxury hotel.",
+        "poster_path": "/fYiaBZDjyXjvlY6EDZMAxIhBO1I.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10751,
+          878,
+          35
+        ],
+        "popularity": 2.2906,
+        "release_date": "2021-10-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.789,
+        "vote_count": 292
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jhmGJmPcuAhF2ccuKluYlLxnyeP.jpg",
+        "id": 980804,
+        "title": "LEGO Star Wars Summer Vacation",
+        "original_title": "LEGO Star Wars Summer Vacation",
+        "overview": "Looking for a much-needed break, Finn arranges a surprise vacation for his friends Rey, Poe, Rose, Chewie, BB-8, R2-D2, and C-3PO, aboard the luxurious Halcyon. However, Finn's plan to have one last hurrah together quickly goes awry.",
+        "poster_path": "/vUL5UXsL5DaYgGVd2GSeqIvMKfK.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10751,
+          878,
+          35
+        ],
+        "popularity": 2.307,
+        "release_date": "2022-08-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.259,
+        "vote_count": 110
+      }
+    ]
+  }
+}

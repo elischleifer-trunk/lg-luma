@@ -24,6 +24,16 @@
     }
   },
   {
+    "name": "search-title-ghostbusters",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "ghostbusters",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
     "name": "search-title-star-wars",
     "path": "/shows/search/title",
     "query": {

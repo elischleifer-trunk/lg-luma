@@ -1,0 +1,128 @@
+{
+  "request": {
+    "path": "/3/tv/127613",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:14.549Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/qUSBsukeHv9GrPy2pXzmWP1kZ7c.jpg",
+    "created_by": [
+      {
+        "id": 3127522,
+        "credit_id": "60cb035751c01f0040fff92f",
+        "name": "Sunil Teli STR",
+        "original_name": "Sunil Teli STR",
+        "gender": 0,
+        "profile_path": "/6dsvXIbyiUD0cf0sDkILgPCet0i.jpg"
+      }
+    ],
+    "episode_run_time": [
+      70
+    ],
+    "first_air_date": "2021-08-16",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 9648,
+        "name": "Mystery"
+      }
+    ],
+    "homepage": "",
+    "id": 127613,
+    "in_production": true,
+    "languages": [
+      "hi"
+    ],
+    "last_air_date": "2021-08-16",
+    "last_episode_to_air": {
+      "id": 3029088,
+      "name": "Episode 5",
+      "overview": "However all of them found what's going on with them also understood what ghost really want to them. They found a solution to stuck out but what is next will is works ?",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2021-08-16",
+      "episode_number": 5,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 70,
+      "season_number": 1,
+      "show_id": 127613,
+      "still_path": "/xh23Vhjf6GVnKyVJnAR3wYvSqUk.jpg"
+    },
+    "name": "Gho.C.Hu.",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2964,
+        "logo_path": "/xKMlXKggJ1mTsfC5OSnlBKuFccO.png",
+        "name": "MX Player",
+        "origin_country": "IN"
+      }
+    ],
+    "number_of_episodes": 5,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_name": "Gho.C.Hu.",
+    "overview": "Four Friends rent a ruins house and decide to surprise her friend by horror things but after they experience real ghost then something happened unexpected to them.",
+    "popularity": 0.2333,
+    "poster_path": "/liIFeMQcyHJdHyO3Zo8SnfzGnRm.jpg",
+    "production_companies": [
+      {
+        "id": 155941,
+        "logo_path": "/jJ0NOKJKbsQly9ZhTuIxzfLmaUk.png",
+        "name": "STR Motion Pictures",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2021-08-16",
+        "episode_count": 5,
+        "id": 199348,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/liIFeMQcyHJdHyO3Zo8SnfzGnRm.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": null,
+        "episode_count": 0,
+        "id": 199386,
+        "name": "Gho.C.Hu. S.",
+        "overview": "After that incident All of those life is going to change and that's  very big Change in those life. Be prepare to experience all that with double trouble.",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "Hunters become hunted.",
+    "type": "Miniseries",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

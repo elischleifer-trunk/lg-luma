@@ -16,6 +16,8 @@ pub enum Error {
     TooLarge,
     /// The reply was not the JSON the spec describes.
     Decode(String),
+    /// The API cannot be called: its key is not set.
+    NotConfigured(&'static str),
 }
 
 impl fmt::Display for Error {
@@ -26,6 +28,7 @@ impl fmt::Display for Error {
             Error::Status { status, message } => write!(f, "HTTP {status}: {message}"),
             Error::TooLarge => f.write_str("The reply is too large"),
             Error::Decode(e) => write!(f, "Unreadable reply: {e}"),
+            Error::NotConfigured(api) => write!(f, "{api} key is not set"),
         }
     }
 }
@@ -232,7 +235,41 @@ mod tests {
             result.unwrap_or_else(|e| panic!("{}: {e}", file.display()));
             checked += 1;
         }
-        assert_eq!(checked, 18);
+        assert_eq!(checked, 19);
+    }
+
+    /// Every captured TMDB reply decodes into the generated type for its endpoint. This is how
+    /// the spec's wrong season rating type was found (see `patches` in tools/openapi.mjs).
+    #[test]
+    fn captured_tmdb_replies_decode_into_generated_types() {
+        use crate::tmdb_api::{
+            CollectionDetailsResponse, MovieDetailsResponse, SearchMultiResponse,
+            TvSeriesDetailsResponse,
+        };
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/tmdb");
+        let mut checked = 0;
+        for entry in std::fs::read_dir(&dir).unwrap() {
+            let file = entry.unwrap().path();
+            let name = file.file_name().unwrap().to_string_lossy().into_owned();
+            if name == "index.json" {
+                continue;
+            }
+            let record: serde_json::Value =
+                serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap();
+            let reply = record["response"].clone();
+            let result = match name.split('-').next().unwrap() {
+                "search" => serde_json::from_value::<SearchMultiResponse>(reply).map(drop),
+                "movie" => serde_json::from_value::<MovieDetailsResponse>(reply).map(drop),
+                "tv" => serde_json::from_value::<TvSeriesDetailsResponse>(reply).map(drop),
+                "collection" => {
+                    serde_json::from_value::<CollectionDetailsResponse>(reply).map(drop)
+                }
+                other => panic!("{name}: no type for {other}"),
+            };
+            result.unwrap_or_else(|e| panic!("{name}: {e}"));
+            checked += 1;
+        }
+        assert!(checked > 200, "{checked}");
     }
 
     #[test]

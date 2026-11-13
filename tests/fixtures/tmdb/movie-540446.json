@@ -1,0 +1,56 @@
+{
+  "request": {
+    "path": "/3/movie/540446",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:23.815Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 540446,
+    "imdb_id": "tt0239741",
+    "origin_country": [
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_title": "Occupe-toi d'Amélie",
+    "overview": "Film adaptation of Georges Feydeau's 1908 stage farce.",
+    "popularity": 0.3909,
+    "poster_path": "/sDbu1WmC31eOr9one7SPiQt2g72.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "1932-12-07",
+    "revenue": 0,
+    "runtime": 107,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Take Care of Amelie",
+    "video": false,
+    "vote_average": 7,
+    "vote_count": 1
+  }
+}

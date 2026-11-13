@@ -1,0 +1,62 @@
+{
+  "request": {
+    "path": "/3/collection/1679602",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:29.334Z",
+  "response": {
+    "id": 1679602,
+    "name": "Ghost in the Cell Collection",
+    "original_language": "en",
+    "original_name": "Ghost in the Cell Collection",
+    "overview": "A Ghost in the Cell Collection",
+    "poster_path": null,
+    "backdrop_path": null,
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/tK3QdOOrX4qEkmSlvrmc8cK7iOU.jpg",
+        "id": 1393326,
+        "title": "Ghost in the Cell",
+        "original_title": "Ghost in the Cell",
+        "overview": "In a notorious prison, an invisible force begins killing inmates brutally, compelling enemy gangs and corrupt guards to work together as they try to survive the mounting bloodshed.",
+        "poster_path": "/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg",
+        "media_type": "movie",
+        "original_language": "id",
+        "genre_ids": [
+          27,
+          35
+        ],
+        "popularity": 40.1222,
+        "release_date": "2026-04-16",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.8,
+        "vote_count": 118
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1679600,
+        "title": "Ghost in the Cell 2",
+        "original_title": "Ghost in the Cell 2",
+        "overview": "",
+        "poster_path": null,
+        "media_type": "movie",
+        "original_language": "id",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "popularity": 0.454,
+        "release_date": "",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "request": {
+    "path": "/3/movie/188628",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:43.665Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/w0fkX7sLwR8OfiICwbbyj7nSZj3.jpg",
+    "belongs_to_collection": null,
+    "budget": 50000,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "",
+    "id": 188628,
+    "imdb_id": "tt0068425",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Cremators",
+    "overview": "An alien life form, resembling glowing rocks, summons forth a huge, rolling ball of fire, whenever threatened, that incinerates people.",
+    "popularity": 0.6596,
+    "poster_path": "/7lOox9krlgwCcIr8IaCNmYiybHk.jpg",
+    "production_companies": [
+      {
+        "id": 92277,
+        "logo_path": null,
+        "name": "Arista Productions Inc.",
+        "origin_country": ""
+      },
+      {
+        "id": 1950,
+        "logo_path": "/eIoDtHIJKZaZ4hGbKgqC0PzlqJc.png",
+        "name": "New World Pictures",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "1972-09-06",
+    "revenue": 0,
+    "runtime": 72,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "From the sun come the Fire-People to incinerate all mankind! Great Balls of Fire: Scorching! Ravaging! Engulfing!",
+    "title": "The Cremators",
+    "video": false,
+    "vote_average": 2.792,
+    "vote_count": 12
+  }
+}

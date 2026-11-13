@@ -2,7 +2,7 @@
 //! `tools/openapi/tmdb.json` (trimmed from <https://developer.themoviedb.org/openapi/tmdb-api.json>).
 //! Do not edit: change `tools/openapi.mjs` and regenerate. HTTP lives in `openapi.rs`.
 use crate::openapi::{Error, Http, Query, QueryValue, encode_path};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Server URLs from the spec, in spec order.
 pub const SERVERS: &[&str] = &["https://api.themoviedb.org"];
@@ -15,6 +15,24 @@ pub struct Client {
 impl Client {
     pub fn new(http: Http) -> Self {
         Self { http }
+    }
+
+    /// Details
+    ///
+    /// `GET /3/collection/{collection_id}`
+    pub fn collection_details(
+        &self,
+        params: &CollectionDetailsParams,
+    ) -> Result<CollectionDetailsResponse, Error> {
+        let path = format!(
+            "/3/collection/{}",
+            encode_path(&params.collection_id.to_query())
+        );
+        let mut query = Query::default();
+        if let Some(value) = &params.language {
+            query.add("language", value);
+        }
+        self.http.get(&path, &query)
     }
 
     /// Find By ID
@@ -86,7 +104,45 @@ impl Client {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]
+/// Parameters of [`Client::collection_details`].
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct CollectionDetailsParams {
+    pub collection_id: i64,
+    pub language: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct CollectionDetailsResponse {
+    pub id: Option<i64>,
+    pub name: Option<String>,
+    pub original_language: Option<String>,
+    pub original_name: Option<String>,
+    pub overview: Option<String>,
+    pub poster_path: Option<String>,
+    pub backdrop_path: Option<String>,
+    pub parts: Option<Vec<CollectionDetailsResponsePart>>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct CollectionDetailsResponsePart {
+    pub adult: Option<bool>,
+    pub backdrop_path: Option<String>,
+    pub id: Option<i64>,
+    pub name: Option<String>,
+    pub original_name: Option<String>,
+    pub overview: Option<String>,
+    pub poster_path: Option<String>,
+    pub media_type: Option<String>,
+    pub original_language: Option<String>,
+    pub genre_ids: Option<Vec<i64>>,
+    pub popularity: Option<f64>,
+    pub release_date: Option<String>,
+    pub video: Option<bool>,
+    pub vote_average: Option<f64>,
+    pub vote_count: Option<i64>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum ExternalSource {
     #[serde(rename = "imdb_id")]
     ImdbId,
@@ -139,7 +195,7 @@ pub struct FindByIdParams {
     pub language: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FindByIdResponse {
     pub movie_results: Option<Vec<FindByIdResponseMovieResult>>,
     pub person_results: Option<Vec<serde_json::Value>>,
@@ -148,7 +204,7 @@ pub struct FindByIdResponse {
     pub tv_season_results: Option<Vec<serde_json::Value>>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FindByIdResponseMovieResult {
     pub adult: Option<bool>,
     pub backdrop_path: Option<String>,
@@ -176,7 +232,7 @@ pub struct MovieDetailsParams {
     pub language: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct MovieDetailsResponse {
     pub adult: Option<bool>,
     pub backdrop_path: Option<String>,
@@ -206,7 +262,7 @@ pub struct MovieDetailsResponse {
     pub vote_count: Option<i64>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct MovieDetailsResponseBelongsToCollection {
     pub id: Option<i64>,
     pub name: Option<String>,
@@ -214,13 +270,13 @@ pub struct MovieDetailsResponseBelongsToCollection {
     pub backdrop_path: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct MovieDetailsResponseGenre {
     pub id: Option<i64>,
     pub name: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct MovieDetailsResponseProductionCompany {
     pub id: Option<i64>,
     pub logo_path: Option<String>,
@@ -228,13 +284,13 @@ pub struct MovieDetailsResponseProductionCompany {
     pub origin_country: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct MovieDetailsResponseProductionCountry {
     pub iso_3166_1: Option<String>,
     pub name: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct MovieDetailsResponseSpokenLanguage {
     pub english_name: Option<String>,
     pub iso_639_1: Option<String>,
@@ -250,7 +306,7 @@ pub struct SearchMultiParams {
     pub page: Option<i64>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct SearchMultiResponse {
     pub page: Option<i64>,
     pub results: Option<Vec<SearchMultiResponseResult>>,
@@ -258,7 +314,7 @@ pub struct SearchMultiResponse {
     pub total_results: Option<i64>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct SearchMultiResponseResult {
     pub adult: Option<bool>,
     pub backdrop_path: Option<String>,
@@ -288,7 +344,7 @@ pub struct TvSeriesDetailsParams {
     pub language: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponse {
     pub adult: Option<bool>,
     pub backdrop_path: Option<String>,
@@ -324,7 +380,7 @@ pub struct TvSeriesDetailsResponse {
     pub vote_count: Option<i64>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseCreatedBy {
     pub id: Option<i64>,
     pub credit_id: Option<String>,
@@ -333,13 +389,13 @@ pub struct TvSeriesDetailsResponseCreatedBy {
     pub profile_path: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseGenre {
     pub id: Option<i64>,
     pub name: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseLastEpisodeToAir {
     pub id: Option<i64>,
     pub name: Option<String>,
@@ -355,7 +411,7 @@ pub struct TvSeriesDetailsResponseLastEpisodeToAir {
     pub still_path: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseNetwork {
     pub id: Option<i64>,
     pub logo_path: Option<String>,
@@ -363,7 +419,7 @@ pub struct TvSeriesDetailsResponseNetwork {
     pub origin_country: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseProductionCompany {
     pub id: Option<i64>,
     pub logo_path: Option<String>,
@@ -371,13 +427,13 @@ pub struct TvSeriesDetailsResponseProductionCompany {
     pub origin_country: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseProductionCountry {
     pub iso_3166_1: Option<String>,
     pub name: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseSeason {
     pub air_date: Option<String>,
     pub episode_count: Option<i64>,
@@ -386,10 +442,10 @@ pub struct TvSeriesDetailsResponseSeason {
     pub overview: Option<String>,
     pub poster_path: Option<String>,
     pub season_number: Option<i64>,
-    pub vote_average: Option<i64>,
+    pub vote_average: Option<f64>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct TvSeriesDetailsResponseSpokenLanguage {
     pub english_name: Option<String>,
     pub iso_639_1: Option<String>,

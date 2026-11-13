@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/10154",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.560Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7BUkUyHAijyZ8UpMxnn3TM5vHwg.jpg",
+    "belongs_to_collection": null,
+    "budget": 75000000,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 10749,
+        "name": "Romance"
+      }
+    ],
+    "homepage": "",
+    "id": 10154,
+    "imdb_id": "tt0130121",
+    "origin_country": [
+      "US",
+      "GB"
+    ],
+    "original_language": "en",
+    "original_title": "Mickey Blue Eyes",
+    "overview": "An English auctioneer proposes to the daughter of a mafia kingpin, only to realize that certain \"favors\" would be asked of him.",
+    "popularity": 2.1404,
+    "poster_path": "/gEnKsStQ27P0KCCIGtkYwvFQ0RX.jpg",
+    "production_companies": [
+      {
+        "id": 97,
+        "logo_path": "/smyTD67uNsdaySnnjVDmh0kyotp.png",
+        "name": "Castle Rock Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 10153,
+        "logo_path": null,
+        "name": "Simian Films",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "1999-08-16",
+    "revenue": 54264342,
+    "runtime": 102,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "A romantic comedy you can't refuse",
+    "title": "Mickey Blue Eyes",
+    "video": false,
+    "vote_average": 5.686,
+    "vote_count": 618
+  }
+}

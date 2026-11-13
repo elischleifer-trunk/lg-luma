@@ -1,0 +1,71 @@
+{
+  "request": {
+    "path": "/3/movie/1211769",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.354Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/brmwVNiysVYPYrpl4TeI1fqxrNB.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "",
+    "id": 1211769,
+    "imdb_id": "tt18280928",
+    "origin_country": [
+      "IT"
+    ],
+    "original_language": "it",
+    "original_title": "Assault on Florence: A Ghostbusters Story",
+    "overview": "When ghosts invade Florence, who you gonna call?",
+    "popularity": 0.3178,
+    "poster_path": "/beokcZl2jkPGqkvjeS9sJL03CrT.jpg",
+    "production_companies": [
+      {
+        "id": 214779,
+        "logo_path": null,
+        "name": "Gens Florentiae",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IT",
+        "name": "Italy"
+      }
+    ],
+    "release_date": "2023-10-31",
+    "revenue": 0,
+    "runtime": 75,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Italian",
+        "iso_639_1": "it",
+        "name": "Italiano"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Assault on Florence: A Ghostbusters Story",
+    "video": false,
+    "vote_average": 7,
+    "vote_count": 1
+  }
+}

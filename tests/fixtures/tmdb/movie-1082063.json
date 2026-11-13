@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/1082063",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.106Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/tDbMom0pFUjJ8u0ScLsZbdPm1aD.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 9648,
+        "name": "Mystery"
+      }
+    ],
+    "homepage": "https://www.magnetreleasing.com/ameliaschildren",
+    "id": 1082063,
+    "imdb_id": "tt26594993",
+    "origin_country": [
+      "PT"
+    ],
+    "original_language": "en",
+    "original_title": "A Semente do Mal",
+    "overview": "When Edward’s search for his biological family leads him and his girlfriend Ryley to a magnificent villa high in the mountains of Northern Portugal, he is full of excitement at meeting his long-lost mother and twin brother. Finally, he will discover who he is and where he comes from. But nothing is as it seems, and Edward will soon learn that he is linked to them by a monstrous secret.",
+    "popularity": 1.5111,
+    "poster_path": "/ri9cazZeb7QKlmJpLZ7PpJelHb.jpg",
+    "production_companies": [
+      {
+        "id": 117890,
+        "logo_path": null,
+        "name": "Artificial Humors",
+        "origin_country": "PT"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "PT",
+        "name": "Portugal"
+      }
+    ],
+    "release_date": "2024-01-18",
+    "revenue": 0,
+    "runtime": 91,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Portuguese",
+        "iso_639_1": "pt",
+        "name": "Português"
+      },
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "A mother's love never dies.",
+    "title": "Amelia’s Children",
+    "video": false,
+    "vote_average": 6,
+    "vote_count": 166
+  }
+}

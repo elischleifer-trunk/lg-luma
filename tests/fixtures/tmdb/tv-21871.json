@@ -1,0 +1,111 @@
+{
+  "request": {
+    "path": "/3/tv/21871",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:16.632Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/napJI40XqbQ4wv5zgPbJlgboEAJ.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      7
+    ],
+    "first_air_date": "1988-09-10",
+    "genres": [
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10762,
+        "name": "Kids"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 21871,
+    "in_production": false,
+    "languages": [
+      "de",
+      "en"
+    ],
+    "last_air_date": "1989-04-08",
+    "last_episode_to_air": {
+      "id": 602188,
+      "name": "Sweet Revenge",
+      "overview": "On Halloween Slimer and Fred head out to collect bags of goodies, but unbeknownst to them, Professor Dweeb teams up with Goolem and Zugg in a plan to get rid of Slimer.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1989-04-08",
+      "episode_number": 33,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 30,
+      "season_number": 1,
+      "show_id": 21871,
+      "still_path": null
+    },
+    "name": "Slimer! and the Real Ghostbusters",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2,
+        "logo_path": "/2uy2ZWcplrSObIyt4x0Y9rkG6qO.png",
+        "name": "ABC",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 33,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Slimer! and the Real Ghostbusters",
+    "overview": "Episodes feature the Ghostbusters as well as their secretary Janine. But the main star of this show is their pet ghost Slimer, who's joined by some new friends and some new enemies.",
+    "popularity": 4.9732,
+    "poster_path": "/tz66RkWHcjwR2c3nJWaDxgC4a1G.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "1988-09-10",
+        "episode_count": 33,
+        "id": 31658,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/wnpd7YoovRjqrowPhbENGPnA5Zn.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "German",
+        "iso_639_1": "de",
+        "name": "Deutsch"
+      },
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7,
+    "vote_count": 19
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "request": {
+    "path": "/3/movie/236426",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.198Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/oTWLcdVrcjDdf3Cp4zQyZ561Cex.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 99,
+        "name": "Documentary"
+      }
+    ],
+    "homepage": "https://buenoproductions.com/films/cleanin-up-the-town-remembering-ghostbusters/",
+    "id": 236426,
+    "imdb_id": "tt1446678",
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_title": "Cleanin' Up the Town: Remembering Ghostbusters",
+    "overview": "The documentary that tells us the full story from where it all started through to the future of the \"Ghostbusters\" franchise.",
+    "popularity": 1.1808,
+    "poster_path": "/kcc6qTeofnrBYX84LbvLIeHzIf0.jpg",
+    "production_companies": [
+      {
+        "id": 264718,
+        "logo_path": null,
+        "name": "Bueno Productions",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "release_date": "2020-01-07",
+    "revenue": 0,
+    "runtime": 101,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "First in 1984. Again in '89. Still in 2016, bustin' makes us feel good",
+    "title": "Cleanin' Up the Town: Remembering Ghostbusters",
+    "video": false,
+    "vote_average": 6.778,
+    "vote_count": 18
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "request": {
+    "path": "/3/tv/316461",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.642Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/KW4meIHP81E95GRrtzEsLFn8Dk.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      30
+    ],
+    "first_air_date": "2026-04-07",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.ytv.co.jp/smokeblue/",
+    "id": 316461,
+    "in_production": false,
+    "languages": [
+      "ja"
+    ],
+    "last_air_date": "2026-06-09",
+    "last_episode_to_air": {
+      "id": 7191151,
+      "name": "Continuously",
+      "overview": "Kuji hands Sakutaro a spare key and prepares to reveal their relationship to Tamaki as both take a new step forward.",
+      "vote_average": 10,
+      "vote_count": 1,
+      "air_date": "2026-06-09",
+      "episode_number": 10,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 24,
+      "season_number": 1,
+      "show_id": 316461,
+      "still_path": "/s2QQ01HoqGmIseZVa86xTmB9pF3.jpg"
+    },
+    "name": "Life in Smokey Blue",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 569,
+        "logo_path": "/cIMyE9cw1W4kMFGxmC17HKTnVz9.png",
+        "name": "YTV",
+        "origin_country": "JP"
+      }
+    ],
+    "number_of_episodes": 10,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_name": "スモークブルーの雨のち晴れ",
+    "overview": "Struggling salesman Sakutaro reunites with his sharp-tongued former rival Kuji, reigniting a buried one-night spark from eight years ago.",
+    "popularity": 2.1363,
+    "poster_path": "/iTA1WdsUguCjiBmvppWAPN1y7JE.jpg",
+    "production_companies": [
+      {
+        "id": 11727,
+        "logo_path": "/cIMyE9cw1W4kMFGxmC17HKTnVz9.png",
+        "name": "Yomiuri Telecasting Corporation",
+        "origin_country": "JP"
+      },
+      {
+        "id": 55938,
+        "logo_path": "/ku5PUEwBjUx8XaYikgaXRVLIMbb.png",
+        "name": "avex pictures",
+        "origin_country": "JP"
+      },
+      {
+        "id": 78953,
+        "logo_path": "/b5I0WTTLUoxNJgmtEVaL4pt7T4H.png",
+        "name": "LesPros Entertainment",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-04-07",
+        "episode_count": 10,
+        "id": 504908,
+        "name": "Season 1",
+        "overview": "Struggling salesman Sakutaro reunites with his sharp-tongued former rival Kuji, reigniting a buried one-night spark from eight years ago.",
+        "poster_path": "/iTA1WdsUguCjiBmvppWAPN1y7JE.jpg",
+        "season_number": 1,
+        "vote_average": 10
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Miniseries",
+    "vote_average": 7.95,
+    "vote_count": 10
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/1413356",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.704Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 1413356,
+    "imdb_id": "tt0225140",
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "en",
+    "original_title": "Back Alley Blue",
+    "overview": "Stolen money, a love intrigue and a police chase unite with the main theme, which is a day in the life of an old woman who scratches out a living collecting used pop bottles and picking through back alleys. She is not too poor, however, to return a kindness.",
+    "popularity": 0.0319,
+    "poster_path": null,
+    "production_companies": [
+      {
+        "id": 10473,
+        "logo_path": "/lMUDQZVtg8On4PAW5XFQPaQy6UK.png",
+        "name": "ONF | NFB",
+        "origin_country": "CA"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "release_date": "1977-01-01",
+    "revenue": 0,
+    "runtime": 25,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Back Alley Blue",
+    "video": false,
+    "vote_average": 9,
+    "vote_count": 1
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "request": {
+    "path": "/3/tv/36024",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:15.115Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/aqIOOXlKuhlIbnp3cSNBVd33bNx.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      25
+    ],
+    "first_air_date": "2007-10-18",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 9648,
+        "name": "Mystery"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "",
+    "id": 36024,
+    "in_production": false,
+    "languages": [
+      "en",
+      "ja"
+    ],
+    "last_air_date": "2008-04-03",
+    "last_episode_to_air": {
+      "id": 817884,
+      "name": "Passage",
+      "overview": "Makoto and Masayuki help devise a plan to allow Taro to enter the shrine where Miyako is being held as the leader of the Ogami religious group. Only women and girls are allowed to enter, so the boys plan on dressing Taro up as a young female so that he may enter and rescue Miyako. Hirata and Reika also assist in carrying out the plan.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2008-04-03",
+      "episode_number": 22,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 25,
+      "season_number": 1,
+      "show_id": 36024,
+      "still_path": "/gwDWKlpO7yrtkKJvTKKnqicDc9Y.jpg"
+    },
+    "name": "Ghost Hound",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 172,
+        "logo_path": "/dCN47YS5lugkwts5ellpW51cBzL.png",
+        "name": "WOWOW Prime",
+        "origin_country": "JP"
+      }
+    ],
+    "number_of_episodes": 22,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_name": "神霊狩／GHOST HOUND",
+    "overview": "In an isolated region of Kyushu lies the town of Suiten. Though seeming small and modest, Suiten is not a picturesque place for a vacation, unless it is from the “Unseen World”. Taro, Makoto and Masayuki, three boys with traumatic pasts, learn to let their souls cross between the two parallel worlds. However, the Unseen World is no mere copy of the real Apparent World. The Unseen World is the home of ghosts, but changes are now allowing the souls of the dead to pass over into the Apparent World, with unpredictable effects. Follow the journey of Taro, Makoto and Masayuki, as they cross between the two worlds, trying to unravel a great mystery.",
+    "popularity": 6.7959,
+    "poster_path": "/mebvYDOMnnadzDDbJOdjQRnap63.jpg",
+    "production_companies": [
+      {
+        "id": 529,
+        "logo_path": "/rwB6w2aPENQbx756pBWSw44Ouk.png",
+        "name": "Production I.G",
+        "origin_country": "JP"
+      },
+      {
+        "id": 17392,
+        "logo_path": "/kqIFj3dASar2j9rm7jHph5493GB.png",
+        "name": "Showgate",
+        "origin_country": "JP"
+      },
+      {
+        "id": 9148,
+        "logo_path": "/rtW3NadfF4kR5mTW00ahiFxw6k7.png",
+        "name": "Pony Canyon",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2007-10-18",
+        "episode_count": 22,
+        "id": 46836,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/jPebO2T57mVWx38j0shSoyboIvp.jpg",
+        "season_number": 1,
+        "vote_average": 8
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.5,
+    "vote_count": 28
+  }
+}

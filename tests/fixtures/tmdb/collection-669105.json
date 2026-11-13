@@ -1,0 +1,62 @@
+{
+  "request": {
+    "path": "/3/collection/669105",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:47.123Z",
+  "response": {
+    "id": 669105,
+    "name": "Призрак (Серия)",
+    "original_language": "ru",
+    "original_name": "Призрак (Серия)",
+    "overview": "",
+    "poster_path": "/kBtnbx1jM3NtwsX19bOfargOFS2.jpg",
+    "backdrop_path": null,
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/HWN8qve56lvX0obp5YQs5hV7mS.jpg",
+        "id": 332512,
+        "title": "Ghost",
+        "original_title": "Призрак",
+        "overview": "An aircraft designer becomes a ghost after a sudden death. Now he needs to engage a help of seven-grader in order to finish all his unaccomplished tasks.",
+        "poster_path": "/2njykKt6eASXbrMENEcLkDLZZ6Y.jpg",
+        "media_type": "movie",
+        "original_language": "ru",
+        "genre_ids": [
+          10751,
+          35
+        ],
+        "popularity": 0.7036,
+        "release_date": "2015-03-26",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.4,
+        "vote_count": 62
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 669104,
+        "title": "Ghost 2",
+        "original_title": "Призрак 2",
+        "overview": "The sequel to the 2015 film with Bondarchuk",
+        "poster_path": null,
+        "media_type": "movie",
+        "original_language": "ru",
+        "genre_ids": [
+          35,
+          10751
+        ],
+        "popularity": 0.3877,
+        "release_date": "",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      }
+    ]
+  }
+}

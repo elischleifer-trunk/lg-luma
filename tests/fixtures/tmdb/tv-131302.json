@@ -1,0 +1,105 @@
+{
+  "request": {
+    "path": "/3/tv/131302",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:24.337Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/vavBDeFkJyRYCnD1MR9xsvUe7zW.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      8
+    ],
+    "first_air_date": "2019-02-28",
+    "genres": [
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "https://www.tv5unis.ca/et-puis-amelie-est-partie",
+    "id": 131302,
+    "in_production": false,
+    "languages": [
+      "fr"
+    ],
+    "last_air_date": "2019-02-28",
+    "last_episode_to_air": {
+      "id": 3134674,
+      "name": "Episode 6",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2019-02-28",
+      "episode_number": 6,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 8,
+      "season_number": 1,
+      "show_id": 131302,
+      "still_path": "/iXxx432fwQ60aZ7oaZYHHkaJjVw.jpg"
+    },
+    "name": "And Then, Amelie Left",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2919,
+        "logo_path": null,
+        "name": "unis.ca",
+        "origin_country": "CA"
+      }
+    ],
+    "number_of_episodes": 6,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "fr",
+    "original_name": "Et puis, Amélie est partie",
+    "overview": "Nathaniel (17 years old) was just abandoned by his long-time imaginary friend, Amélie. At the Board of Imaginary Support, Nathaniel is being convinced that he is now too old for an imaginary friend but the teenager is afraid of being alone. He is therefore assigned Bertrand, an old-timer with unorthodox methods. But the new duo combined with Nathaniel's obsession for Amélie will create a chain of risks that might just head right to a catastrophe...",
+    "popularity": 0.7417,
+    "poster_path": null,
+    "production_companies": [
+      {
+        "id": 122417,
+        "logo_path": "/pQiSunYd8ItzSA5Cb8Ru7AKGEQc.png",
+        "name": "SPORT",
+        "origin_country": "CA"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2019-02-27",
+        "episode_count": 6,
+        "id": 206166,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

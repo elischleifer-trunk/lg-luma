@@ -1,0 +1,118 @@
+{
+  "request": {
+    "path": "/3/tv/241100",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:31.784Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/5LF7wUhDEOrpkE0Web0YNccpLvF.jpg",
+    "created_by": [
+      {
+        "id": 95893,
+        "credit_id": "659327c5028f1477bbc5de7e",
+        "name": "James Strong",
+        "original_name": "James Strong",
+        "gender": 2,
+        "profile_path": "/qOBBxMHqs6UcWYxE4P7LGa3nT10.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2024-01-01",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.itv.com/watch/mr-bates-vs-the-post-office/10a0469",
+    "id": 241100,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2024-01-04",
+    "last_episode_to_air": {
+      "id": 4981263,
+      "name": "Episode 4",
+      "overview": "Alan and his friends finally get the chance to embark on the epic challenge of battling the Post Office in court.",
+      "vote_average": 7.7,
+      "vote_count": 11,
+      "air_date": "2024-01-04",
+      "episode_number": 4,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 51,
+      "season_number": 1,
+      "show_id": 241100,
+      "still_path": "/3dsJ0heoIdIvfkH52vvP4z2j1Il.jpg"
+    },
+    "name": "Mr Bates vs The Post Office",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 9,
+        "logo_path": "/oz9pjTHnBUmlju8OkaTymhKbh6C.png",
+        "name": "ITV1",
+        "origin_country": "GB"
+      }
+    ],
+    "number_of_episodes": 4,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_name": "Mr Bates vs The Post Office",
+    "overview": "The story of one of the greatest miscarriages of justice in British legal history, where hundreds of innocent sub-postmasters and postmistresses were wrongly accused of theft, fraud and false accounting due to a defective IT system.",
+    "popularity": 3.0269,
+    "poster_path": "/sQWIaSoMbuPxDBiAcCeQIn3NLZx.jpg",
+    "production_companies": [
+      {
+        "id": 24546,
+        "logo_path": "/jTR3M7xz7jE9dTwWs0e25eN1xcL.png",
+        "name": "ITV Studios",
+        "origin_country": "GB"
+      },
+      {
+        "id": 83648,
+        "logo_path": "/hc4haA8VAJesBqgc45SN0Pbp2yp.png",
+        "name": "Little Gem Media",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2024-01-01",
+        "episode_count": 4,
+        "id": 368873,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/cuJy9NE50upYqSqmft3zqleW7eb.jpg",
+        "season_number": 1,
+        "vote_average": 7.7
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Miniseries",
+    "vote_average": 7.95,
+    "vote_count": 101
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/329205",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:40.933Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/k1Bj2kQ6swUsCCbc7mKfaTQYtfV.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 53,
+        "name": "Thriller"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "http://www.theghoulmovie.com/",
+    "id": 329205,
+    "imdb_id": "tt3101132",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Ghoul",
+    "overview": "A small group of Americans travel to Ukraine to film a documentary about the cannibalism epidemic that swept through the country during the famine of 1932. After being lured deep into the Ukrainian forest for an interview with one of the last known survivors, they quickly find themselves trapped in a supernatural hunting ground.",
+    "popularity": 0.6788,
+    "poster_path": "/91iMDna1RoTLGCEosMiKCby0aZ0.jpg",
+    "production_companies": [
+      {
+        "id": 55956,
+        "logo_path": null,
+        "name": "JBJ Film",
+        "origin_country": "CZ"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CZ",
+        "name": "Czech Republic"
+      }
+    ],
+    "release_date": "2015-02-26",
+    "revenue": 0,
+    "runtime": 86,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Russian",
+        "iso_639_1": "ru",
+        "name": "Pусский"
+      },
+      {
+        "english_name": "Ukrainian",
+        "iso_639_1": "uk",
+        "name": "Український"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Hunger takes many forms…",
+    "title": "Ghoul",
+    "video": false,
+    "vote_average": 4.608,
+    "vote_count": 83
+  }
+}

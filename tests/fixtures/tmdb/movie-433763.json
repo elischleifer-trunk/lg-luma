@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/433763",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:23.712Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/cbSw6qDbv182wUqSMcLUakhR7tE.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      }
+    ],
+    "homepage": "",
+    "id": 433763,
+    "imdb_id": "tt5712474",
+    "origin_country": [
+      "DE"
+    ],
+    "original_language": "de",
+    "original_title": "Amelie rennt",
+    "overview": "A girl struggling with asthma is taken to a clinic in South Tyrol to be cured. After some time she decides to get out of this hell (that's how she feels about it) and soon she'll meet a new friend. Together they try to reach the peak of a mountain where, according to an old custom, she can be healed.",
+    "popularity": 1.2611,
+    "poster_path": "/f46ZJBN8RxdqKW6UqGIkJGT7hRB.jpg",
+    "production_companies": [
+      {
+        "id": 12343,
+        "logo_path": null,
+        "name": "Farbfilm-Verleih",
+        "origin_country": "DE"
+      },
+      {
+        "id": 127959,
+        "logo_path": null,
+        "name": "Helios Sustainable Films",
+        "origin_country": "IT"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "DE",
+        "name": "Germany"
+      },
+      {
+        "iso_3166_1": "IT",
+        "name": "Italy"
+      }
+    ],
+    "release_date": "2017-09-21",
+    "revenue": 0,
+    "runtime": 97,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "German",
+        "iso_639_1": "de",
+        "name": "Deutsch"
+      },
+      {
+        "english_name": "Dutch",
+        "iso_639_1": "nl",
+        "name": "Nederlands"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Mountain Miracle",
+    "video": false,
+    "vote_average": 6.365,
+    "vote_count": 52
+  }
+}

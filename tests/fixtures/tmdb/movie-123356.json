@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/123356",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.622Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/bffPzgZYIK2Z6Vff7NENmnECfoM.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      }
+    ],
+    "homepage": "",
+    "id": 123356,
+    "imdb_id": "tt0406837",
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_title": "はいすくーる・ゴーストバスターズ",
+    "overview": "At Onin High School, a trio of schoolgirls who battle paranormal entities face off against \"erotomaniac spirits\" that have possessed the female students with insatiable desires.",
+    "popularity": 0.7784,
+    "poster_path": "/qaN2Z3IhMvmsWPz4uDNln6nw6v0.jpg",
+    "production_companies": [
+      {
+        "id": 14346,
+        "logo_path": "/kpbK8OGxPOK7x2vKVyfebM84bog.png",
+        "name": "JVD",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "release_date": "1995-09-22",
+    "revenue": 0,
+    "runtime": 76,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Demonic possession of the kinkiest kind.",
+    "title": "High School Ghosthustlers",
+    "video": false,
+    "vote_average": 6,
+    "vote_count": 3
+  }
+}

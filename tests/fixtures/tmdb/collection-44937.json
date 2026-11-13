@@ -1,0 +1,464 @@
+{
+  "request": {
+    "path": "/3/collection/44937",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:46.962Z",
+  "response": {
+    "id": 44937,
+    "name": "The Bodin’s Collection",
+    "original_language": "fr",
+    "original_name": "Les Bodin's - Saga",
+    "overview": "",
+    "poster_path": "/yOtOtd8EbWdBvMG2f7ZPSk3CgXR.jpg",
+    "backdrop_path": "/56fL43Dgyhj6qAvV0RR1SVsJ9LK.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/od2EZtDNm6PluAzcsxknPXyvOwn.jpg",
+        "id": 14406,
+        "title": "Mariage chez les Bodin's",
+        "original_title": "Mariage chez les Bodin's",
+        "overview": "Nous sommes dans un coin de France reculé... très reculé.",
+        "poster_path": "/tHwHyMVbZ86j4F1N2L1eaaAMzwr.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.4068,
+        "release_date": "2008-04-23",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.8,
+        "vote_count": 28
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/zCv2stg4umSrRMwWcjk9FLOUqxM.jpg",
+        "id": 491392,
+        "title": "Amélie au pays des Bodin's",
+        "original_title": "Amélie au pays des Bodin's",
+        "overview": "",
+        "poster_path": "/iX9O6PRtMBGHXOLBGCOYEHMtYLe.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.5984,
+        "release_date": "2010-04-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.9,
+        "vote_count": 15
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/paUMaMnQgxF0a7cVLN7obVxMoEC.jpg",
+        "id": 225695,
+        "title": "Les Bodin's - Bienvenue à la capitale",
+        "original_title": "Les Bodin's - Bienvenue à la capitale",
+        "overview": "",
+        "poster_path": "/ftbxzekzm1bjIeeGJjUOHlvubsv.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.6568,
+        "release_date": "2007-03-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.7,
+        "vote_count": 15
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/yvfYbU8AioSHGZBHkbZjeji0VTb.jpg",
+        "id": 140752,
+        "title": "Les Bodin's - Grandeur Nature",
+        "original_title": "Les Bodin's - Grandeur Nature",
+        "overview": "",
+        "poster_path": "/kGteHXtGXgu5Hw9ujb4l4a6jjja.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.4603,
+        "release_date": "2006-02-06",
+        "softcore": false,
+        "video": true,
+        "vote_average": 7.6,
+        "vote_count": 16
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/qHZ3zmK4jTr7c2ZGGUJvHKJAiPh.jpg",
+        "id": 73694,
+        "title": "Les Bodin's - Mère & Fils",
+        "original_title": "Les Bodin's - Mère & Fils",
+        "overview": "",
+        "poster_path": "/s9hLJ6IZSXXeuYgWrgBOmLgmlBq.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.4725,
+        "release_date": "2004-03-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.3,
+        "vote_count": 15
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8KO9QGRWEJlClsyyUTnnjbHkusX.jpg",
+        "id": 140754,
+        "title": "Les Bodin's : L'inauguration de la salle des fêtes",
+        "original_title": "Les Bodin's : L'inauguration de la salle des fêtes",
+        "overview": "",
+        "poster_path": "/sliiSTYrMzKsFLnif596eQ8MWeN.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.3738,
+        "release_date": "2000-01-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 3.7,
+        "vote_count": 6
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 140756,
+        "title": "Maria Bodin",
+        "original_title": "Maria Bodin",
+        "overview": "",
+        "poster_path": "/yvwBzv79yeGMhidj4Nty3rm0SFg.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [],
+        "popularity": 0.277,
+        "release_date": "1998-03-20",
+        "softcore": false,
+        "video": true,
+        "vote_average": 5.8,
+        "vote_count": 2
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/1DQ3PBUl3aEP3etlQgzfqRdo3UQ.jpg",
+        "id": 649549,
+        "title": "Les Bodin's - Grandeur Nature",
+        "original_title": "Les Bodin's - Grandeur Nature",
+        "overview": "",
+        "poster_path": "/svr3a4wwJertww8rXe9scJhGpL7.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.476,
+        "release_date": "2019-04-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8,
+        "vote_count": 2
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/oiAWABTTCRDeRwIEeKOI8IPNq36.jpg",
+        "id": 442581,
+        "title": "Les Bodin's : Grandeur Nature (@Zenith de Limoges)",
+        "original_title": "Les Bodin's : Grandeur Nature (@Zenith de Limoges)",
+        "overview": "",
+        "poster_path": "/1JNgLy5zYUlk4aNCNaDZW4oZaGe.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.4467,
+        "release_date": "2016-09-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.8,
+        "vote_count": 12
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6p8UFKoeadjCyqWOmJfl7kOEFab.jpg",
+        "id": 442600,
+        "title": "Le Grand Barnum des Bodin’s",
+        "original_title": "Le Grand Barnum des Bodin’s",
+        "overview": "",
+        "poster_path": "/4V89CIvhiYPGy7FlCffaoaeb56L.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.3816,
+        "release_date": "2016-01-16",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.5,
+        "vote_count": 4
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/kZ03Zwzcuxzk9GdS9KWu3aJc43k.jpg",
+        "id": 874294,
+        "title": "The Bodin’s in Thailand",
+        "original_title": "Les Bodin's en Thaïlande",
+        "overview": "Christian Bodin and his mother Maria Bodin are set on an adventure for the Land of Smiles. They meet many zany characters and face several obstacles along their journey in Thailand.",
+        "poster_path": "/1rpDCiHqnDmFy74gSVGG4lLZSic.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 1.0943,
+        "release_date": "2021-11-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 56
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/A9GUc5SVAENFp2cL91QBwQ5T1Hh.jpg",
+        "id": 1235619,
+        "title": "Les Bodin’s partent en vrille",
+        "original_title": "Les Bodin’s partent en vrille",
+        "overview": "When Maria Bodin, a strong-willed and cantankerous farmer, and her son Christian learn that an industrial cheese factory is about to be built in their small village, they are ready to do anything to defend their artisanal cheese dairy. From the Agricultural Show to the Moroccan desert, they will stop at nothing to thwart this factory project: blackmail, brawls, car chases—once again, the Bodins will brave all dangers to save their values and traditions.",
+        "poster_path": "/tRuZUbucePOXsBgkGB5oSTzTYzi.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 1.0301,
+        "release_date": "2025-03-19",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.2,
+        "vote_count": 37
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/k1kbP0HLbiE2v1l2nBkDLyjmvJ1.jpg",
+        "id": 1146263,
+        "title": "The Bodin’s Investigate in Corsica",
+        "original_title": "Les Bodin's enquêtent en Corse",
+        "overview": "From Pouziou les Trois Galoches to the Isle of Beauty, it’s just a step… Invested with a supernatural power transmitted by the ghost of his father, Christian foresees a future murder in a premonitory dream. A certain Pasqualini, a clementine producer in the Aléria region, will be assassinated in seven days. But how to apprehend the murderer of a dead man who is not dead? Thanks to the legendary common sense and tyrannical nature of Maria, ready to annoy all the Corsicans to save one, and the rare flashes of genius from her big oaf of a son Christian. It’s just as well if, in the process, they have to immerse themselves in local customs, disguise themselves as bandits, try Corsican polyphonies, or force Christian to eat brocciu.",
+        "poster_path": "/hz8T6MurtvGYC1uzkw3Ufozb7Ya.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35,
+          10770
+        ],
+        "popularity": 0.7589,
+        "release_date": "2024-02-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.8,
+        "vote_count": 17
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 936876,
+        "title": "Le bal des Bodin's",
+        "original_title": "Le bal des Bodin's",
+        "overview": "",
+        "poster_path": "/lcBfH8Lg5Gvj3z1XczRAbCJyr0j.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35,
+          10402,
+          10751
+        ],
+        "popularity": 0.3593,
+        "release_date": "2022-02-09",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 776446,
+        "title": "La télé des Bodin's",
+        "original_title": "La télé des Bodin's",
+        "overview": "",
+        "poster_path": "/vLkbqgDBjZOh5w87qM3vQA5sjVd.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.286,
+        "release_date": "2019-12-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 2
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 936350,
+        "title": "Bienvenue chez les Bodin's",
+        "original_title": "Bienvenue chez les Bodin's",
+        "overview": "",
+        "poster_path": "/AsGaLkeOa126t7B1QlsybUF2ZAC.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.4292,
+        "release_date": "2022-02-09",
+        "softcore": false,
+        "video": false,
+        "vote_average": 4.2,
+        "vote_count": 5
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/1y618En2eK9ISqMzIiBoRgyVbZP.jpg",
+        "id": 1435944,
+        "title": "Les Bodin's en folie : La Soirée des 30 ans",
+        "original_title": "Les Bodin's en folie : La Soirée des 30 ans",
+        "overview": "",
+        "poster_path": "/kVm3H0ZDjSiA02OtSIyWDljLtIM.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35,
+          10751
+        ],
+        "popularity": 0.8822,
+        "release_date": "2025-02-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.7,
+        "vote_count": 3
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dhVynA5oxmtsO7UR7ROfbG70Ct2.jpg",
+        "id": 1179925,
+        "title": "Les Bodin's - Grandeur Nature - La Dernière Des Zénith",
+        "original_title": "Les Bodin's - Grandeur Nature - La Dernière Des Zénith",
+        "overview": "",
+        "poster_path": "/q10TEIOFDblCvybscPjJx1Yh08B.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35,
+          10751
+        ],
+        "popularity": 0.6104,
+        "release_date": "2023-04-27",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 1
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/iWRGQGJKPnadeMS18xV71Ch2ORg.jpg",
+        "id": 1085285,
+        "title": "Anniversaire surprise chez les Bodin's",
+        "original_title": "Anniversaire surprise chez les Bodin's",
+        "overview": "",
+        "poster_path": "/b4MiXjmKcEJoylNFjydQr7Q8aF4.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.6869,
+        "release_date": "2023-02-11",
+        "softcore": false,
+        "video": true,
+        "vote_average": 7.1,
+        "vote_count": 7
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/yR7hSkKk6p1U7DVhLVjDxrQxrt2.jpg",
+        "id": 1436063,
+        "title": "Les Bodin's en folie : La suite",
+        "original_title": "Les Bodin's en folie : La suite",
+        "overview": "",
+        "poster_path": "/oXNmU3UU0BeXDzEvi7HkqiK9QTA.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35,
+          10751
+        ],
+        "popularity": 0.8115,
+        "release_date": "2025-02-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 1
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/tbXylJ9391k9uvB96E4TG1nqeMo.jpg",
+        "id": 1119220,
+        "title": "La grande histoire des Bodin's",
+        "original_title": "La grande histoire des Bodin's",
+        "overview": "",
+        "poster_path": "/xH9YspObA1x9RDp43thNCPHYYFm.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          99
+        ],
+        "popularity": 0.43,
+        "release_date": "2023-04-27",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.5,
+        "vote_count": 2
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/rd5jywv3UiflClj3jmYXdcHP9lR.jpg",
+        "id": 1077244,
+        "title": "Les Bodin's chez les Belges",
+        "original_title": "Les Bodin's chez les Belges",
+        "overview": "The colorful Maria Bodin and her son Christian are over the moon: they have just been chosen by the Belgian royal family to organize a gala in honor of their 25th wedding anniversary. The gala will be held at the Royal Palace in front of the royal family themselves. Unfamiliar with the workings of the Belgian monarchy, mother and son will have to learn the ropes, get organized, and prepare to join the aristocratic ranks.",
+        "poster_path": "/wNqq0DSpeoQsxdH1giXIsiED8cg.jpg",
+        "media_type": "movie",
+        "original_language": "fr",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.5188,
+        "release_date": "2023-01-03",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 1
+      }
+    ]
+  }
+}

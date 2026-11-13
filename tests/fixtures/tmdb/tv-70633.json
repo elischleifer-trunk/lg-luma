@@ -1,0 +1,131 @@
+{
+  "request": {
+    "path": "/3/tv/70633",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:42.303Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/dmVj3aNLcyzIxS1EM5GvL7Cg16W.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      22
+    ],
+    "first_air_date": "2017-03-03",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://elisaviihde.fi/konttori",
+    "id": 70633,
+    "in_production": false,
+    "languages": [
+      "fi"
+    ],
+    "last_air_date": "2019-02-22",
+    "last_episode_to_air": {
+      "id": 2196863,
+      "name": "Episode 8",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2019-02-22",
+      "episode_number": 8,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 22,
+      "season_number": 3,
+      "show_id": 70633,
+      "still_path": null
+    },
+    "name": "The Office",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1823,
+        "logo_path": "/gPkqpaV3B9JXb0jtzTqEjtA6fom.png",
+        "name": "Elisa Viihde",
+        "origin_country": "FI"
+      },
+      {
+        "id": 1007,
+        "logo_path": "/uFxen4Fik1EbOLfzTQC80zZvoeh.png",
+        "name": "Nelonen",
+        "origin_country": "FI"
+      }
+    ],
+    "number_of_episodes": 26,
+    "number_of_seasons": 3,
+    "origin_country": [
+      "FI"
+    ],
+    "original_language": "fi",
+    "original_name": "Konttori",
+    "overview": "Finnish adaption of the British TV series \"The Office\".",
+    "popularity": 2.5275,
+    "poster_path": "/gXRVl5vnlvy3erURyKXd0ZsoZtt.jpg",
+    "production_companies": [
+      {
+        "id": 87529,
+        "logo_path": null,
+        "name": "Solar Republic",
+        "origin_country": "FI"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FI",
+        "name": "Finland"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2017-03-03",
+        "episode_count": 8,
+        "id": 86003,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2017-10-13",
+        "episode_count": 8,
+        "id": 109992,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-02-15",
+        "episode_count": 10,
+        "id": 109993,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Finnish",
+        "iso_639_1": "fi",
+        "name": "suomi"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 3,
+    "vote_count": 2
+  }
+}

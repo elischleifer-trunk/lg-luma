@@ -13,6 +13,7 @@
 // - allOf → one struct with the merged properties
 // - additionalProperties → HashMap<String, T>
 // - string enum → enum with an `Unknown` fallback, so a value added upstream does not break decoding
+// - every type is also Serialize, so replies can be cached on disk and read back
 // - integer → i64 (TMDB revenues exceed i32), number → f64, other schemas → serde_json::Value
 // - array query parameters → one comma-separated value (OpenAPI form style, explode: false)
 import fs from 'node:fs/promises';
@@ -43,7 +44,37 @@ const APIS = [
   {
     name: 'tmdb',
     source: 'https://developer.themoviedb.org/openapi/tmdb-api.json',
-    operations: ['search-multi', 'movie-details', 'tv-series-details', 'find-by-id'],
+    operations: [
+      'search-multi',
+      'movie-details',
+      'tv-series-details',
+      'collection-details',
+      'find-by-id',
+    ],
+    // Corrections where the upstream spec disagrees with what the API sends, found by
+    // decoding captured fixtures. Each is a path into the spec and the value to put there.
+    patches: [
+      {
+        // Season ratings are decimals such as 7.9, not integers.
+        path: [
+          'paths',
+          '/3/tv/{series_id}',
+          'get',
+          'responses',
+          '200',
+          'content',
+          'application/json',
+          'schema',
+          'properties',
+          'seasons',
+          'items',
+          'properties',
+          'vote_average',
+          'type',
+        ],
+        value: 'number',
+      },
+    ],
   },
 ];
 
@@ -112,6 +143,13 @@ async function fetchSpec(api) {
     paths,
     components,
   };
+  for (const patch of api.patches ?? []) {
+    const parent = patch.path.slice(0, -1).reduce((value, key) => value?.[key], trimmed);
+    const key = patch.path.at(-1);
+    if (!parent || !(key in parent)) throw new Error(`${api.name}: stale patch ${patch.path}`);
+    parent[key] = patch.value;
+  }
+  if (api.patches?.length) trimmed.info['x-luma-patches'] = api.patches;
   await fs.mkdir(path.dirname(specFile(api)), { recursive: true });
   await fs.writeFile(specFile(api), `${JSON.stringify(trimmed, null, 2)}\n`);
   console.log(`${api.name}: ${found.size} operations from ${api.source}`);
@@ -299,7 +337,7 @@ class Generator {
       body += `    pub ${field}: ${type},\n`;
     }
     this.items[slot] =
-      `${doc(schema.description)}#[derive(Clone, Debug, Deserialize, PartialEq)]\n` +
+      `${doc(schema.description)}#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]\n` +
       `pub struct ${name} {\n${body}}\n`;
   }
 
@@ -317,7 +355,7 @@ class Generator {
       ([value, variant]) => `            Self::${variant} => "${value}",\n`,
     );
     this.items.push(
-      `${doc(schema.description)}#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Hash)]\n` +
+      `${doc(schema.description)}#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]\n` +
         `pub enum ${name} {\n${body}}\n\n` +
         `impl ${name} {\n    pub fn as_str(self) -> &'static str {\n        match self {\n` +
         `${arms.join('')}            Self::Unknown => "",\n        }\n    }\n}\n\n` +
@@ -400,7 +438,7 @@ class Generator {
       `//! \`tools/openapi/${this.api.name}.json\` (trimmed from <${info['x-luma-source']}>).\n` +
       `//! Do not edit: change \`tools/openapi.mjs\` and regenerate. HTTP lives in \`openapi.rs\`.\n` +
       `use crate::openapi::{Error, Http, Query, QueryValue, encode_path};\n` +
-      `use serde::Deserialize;\n` +
+      `use serde::{Deserialize, Serialize};\n` +
       (this.usesMap ? 'use std::collections::HashMap;\n' : '') +
       `\n/// Server URLs from the spec, in spec order.\npub const SERVERS: &[&str] = &[\n${servers}];\n\n` +
       `#[derive(Clone)]\npub struct Client {\n    http: Http,\n}\n\n` +

@@ -1,0 +1,71 @@
+{
+  "request": {
+    "path": "/3/movie/1289732",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:41.155Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/e9QXnG8IWYyjudoIAcdr2eu3pIf.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      }
+    ],
+    "homepage": "",
+    "id": 1289732,
+    "imdb_id": "tt1230164",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Return Of The Ghostbusters",
+    "overview": "The Ghost Adventures crew return to tackle the terrors of the night.",
+    "popularity": 0.7098,
+    "poster_path": "/6RF6myhncd7KODguJZKZitOJCq8.jpg",
+    "production_companies": [
+      {
+        "id": 3743,
+        "logo_path": null,
+        "name": "BraxtanFILM",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2007-10-31",
+    "revenue": 0,
+    "runtime": 85,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Return Of The Ghostbusters",
+    "video": false,
+    "vote_average": 5.5,
+    "vote_count": 2
+  }
+}

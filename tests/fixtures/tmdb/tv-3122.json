@@ -1,0 +1,178 @@
+{
+  "request": {
+    "path": "/3/tv/3122",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:18.818Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/6Bsfr4QipqfAMlv9DCk8zNACvUG.jpg",
+    "created_by": [
+      {
+        "id": 1,
+        "credit_id": "52574c8c760ee36aaa156a38",
+        "name": "George Lucas",
+        "original_name": "George Lucas",
+        "gender": 2,
+        "profile_path": "/mDLDvsx8PaZoEThkBdyaG1JxPdf.jpg"
+      },
+      {
+        "id": 185438,
+        "credit_id": "52574c8c760ee36aaa156a3e",
+        "name": "Genndy Tartakovsky",
+        "original_name": "Genndy Tartakovsky",
+        "gender": 2,
+        "profile_path": "/neLR8ws82ezlbhOyUvhtLXwQZWL.jpg"
+      },
+      {
+        "id": 35294,
+        "credit_id": "52574c8c760ee36aaa156a4a",
+        "name": "Henry Gilroy",
+        "original_name": "Henry Gilroy",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      3
+    ],
+    "first_air_date": "2003-11-07",
+    "genres": [
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.disneyplus.com/pt-pt/series/star-wars-vintage-a-microsserie-2d-de-clone-wars/7UHqaxQ62pSx",
+    "id": 3122,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2005-03-25",
+    "last_episode_to_air": {
+      "id": 234942,
+      "name": "Chapter 25",
+      "overview": "Shaak Ti takes a desperate stand against Grievous' Magnaguards. Anakin, surrounded by mutated Nelvaan Warriors, must destroy the geothermal crystal powering the siphon generator. Mace Windu hurries to face General Grievous. This episode's end marks the beginning of Episode III: Revenge of the Sith.",
+      "vote_average": 8,
+      "vote_count": 19,
+      "air_date": "2005-03-25",
+      "episode_number": 5,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 14,
+      "season_number": 3,
+      "show_id": 3122,
+      "still_path": "/hdrjZEthR9hrBVWlWHRw9LfWhPY.jpg"
+    },
+    "name": "Star Wars: Clone Wars",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 56,
+        "logo_path": "/c5OC6oVCg6QP4eqzW6XIq17CQjI.png",
+        "name": "Cartoon Network",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 25,
+    "number_of_seasons": 3,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Star Wars: Clone Wars",
+    "overview": "During the Clone Wars, Jedi Master Obi-Wan Kenobi leads an assault on the planet Muunilinst, home of the Intergalactic Banking Clan; and his Padawan, Anakin Skywalker, is appointed by Supreme Chancellor Palpatine to lead the Republic’s space forces. Meanwhile, Separatist leader and Sith Lord Count Dooku takes in Force-sensitive gladiator Asajj Ventress as his Sith apprentice, and tasks her with eliminating Skywalker.",
+    "popularity": 10.7705,
+    "poster_path": "/jKfAVTGkf9qpGPZ4E1pNKdW6vra.jpg",
+    "production_companies": [
+      {
+        "id": 1,
+        "logo_path": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png",
+        "name": "Lucasfilm Ltd.",
+        "origin_country": "US"
+      },
+      {
+        "id": 7899,
+        "logo_path": "/qnhd98hnBxCMMMod58FJqbCZ5O7.png",
+        "name": "Cartoon Network Studios",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2005-04-24",
+        "episode_count": 5,
+        "id": 75245,
+        "name": "Specials",
+        "overview": "Star Wars: Clone Wars, Vol. 1 (2005)\n\nStar Wars: Clone Wars, Vol. 2 (2005)",
+        "poster_path": "/4ZOlU1RDSsffCcW8CheJVIeSWRS.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2003-11-07",
+        "episode_count": 10,
+        "id": 9865,
+        "name": "Season 1",
+        "overview": "The first season consisted of 10 episodes, lasting three minutes each. Along with the second season, it was released on DVD as 'Volume One'.",
+        "poster_path": "/7EdIzGXdVEVGpNuAORhiVj0JmaX.jpg",
+        "season_number": 1,
+        "vote_average": 7.5
+      },
+      {
+        "air_date": "2004-03-26",
+        "episode_count": 10,
+        "id": 9864,
+        "name": "Season 2",
+        "overview": "The second season consisted of 10 episodes, lasting three minutes each. Along with the first season, it was released on DVD as 'Volume One'.",
+        "poster_path": "/7TDuSj4yyqYG4WTYp9wiYvhCRBY.jpg",
+        "season_number": 2,
+        "vote_average": 7.7
+      },
+      {
+        "air_date": "2005-03-21",
+        "episode_count": 5,
+        "id": 9866,
+        "name": "Season 3",
+        "overview": "The third and final season consisted of five episodes, lasting 12 minutes each. These episodes were released on DVD as 'Volume Two'.",
+        "poster_path": "/tQLDDboSQILJ09rm0PWGv48wcM0.jpg",
+        "season_number": 3,
+        "vote_average": 7.8
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "Spread like fire, the Clone Wars have!",
+    "type": "Scripted",
+    "vote_average": 7.8,
+    "vote_count": 524
+  }
+}

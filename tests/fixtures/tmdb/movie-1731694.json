@@ -1,0 +1,85 @@
+{
+  "request": {
+    "path": "/3/movie/1731694",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:17.852Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/upecGaCuQOIbSpdz85mrJ395UMg.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      }
+    ],
+    "homepage": "https://www.disneyplus.com/browse/entity-e1234eda-704c-4729-a47e-e8be088bc61f",
+    "id": 1731694,
+    "imdb_id": "tt43679852",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "LEGO Star Wars: The Mandalorian",
+    "overview": "The Mandalorian and Grogu join their misfit allies for an epic party, celebrating their heroism. As friends regale the crowd with tales of their adventures, a pirate threat looms.",
+    "popularity": 6.7916,
+    "poster_path": "/x3HEvYXWOW6WHqsHmg2MUVy3SLm.jpg",
+    "production_companies": [
+      {
+        "id": 1,
+        "logo_path": "/tlVSws0RvvtPBwViUyOFAO0vcQS.png",
+        "name": "Lucasfilm Ltd.",
+        "origin_country": "US"
+      },
+      {
+        "id": 299443,
+        "logo_path": "/4B43I3FGlYr83zLGEvhBc0vvJIE.png",
+        "name": "The LEGO Group",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2026-09-02",
+    "revenue": 0,
+    "runtime": 50,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Some heroes juct click.",
+    "title": "LEGO Star Wars: The Mandalorian",
+    "video": false,
+    "vote_average": 6.593,
+    "vote_count": 43
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "request": {
+    "path": "/3/tv/128822",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:20.303Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/9gm3mqdQ1FcK0R8GMKs85xAbhAp.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      26
+    ],
+    "first_air_date": "2021-10-22",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://pl.canalplus.com/online/the-office-pl",
+    "id": 128822,
+    "in_production": true,
+    "languages": [
+      "en",
+      "pl"
+    ],
+    "last_air_date": "2026-11-06",
+    "last_episode_to_air": {
+      "id": 8083590,
+      "name": "Episode 3",
+      "overview": "",
+      "vote_average": 10,
+      "vote_count": 1,
+      "air_date": "2026-11-06",
+      "episode_number": 3,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 24,
+      "season_number": 6,
+      "show_id": 128822,
+      "still_path": "/5FQkONHHi69qm3dbJZBiBVz9u48.jpg"
+    },
+    "name": "The Office PL",
+    "next_episode_to_air": {
+      "id": 8083591,
+      "name": "Episode 4",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-11-13",
+      "episode_number": 4,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 6,
+      "show_id": 128822,
+      "still_path": null
+    },
+    "networks": [
+      {
+        "id": 951,
+        "logo_path": "/snQBlVJrlLu8mgvvNf7cn6NUP9g.png",
+        "name": "Canal+",
+        "origin_country": "PL"
+      }
+    ],
+    "number_of_episodes": 66,
+    "number_of_seasons": 6,
+    "origin_country": [
+      "PL"
+    ],
+    "original_language": "pl",
+    "original_name": "The Office PL",
+    "overview": "",
+    "popularity": 9.9014,
+    "poster_path": "/5hD6I5fQ7KCCmhFlXoQCzi9vaoS.jpg",
+    "production_companies": [
+      {
+        "id": 213582,
+        "logo_path": "/9Px2FG6EhNfRvMoS9MdtY0ivkFo.png",
+        "name": "Jake Vision DGA Studio",
+        "origin_country": "PL"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "PL",
+        "name": "Poland"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2021-10-22",
+        "episode_count": 12,
+        "id": 201607,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/6jrNSjqNPP0dLJZ0qEXnApoNc90.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2022-11-04",
+        "episode_count": 12,
+        "id": 314154,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/wlvfEQEXcdnWVI4JfS8VqrvMVsb.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-11-03",
+        "episode_count": 12,
+        "id": 364055,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/mDyx2TSCsxYYjYElNSBjejaE6KV.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2024-10-25",
+        "episode_count": 12,
+        "id": 399901,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/5hD6I5fQ7KCCmhFlXoQCzi9vaoS.jpg",
+        "season_number": 4,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-11-14",
+        "episode_count": 12,
+        "id": 480223,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": "/i1KprvFwXIxCp9jccwx2MFU7dsT.jpg",
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-11-06",
+        "episode_count": 12,
+        "id": 551604,
+        "name": "Season 6",
+        "overview": "",
+        "poster_path": "/rlEYMx8HzsGAyyzI0c6jCJUghDi.jpg",
+        "season_number": 6,
+        "vote_average": 10
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Polish",
+        "iso_639_1": "pl",
+        "name": "Polski"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.8,
+    "vote_count": 12
+  }
+}

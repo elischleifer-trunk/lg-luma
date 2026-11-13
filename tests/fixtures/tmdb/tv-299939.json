@@ -1,0 +1,122 @@
+{
+  "request": {
+    "path": "/3/tv/299939",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:45.197Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/gaew60NXUxok3Vmls7gkAT7lYW0.jpg",
+    "created_by": [
+      {
+        "id": 59595,
+        "credit_id": "6a72173cf1be1a3deda280fb",
+        "name": "Ian Brennan",
+        "original_name": "Ian Brennan",
+        "gender": 2,
+        "profile_path": "/vTlp8Ho8imcf3IB03dqp9S1HmXC.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2026-09-17",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "https://www.netflix.com/title/82068293",
+    "id": 299939,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2026-09-17",
+    "last_episode_to_air": {
+      "id": 7639098,
+      "name": "Carnival",
+      "overview": "As the burden of her monstrous legacy threatens to pull her under, Lizzie searches for meaning — and a way to move forward.",
+      "vote_average": 7,
+      "vote_count": 17,
+      "air_date": "2026-09-17",
+      "episode_number": 8,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 66,
+      "season_number": 1,
+      "show_id": 299939,
+      "still_path": "/5Lxg9bKya1K89hh7MUYC2uVqNzc.jpg"
+    },
+    "name": "Monster: The Lizzie Borden Story",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 213,
+        "logo_path": "/wwemzKWzjKYJFfCeiB57q3r4Bcm.png",
+        "name": "Netflix",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 8,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Monster: The Lizzie Borden Story",
+    "overview": "Trapped in a cruel Victorian-era household, Lizzie Borden kills her parents in a gory ax murder that shocks the nation.",
+    "popularity": 24.3414,
+    "poster_path": "/57XScX1aYtKi1LvHYFQLPUxVhTG.jpg",
+    "production_companies": [
+      {
+        "id": 19328,
+        "logo_path": "/2AdkrU1av4fDGw0Zaf68XH4YcqC.png",
+        "name": "Ryan Murphy Television",
+        "origin_country": "US"
+      },
+      {
+        "id": 182831,
+        "logo_path": null,
+        "name": "Prospect Films",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-09-17",
+        "episode_count": 8,
+        "id": 473542,
+        "name": "Miniseries",
+        "overview": "When the repressed daughter of a wealthy New England family and her rebellious maid find themselves trapped in a house built on humiliation and cruelty, they escape into a fantasy of sex, power, and revenge. The gruesome unsolved murders that follow don't just shock the world — they give birth to an icon who refuses to live imprisoned in a cage, choosing instead to forge her own legend: shocking, monstrous, and gloriously free.",
+        "poster_path": "/57XScX1aYtKi1LvHYFQLPUxVhTG.jpg",
+        "season_number": 1,
+        "vote_average": 7.3
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Miniseries",
+    "vote_average": 7.055,
+    "vote_count": 255
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/collection/1628043",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:47.307Z",
+  "response": {
+    "id": 1628043,
+    "name": "Dhurandhar Collection",
+    "original_language": "en",
+    "original_name": "धुरंधर Collection",
+    "overview": "In a high-stakes covert counter-terrorism operation, an undercover agent infiltrates Karachi's criminal syndicates and political power structures in Pakistan in an effort to dismantle a terror network targeting India.",
+    "poster_path": "/r4w2Ps0QN9wzMHDepRoj4H7tAM.jpg",
+    "backdrop_path": "/4Xv36ZwubtUn6JlIKoKDdhZj565.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/snYOXem8pUGOffnLbbGq4aB1pg4.jpg",
+        "id": 1291608,
+        "title": "Dhurandhar",
+        "original_title": "Dhurandhar",
+        "overview": "In the early 2000s, an undercover operative infiltrates Karachi's underworld, breaking into its inner circle to dismantle a violent nexus from within.",
+        "poster_path": "/8FHOtUpNIk5ZPEay2N2EY5lrxkv.jpg",
+        "media_type": "movie",
+        "original_language": "hi",
+        "genre_ids": [
+          28,
+          80,
+          53
+        ],
+        "popularity": 9.983,
+        "release_date": "2025-12-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.304,
+        "vote_count": 385
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/br4Ra4dRpvR0R7a1zPPkOwGkcky.jpg",
+        "id": 1582770,
+        "title": "Dhurandhar: The Revenge",
+        "original_title": "धुरंधर: द रिवेंज",
+        "overview": "As rival gangs, corrupt officials and a ruthless Major Iqbal close in, Hamza's mission for his country spirals into a bloody personal war where the line between patriot and monster disappears in the streets of Lyari.",
+        "poster_path": "/ov8vrRLZGoXHpYjSY9Vpv1tHJX7.jpg",
+        "media_type": "movie",
+        "original_language": "hi",
+        "genre_ids": [
+          28,
+          80,
+          53
+        ],
+        "popularity": 7.576,
+        "release_date": "2026-03-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.197,
+        "vote_count": 178
+      }
+    ]
+  }
+}

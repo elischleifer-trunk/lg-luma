@@ -1,0 +1,577 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "gho",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:31.337Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "id": 6532998,
+        "name": "Paolo Gho",
+        "original_name": "Paolo Gho",
+        "media_type": "person",
+        "popularity": 0.0943,
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/rkqRXqTciw34Y2Y5J4ruL7fTKut.jpg",
+            "id": 1783597,
+            "title": "Eclipse",
+            "original_title": "Eclipse",
+            "overview": "In a near future, humanity has blotted out the sun with an artificial cloud in an attempt to stop climate collapse, and the world has lost its color. A photographer wanders this gray, lifeless landscape, obsessively searching for one last sign of life. When he meets a mysterious girl, he may finally have the chance to take the photograph he has been chasing all his life.",
+            "poster_path": "/idl0shMI7n38o34bz8nqKnl4ZuF.jpg",
+            "media_type": "movie",
+            "original_language": "it",
+            "genre_ids": [
+              18,
+              878
+            ],
+            "popularity": 0.5475,
+            "release_date": "2026-10-22",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/uVnf8pHrJtSIJnqZ5BBhWicQ5YM.jpg",
+            "id": 1791064,
+            "title": "Doubt in the Shadow",
+            "original_title": "Dubbio nel buio",
+            "overview": "A detective consumed by obsession. A killer who has stayed in the shadows for years, and a question that keeps coming back: where does the world end, and where do we begin?",
+            "poster_path": "/uiw4GqZbqQR3F7RmAlT18baCsqK.jpg",
+            "media_type": "movie",
+            "original_language": "it",
+            "genre_ids": [
+              80,
+              53
+            ],
+            "popularity": 0.4225,
+            "release_date": "2026-09-25",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 6571609,
+        "name": "Pablo Gho",
+        "original_name": "Pablo Gho",
+        "media_type": "person",
+        "popularity": 0.0552,
+        "gender": 0,
+        "known_for_department": "Crew",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/1zfDdIeGYSwLi7j1sL9HgEEL30V.jpg",
+            "id": 1472844,
+            "title": "Everyone Is Lying to You for Money",
+            "original_title": "Everyone Is Lying to You for Money",
+            "overview": "With any and all things crypto being pushed by celebrities, influencers, and politicians alike, actor-turned-author and director Ben McKenzie decides to investigate. Leveraging his celebrity status to gain access to eager prospectors, McKenzie finds himself unraveling the loosely regulated world of cryptocurrency. This skeptical but evenhanded take on the present and future of what we consider money gives a firsthand account of the chaotic financial frontier of our time.",
+            "poster_path": "/pkppk6J9ieH4VU9g5ISDY7XFKjK.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              99
+            ],
+            "popularity": 1.4288,
+            "release_date": "2026-04-17",
+            "softcore": false,
+            "video": false,
+            "vote_average": 6.8,
+            "vote_count": 17
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/62pNpSI2Pq7ZnLXifKKKuhAoArR.jpg",
+        "id": 114564,
+        "title": "Shikshanachya Aaicha Gho!",
+        "original_title": "शिक्षणाच्या आयचा घो!",
+        "overview": "Shrinivas feels pressurised by his father's constant endeavours to make him the brightest student. This, in turn, affects their relationship, eventually leading to disastrous consequences.",
+        "poster_path": "/xWMwKTKnqCz1rYaOzWgjTgqqZiC.jpg",
+        "media_type": "movie",
+        "original_language": "mr",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "popularity": 0.3967,
+        "release_date": "2010-01-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.3,
+        "vote_count": 7
+      },
+      {
+        "adult": false,
+        "id": 4622830,
+        "name": "Pablo Gho",
+        "original_name": "Pablo Gho",
+        "media_type": "person",
+        "popularity": 0.0736,
+        "gender": 0,
+        "known_for_department": "Sound",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1145169,
+            "title": "Family Matters",
+            "original_title": "Family Matters",
+            "overview": "An inside peek into the lives and relationships between sex workers and their family members. The documentary profiles four families who share of the struggles that got them where they are today and the unconditional love that allowed them to heal together.",
+            "poster_path": "/jE4LwJOswBCK2zk6yNzPI3GJ8sj.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              99
+            ],
+            "popularity": 0.1393,
+            "release_date": "2022-10-21",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          },
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1381887,
+            "title": "The Disruption",
+            "original_title": "The Disruption",
+            "overview": "A young man goes toe to toe with a week-long spell of diarrhea that causes him to lose his grip on reality.",
+            "poster_path": "/2YZTeY2WHiXVVXH247mAvLICUWO.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              35,
+              27
+            ],
+            "popularity": 0.4089,
+            "release_date": "2017-10-06",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 6206980,
+        "name": "Ning Ning Gho",
+        "original_name": "Ning Ning Gho",
+        "media_type": "person",
+        "popularity": 0.0345,
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/qYpLRpVW1sK0OZE7UyEGxppfPUQ.jpg",
+            "id": 8557,
+            "title": "True North",
+            "original_title": "True North",
+            "overview": "The crew of a bankrupt Scottish trawler turn to smuggling illegal immigrants over the stormy waters of the North Sea.",
+            "poster_path": "/pquMZPfTw0EWbYhvx4jAqK5Via9.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              18
+            ],
+            "popularity": 0.544,
+            "release_date": "2007-09-14",
+            "softcore": false,
+            "video": false,
+            "vote_average": 6.5,
+            "vote_count": 16
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 6556797,
+        "name": "Sunny Gho",
+        "original_name": "Sunny Gho",
+        "media_type": "person",
+        "popularity": 0.0286,
+        "gender": 0,
+        "known_for_department": "Production",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1785508,
+            "title": "Slaughterground",
+            "original_title": "Hujan Kematian",
+            "overview": "Set in the 1960s, the story highlights a Chinese community that was labeled as communist and became victims of violence; they fled and took refuge in a tobacco warehouse in North Sumatra. Amid the cramped and stressful conditions of their refuge, a strange phenomenon occurred in which thousands of locusts fell from the sky. These locusts were no ordinary insects, but aggressive mutant pests that devoured everything in their path—including humans.",
+            "poster_path": "/u3JKWjIF6g8yFmFNPHTsI9c59g7.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              27
+            ],
+            "popularity": 0.5047,
+            "release_date": "",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 116541,
+        "name": "Gho Gho Rani",
+        "original_name": "Gho Gho Rani",
+        "overview": "Based on women empowerment. Principal of ranker's collage narrating a story to his student's regarding Santanu's welfare. All songs of the movie Gho gho rani",
+        "poster_path": null,
+        "media_type": "tv",
+        "original_language": "hi",
+        "genre_ids": [],
+        "popularity": 0.101,
+        "first_air_date": "2019-11-21",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "IO"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1222309,
+        "title": "Gho Mala Asala Hawa",
+        "original_title": "घो मला असला हवा",
+        "overview": "Savitri, a young girl, revolts against the age-old custom of arranged marriages. Despite facing troubles, she manages to convince an entire village about the upshots of pre-planned matches.",
+        "poster_path": "/sAmU2Tmx5PfNQXEgOzZs19rNyU2.jpg",
+        "media_type": "movie",
+        "original_language": "mr",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "popularity": 0.4185,
+        "release_date": "2009-02-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "id": 4109202,
+        "name": "Jessica Meriani Gho",
+        "original_name": "Jessica Meriani Gho",
+        "media_type": "person",
+        "popularity": 0.0088,
+        "gender": 0,
+        "known_for_department": "Visual Effects",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/qYzstsOGs7x4qPXJgFWUSYPRYjM.jpg",
+            "id": 1139674,
+            "title": "Ephemera",
+            "original_title": "Ephemera",
+            "overview": "Time is finite for everyone, but what one does in that limited period are what is called as “living”. When a father suffers from a disease that destroys his memories and consciousness, his son is determined to give him the most beautiful memories of life before his passing.",
+            "poster_path": "/6KUNysxDplPlgYXxobphqREN6vd.jpg",
+            "media_type": "movie",
+            "original_language": "id",
+            "genre_ids": [
+              18
+            ],
+            "popularity": 0.1261,
+            "release_date": "2024-09-14",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/qUSBsukeHv9GrPy2pXzmWP1kZ7c.jpg",
+        "id": 127613,
+        "name": "Gho.C.Hu.",
+        "original_name": "Gho.C.Hu.",
+        "overview": "Four Friends rent a ruins house and decide to surprise her friend by horror things but after they experience real ghost then something happened unexpected to them.",
+        "poster_path": "/liIFeMQcyHJdHyO3Zo8SnfzGnRm.jpg",
+        "media_type": "tv",
+        "original_language": "hi",
+        "genre_ids": [
+          35,
+          9648
+        ],
+        "popularity": 0.2333,
+        "first_air_date": "2021-08-16",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "IN"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/ggqvhSdAASrseKuMlzk51sbvbE8.jpg",
+        "id": 1562642,
+        "title": "Ghost Soldier",
+        "original_title": "Ghost Soldier",
+        "overview": "Henry “Fitz” Fitzgerald has spent years living quietly off the grid, hiding from a past few people know anything about. But when a powerful foreign corporation moves into his hometown to seize his neighbors’ land for a massive payday, Fitz is forced to reveal who he really is: a former Special Forces soldier and advanced weapons developer. Armed with experimental technology, lethal combat skills, and an unwavering code of justice, Fitz wages a one-man war against an enemy that never saw him coming.",
+        "poster_path": "/8Y4oJ5iUs3hgPcDB3SIEmsNYjZk.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          28,
+          53
+        ],
+        "popularity": 120.5826,
+        "release_date": "2026-11-06",
+        "softcore": false,
+        "video": false,
+        "vote_average": 9.1,
+        "vote_count": 9
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/2aZc3aNtycEDYkYbcuu6Q2QQ9bD.jpg",
+        "id": 255358,
+        "name": "THE GHOST IN THE SHELL",
+        "original_name": "攻殻機動隊 THE GHOST IN THE SHELL",
+        "overview": "2029, a near-future Japan. The full cyborg Motoko Kusanagi envisions a task force that preemptively strikes emerging threats. She and her team are scouted by Daisuke Aramaki as Public Security Section 9, AKA the \"Shell Squad.\" An international conspiracy hints at a hacker known as The \"Puppet Master.\" What fate awaits Kusanagi? What is the hacker's endgame?",
+        "poster_path": "/nUXjSyXAQZhOf32e6lkLX6C6Rf3.jpg",
+        "media_type": "tv",
+        "original_language": "ja",
+        "genre_ids": [
+          16,
+          10759,
+          10765
+        ],
+        "popularity": 11.2496,
+        "first_air_date": "2026-07-07",
+        "softcore": false,
+        "vote_average": 8.1,
+        "vote_count": 81,
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jIpagj2Dud9g3ZVJFvaWikEWsYz.jpg",
+        "id": 9323,
+        "title": "Ghost in the Shell",
+        "original_title": "GHOST IN THE SHELL / 攻殻機動隊",
+        "overview": "In the year 2029, the barriers of our world have been broken down by the net and by cybernetics, but this brings new vulnerability to humans in the form of brain-hacking. When a highly-wanted hacker known as 'The Puppetmaster' begins involving them in politics, Section 9, a group of cybernetically enhanced cops, are called in to investigate and stop the Puppetmaster.",
+        "poster_path": "/9gC88zYUBARRSThcG93MvW14sqx.jpg",
+        "media_type": "movie",
+        "original_language": "ja",
+        "genre_ids": [
+          28,
+          16,
+          878
+        ],
+        "popularity": 10.1634,
+        "release_date": "1995-11-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.931,
+        "vote_count": 4148
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6M7CuNytVXL57OjWf3u9cu1HUb2.jpg",
+        "id": 4793,
+        "name": "Extreme Ghostbusters",
+        "original_name": "Extreme Ghostbusters",
+        "overview": "Based on the blockbuster films, this action-packed animated series starts a decade after the original Ghostbusters saved New York City from ghosts, goblins and ghouls. All the guys have left town, except Egon, now teaching a Paranormal Studies class at the local university. But Zuul, the all-powerful demon, has awakened from hibernation to wreak havoc on the unsuspecting masses. Desperate to recruit a new team, Egon and the plucky Janine turn to four of his teenage students: Kylie, a genius with an encyclopedic knowledge of the occult; Eduardo, a hip slacker with a crush on Kylie; Garrett, a wheelchair-bound athlete with a hot temper; and Roland, a “gentle giant” mechanical whiz. It's only a matter of time before Egon, Janine, old pal Slimer and the “kids” band together to rid the city of the evildoers.",
+        "poster_path": "/7E3jimDtr5oNNM3NGf8MP8So3yp.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          10759,
+          35,
+          10765,
+          10762
+        ],
+        "popularity": 9.5141,
+        "first_air_date": "1997-09-01",
+        "softcore": false,
+        "vote_average": 6.7,
+        "vote_count": 76,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/p5FOkor90VRBJEEhUMFdFdkixfe.jpg",
+        "id": 126027,
+        "name": "Ghosts",
+        "original_name": "Ghosts",
+        "overview": "Samantha and Jay throw caution to the wind when they convert their recently inherited country estate into a bed-and-breakfast. Call it mislaid plans. Not only is the place falling apart, but it’s also inhabited by spirits of previous residents -- whom only Samantha can see and hear.",
+        "poster_path": "/8yBQYa6AdvMY5H9CiAv0HkvF3UE.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          10765
+        ],
+        "popularity": 60.3435,
+        "first_air_date": "2021-10-07",
+        "softcore": false,
+        "vote_average": 8.1,
+        "vote_count": 515,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dWhMavg03rBGM96JSQmiUGcj3WE.jpg",
+        "id": 1606,
+        "name": "Ghost Whisperer",
+        "original_name": "Ghost Whisperer",
+        "overview": "Newlywed Melinda Gordon tries to help the dead communicate with loved ones, but sometimes the messages she receives are intense and confusing. Most of Melinda's efforts involve resolving conflicts that are preventing the spirits from passing over.",
+        "poster_path": "/9ZtGupUFaHhws7mOcwhNTtRpRHC.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10765,
+          9648,
+          18
+        ],
+        "popularity": 50.4549,
+        "first_air_date": "2005-09-23",
+        "softcore": false,
+        "vote_average": 8.059,
+        "vote_count": 1934,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/aqIOOXlKuhlIbnp3cSNBVd33bNx.jpg",
+        "id": 36024,
+        "name": "Ghost Hound",
+        "original_name": "神霊狩／GHOST HOUND",
+        "overview": "In an isolated region of Kyushu lies the town of Suiten. Though seeming small and modest, Suiten is not a picturesque place for a vacation, unless it is from the “Unseen World”. Taro, Makoto and Masayuki, three boys with traumatic pasts, learn to let their souls cross between the two parallel worlds. However, the Unseen World is no mere copy of the real Apparent World. The Unseen World is the home of ghosts, but changes are now allowing the souls of the dead to pass over into the Apparent World, with unpredictable effects. Follow the journey of Taro, Makoto and Masayuki, as they cross between the two worlds, trying to unravel a great mystery.",
+        "poster_path": "/mebvYDOMnnadzDDbJOdjQRnap63.jpg",
+        "media_type": "tv",
+        "original_language": "ja",
+        "genre_ids": [
+          16,
+          18,
+          9648,
+          10765
+        ],
+        "popularity": 6.7959,
+        "first_air_date": "2007-10-18",
+        "softcore": false,
+        "vote_average": 7.5,
+        "vote_count": 28,
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/tK3QdOOrX4qEkmSlvrmc8cK7iOU.jpg",
+        "id": 1393326,
+        "title": "Ghost in the Cell",
+        "original_title": "Ghost in the Cell",
+        "overview": "In a notorious prison, an invisible force begins killing inmates brutally, compelling enemy gangs and corrupt guards to work together as they try to survive the mounting bloodshed.",
+        "poster_path": "/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg",
+        "media_type": "movie",
+        "original_language": "id",
+        "genre_ids": [
+          27,
+          35
+        ],
+        "popularity": 40.1222,
+        "release_date": "2026-04-16",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.8,
+        "vote_count": 118
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jnwRlthXIgJB75Mt9GEl93Dczki.jpg",
+        "id": 61374,
+        "name": "Tokyo Ghoul",
+        "original_name": "東京喰種トーキョーグール",
+        "overview": "Ken Kaneki, a bookworm college student, meets Rize, a girl his own age with whom he shares many interests.",
+        "poster_path": "/1m4RlC9BTCbyY549TOdVQ5NRPcR.jpg",
+        "media_type": "tv",
+        "original_language": "ja",
+        "genre_ids": [
+          16,
+          18,
+          10765
+        ],
+        "popularity": 43.5435,
+        "first_air_date": "2014-07-04",
+        "softcore": false,
+        "vote_average": 8.246,
+        "vote_count": 2633,
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/u64huzTnF3jEYUXJ4BDlpHy2L3K.jpg",
+        "id": 17937,
+        "name": "Ghost Adventures",
+        "original_name": "Ghost Adventures",
+        "overview": "Paranormal investigator Zak Bagans and his crew, Nick Groff and Aaron Goodwin, search for haunted locations both domestically and internationally. During their investigations, Zak and crew acquaint themselves with the general area; interview locals about the hauntings; and go face-to-face with the evil spirits who reportedly haunt these locations.",
+        "poster_path": "/xLJZuDxdeUqRFHFlqs0mIk9faMR.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10764
+        ],
+        "popularity": 32.752,
+        "first_air_date": "2008-10-17",
+        "softcore": false,
+        "vote_average": 7.6,
+        "vote_count": 219,
+        "origin_country": [
+          "US"
+        ]
+      }
+    ],
+    "total_pages": 306,
+    "total_results": 6112
+  }
+}

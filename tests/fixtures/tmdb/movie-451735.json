@@ -1,0 +1,65 @@
+{
+  "request": {
+    "path": "/3/movie/451735",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:44.959Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/bojT9mi6e5UHxxdcljv4rrvGmto.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 99,
+        "name": "Documentary"
+      },
+      {
+        "id": 10402,
+        "name": "Music"
+      }
+    ],
+    "homepage": "",
+    "id": 451735,
+    "imdb_id": "tt5331594",
+    "origin_country": [
+      "TR"
+    ],
+    "original_language": "tr",
+    "original_title": "Blue",
+    "overview": "A thorough look at the 90's Turkish rock scene, one legendary stage band and its two members: Kerim Capli and Yavuz Cetin... An inquiry of their existential battles with the society, the industry and their own minds.",
+    "popularity": 0.363,
+    "poster_path": "/iQu5Or92lvEv69jcTmjQGFbm8eG.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "TR",
+        "name": "Turkey"
+      }
+    ],
+    "release_date": "2017-04-11",
+    "revenue": 0,
+    "runtime": 94,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Turkish",
+        "iso_639_1": "tr",
+        "name": "Türkçe"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Blue",
+    "video": false,
+    "vote_average": 8.067,
+    "vote_count": 15
+  }
+}

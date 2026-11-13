@@ -1,0 +1,84 @@
+{
+  "request": {
+    "path": "/3/movie/332512",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:40.729Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/HWN8qve56lvX0obp5YQs5hV7mS.jpg",
+    "belongs_to_collection": {
+      "id": 669105,
+      "name": "Призрак (Серия)",
+      "poster_path": "/kBtnbx1jM3NtwsX19bOfargOFS2.jpg",
+      "backdrop_path": null
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 332512,
+    "imdb_id": "tt4559932",
+    "origin_country": [
+      "RU"
+    ],
+    "original_language": "ru",
+    "original_title": "Призрак",
+    "overview": "An aircraft designer becomes a ghost after a sudden death. Now he needs to engage a help of seven-grader in order to finish all his unaccomplished tasks.",
+    "popularity": 0.7036,
+    "poster_path": "/2njykKt6eASXbrMENEcLkDLZZ6Y.jpg",
+    "production_companies": [
+      {
+        "id": 318,
+        "logo_path": "/q0UG4oZERwIywJdDPF4lRlvdYGW.png",
+        "name": "CTB Film Company",
+        "origin_country": "RU"
+      },
+      {
+        "id": 76049,
+        "logo_path": "/tam9pIV4QK1ZPwdxBgtVkK1WTYC.png",
+        "name": "Cinema Foundation of Russia",
+        "origin_country": "RU"
+      },
+      {
+        "id": 100821,
+        "logo_path": "/qBnzozNLi8gHHqwyN0ycGy8seZm.png",
+        "name": "Vodorod Film Company",
+        "origin_country": "RU"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "RU",
+        "name": "Russia"
+      }
+    ],
+    "release_date": "2015-03-26",
+    "revenue": 3300000,
+    "runtime": 90,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Russian",
+        "iso_639_1": "ru",
+        "name": "Pусский"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Ghost",
+    "video": false,
+    "vote_average": 6.4,
+    "vote_count": 62
+  }
+}

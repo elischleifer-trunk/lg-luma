@@ -1,0 +1,66 @@
+{
+  "request": {
+    "path": "/3/collection/1461530",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:47.261Z",
+  "response": {
+    "id": 1461530,
+    "name": "Minecraft Movie Collection",
+    "original_language": "en",
+    "original_name": "Minecraft Movie Collection",
+    "overview": "A series of films from Warner Bros. based on the worldwide bestselling video game, Minecraft.",
+    "poster_path": "/8jMQ2sVZ1RRiYSpcb7Yommo7V4r.jpg",
+    "backdrop_path": "/gvR8XaxV3wZlh1LKpReAjaTWhA2.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg",
+        "id": 950387,
+        "title": "A Minecraft Movie",
+        "original_title": "A Minecraft Movie",
+        "overview": "Four misfits find themselves struggling with ordinary problems when they are suddenly pulled through a mysterious portal into the Overworld: a bizarre, cubic wonderland that thrives on imagination. To get back home, they'll have to master this world while embarking on a magical quest with an unexpected, expert crafter, Steve.",
+        "poster_path": "/yFHHfHcUgGAxziP1C3lLt0q2T4s.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          10751,
+          14,
+          35,
+          12
+        ],
+        "popularity": 18.2666,
+        "release_date": "2025-03-31",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.188,
+        "vote_count": 3448
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/Aas6zyCznVr9V175xLB59YroQ9Q.jpg",
+        "id": 1461519,
+        "title": "A Minecraft Movie Squared",
+        "original_title": "A Minecraft Movie Squared",
+        "overview": "The second installment in the franchise. Plot TBA.",
+        "poster_path": "/dTlFgQFiILG6stHBhXMDXblgdCw.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          10751,
+          14,
+          35,
+          12
+        ],
+        "popularity": 3.4556,
+        "release_date": "2027-07-22",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      }
+    ]
+  }
+}

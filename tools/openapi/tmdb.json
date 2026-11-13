@@ -3,7 +3,28 @@
   "info": {
     "title": "tmdb-api",
     "version": "3",
-    "x-luma-source": "https://developer.themoviedb.org/openapi/tmdb-api.json"
+    "x-luma-source": "https://developer.themoviedb.org/openapi/tmdb-api.json",
+    "x-luma-patches": [
+      {
+        "path": [
+          "paths",
+          "/3/tv/{series_id}",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+          "properties",
+          "seasons",
+          "items",
+          "properties",
+          "vote_average",
+          "type"
+        ],
+        "value": "number"
+      }
+    ]
   },
   "servers": [
     {
@@ -26,6 +47,159 @@
     }
   ],
   "paths": {
+    "/3/collection/{collection_id}": {
+      "get": {
+        "summary": "Details",
+        "description": "Get collection details by ID.",
+        "operationId": "collection-details",
+        "parameters": [
+          {
+            "name": "collection_id",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "required": true
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en-US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"id\": 10,\n  \"name\": \"Star Wars Collection\",\n  \"original_language\": \"en\",\n  \"original_name\": \"Star Wars Collection\",\n  \"overview\": \"An epic space-opera theatrical film series, which depicts the adventures of various characters \\\"a long time ago in a galaxy far, far away….\\\"\",\n  \"poster_path\": \"/22dj38IckjzEEUZwN1tPU5VJ1qq.jpg\",\n  \"backdrop_path\": \"/4z9ijhgEthfRHShoOvMaBlpciXS.jpg\",\n  \"parts\": [\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/2w4xG178RpB4MDAIfTkqAuSJzec.jpg\",\n      \"id\": 11,\n      \"name\": \"Star Wars\",\n      \"original_name\": \"Star Wars\",\n      \"overview\": \"Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.\",\n      \"poster_path\": \"/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 15.8557,\n      \"release_date\": \"1977-05-25\",\n      \"video\": false,\n      \"vote_average\": 8.205,\n      \"vote_count\": 21522\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/dMZxEdrWIzUmUoOz2zvmFuutbj7.jpg\",\n      \"id\": 1891,\n      \"name\": \"The Empire Strikes Back\",\n      \"original_name\": \"The Empire Strikes Back\",\n      \"overview\": \"The epic saga continues as Luke Skywalker, in hopes of defeating the evil Galactic Empire, learns the ways of the Jedi from aging master Yoda. But Darth Vader is more determined than ever to capture Luke. Meanwhile, rebel leader Princess Leia, cocky Han Solo, Chewbacca, and droids C-3PO and R2-D2 are thrown into various stages of capture, betrayal and despair.\",\n      \"poster_path\": \"/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 6.7352,\n      \"release_date\": \"1980-05-20\",\n      \"video\": false,\n      \"vote_average\": 8.395,\n      \"vote_count\": 17713\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/r2IOBOeg5wLfLtyOnT5Pur6Tl4q.jpg\",\n      \"id\": 1892,\n      \"name\": \"Return of the Jedi\",\n      \"original_name\": \"Return of the Jedi\",\n      \"overview\": \"Luke Skywalker leads a mission to rescue his friend Han Solo from the clutches of Jabba the Hutt, while the Emperor seeks to destroy the Rebellion once and for all with a second dreaded Death Star.\",\n      \"poster_path\": \"/jQYlydvHm3kUix1f8prMucrplhm.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 5.5117,\n      \"release_date\": \"1983-05-25\",\n      \"video\": false,\n      \"vote_average\": 7.9,\n      \"vote_count\": 16334\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/wDe8LzwuvHYYiuwyNfxdYQq8ti4.jpg\",\n      \"id\": 1893,\n      \"name\": \"Star Wars: Episode I - The Phantom Menace\",\n      \"original_name\": \"Star Wars: Episode I - The Phantom Menace\",\n      \"overview\": \"Anakin Skywalker, a young slave strong with the Force, is discovered on Tatooine. Meanwhile, the evil Sith have returned, enacting their plot for revenge against the Jedi.\",\n      \"poster_path\": \"/6wkfovpn7Eq8dYNKaG5PY3q2oq6.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 7.1731,\n      \"release_date\": \"1999-05-19\",\n      \"video\": false,\n      \"vote_average\": 6.6,\n      \"vote_count\": 15251\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/msYmRFJfXy0zsFd73PAEqdetKpO.jpg\",\n      \"id\": 1894,\n      \"name\": \"Star Wars: Episode II - Attack of the Clones\",\n      \"original_name\": \"Star Wars: Episode II - Attack of the Clones\",\n      \"overview\": \"Following an assassination attempt on Senator Padmé Amidala, Jedi Knights Anakin Skywalker and Obi-Wan Kenobi investigate a mysterious plot that could change the galaxy forever.\",\n      \"poster_path\": \"/oZNPzxqM2s5DyVWab09NTQScDQt.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 6.9779,\n      \"release_date\": \"2002-05-15\",\n      \"video\": false,\n      \"vote_average\": 6.6,\n      \"vote_count\": 13807\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/jniabJVBSW3EqLlyhjxWCZjVkiE.jpg\",\n      \"id\": 1895,\n      \"name\": \"Star Wars: Episode III - Revenge of the Sith\",\n      \"original_name\": \"Star Wars: Episode III - Revenge of the Sith\",\n      \"overview\": \"The evil Darth Sidious enacts his final plan for unlimited power – and the heroic Jedi Anakin Skywalker must choose a side.\",\n      \"poster_path\": \"/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 7.0776,\n      \"release_date\": \"2005-05-17\",\n      \"video\": false,\n      \"vote_average\": 7.5,\n      \"vote_count\": 14365\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/8BTsTfln4jlQrLXUBquXJ0ASQy9.jpg\",\n      \"id\": 140607,\n      \"name\": \"Star Wars: The Force Awakens\",\n      \"original_name\": \"Star Wars: The Force Awakens\",\n      \"overview\": \"Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers.\",\n      \"poster_path\": \"/wqnLdwVXoBjKibFRR5U3y0aDUhs.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 10.9225,\n      \"release_date\": \"2015-12-15\",\n      \"video\": false,\n      \"vote_average\": 7.256,\n      \"vote_count\": 19985\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/SPkEiZGxq5aHWQ2Zw7AITwSEo2.jpg\",\n      \"id\": 181812,\n      \"name\": \"Star Wars: The Rise of Skywalker\",\n      \"original_name\": \"Star Wars: The Rise of Skywalker\",\n      \"overview\": \"The surviving Resistance faces the First Order once again as the journey of Rey, Finn and Poe Dameron continues. With the power and knowledge of generations behind them, the final battle begins.\",\n      \"poster_path\": \"/db32LaOibwEliAmSL2jjDF6oDdj.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 10.4568,\n      \"release_date\": \"2019-12-18\",\n      \"video\": false,\n      \"vote_average\": 6.283,\n      \"vote_count\": 10367\n    },\n    {\n      \"adult\": false,\n      \"backdrop_path\": \"/5Iw7zQTHVRBOYpA0V6z0yypOPZh.jpg\",\n      \"id\": 181808,\n      \"name\": \"Star Wars: The Last Jedi\",\n      \"original_name\": \"Star Wars: The Last Jedi\",\n      \"overview\": \"Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.\",\n      \"poster_path\": \"/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg\",\n      \"media_type\": \"movie\",\n      \"original_language\": \"en\",\n      \"genre_ids\": [\n        12,\n        28,\n        878\n      ],\n      \"popularity\": 8.732,\n      \"release_date\": \"2017-12-13\",\n      \"video\": false,\n      \"vote_average\": 6.768,\n      \"vote_count\": 15821\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 10,
+                      "default": 0
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Star Wars Collection"
+                    },
+                    "original_language": {
+                      "type": "string",
+                      "example": "en"
+                    },
+                    "original_name": {
+                      "type": "string",
+                      "example": "Star Wars Collection"
+                    },
+                    "overview": {
+                      "type": "string",
+                      "example": "An epic space-opera theatrical film series, which depicts the adventures of various characters \"a long time ago in a galaxy far, far away….\""
+                    },
+                    "poster_path": {
+                      "type": "string",
+                      "example": "/22dj38IckjzEEUZwN1tPU5VJ1qq.jpg"
+                    },
+                    "backdrop_path": {
+                      "type": "string",
+                      "example": "/4z9ijhgEthfRHShoOvMaBlpciXS.jpg"
+                    },
+                    "parts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "adult": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "backdrop_path": {
+                            "type": "string",
+                            "example": "/2w4xG178RpB4MDAIfTkqAuSJzec.jpg"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "example": 11,
+                            "default": 0
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Star Wars"
+                          },
+                          "original_name": {
+                            "type": "string",
+                            "example": "Star Wars"
+                          },
+                          "overview": {
+                            "type": "string",
+                            "example": "Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire."
+                          },
+                          "poster_path": {
+                            "type": "string",
+                            "example": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg"
+                          },
+                          "media_type": {
+                            "type": "string",
+                            "example": "movie"
+                          },
+                          "original_language": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "genre_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "example": 12,
+                              "default": 0
+                            }
+                          },
+                          "popularity": {
+                            "type": "number",
+                            "example": 15.8557,
+                            "default": 0
+                          },
+                          "release_date": {
+                            "type": "string",
+                            "example": "1977-05-25"
+                          },
+                          "video": {
+                            "type": "boolean",
+                            "example": false,
+                            "default": true
+                          },
+                          "vote_average": {
+                            "type": "number",
+                            "example": 8.205,
+                            "default": 0
+                          },
+                          "vote_count": {
+                            "type": "integer",
+                            "example": 21522,
+                            "default": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
     "/3/find/{external_id}": {
       "get": {
         "summary": "Find By ID",
@@ -1449,7 +1623,7 @@
                             "default": 0
                           },
                           "vote_average": {
-                            "type": "integer",
+                            "type": "number",
                             "example": 0,
                             "default": 0
                           }

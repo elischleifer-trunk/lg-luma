@@ -1,0 +1,459 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "the office",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-13T21:26:31.669Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/9vMzIrMIncPmtalcxh1MOrgcE6C.jpg",
+        "id": 2316,
+        "name": "The Office",
+        "original_name": "The Office",
+        "overview": "The everyday lives of office employees in the Scranton, Pennsylvania branch of the fictional Dunder Mifflin Paper Company.",
+        "poster_path": "/7DJKHzAi83BmQrWLrYYOqcoKfhR.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 1944.6525,
+        "first_air_date": "2005-03-24",
+        "softcore": false,
+        "vote_average": 8.584,
+        "vote_count": 5703,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/9GWU1AyNqUYIUl1tU7CvXEHUVs9.jpg",
+        "id": 2996,
+        "name": "The Office",
+        "original_name": "The Office",
+        "overview": "Nightmare boss. Tedious colleagues. Pointless tasks. Welcome to Wernham Hogg.",
+        "poster_path": "/oX2JKE1RzAONMbYlujHx0hRAJo1.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 9.3729,
+        "first_air_date": "2001-07-09",
+        "softcore": false,
+        "vote_average": 7.836,
+        "vote_count": 1018,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/9gm3mqdQ1FcK0R8GMKs85xAbhAp.jpg",
+        "id": 128822,
+        "name": "The Office PL",
+        "original_name": "The Office PL",
+        "overview": "",
+        "poster_path": "/5hD6I5fQ7KCCmhFlXoQCzi9vaoS.jpg",
+        "media_type": "tv",
+        "original_language": "pl",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 9.9014,
+        "first_air_date": "2021-10-22",
+        "softcore": false,
+        "vote_average": 7.8,
+        "vote_count": 12,
+        "origin_country": [
+          "PL"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/iGrqdlhYRNsGG4ZQ5TBkRsJue4U.jpg",
+        "id": 90762,
+        "name": "The Office",
+        "original_name": "The Office",
+        "overview": "Life at Wilkins Chawla, a mediocre paper company is as boring as the humour of its 'Fun'jabi boss. Add to it some ordinary employees, an uncomfortable receptionist, the boss' sycophant, and the mediocrity goes a notch higher!",
+        "poster_path": "/p61QSlJor7edi2DJIH0jFL3whfa.jpg",
+        "media_type": "tv",
+        "original_language": "hi",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 4.2774,
+        "first_air_date": "2019-06-28",
+        "softcore": false,
+        "vote_average": 6.1,
+        "vote_count": 10,
+        "origin_country": [
+          "IN"
+        ]
+      },
+      {
+        "adult": false,
+        "id": 3328503,
+        "name": "The Post Office",
+        "original_name": "The Post Office",
+        "media_type": "person",
+        "popularity": 0.1133,
+        "gender": 0,
+        "known_for_department": "Sound",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/jcjrP3OeZVfc7gTsb6O7MAX6x7S.jpg",
+            "id": 139687,
+            "name": "SONA",
+            "original_name": "SONA",
+            "overview": "Forced to choose between her alien husband and her home planet, a United Earth Space Corps officer has no option but betrayal.",
+            "poster_path": "/3CWNt9tP5OsvpNkHMVoKWYIX2w8.jpg",
+            "media_type": "tv",
+            "original_language": "en",
+            "genre_ids": [
+              10765,
+              9648,
+              18
+            ],
+            "popularity": 1.344,
+            "first_air_date": "2018-08-22",
+            "softcore": false,
+            "vote_average": 7.5,
+            "vote_count": 2,
+            "origin_country": [
+              "US"
+            ]
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/sjqFcCmTVuhz7bFxzmKrA0ZvvKZ.jpg",
+        "id": 256480,
+        "name": "The Office",
+        "original_name": "The Office",
+        "overview": "Hannah Howard is the managing director of packaging company Flinley Craddick. When she gets news from Head Office that her branch will be shut down and everyone will go remote, she goes into survival mode, making promises she can't keep in order to keep her \"work family\" together.",
+        "poster_path": "/wVS8a4sJmD9sP4NOo6qr4PTnlF9.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 4.1171,
+        "first_air_date": "2024-10-18",
+        "softcore": false,
+        "vote_average": 5.625,
+        "vote_count": 44,
+        "origin_country": [
+          "AU"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/e3h97EqlVpsgJrlWsNHIcZOl2od.jpg",
+        "id": 24876,
+        "name": "The Office",
+        "original_name": "The Office",
+        "overview": "A look at office life seen though the eyes of Rita Stone, a secretary who has worked at the packaging department of an ad agency called Package, Inc for 19 years. ",
+        "poster_path": "/glcJraGwrHarnQTqN0e6p0YpdDw.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 2.0024,
+        "first_air_date": "1995-03-11",
+        "softcore": false,
+        "vote_average": 6,
+        "vote_count": 2,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/bGXwtVYNDD34GodfCjqTEuleYM7.jpg",
+        "id": 249145,
+        "name": "Phantom of the Office",
+        "original_name": "Phantom of the Office",
+        "overview": "The Phantom (Streeter Seidell) isn't here to make friends. He isn't here to work or haunt, either. Honestly, we think he's a freelance corporate loiterer.",
+        "poster_path": "/zCRbeOg1k7e6DpVPgm4FOemyTt4.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [],
+        "popularity": 2.6499,
+        "first_air_date": "2008-05-28",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 37054,
+        "name": "The Office",
+        "original_name": "המשרד",
+        "overview": "“The Office” is a mocumentary series based on the British show of the same name. Somewhere within the industrial area of Yahud is a grey, drab office, the failing branch of an office supply company heroically named “Paper-Office”. The branch is run by the show’s protagonist, Avi Meshulam, a 40-year-old loser, who’s overweight and has severe self-image issues that turn him into a liar, a suck-up, and a generally unbearable human being. He’s absolutely sure that he’s a wonderful standup comedian, who wound up in this boring, humiliating job purely by chance.\n\nManagement is constantly trying to fire him, his employees despise him, yet he is ever the optimist, and he talks in catch phrases lifted from the most banal management books. He is surrounded by the range of characters that make up the impossible mosaic of Israeli society. Romance flourishes, schemes are hatched, lamination machines are sold on sale– and everybody tries to make it through yet another day with their unbearable boss.",
+        "poster_path": "/fmqPScgb2GDWwk6t3j4lBXkdkHn.jpg",
+        "media_type": "tv",
+        "original_language": "he",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 3.0741,
+        "first_air_date": "2010-08-10",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "IL"
+        ]
+      },
+      {
+        "adult": false,
+        "id": 4608412,
+        "name": "The DA's Office",
+        "original_name": "The DA's Office",
+        "media_type": "person",
+        "popularity": 0.0604,
+        "gender": 0,
+        "known_for_department": "Sound",
+        "profile_path": null,
+        "known_for": []
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dmVj3aNLcyzIxS1EM5GvL7Cg16W.jpg",
+        "id": 70633,
+        "name": "The Office",
+        "original_name": "Konttori",
+        "overview": "Finnish adaption of the British TV series \"The Office\".",
+        "poster_path": "/gXRVl5vnlvy3erURyKXd0ZsoZtt.jpg",
+        "media_type": "tv",
+        "original_language": "fi",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 2.5275,
+        "first_air_date": "2017-03-03",
+        "softcore": false,
+        "vote_average": 3,
+        "vote_count": 2,
+        "origin_country": [
+          "FI"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/lDtfM8sRZaVvJfUAflK5MaCZ1ev.jpg",
+        "id": 272429,
+        "name": "The Office Movers",
+        "original_name": "The Office Movers",
+        "overview": "Everett and Eric Saunders are two brothers reluctantly following in their father’s footsteps in commercial office moving. Everett, the owner of Shazam Moving, is fighting to keep his business afloat against stiff competition. Alongside his brother Eric, and a quirky crew of co-workers, Everett struggles to keep it together to land a big enough contract to be bought out by Zenithon Logistics, a moving industry giant. The Saunders brothers battle each other, their family and their crew as they face the unforgiving nature of the Toronto office moving game to make a last-ditch attempt to cash out and leave moving behind for good.",
+        "poster_path": "/kOHls1i4IatW8AnQahsTMlJ6t4I.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 1.2249,
+        "first_air_date": "2024-10-11",
+        "softcore": false,
+        "vote_average": 5.2,
+        "vote_count": 5,
+        "origin_country": [
+          "CA"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/5LF7wUhDEOrpkE0Web0YNccpLvF.jpg",
+        "id": 241100,
+        "name": "Mr Bates vs The Post Office",
+        "original_name": "Mr Bates vs The Post Office",
+        "overview": "The story of one of the greatest miscarriages of justice in British legal history, where hundreds of innocent sub-postmasters and postmistresses were wrongly accused of theft, fraud and false accounting due to a defective IT system.",
+        "poster_path": "/sQWIaSoMbuPxDBiAcCeQIn3NLZx.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          18
+        ],
+        "popularity": 3.0269,
+        "first_air_date": "2024-01-01",
+        "softcore": false,
+        "vote_average": 7.95,
+        "vote_count": 101,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 1563251,
+        "title": "The Office",
+        "original_title": "The Office",
+        "overview": "Middle manager Norman is preparing an address to senior management. When an interview with his new boss leads to an awful misunderstanding, Norman finds himself naked in the wrong office with minutes to go until his presentation.",
+        "poster_path": "/s9V0Fn7dd9VAmyiwngmt76ttB6m.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 0.6891,
+        "release_date": "1996-07-02",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 25477,
+        "name": "The Singing Office",
+        "original_name": "The Singing Office",
+        "overview": "Groups of office coworkers compete against each other in a singing competition -- hosted by ex-Spice Girl Melanie Brown and ex-NSYNC member Joey Fatone.",
+        "poster_path": "/fJGTlJSyrynMRzMwqa7E5D6wjij.jpg",
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10764
+        ],
+        "popularity": 0.8639,
+        "first_air_date": "2008-06-29",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 761856,
+        "title": "The Office",
+        "original_title": "The Office",
+        "overview": "A man enters a mysterious office.",
+        "poster_path": null,
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          16,
+          27,
+          35
+        ],
+        "popularity": 0.2431,
+        "release_date": "2020-10-26",
+        "softcore": false,
+        "video": false,
+        "vote_average": 10,
+        "vote_count": 1
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6xpS5lZvFhD1jd8S1k9Ig7U9Cak.jpg",
+        "id": 213307,
+        "name": "The Office (SA)",
+        "original_name": "المكتب",
+        "overview": "In a postal service company in Riyadh, a group of employees go about their daily work while dealing with their clumsy, but kind-hearted boss.",
+        "poster_path": "/r55H1Klk1y1GxdJsH2yQdyGfIv7.jpg",
+        "media_type": "tv",
+        "original_language": "ar",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 2.3837,
+        "first_air_date": "2022-10-27",
+        "softcore": false,
+        "vote_average": 6.8,
+        "vote_count": 4,
+        "origin_country": [
+          "SA"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 24781,
+        "name": "The 1970s Office",
+        "original_name": "The 1970s Office",
+        "overview": "Two teams of advertising executives compete to win the Raleigh of Nottingham's 'Raleigh Chopper' Christmas ad campaign. One team live and work the 1970s - without computers, mobile phones, internet or even motorcycle couriers - and has two weeks to put together a pitch. The other has team access to all modern technology, but only has a day to do the job.",
+        "poster_path": null,
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          10764
+        ],
+        "popularity": 0.9458,
+        "first_air_date": "2004-10-21",
+        "softcore": false,
+        "vote_average": 10,
+        "vote_count": 1,
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/qQFdIUoIRVk2kIgU9Z8LDUuLKBg.jpg",
+        "id": 96161,
+        "title": "The Office Wife",
+        "original_title": "The Office Wife",
+        "overview": "Larry, a publisher, wants Kate to write a book about the 'Office Wife'. An executive stenographer's duties creates a relationship approaching that of his wife. Little does Larry know that sometimes literature mirrors life.",
+        "poster_path": "/jqKc1aJji5bORUVqtbdM8FTqLKt.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          10749
+        ],
+        "popularity": 0.5914,
+        "release_date": "1930-08-23",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.1,
+        "vote_count": 13
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "id": 25800,
+        "name": "Nice Day at the Office",
+        "original_name": "Nice Day at the Office",
+        "overview": "Nice Day at the Office is a British sitcom starring Timothy Spall, John Sessions and David Haig as put-upon and frustrated employees of a large company.",
+        "poster_path": null,
+        "media_type": "tv",
+        "original_language": "en",
+        "genre_ids": [
+          35
+        ],
+        "popularity": 1.3365,
+        "first_air_date": "1994-09-26",
+        "softcore": false,
+        "vote_average": 9,
+        "vote_count": 1,
+        "origin_country": [
+          "GB"
+        ]
+      }
+    ],
+    "total_pages": 13,
+    "total_results": 260
+  }
+}

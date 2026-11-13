@@ -1,0 +1,105 @@
+{
+  "request": {
+    "path": "/3/tv/24876",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:20.625Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/e3h97EqlVpsgJrlWsNHIcZOl2od.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      30
+    ],
+    "first_air_date": "1995-03-11",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 24876,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1995-04-15",
+    "last_episode_to_air": {
+      "id": 647692,
+      "name": "Judgement Day",
+      "overview": "It's evaluation time, which makes for some unhappy staffers; meanwhile, Beth earns low marks on her household skills from guest Rita.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1995-04-15",
+      "episode_number": 5,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 30,
+      "season_number": 1,
+      "show_id": 24876,
+      "still_path": null
+    },
+    "name": "The Office",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 16,
+        "logo_path": "/wju8KhOUsR5y4bH9p3Jc50hhaLO.png",
+        "name": "CBS",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 6,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "The Office",
+    "overview": "A look at office life seen though the eyes of Rita Stone, a secretary who has worked at the packaging department of an ad agency called Package, Inc for 19 years. ",
+    "popularity": 2.0024,
+    "poster_path": "/glcJraGwrHarnQTqN0e6p0YpdDw.jpg",
+    "production_companies": [
+      {
+        "id": 1089,
+        "logo_path": null,
+        "name": "Witt/Thomas Productions",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1995-03-11",
+        "episode_count": 6,
+        "id": 35085,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6,
+    "vote_count": 2
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "request": {
+    "path": "/3/tv/257018",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:26.015Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/znyGmKo8oDwODCmP6ZoD6z2Y3Ho.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2024-02-13",
+    "genres": [
+      {
+        "id": 10762,
+        "name": "Kids"
+      }
+    ],
+    "homepage": "",
+    "id": 257018,
+    "in_production": true,
+    "languages": [],
+    "last_air_date": "2026-10-20",
+    "last_episode_to_air": {
+      "id": 8114103,
+      "name": "The Decider",
+      "overview": "Ash Barty reads “The Decider”, a story about getting together and watching a big game!\n\nLucky’s Dad, Lucky and Chucky have come over to the Heelers’ house to watch a rugby final together. Everyone at the Heelers is supporting the Maroons, but Lucky’s Mum has stayed at home next door to support the Blues.\n\nChucky asks Bluey to help him choose which side he should support. After flip flopping between the two teams in the first half, Chucky finally decides to support his dad’s team.\n\nHis Mum feels sad but stoically accepts his choice. A few days later, Chucky’s family and Bluey’s family unite to support one team, when Australia faces New Zealand in an international!",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-11-09",
+      "episode_number": 10,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 6,
+      "season_number": 3,
+      "show_id": 257018,
+      "still_path": "/j5C0R3EG3mL9Rfp0hASG5PUjOEI.jpg"
+    },
+    "name": "Bluey Book Reads",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 247,
+        "logo_path": "/i9YpTodhXMOAYo0TZrP0UrHeunc.png",
+        "name": "YouTube",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 23,
+    "number_of_seasons": 3,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Bluey Book Reads",
+    "overview": "Bluey Book Reads offers fans a new way to experience their favourite Bluey storybooks, combining off-screen narration from global talent with visuals from Bluey storybooks and live action shots.",
+    "popularity": 3.5466,
+    "poster_path": "/qPr1v0YnRMzL4IL6S5ehRiWK4PF.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "2024-02-13",
+        "episode_count": 12,
+        "id": 398662,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-04-16",
+        "episode_count": 2,
+        "id": 452550,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-09-08",
+        "episode_count": 10,
+        "id": 546538,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 10,
+    "vote_count": 1
+  }
+}

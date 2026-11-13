@@ -1,0 +1,157 @@
+{
+  "request": {
+    "path": "/3/tv/4793",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:24:14.756Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/6M7CuNytVXL57OjWf3u9cu1HUb2.jpg",
+    "created_by": [
+      {
+        "id": 283804,
+        "credit_id": "6448b7332fdec602fca0d28f",
+        "name": "Jeff Kline",
+        "original_name": "Jeff Kline",
+        "gender": 2,
+        "profile_path": null
+      },
+      {
+        "id": 1175223,
+        "credit_id": "6448b73a49756004e6df1ee8",
+        "name": "Richard Raynis",
+        "original_name": "Richard Raynis",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      22
+    ],
+    "first_air_date": "1997-09-01",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 10762,
+        "name": "Kids"
+      }
+    ],
+    "homepage": "",
+    "id": 4793,
+    "in_production": false,
+    "languages": [
+      "de",
+      "es",
+      "en"
+    ],
+    "last_air_date": "1997-12-08",
+    "last_episode_to_air": {
+      "id": 343620,
+      "name": "Witchy Woman",
+      "overview": "Three teenage witches try to bring Kylie into their circle.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1997-12-08",
+      "episode_number": 40,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 22,
+      "season_number": 1,
+      "show_id": 4793,
+      "still_path": null
+    },
+    "name": "Extreme Ghostbusters",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 184,
+        "logo_path": null,
+        "name": "Syndication",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 40,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Extreme Ghostbusters",
+    "overview": "Based on the blockbuster films, this action-packed animated series starts a decade after the original Ghostbusters saved New York City from ghosts, goblins and ghouls. All the guys have left town, except Egon, now teaching a Paranormal Studies class at the local university. But Zuul, the all-powerful demon, has awakened from hibernation to wreak havoc on the unsuspecting masses. Desperate to recruit a new team, Egon and the plucky Janine turn to four of his teenage students: Kylie, a genius with an encyclopedic knowledge of the occult; Eduardo, a hip slacker with a crush on Kylie; Garrett, a wheelchair-bound athlete with a hot temper; and Roland, a “gentle giant” mechanical whiz. It's only a matter of time before Egon, Janine, old pal Slimer and the “kids” band together to rid the city of the evildoers.",
+    "popularity": 9.5141,
+    "poster_path": "/7E3jimDtr5oNNM3NGf8MP8So3yp.jpg",
+    "production_companies": [
+      {
+        "id": 23548,
+        "logo_path": null,
+        "name": "Adelaide Productions",
+        "origin_country": "US"
+      },
+      {
+        "id": 10471,
+        "logo_path": "/tHIwIKoXdLKA8Nt3XeRInh71OvD.png",
+        "name": "Columbia TriStar Television",
+        "origin_country": "US"
+      },
+      {
+        "id": 125458,
+        "logo_path": null,
+        "name": "BKN International",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "1997-09-01",
+        "episode_count": 40,
+        "id": 14525,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/4yPdu049xM9yc23P7lmGqnzty5z.jpg",
+        "season_number": 1,
+        "vote_average": 10
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "German",
+        "iso_639_1": "de",
+        "name": "Deutsch"
+      },
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      },
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.7,
+    "vote_count": 76
+  }
+}

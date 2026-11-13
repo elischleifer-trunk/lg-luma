@@ -1,0 +1,62 @@
+{
+  "request": {
+    "path": "/3/collection/1314623",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:47.215Z",
+  "response": {
+    "id": 1314623,
+    "name": "The Devil Wears Prada Collection",
+    "original_language": "en",
+    "original_name": "The Devil Wears Prada Collection",
+    "overview": "A naïve Midwesterner arrives in the Big Apple to intern at a fashion magazine, where she discovers the cutthroat world of the industry.",
+    "poster_path": "/nlzKiU0L5Rt3eCsUrN6mDtynEQ9.jpg",
+    "backdrop_path": "/h3EaoLd3ZyYyx5ME9dWTXcmTMCM.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/gkh6Nt8DtY1XT4gQsyFq9XAVJlJ.jpg",
+        "id": 350,
+        "title": "The Devil Wears Prada",
+        "original_title": "The Devil Wears Prada",
+        "overview": "A young woman from the Midwest gets more than she bargained for when she moves to New York to become a writer and ends up as the assistant to the tyrannical, larger-than-life editor-in-chief of a major fashion magazine.",
+        "poster_path": "/8912AsVuS7Sj915apArUFbv6F9L.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          18,
+          35
+        ],
+        "popularity": 19.7691,
+        "release_date": "2006-06-29",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.432,
+        "vote_count": 14431
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dRoFlUbH1l51ACmx5oPCI3jfvZq.jpg",
+        "id": 1314481,
+        "title": "The Devil Wears Prada 2",
+        "original_title": "The Devil Wears Prada 2",
+        "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+        "poster_path": "/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
+        "media_type": "movie",
+        "original_language": "en",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "popularity": 23.2714,
+        "release_date": "2026-04-29",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.013,
+        "vote_count": 2558
+      }
+    ]
+  }
+}

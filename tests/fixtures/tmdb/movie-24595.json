@@ -1,0 +1,76 @@
+{
+  "request": {
+    "path": "/3/movie/24595",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-13T21:25:45.012Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/zTCcpYpRIBnjdcZGJdlfENcZPrP.jpg",
+    "belongs_to_collection": null,
+    "budget": 17500000,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 24595,
+    "imdb_id": "tt1223922",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_title": "ब्लू",
+    "overview": "Sagar, Sam, and Aarav decide to go underwater to find the sunken ship Lady in Blue to retrieve the treasure in it to help Sameer clear his debt, but one of them has a hidden agenda.",
+    "popularity": 1.2288,
+    "poster_path": "/g9bpZSbBRRfbx86s61lgormparP.jpg",
+    "production_companies": [
+      {
+        "id": 5670,
+        "logo_path": null,
+        "name": "Shree Ashtavinayak Cine Vision",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2009-10-16",
+    "revenue": 0,
+    "runtime": 119,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Released",
+    "tagline": "250 feet deep lies the secret of...",
+    "title": "Blue",
+    "video": false,
+    "vote_average": 4,
+    "vote_count": 52
+  }
+}

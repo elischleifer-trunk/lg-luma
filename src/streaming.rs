@@ -11,7 +11,7 @@
 //!    on a less recently used app. Rentals and purchases are still offered when nothing is
 //!    included.
 use crate::branding;
-use serde::Deserialize;
+pub use crate::motn_api::{Show, StreamingOptionType};
 use std::{
     collections::{HashMap, VecDeque},
     time::{Duration, Instant},
@@ -42,77 +42,9 @@ const SERVICE_BRANDS: &[(&str, &str)] = &[
     ("plex", "plex"),
 ];
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct Show {
-    pub id: String,
-    pub title: String,
-    #[serde(default)]
-    pub show_type: ShowType,
-    pub release_year: Option<u16>,
-    pub first_air_year: Option<u16>,
-    #[serde(default)]
-    pub overview: String,
-    /// Movie of the Night's own 0–100 rating (aggregated from IMDb/TMDB; not Rotten Tomatoes).
-    pub rating: Option<u8>,
-    /// Poster/backdrop URLs, kept raw until the UI picks sizes.
-    #[serde(default)]
-    pub image_set: serde_json::Value,
-    /// Keyed by lowercase country code.
-    #[serde(default)]
-    pub streaming_options: HashMap<String, Vec<StreamingOption>>,
-}
-
-impl Show {
-    pub fn year(&self) -> Option<u16> {
-        self.release_year.or(self.first_air_year)
-    }
-}
-
-#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub enum ShowType {
-    #[default]
-    Movie,
-    Series,
-}
-
-#[derive(Clone, Debug, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct StreamingOption {
-    pub service: Service,
-    #[serde(rename = "type")]
-    pub kind: Kind,
-    #[serde(default)]
-    pub link: String,
-    pub price: Option<Price>,
-    pub addon: Option<Service>,
-}
-
-#[derive(Clone, Debug, Deserialize, PartialEq)]
-pub struct Service {
-    pub id: String,
-    #[serde(default)]
-    pub name: String,
-}
-
-#[derive(Clone, Debug, Deserialize, PartialEq)]
-pub struct Price {
-    /// Decimal string, e.g. "3.99".
-    pub amount: String,
-    pub formatted: String,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub enum Kind {
-    Subscription,
-    Free,
-    Addon,
-    Rent,
-    Buy,
-    #[serde(other)]
-    Other,
+/// Release year for movies, first air year for series.
+pub fn year(show: &Show) -> Option<i64> {
+    show.release_year.or(show.first_air_year)
 }
 
 /// What watching costs, cheapest first: the derived order is the preference order.
@@ -126,15 +58,13 @@ pub enum Access {
     Buy,
 }
 
-impl Kind {
-    fn access(self) -> Option<Access> {
-        match self {
-            Kind::Subscription | Kind::Free => Some(Access::Included),
-            Kind::Addon => Some(Access::Addon),
-            Kind::Rent => Some(Access::Rent),
-            Kind::Buy => Some(Access::Buy),
-            Kind::Other => None,
-        }
+fn access(kind: StreamingOptionType) -> Option<Access> {
+    match kind {
+        StreamingOptionType::Subscription | StreamingOptionType::Free => Some(Access::Included),
+        StreamingOptionType::Addon => Some(Access::Addon),
+        StreamingOptionType::Rent => Some(Access::Rent),
+        StreamingOptionType::Buy => Some(Access::Buy),
+        StreamingOptionType::Unknown => None,
     }
 }
 
@@ -210,7 +140,7 @@ pub fn pick(show: &Show, country: &str, services: &Services) -> (Option<Pick>, V
         .into_iter()
         .flatten()
         .filter_map(|option| {
-            let access = option.kind.access()?;
+            let access = access(option.r#type)?;
             let (app, rank) = services.app(&option.service.id)?;
             let cents = option.price.as_ref().map_or(0, |p| price_cents(&p.amount));
             Some((access, *rank, cents, app, option))
