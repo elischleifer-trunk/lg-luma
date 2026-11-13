@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 
 import pytest
@@ -212,13 +213,22 @@ async def test_video_mode_sends_the_cameras_hls_playlist_with_mjpeg_fallbacks(
     hass.states.async_set("camera.yard", "idle", {"access_token": "y1", "friendly_name": "Yard"})
     requested = []
 
+    # How camera.still fails to start a stream; None makes it too slow instead.
+    still: dict[str, Exception | None] = {
+        "failure": HomeAssistantError("camera.still does not support play stream service")
+    }
+
     async def request_stream(hass_: HomeAssistant, entity_id: str) -> str:
         requested.append(entity_id)
         if entity_id == "camera.still":
-            raise HomeAssistantError("camera.still does not support play stream service")
+            if still["failure"] is None:
+                await asyncio.sleep(1)
+            else:
+                raise still["failure"]
         return "/api/hls/abc/master_playlist.m3u8"
 
     monkeypatch.setattr("custom_components.luma._request_stream", request_stream)
+    monkeypatch.setattr("custom_components.luma.HLS_START_TIMEOUT", 0.05)
     aioclient_mock.post(f"{TV}/api/overlay", json={"session": "s", "paused": False})
 
     await hass.services.async_call(
@@ -241,6 +251,16 @@ async def test_video_mode_sends_the_cameras_hls_playlist_with_mjpeg_fallbacks(
     assert "hls_url" not in payload
     assert payload["stream_url"].startswith("http://192.168.1.10:8123/api/camera_proxy_stream/")
 
+    # Any other failure, or a stream that takes too long to start, never holds back the card.
+    for failure in (OSError("camera cloud unreachable"), None):
+        still["failure"] = failure
+        await hass.services.async_call(
+            DOMAIN, "show_camera", {"camera": "camera.still", "mode": "video"}, blocking=True
+        )
+        payload = aioclient_mock.mock_calls[-1][2]
+        assert "hls_url" not in payload
+        assert payload["stream_url"].startswith("http://192.168.1.10:8123/")
+
     # Video is the default; stream mode never starts an HLS stream.
     await hass.services.async_call(DOMAIN, "show_camera", {"camera": "camera.door"}, blocking=True)
     assert "hls_url" in aioclient_mock.mock_calls[-1][2]
@@ -251,7 +271,13 @@ async def test_video_mode_sends_the_cameras_hls_playlist_with_mjpeg_fallbacks(
     # A camera without the stream feature never asks for one.
     await hass.services.async_call(DOMAIN, "show_camera", {"camera": "camera.yard"}, blocking=True)
     assert "hls_url" not in aioclient_mock.mock_calls[-1][2]
-    assert requested == ["camera.door", "camera.still", "camera.door"]
+    assert requested == [
+        "camera.door",
+        "camera.still",
+        "camera.still",
+        "camera.still",
+        "camera.door",
+    ]
 
 
 async def test_show_camera_rejects_non_cameras_and_missing_sources(

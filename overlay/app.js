@@ -17,11 +17,15 @@
   var cardVideo = document.getElementById('card-video');
   // A video that shows nothing by then gives the screen back to the motion-JPEG stream.
   var VIDEO_WAIT_MS = 15000;
+  // A playing video whose picture stops moving this long has stalled for good.
+  var VIDEO_STALL_MS = 10000;
   var video = null;
   var cardPlayback = null;
   var current = null;
   var timers = [];
   var feedTimer = null;
+  // Bumped by stopFeed, so snapshot frames still loading from an earlier feed are dropped.
+  var feedRun = 0;
   var closing = false;
   var closeTimer = null;
 
@@ -102,16 +106,19 @@
 
   function snapshots(settings) {
     var loading = false;
+    var run = feedRun;
     function next() {
       if (loading) return;
       loading = true;
       var image = new Image();
       image.onload = function () {
+        if (run !== feedRun) return;
         loading = false;
         feed.src = image.src;
         showStatus('');
       };
       image.onerror = function () {
+        if (run !== feedRun) return;
         loading = false;
         showStatus('Camera unavailable');
       };
@@ -146,6 +153,7 @@
   }
 
   function stopFeed() {
+    feedRun += 1;
     clearInterval(feedTimer);
     feedTimer = null;
     feed.onload = null;
@@ -181,10 +189,10 @@
 
   // Plays an HLS playlist in a <video>: the TV's own player first, where it says it plays HLS;
   // hls.js through Media Source Extensions otherwise or if that fails. `onPlaying` runs once,
-  // when the first frame shows; `onFail(wasPlaying)` once, when it cannot play or stops for good,
-  // or when nothing plays within VIDEO_WAIT_MS. `stop()` ends it without calling either.
+  // when the first frame shows; `onFail(wasPlaying)` once, when it cannot play, ends, stalls for
+  // VIDEO_STALL_MS, or shows nothing within VIDEO_WAIT_MS. `stop()` ends it without calling either.
   function playHls(element, url, onPlaying, onFail) {
-    var playback = { stopped: false, playing: false, hls: null, wait: null };
+    var playback = { stopped: false, playing: false, hls: null, wait: null, watch: null };
     function fail() {
       if (playback.stopped) return;
       var wasPlaying = playback.playing;
@@ -213,12 +221,14 @@
     playback.stop = function () {
       playback.stopped = true;
       clearTimeout(playback.wait);
+      clearInterval(playback.watch);
       if (playback.hls) {
         playback.hls.destroy();
         playback.hls = null;
       }
       element.onplaying = null;
       element.onerror = null;
+      element.onended = null;
       element.pause();
       element.removeAttribute('src');
       try {
@@ -231,8 +241,20 @@
       if (playback.playing) return;
       playback.playing = true;
       clearTimeout(playback.wait);
+      // A live stream that stops updating freezes on its last frame without an error event.
+      var position = element.currentTime;
+      var still = 0;
+      playback.watch = setInterval(function () {
+        if (element.currentTime !== position) {
+          position = element.currentTime;
+          still = 0;
+        } else if ((still += 1000) >= VIDEO_STALL_MS) {
+          fail();
+        }
+      }, 1000);
       onPlaying();
     };
+    element.onended = fail;
     playback.wait = setTimeout(function () {
       if (!playback.playing) fail();
     }, VIDEO_WAIT_MS);
@@ -299,22 +321,20 @@
     card.classList.remove('playing');
   }
 
-  // Full-frame-rate video in the card. The motion-JPEG keeps showing until the video plays, then
-  // stops so the TV loads one feed; a video that cannot play leaves (or restarts) the feed.
+  // Full-frame-rate video in the card, over the motion-JPEG once it plays. The motion-JPEG stays
+  // connected underneath: its URL's camera token may have rotated by the time a long card's video
+  // fails, so reconnecting then could be refused. A video that fails just uncovers it.
   function playCardVideo(settings) {
     cardVideo.muted = true;
     cardPlayback = playHls(
       cardVideo,
       settings.hls,
       function () {
-        stopFeed();
-        showStatus('');
         card.classList.add('playing');
       },
-      function (wasPlaying) {
+      function () {
         cardPlayback = null;
         card.classList.remove('playing');
-        if (wasPlaying && current === settings && !closing) startFeed(settings);
       }
     );
   }

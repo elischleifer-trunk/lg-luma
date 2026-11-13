@@ -64,6 +64,8 @@ HLS_VIEW_URL = "/api/luma/stream/{entity_id}"
 CAMERA_STREAM = 2
 # Camera changes arrive in bursts (one per camera at each token rotation); send the list once.
 CAMERAS_PUSH_DELAY = 2.0
+# A doorbell card waits at most this long for Home Assistant to start a camera's HLS stream.
+HLS_START_TIMEOUT = 5.0
 MAX_CAMERAS = 32
 # Luma keeps cameras in memory only; this often, check whether a restarted TV needs the list.
 CAMERAS_CHECK_INTERVAL = timedelta(minutes=1)
@@ -290,10 +292,12 @@ async def card_hls_url(hass: HomeAssistant, data: dict[str, Any]) -> str | None:
     if state is None or not int(state.attributes.get("supported_features", 0)) & CAMERA_STREAM:
         return None
     base_url = local_url(hass, data.get(ATTR_BASE_URL))
+    # The stream is a bonus: however it fails or however slow it is, the card still goes out.
     try:
-        path = await _request_stream(hass, camera)
-    except HomeAssistantError as err:
-        _LOGGER.debug("No HLS stream for %s, showing motion-JPEG: %s", camera, err)
+        async with asyncio.timeout(HLS_START_TIMEOUT):
+            path = await _request_stream(hass, camera)
+    except Exception as err:
+        _LOGGER.debug("No HLS stream for %s, showing motion-JPEG: %r", camera, err)
         return None
     return f"{base_url}{path}"
 

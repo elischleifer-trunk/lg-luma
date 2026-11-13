@@ -499,10 +499,12 @@ starts the stream in Home Assistant (`card_hls_url`, the same `async_request_str
 `StreamView`) and adds the absolute playlist URL as `hls_url`; a camera that cannot stream just
 leaves it out. `POST /api/overlay` validates it like the other camera URLs and passes it to the
 page as `hls`, still requiring `stream_url` or `snapshot_url` as the card's picture. The page
-plays both through `playHls` (native HLS, then hls.js, 15 s to show a frame): the card's muted
-`<video>` stays invisible over the motion-JPEG until it plays, then the motion-JPEG stops; a video
-that fails before playing leaves the motion-JPEG, and one that fails later restarts it. Older
-Luma builds ignore `hls_url`.
+plays both through `playHls` (native HLS, then hls.js, 15 s to show a frame; an `ended` video or
+one whose `currentTime` stands still for 10 s fails too): the card's muted `<video>` stays
+invisible over the motion-JPEG until it plays, then covers it. The motion-JPEG stays connected
+underneath, because its camera token may have rotated by the time a long card's video fails, so a
+failed video just uncovers it. Home Assistant gives the stream 5 s to start, and any failure there
+sends the card without `hls_url`. Older Luma builds ignore `hls_url`.
 
 Holding OK (or a long pointer press, or Menu) on a tile opens **Move** (arrows move it, OK or Back
 ends), **Hide camera** and **Camera settings**; the settings button at the top right, reached

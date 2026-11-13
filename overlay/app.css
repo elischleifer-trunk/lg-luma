@@ -75,13 +75,17 @@ body {
   object-fit: cover;
 }
 
-/* The card's HLS video stays invisible over the motion-JPEG until it plays. */
+/* The card's HLS video stays invisible over the motion-JPEG until it plays, then covers it. */
 .frame video {
   opacity: 0;
 }
 
 .card.playing .frame video {
   opacity: 1;
+}
+
+.card.playing .status {
+  display: none;
 }
 
 .status {
