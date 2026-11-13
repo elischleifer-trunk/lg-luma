@@ -136,6 +136,16 @@ pub enum Update {
     },
 }
 
+/// A camera video for the overlay app to play.
+#[derive(Clone, Debug, PartialEq)]
+pub struct VideoRequest {
+    /// Home Assistant's HLS playlist.
+    pub url: String,
+    pub title: String,
+    /// Shown over the video until it plays, hiding the TV's black video plane meanwhile.
+    pub snapshot: Option<String>,
+}
+
 /// Home Assistant's HLS video for the enlarged camera.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum Video {
@@ -636,8 +646,8 @@ pub struct Gallery {
     pub video_failed: Vec<String>,
     /// For the main loop: start this camera's HLS stream (id, endpoint).
     pub resolve: Option<(String, String)>,
-    /// For the main loop: play this HLS address full screen (url, title).
-    pub play: Option<(String, String)>,
+    /// For the main loop: play this camera video full screen.
+    pub play: Option<VideoRequest>,
     /// For the main loop: close the video the overlay app is playing.
     pub stop_video: bool,
     /// The camera being renamed while the keyboard replaces the gallery's overlay, and the
@@ -942,8 +952,13 @@ impl State {
                         let title = gallery
                             .camera(&id)
                             .map_or_else(String::new, |c| c.title().to_owned());
+                        let snapshot = gallery.camera(&id).and_then(|c| c.snapshot.clone());
                         gallery.video = Video::Playing(id);
-                        gallery.play = Some((url, title));
+                        gallery.play = Some(VideoRequest {
+                            url,
+                            title,
+                            snapshot,
+                        });
                     }
                     Err(error) => {
                         eprintln!("Luma cameras {id}: no HLS stream: {error}");

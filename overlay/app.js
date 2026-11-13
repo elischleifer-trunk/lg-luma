@@ -12,13 +12,17 @@
   var bar = document.getElementById('bar');
   var videoView = document.getElementById('video');
   var player = document.getElementById('player');
-  var videoStatus = document.getElementById('video-status');
+  var videoCover = document.getElementById('video-cover');
   var videoLive = document.getElementById('video-live');
   var cardVideo = document.getElementById('card-video');
   // A video that shows nothing by then gives the screen back to the motion-JPEG stream.
   var VIDEO_WAIT_MS = 15000;
   // A playing video whose picture stops moving this long has stalled for good.
   var VIDEO_STALL_MS = 10000;
+  // The Cameras video's cover comes off once it has played this long, so its first frames show.
+  var VIDEO_SETTLE_S = 0.3;
+  // Cover snapshots load back to back, at most this often.
+  var COVER_GAP_MS = 250;
   var video = null;
   var cardPlayback = null;
   var current = null;
@@ -188,28 +192,75 @@
   }
 
   // Plays an HLS playlist in a <video>: the TV's own player first, where it says it plays HLS;
-  // hls.js through Media Source Extensions otherwise or if that fails. `onPlaying` runs once,
-  // when the first frame shows; `onFail(wasPlaying)` once, when it cannot play, ends, stalls for
+  // hls.js through Media Source Extensions otherwise or if that fails. With `options.hlsFirst`,
+  // hls.js goes first instead: it reads Home Assistant's low-latency parts, so video starts
+  // within a couple of seconds, where the TV's player may wait for whole segments. `onPlaying`
+  // runs once, when the first frame shows (with `options.settle`, once the video has advanced
+  // VIDEO_SETTLE_S); `onFail(wasPlaying)` once, when it cannot play, ends, stalls for
   // VIDEO_STALL_MS, or shows nothing within VIDEO_WAIT_MS. `stop()` ends it without calling either.
-  function playHls(element, url, onPlaying, onFail) {
-    var playback = { stopped: false, playing: false, hls: null, wait: null, watch: null };
+  function playHls(element, url, onPlaying, onFail, options) {
+    options = options || {};
+    var playback = {
+      stopped: false,
+      playing: false,
+      hls: null,
+      wait: null,
+      watch: null,
+      startedAt: null,
+    };
+    var native = !!(element.canPlayType && element.canPlayType('application/vnd.apple.mpegurl'));
     function fail() {
       if (playback.stopped) return;
       var wasPlaying = playback.playing;
       playback.stop();
       onFail(wasPlaying);
     }
+    // Whichever player is trying gets the whole wait to show something.
+    function arm() {
+      clearTimeout(playback.wait);
+      playback.wait = setTimeout(function () {
+        if (!playback.playing) fail();
+      }, VIDEO_WAIT_MS);
+    }
+    // The other player takes over: progress is measured on its own timeline, with a fresh wait
+    // (the TV's player can need most of it to fetch whole segments).
+    function handOver() {
+      playback.startedAt = null;
+      arm();
+    }
+    function withNative() {
+      element.onerror = function () {
+        element.onerror = null;
+        if (playback.playing || options.hlsFirst) fail();
+        else {
+          handOver();
+          withHlsJs();
+        }
+      };
+      element.src = url;
+      start(element);
+    }
+    // hls.js going first hands over to the TV's player if it cannot play before anything shows.
+    function nativeFallback() {
+      if (options.hlsFirst && native && !playback.playing) {
+        handOver();
+        withNative();
+      } else fail();
+    }
     function withHlsJs() {
       loadHls(function (Hls) {
         if (playback.stopped) return;
         if (!Hls || !Hls.isSupported()) {
-          fail();
+          nativeFallback();
           return;
         }
         element.removeAttribute('src');
-        playback.hls = new Hls({ lowLatencyMode: true, backBufferLength: 10 });
+        playback.hls = new Hls({ lowLatencyMode: true, backBufferLength: 10, maxBufferLength: 10 });
         playback.hls.on(Hls.Events.ERROR, function (_event, data) {
-          if (data && data.fatal) fail();
+          if (!data || !data.fatal) return;
+          playback.hls.destroy();
+          playback.hls = null;
+          nativeFallback();
         });
         playback.hls.on(Hls.Events.MANIFEST_PARSED, function () {
           start(element);
@@ -227,6 +278,7 @@
         playback.hls = null;
       }
       element.onplaying = null;
+      element.ontimeupdate = null;
       element.onerror = null;
       element.onended = null;
       element.pause();
@@ -237,7 +289,7 @@
         // Nothing was loading.
       }
     };
-    element.onplaying = function () {
+    function began() {
       if (playback.playing) return;
       playback.playing = true;
       clearTimeout(playback.wait);
@@ -253,23 +305,22 @@
         }
       }, 1000);
       onPlaying();
-    };
-    element.onended = fail;
-    playback.wait = setTimeout(function () {
-      if (!playback.playing) fail();
-    }, VIDEO_WAIT_MS);
-    var native = element.canPlayType && element.canPlayType('application/vnd.apple.mpegurl');
-    if (native) {
-      element.onerror = function () {
-        element.onerror = null;
-        if (playback.playing) fail();
-        else withHlsJs();
-      };
-      element.src = url;
-      start(element);
-    } else {
-      withHlsJs();
     }
+    if (options.settle) {
+      // Shown once the video has advanced a little past its first frame: webOS shows hardware
+      // video on a plane behind the page that is black until frames decode.
+      element.ontimeupdate = function () {
+        if (playback.playing) return;
+        if (playback.startedAt === null) playback.startedAt = element.currentTime;
+        if (element.currentTime - playback.startedAt >= VIDEO_SETTLE_S) began();
+      };
+    } else {
+      element.onplaying = began;
+    }
+    element.onended = fail;
+    arm();
+    if (native && !options.hlsFirst) withNative();
+    else withHlsJs();
     return playback;
   }
 
@@ -280,8 +331,31 @@
       video.stop();
       video = null;
     }
+    videoCover.hidden = true;
+    videoCover.removeAttribute('src');
     videoView.hidden = true;
     videoView.className = 'video';
+  }
+
+  // The camera's snapshots, refreshed, over the video until it plays.
+  function cover(settings) {
+    if (!settings.snapshot) return;
+    function next() {
+      if (closing || current !== settings || videoView.className === 'video playing') return;
+      var started = Date.now();
+      var image = new Image();
+      image.onload = function () {
+        if (current !== settings || videoView.className === 'video playing') return;
+        videoCover.src = image.src;
+        videoCover.hidden = false;
+        timers.push(setTimeout(next, Math.max(0, COVER_GAP_MS - (Date.now() - started))));
+      };
+      image.onerror = function () {
+        timers.push(setTimeout(next, 1000));
+      };
+      image.src = logic.frameUrl(settings.snapshot, Date.now());
+    }
+    next();
   }
 
   function playVideo(settings) {
@@ -294,20 +368,21 @@
     closing = false;
     current = settings;
     document.getElementById('video-title').textContent = settings.title;
-    videoStatus.hidden = false;
     videoLive.hidden = true;
     videoView.hidden = false;
+    cover(settings);
     video = playHls(
       player,
       settings.url,
       function () {
         videoView.className = 'video playing';
-        videoStatus.hidden = true;
+        videoCover.hidden = true;
         videoLive.hidden = false;
       },
       function () {
         dismiss(true);
-      }
+      },
+      { hlsFirst: true, settle: true }
     );
   }
 
