@@ -438,7 +438,7 @@ fn remote_routes_from_header_and_back_through_settings() {
     state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Sidebar(0));
     state.activate();
-    assert_eq!(state.focus, Target::Setting(0));
+    assert_eq!(state.focus, Target::CheckUpdates);
     assert!(state.back().is_empty());
     assert_eq!(state.focus, Target::Sidebar(0));
     state.back();
@@ -973,7 +973,8 @@ fn clock_choices_only_highlight_focus_while_preserving_saved_checkmarks() {
     state.preferences.reduced_motion = true;
     state.preferences.show_seconds = true;
     state.open(2);
-    state.focus = Target::Setting(1);
+    state.section = crate::state::WIDGETS_SECTION;
+    state.focus = Target::Widget(5);
     state.activate();
     state.activate();
     for index in 0..2 {
@@ -1008,7 +1009,8 @@ fn clock_choices_only_highlight_focus_while_preserving_saved_checkmarks() {
 fn clock_format_subpage_saves_and_restores_its_parent_row() {
     let mut state = ready();
     state.open(2);
-    state.focus = Target::Setting(1);
+    state.section = crate::state::WIDGETS_SECTION;
+    state.focus = Target::Widget(5);
     assert!(
         state
             .direction(Direction::Right, &controls(&state))
@@ -1031,14 +1033,14 @@ fn clock_format_subpage_saves_and_restores_its_parent_row() {
     assert_eq!(state.focus, Target::ClockFormat);
     state.direction(Direction::Left, &controls(&state));
     assert!(state.subpage.is_none());
-    assert_eq!(state.focus, Target::Setting(1));
+    assert_eq!(state.focus, Target::Widget(5));
     state.activate();
     state.activate();
     state.direction(Direction::Left, &controls(&state));
     assert_eq!(state.subpage, Some(crate::state::Subpage::Clock));
     assert_eq!(state.focus, Target::ClockFormat);
     state.back();
-    assert_eq!(state.focus, Target::Setting(1));
+    assert_eq!(state.focus, Target::Widget(5));
     assert!(state.subpage.is_none());
 }
 
@@ -1047,7 +1049,8 @@ fn time_format_selects_seconds_without_changing_the_hour_format() {
     let mut state = ready();
     state.preferences.hour_24 = true;
     state.open(2);
-    state.focus = Target::Setting(1);
+    state.section = crate::state::WIDGETS_SECTION;
+    state.focus = Target::Widget(5);
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.subpage, Some(crate::state::Subpage::Clock));
     assert!(!state.preferences.show_seconds);
@@ -1080,30 +1083,67 @@ fn time_format_selects_seconds_without_changing_the_hour_format() {
     assert!(state.preferences.hour_24);
     state.back();
     assert!(state.subpage.is_none());
-    assert_eq!(state.focus, Target::Setting(1));
+    assert_eq!(state.focus, Target::Widget(5));
 }
 
 #[test]
-fn system_version_is_inside_the_update_status_card_without_a_separate_row() {
+fn general_shows_updates_as_one_line_with_a_check_now_button() {
     let mut state = ready();
     state.open(2);
-    state.section = crate::state::SYSTEM_SECTION;
+    state.section = 0;
     state.panel_started = None;
-    let system = scene(&state);
-    assert!(system.draw.iter().any(|draw| matches!(
+    let general = scene(&state);
+    assert!(general.draw.iter().any(|draw| matches!(
         draw,
         crate::renderer::Draw::Shape(rect, _, _, color)
-            if rect.x == 640. && rect.y == 164.8 && rect.w == 1120. && rect.h == 220. && color[3] == 0.72
+            if rect.x == 640. && rect.y == 164.8 && rect.w == 1120. && rect.h == 72. && color[3] == 0.72
     )));
-    assert!(system.draw.iter().any(|draw| matches!(
+    assert!(general.draw.iter().any(|draw| matches!(
         draw,
-        crate::renderer::Draw::Text(label, _, style, color, _)
-            if label == "Current version: test" && style.size == 20.8 && style.weight == 450 && color[3] == 0.73
+        crate::renderer::Draw::Text(label, ..) if label == "test · Not checked yet"
     )));
-    assert_eq!(state.hit_test(&system.controls, 900., 200.), None);
-    state.focus = Target::Sidebar(crate::state::SYSTEM_SECTION);
-    state.direction(Direction::Right, &system.controls);
+    assert!(general.draw.iter().any(|draw| matches!(
+        draw,
+        crate::renderer::Draw::Text(label, ..) if label == "Check now"
+    )));
+    // Only the button on the right is a control; the status text is not.
+    assert_eq!(state.hit_test(&general.controls, 900., 200.), None);
+    let button = general
+        .controls
+        .iter()
+        .find(|c| c.target == Target::CheckUpdates)
+        .unwrap()
+        .rect;
+    assert!(button.x > 1400. && button.y > 164.8 && button.y + button.h < 164.8 + 72.);
+    state.focus = Target::Sidebar(0);
+    state.direction(Direction::Right, &general.controls);
     assert_eq!(state.focus, Target::CheckUpdates);
+    state.direction(Direction::Up, &general.controls);
+    assert_eq!(state.focus, Target::Nav(2));
+    state.update_response(Ok(None));
+    assert!(state.update_checked.is_some());
+    assert!(scene(&state).draw.iter().any(|draw| matches!(
+        draw,
+        crate::renderer::Draw::Text(label, ..) if label.starts_with("test · Checked ")
+    )));
+    // The scene's clock is the Unix epoch (Thursday, 1 January 1970, 12:00 AM).
+    state.update_checked = Some(crate::state::unix_now() - 3 * 86_400);
+    let stale = scene(&state);
+    let line = stale
+        .draw
+        .iter()
+        .find_map(|draw| match draw {
+            crate::renderer::Draw::Text(label, ..) if label.starts_with("test · Checked ") => {
+                Some(label.clone())
+            }
+            _ => None,
+        })
+        .unwrap();
+    assert!(line.ends_with(" 12:00 AM"), "{line}");
+    assert_ne!(
+        line, "test · Checked 12:00 AM",
+        "an older check names its day"
+    );
 }
 
 #[test]
@@ -1125,14 +1165,12 @@ fn system_category_owns_refresh_and_quit_and_restores_sidebar_focus() {
     assert_eq!(state.focus, Target::Sidebar(crate::state::SYSTEM_SECTION));
     assert_eq!(state.section, crate::state::SYSTEM_SECTION);
     state.direction(Direction::Right, &controls(&state));
-    assert_eq!(state.focus, Target::CheckUpdates);
-    state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::TvSettings);
-    state.direction(Direction::Down, &controls(&state));
-    assert_eq!(state.focus, Target::Setting(3));
+    for expected in [0, 4, 2, 8, 7, 3] {
+        state.direction(Direction::Down, &controls(&state));
+        assert_eq!(state.focus, Target::Setting(expected));
+    }
     assert_eq!(state.activate(), vec![Effect::Reload]);
-    state.direction(Direction::Down, &controls(&state));
-    assert_eq!(state.focus, Target::Setting(7));
     state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Setting(5));
     assert_eq!(state.activate(), vec![Effect::Quit]);
@@ -1681,7 +1719,8 @@ fn reduced_motion_disables_panel_wallpaper_and_notification_animation() {
     let mut state = ready();
     state.preferences.reduced_motion = true;
     state.open(2);
-    state.focus = Target::Setting(1);
+    state.section = crate::state::WIDGETS_SECTION;
+    state.focus = Target::Widget(5);
     state.activate();
     assert!(!state.animating());
     state.back();
@@ -1720,6 +1759,8 @@ fn weather_location_keyboard_back_and_sidebar_routes_restore_focus() {
     state.focus = Target::Sidebar(crate::state::WIDGETS_SECTION);
     state.section = crate::state::WIDGETS_SECTION;
     state.activate();
+    assert_eq!(state.focus, Target::Widget(5));
+    state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Widget(4));
     state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Widget(0));
@@ -1904,16 +1945,18 @@ fn settings_order_language_sort_and_shortcut_empty_card() {
     }
     let mut state = ready();
     state.open(2);
-    let general = controls(&state);
-    let language = general
+    state.section = crate::state::SYSTEM_SECTION;
+    let system = controls(&state);
+    let language = system
         .iter()
         .find(|control| control.target == Target::Setting(4))
         .unwrap();
-    let motion = general
+    let motion = system
         .iter()
         .find(|control| control.target == Target::Setting(2))
         .unwrap();
     assert!(language.rect.y < motion.rect.y);
+    state.section = crate::state::WIDGETS_SECTION;
     state.subpage = Some(Subpage::Shortcuts);
     let empty = scene(&state);
     assert!(empty.draw.iter().any(|draw| matches!(draw,
@@ -2579,7 +2622,7 @@ fn widgets_group_existing_settings_and_restore_each_parent_without_changing_pref
     state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Sidebar(WIDGETS_SECTION));
     state.direction(Direction::Right, &controls(&state));
-    assert_eq!(state.focus, Target::Widget(4));
+    assert_eq!(state.focus, Target::Widget(5));
     let widget_order: Vec<_> = controls(&state)
         .into_iter()
         .filter_map(|control| match control.target {
@@ -2587,7 +2630,7 @@ fn widgets_group_existing_settings_and_restore_each_parent_without_changing_pref
             _ => None,
         })
         .collect();
-    assert_eq!(widget_order, [4, 0, 1, 2, 3]);
+    assert_eq!(widget_order, [5, 4, 0, 1, 2, 3]);
     for (index, subpage) in [
         Subpage::Greeting,
         Subpage::Weather,
@@ -2669,10 +2712,11 @@ fn widgets_are_localized_without_legacy_sidebar_entries() {
                 .iter()
                 .filter(|c| matches!(c.target, Target::Widget(_)))
                 .count(),
-            5
+            6
         );
         for key in [
             "widgets",
+            "clock",
             "greeting",
             "weather",
             "shortcuts",
@@ -3191,7 +3235,7 @@ fn update_card_shows_both_versions_and_explicitly_starts_installation() {
         let mut state = ready();
         state.preferences.language = language;
         state.open(2);
-        state.section = crate::state::SYSTEM_SECTION;
+        state.section = 0;
         assert!(
             !controls(&state)
                 .iter()
@@ -3200,11 +3244,10 @@ fn update_card_shows_both_versions_and_explicitly_starts_installation() {
         state.available_update = Some("9.0.0".into());
         let rendered = scene(&state);
         for label in [
-            language.t("updateAvailable").to_owned(),
             language.format("installUpdate", &[("version", "9.0.0")]),
-            language.format(
-                "updateVersions",
-                &[("current", "test"), ("latest", "9.0.0")],
+            format!(
+                "test · {}",
+                language.format("updateReady", &[("latest", "9.0.0")])
             ),
         ] {
             assert!(
@@ -3214,7 +3257,7 @@ fn update_card_shows_both_versions_and_explicitly_starts_installation() {
                     .any(|draw| matches!(draw, Draw::Text(text, ..) if text == &label))
             );
         }
-        state.focus = Target::Sidebar(crate::state::SYSTEM_SECTION);
+        state.focus = Target::Sidebar(0);
         state.direction(Direction::Right, &rendered.controls);
         assert_eq!(state.focus, Target::InstallUpdate);
         assert_eq!(
@@ -3231,11 +3274,8 @@ fn update_card_shows_both_versions_and_explicitly_starts_installation() {
             state.hit_test(&rendered.controls, x, y),
             Some(Target::InstallUpdate)
         );
-        state.direction(Direction::Down, &rendered.controls);
-        assert_eq!(state.focus, Target::TvSettings);
-        state.focus = Target::InstallUpdate;
         state.direction(Direction::Left, &rendered.controls);
-        assert_eq!(state.focus, Target::Sidebar(crate::state::SYSTEM_SECTION));
+        assert_eq!(state.focus, Target::Sidebar(0));
     }
 }
 
@@ -3244,12 +3284,16 @@ fn update_status_card_only_claims_latest_after_success_and_allows_single_flight_
     use crate::{renderer::Draw, update::Status};
     let mut state = ready();
     state.open(2);
-    state.section = crate::state::SYSTEM_SECTION;
+    state.section = 0;
     state.focus = Target::CheckUpdates;
     assert_eq!(state.update_status, Status::Unchecked);
-    assert!(!scene(&state).draw.iter().any(|draw| matches!(draw,
-        Draw::Text(label, ..) if label == state.preferences.language.t("latestVersionInstalled")
-    )));
+    let has = |state: &State, wanted: &str| {
+        scene(state)
+            .draw
+            .iter()
+            .any(|draw| matches!(draw, Draw::Text(label, ..) if label == wanted))
+    };
+    assert!(!has(&state, "test · Checked 12:00 AM"));
     assert!(state.activate().is_empty());
     assert_eq!(state.update_status, Status::Checking);
     assert!(std::mem::take(&mut state.update_check_requested));
@@ -3257,18 +3301,17 @@ fn update_status_card_only_claims_latest_after_success_and_allows_single_flight_
     assert!(!state.update_check_requested);
     state.update_response(Err("offline".into()));
     assert_eq!(state.update_status, Status::Failed);
-    assert!(!scene(&state).draw.iter().any(|draw| matches!(draw,
-        Draw::Text(label, ..) if label == state.preferences.language.t("latestVersionInstalled")
-    )));
+    assert!(state.update_checked.is_none());
+    assert!(has(&state, "test · Couldn't check for updates"));
     state.activate();
     assert!(std::mem::take(&mut state.update_check_requested));
     state.update_response(Ok(None));
     assert_eq!(state.update_status, Status::Checked);
-    for key in ["latestVersionInstalled", "checkAgain"] {
-        assert!(scene(&state).draw.iter().any(|draw| matches!(draw,
-            Draw::Text(label, ..) if label == state.preferences.language.t(key)
-        )));
-    }
+    assert!(state.update_checked.is_some());
+    assert!(has(&state, "Check now"));
+    assert!(scene(&state).draw.iter().any(|draw| matches!(draw,
+        Draw::Text(label, ..) if label.starts_with("test · Checked ")
+    )));
     state.activate();
     state.update_response(Ok(Some("9.0.0".into())));
     assert_eq!(state.focus, Target::InstallUpdate);
@@ -3421,7 +3464,7 @@ fn update_card_shows_progress_restores_retry_and_ignores_presses_while_busy() {
     use crate::update::{InstallStatus, Response, Status};
     let mut state = ready();
     state.open(2);
-    state.section = crate::state::SYSTEM_SECTION;
+    state.section = 0;
     state.focus = Target::CheckUpdates;
     assert!(state.activate().is_empty());
     assert_eq!(state.update_status, Status::Checking);
@@ -3473,6 +3516,9 @@ fn update_card_shows_progress_restores_retry_and_ignores_presses_while_busy() {
     assert!(state.activate().is_empty());
     state.pressed = Some(Target::InstallUpdate);
     state.install_response(Response::Finished(Err("disk full".into())));
+    assert!(scene(&state).draw.iter().any(|draw| {
+        matches!(draw, crate::renderer::Draw::Text(text, ..) if text == "test · Update failed")
+    }));
     assert_eq!(state.focus, Target::CheckUpdates);
     assert!(state.pressed.is_none());
     assert!(state.available_update.is_none());
@@ -3480,23 +3526,46 @@ fn update_card_shows_progress_restores_retry_and_ignores_presses_while_busy() {
     state.activate();
     assert_eq!(state.update_status, Status::Checking);
     assert_eq!(state.update, InstallStatus::Idle);
+    state.update_checked = Some(crate::state::unix_now());
     state.install_response(Response::Finished(Ok(())));
     assert_eq!(state.update_status, Status::Unchecked);
+    // The running build may be the old one: never claim it was just checked.
+    assert!(scene(&state).draw.iter().any(|draw| {
+        matches!(draw, crate::renderer::Draw::Text(text, ..) if text == "test · Not checked yet")
+    }));
 }
 
 #[test]
-fn turning_on_home_assistant_opens_the_hacs_qr_dialog_and_adds_a_reopen_row() {
+fn home_assistant_is_one_system_row_with_toggle_and_setup_code_inside() {
+    use crate::state::{SYSTEM_SECTION, Subpage};
     let mut state = ready();
     state.open(2);
+    state.section = SYSTEM_SECTION;
+    let system = controls(&state);
+    assert_eq!(
+        system
+            .iter()
+            .filter(|c| matches!(c.target, Target::Setting(8)))
+            .count(),
+        1
+    );
+    state.focus = Target::Setting(8);
+    state.direction(Direction::Right, &system);
+    assert_eq!(state.subpage, Some(Subpage::HomeAssistant));
+    assert_eq!(state.focus, Target::HomeAssistantToggle);
     let rows = |state: &State| {
         scene(state)
             .controls
             .iter()
-            .filter(|control| matches!(control.target, Target::Setting(8 | 9)))
+            .filter(|c| {
+                matches!(
+                    c.target,
+                    Target::HomeAssistantToggle | Target::HomeAssistantCode
+                )
+            })
             .count()
     };
     assert_eq!(rows(&state), 1);
-    state.focus = Target::Setting(8);
     assert_eq!(state.activate(), vec![Effect::Save]);
     assert!(state.preferences.home_assistant);
     assert!(matches!(state.overlay, Some(Overlay::HomeAssistantSetup)));
@@ -3515,18 +3584,22 @@ fn turning_on_home_assistant_opens_the_hacs_qr_dialog_and_adds_a_reopen_row() {
     state.back();
     assert!(state.overlay.is_none());
     assert!(state.home_assistant_qr.is_none());
-    assert_eq!(state.focus, Target::Setting(9));
+    assert_eq!(state.focus, Target::HomeAssistantCode);
     assert_eq!(rows(&state), 2);
-    // The second row reopens the dialog without touching the setting or its pairings.
+    // The setup row reopens the dialog without touching the setting or its pairings.
     assert_eq!(state.activate(), vec![]);
     assert!(matches!(state.overlay, Some(Overlay::HomeAssistantSetup)));
     assert!(state.preferences.home_assistant);
     state.back();
-    state.focus = Target::Setting(8);
+    state.direction(Direction::Up, &controls(&state));
+    assert_eq!(state.focus, Target::HomeAssistantToggle);
     state.activate();
     assert!(!state.preferences.home_assistant);
     assert!(state.overlay.is_none());
     assert_eq!(rows(&state), 1);
+    state.back();
+    assert!(state.subpage.is_none());
+    assert_eq!(state.focus, Target::Setting(8));
 }
 
 #[test]
