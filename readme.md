@@ -258,6 +258,12 @@ Toggle **Gradient** beside **Rotation** to turn background shading on or off. It
 and remembers your choice. Older uploads without an unshaded copy keep their full-resolution
 shaded image. This does not change LG's launch splash.
 
+### LG Search
+
+The round search button at the right of the header opens LG's own search, for content across
+the TV's apps and voice search. From the tabs, press **Right** on **Settings** to reach it, then
+**OK**. It appears only when the TV has LG's search app; which one Luma picked is named in its log.
+
 ### Recent app switching
 
 Press **Back** on Home, or hold **Back** for 0.6 seconds from any page, to open Recent apps.

@@ -883,6 +883,36 @@ fn header(
         );
         out.control(Target::Nav(index), rect, false);
     }
+    if state.inventory.search.is_some() {
+        lg_search_button(out, state, assets);
+    }
+}
+
+/// Header search button: a circle level with the tabs at the right content margin.
+pub const LG_SEARCH: Rect = Rect::new(1836. - 68.6, 42.5, 68.6, 68.6);
+
+fn lg_search_button(out: &mut Scene, state: &State, assets: &Assets) {
+    let focused = state.focus == Target::LgSearch;
+    out.pill(LG_SEARCH, focused, false);
+    if focused && !state.pointer {
+        out.border(
+            LG_SEARCH.inset(-5.),
+            LG_SEARCH.h / 2. + 5.,
+            2.,
+            c(0xf0f0f0, 0.95),
+        );
+    }
+    out.icon(
+        assets,
+        "search",
+        LG_SEARCH.inset(21.),
+        if focused {
+            c(0x2c2c2c, 1.)
+        } else {
+            c(0xeeeeee, 0.73)
+        },
+    );
+    out.control(Target::LgSearch, LG_SEARCH, false);
 }
 
 fn tile(
