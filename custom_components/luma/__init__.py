@@ -711,8 +711,18 @@ class LiveView(HomeAssistantView):
             return self.json_message(str(err), 404)
         if not source or source.split(":", 1)[0] not in ("rtsp", "rtsps", "http", "https"):
             return self.json_message("This camera's stream cannot be relayed", 404)
-        options = {"rtsp_flags": "prefer_tcp", "timeout": "5000000"}
-        options.update({key: str(value) for key, value in camera.stream_options.items()})
+        # As Home Assistant's stream integration opens a camera: its certificate is checked only
+        # when the camera asks for that (cameras and recorders use self-signed certificates).
+        chosen = camera.stream_options
+        options = {
+            "rtsp_flags": "prefer_tcp",
+            "timeout": "5000000",
+            "tls_verify": "1" if chosen.get("verify_ssl") else "0",
+        }
+        if transport := chosen.get("rtsp_transport"):
+            options["rtsp_transport"] = str(transport)
+        if chosen.get("use_wallclock_as_timestamps"):
+            options["use_wallclock_as_timestamps"] = "1"
         relay = relays(self.hass).get(entity_id, source, options)
         if "warm" in request.query:
             relay.start()

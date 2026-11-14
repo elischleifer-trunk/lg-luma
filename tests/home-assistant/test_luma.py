@@ -1377,6 +1377,8 @@ async def test_the_live_view_relays_a_cameras_video_from_its_last_keyframe(
     assert opened.count(("rtsp://nvr/door", opened[-1][1])) == 1
     assert opened[-1][1]["rtsp_transport"] == "tcp"
     assert opened[-1][1]["rtsp_flags"] == "prefer_tcp"
+    # Cameras and recorders use self-signed certificates, as Home Assistant's own stream allows.
+    assert opened[-1][1]["tls_verify"] == "0"
     response.close()
     hass.data["luma_relays"].stop()
     finish.set()
