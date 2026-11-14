@@ -3783,6 +3783,7 @@ fn streaming_keys_row_opens_a_phone_dialog_and_shows_only_whether_keys_are_set()
     state.streaming_keys = crate::streaming_keys::Status {
         motn: true,
         tmdb: false,
+        mdblist: false,
         home_assistant: false,
     };
     assert!(value(&state, "Incomplete"));

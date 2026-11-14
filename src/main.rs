@@ -21,6 +21,7 @@ mod input_refresh;
 mod key_editor;
 #[cfg(all(feature = "webos", target_os = "linux", target_arch = "arm"))]
 mod luna;
+mod mdblist;
 mod model;
 mod platform;
 mod posters;
@@ -782,6 +783,12 @@ fn run() -> Result<(), String> {
         search_cache::DiskCache::beside(&preferences_path),
     );
     let posters = posters::Service::new(search_cache::DiskCache::posters_beside(&preferences_path));
+    let scores = mdblist::Service::new(
+        mdblist::Live {
+            keys: keys_path.clone(),
+        },
+        search_cache::DiskCache::beside(&preferences_path),
+    );
     let mut key_editor_service =
         key_editor::Service::new(keys_path, !webos && !options.script.is_empty())?;
     if options.test_extra_apps > 0 {
@@ -1960,6 +1967,12 @@ fn run() -> Result<(), String> {
         }
         for (show_id, poster) in posters.receiver.try_iter() {
             state.accept_poster(&show_id, poster);
+        }
+        if let Some(ids) = state.score_requests() {
+            scores.send(ids);
+        }
+        for reply in scores.receiver.try_iter() {
+            state.accept_scores(reply);
         }
         // SDL-webOS disables text input when its own panel is dismissed, even
         // if it did not forward a Back/Return key to the application.

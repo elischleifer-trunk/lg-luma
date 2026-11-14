@@ -1,6 +1,6 @@
 // Logic for the streaming key page, kept free of the DOM so it can be tested with node:test.
 
-export const SERVICES = ['motn', 'tmdb'];
+export const SERVICES = ['motn', 'tmdb', 'mdblist'];
 
 export async function loadKeys(fetcher) {
   const response = await fetcher('keys.json', { cache: 'no-store' });

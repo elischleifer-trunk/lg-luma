@@ -235,8 +235,9 @@ entity before `luma.show_camera`.
 
 ## Streaming search keys
 
-Luma's streaming search uses a Movie of the Night key (where shows stream) and a TMDB API Read
-Access Token (how prominent they are). Enter them once in Home Assistant: **Settings → Devices &
+Luma's streaming search uses a Movie of the Night key (where shows stream), a TMDB API Read
+Access Token (how prominent they are) and, optionally, an MDBList API key (Rotten Tomatoes and
+IMDb scores on each poster). Enter them once in Home Assistant: **Settings → Devices &
 services → Luma → Configure**. Each new key is checked with its service when you save, then sent
 to the TV. Home Assistant is their source of truth: it sends them again if the TV loses them, for
 example after a reset, or if they were changed on the TV. Clearing a field in Home Assistant
@@ -268,18 +269,18 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
 Home Assistant uses this API. You can script it too: send JSON bodies, with
 `Authorization: Bearer TOKEN` on every endpoint except `info` and the two pairing steps.
 
-| Endpoint                  | Body                                                  | Reply                                                   |
-| ------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
-| `GET /api/info`           |                                                       | `id`, `name`, `version`, `api`                          |
-| `POST /api/pair`          | `name`                                                | `pairing_id`; the TV shows a code                       |
-| `POST /api/pair/confirm`  | `pairing_id`, `code`                                  | `token`, `id`                                           |
-| `DELETE /api/pair`        |                                                       | Unpairs this token                                      |
-| `GET /api/status`         |                                                       | `overlay`, `overlay_ready`, `cameras`, `streaming_keys` |
-| `POST /api/overlay`       | As `luma.show_camera`, using URLs                     | `session`, `paused`                                     |
-| `DELETE /api/overlay`     |                                                       | Closes the card, resumes playback                       |
-| `POST /api/notify`        | `message` (up to 300 characters)                      | Shows a webOS toast                                     |
-| `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list                         |
-| `PUT /api/streaming-keys` | `motn`, `tmdb`; empty or missing keeps the TV's key   | Which keys the TV holds                                 |
+| Endpoint                  | Body                                                           | Reply                                                   |
+| ------------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
+| `GET /api/info`           |                                                                | `id`, `name`, `version`, `api`                          |
+| `POST /api/pair`          | `name`                                                         | `pairing_id`; the TV shows a code                       |
+| `POST /api/pair/confirm`  | `pairing_id`, `code`                                           | `token`, `id`                                           |
+| `DELETE /api/pair`        |                                                                | Unpairs this token                                      |
+| `GET /api/status`         |                                                                | `overlay`, `overlay_ready`, `cameras`, `streaming_keys` |
+| `POST /api/overlay`       | As `luma.show_camera`, using URLs                              | `session`, `paused`                                     |
+| `DELETE /api/overlay`     |                                                                | Closes the card, resumes playback                       |
+| `POST /api/notify`        | `message` (up to 300 characters)                               | Shows a webOS toast                                     |
+| `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url`          | Replaces the Cameras app's list                         |
+| `PUT /api/streaming-keys` | `motn`, `tmdb`, `mdblist`; empty or missing keeps the TV's key | Which keys the TV holds                                 |
 
 ## Troubleshooting
 

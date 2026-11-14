@@ -295,6 +295,9 @@ pub struct State {
     pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
     /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
     pub posters: std::collections::HashMap<String, Option<std::sync::Arc<crate::cameras::Frame>>>,
+    /// Review scores for the shows in `titles`, by IMDb ID: None while loading. Only fetched
+    /// once an MDBList key is stored.
+    pub scores: std::collections::HashMap<String, Option<crate::mdblist::Scores>>,
     /// The HACS install link's QR code, made when its dialog opens.
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
@@ -358,6 +361,7 @@ impl State {
             streaming_keys: Default::default(),
             titles: Default::default(),
             posters: Default::default(),
+            scores: Default::default(),
             home_assistant_qr: None,
             home_assistant_address: None,
             home_assistant_code: None,
@@ -2357,6 +2361,35 @@ impl State {
             }
         }
         (self.posters.len() != before || !requests.is_empty()).then_some(requests)
+    }
+
+    /// IMDb IDs whose scores to fetch for the current results, in one batch, or None when
+    /// there are none. Scores of shows no longer listed are dropped.
+    pub fn score_requests(&mut self) -> Option<Vec<String>> {
+        let titles = &self.titles.results;
+        self.scores
+            .retain(|id, _| titles.iter().any(|result| &result.show.imdb_id == id));
+        if !self.streaming_keys.mdblist {
+            return None;
+        }
+        let mut wanted = Vec::new();
+        for result in titles {
+            let id = &result.show.imdb_id;
+            if crate::mdblist::valid_imdb_id(id) && !self.scores.contains_key(id) {
+                self.scores.insert(id.clone(), None);
+                wanted.push(id.clone());
+            }
+        }
+        (!wanted.is_empty()).then_some(wanted)
+    }
+
+    pub fn accept_scores(&mut self, reply: crate::mdblist::Reply) {
+        for (id, scores) in reply {
+            if let Some(slot) = self.scores.get_mut(&id) {
+                *slot = Some(scores);
+                self.dirty = true;
+            }
+        }
     }
 
     pub fn accept_poster(

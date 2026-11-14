@@ -235,3 +235,75 @@ fn posters_are_requested_once_per_result_and_dropped_with_it() {
     assert_eq!(state.poster_requests().map(|r| r.len()), Some(0));
     assert!(state.posters.is_empty(), "decoded posters are freed");
 }
+
+fn icons(state: &State) -> Vec<String> {
+    scene(state)
+        .draw
+        .iter()
+        .filter_map(|draw| match draw {
+            Draw::TintedImage(path, ..) => Some(path.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+#[test]
+fn scores_are_fetched_in_one_batch_only_with_an_mdblist_key() {
+    let mut state = typed("dune");
+    answer(&mut state, "dune");
+    assert!(state.score_requests().is_none(), "no MDBList key");
+    state.streaming_keys.mdblist = true;
+    let ids = state.score_requests().expect("one batch for the results");
+    assert_eq!(ids.len(), state.titles.results.len());
+    assert!(state.score_requests().is_none(), "already loading");
+
+    // Dune (2021): fresh critics and audience scores on its poster.
+    let dune = crate::mdblist::Scores {
+        critics: Some(83),
+        audience: Some(90),
+        imdb: Some(8.0),
+    };
+    state.accept_scores(vec![("tt1160419".into(), dune)]);
+    assert!(shows_text(&state, "83%") && shows_text(&state, "90%"));
+    let drawn = icons(&state);
+    assert!(
+        drawn
+            .iter()
+            .any(|path| path.ends_with("ui-icons/tomato.lvec"))
+    );
+    assert!(
+        drawn
+            .iter()
+            .any(|path| path.ends_with("ui-icons/popcorn.lvec"))
+    );
+
+    // Without Rotten Tomatoes scores the IMDb rating stands in; with none, no badge.
+    let index = state
+        .titles
+        .results
+        .iter()
+        .position(|r| r.show.imdb_id != "tt1160419")
+        .unwrap();
+    let other = state.titles.results[index].show.imdb_id.clone();
+    state.accept_scores(vec![(
+        other.clone(),
+        crate::mdblist::Scores {
+            imdb: Some(5.75),
+            ..Default::default()
+        },
+    )]);
+    assert!(shows_text(&state, "5.8"));
+    state.accept_scores(vec![(other, crate::mdblist::Scores::default())]);
+    assert!(!shows_text(&state, "5.8"));
+    // Late scores for a show no longer listed are ignored.
+    state.accept_scores(vec![("tt0000001".into(), dune)]);
+    assert!(!state.scores.contains_key("tt0000001"));
+
+    state.query.clear();
+    state.sync_titles(Instant::now());
+    assert!(state.score_requests().is_none());
+    assert!(
+        state.scores.is_empty(),
+        "scores are dropped with their results"
+    );
+}

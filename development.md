@@ -1088,7 +1088,10 @@ from the signed `cdn.movieofthenight.com` links in each result (no other host is
 `posters` workers fetch them with the weather rules (timeout, no redirects or proxy, 1 MiB limit),
 keep the JPEG under `streaming-posters/` (48 MiB cap) keyed by the link without its signature,
 and decode it to card size. The renderer uploads each like a camera frame; State keeps decoded
-posters only for the current results. Scripted
+posters only for the current results. With an MDBList key, `mdblist` fetches review scores for
+a whole search in one `POST /imdb/any` batch by IMDb ID (one request of the free 1,000 a day),
+caches each title's scores for a week in `streaming-cache/`, and scrubs the key (a query
+parameter) from any error text. Captured replies are in `tests/fixtures/mdblist`. Scripted
 captures can wait with `await-titles`. Pre-filling `streaming-cache/` from
 `tests/fixtures/streaming` with a placeholder key renders results without network access.
 

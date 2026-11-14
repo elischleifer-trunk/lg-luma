@@ -788,6 +788,7 @@ impl<T: Tv> Api<T> {
                                 json!({
                                     "motn": status.motn,
                                     "tmdb": status.tmdb,
+                                    "mdblist": status.mdblist,
                                     "home_assistant": status.home_assistant,
                                 })
                             }),
@@ -1034,15 +1035,16 @@ impl<T: Tv> Api<T> {
             Some(Value::String(value)) => Ok(Some(value.as_str())),
             Some(_) => Err(error(400, &format!("{key} must be a string"))),
         };
-        let (motn, tmdb) = match (field("motn"), field("tmdb")) {
-            (Ok(motn), Ok(tmdb)) => (motn, tmdb),
-            (Err(reply), _) | (_, Err(reply)) => return reply,
+        let (motn, tmdb, mdblist) = match (field("motn"), field("tmdb"), field("mdblist")) {
+            (Ok(motn), Ok(tmdb), Ok(mdblist)) => (motn, tmdb, mdblist),
+            (Err(reply), _, _) | (_, Err(reply), _) | (_, _, Err(reply)) => return reply,
         };
         let current = crate::streaming_keys::load(&path);
-        let next = match crate::streaming_keys::merge_from_home_assistant(&current, motn, tmdb) {
-            Ok(next) => next,
-            Err(message) => return error(400, &message),
-        };
+        let next =
+            match crate::streaming_keys::merge_from_home_assistant(&current, motn, tmdb, mdblist) {
+                Ok(next) => next,
+                Err(message) => return error(400, &message),
+            };
         if next != current {
             if let Err(message) = crate::streaming_keys::save(&path, &next) {
                 eprintln!("Luma Home Assistant: could not save streaming keys: {message}");
@@ -1051,7 +1053,10 @@ impl<T: Tv> Api<T> {
             let _ = self.events.send(Event::StreamingKeys(next.status()));
         }
         let status = next.status();
-        reply(200, json!({"motn": status.motn, "tmdb": status.tmdb}))
+        reply(
+            200,
+            json!({"motn": status.motn, "tmdb": status.tmdb, "mdblist": status.mdblist}),
+        )
     }
 
     fn set_cameras(&mut self, client: usize, body: &Value) -> Reply {

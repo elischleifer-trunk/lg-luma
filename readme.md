@@ -271,7 +271,10 @@ or **Settings → System → Streaming search keys**), the Apps search also find
 After three letters and a short pause, a **Movies & shows** section appears under the matching
 apps as a grid of posters. Under each poster are the title, its year, and the app on your TV
 that carries it with what it costs there: included, an add-on channel, or rent or buy with the
-price. A TMDB token puts well-known US titles first. Titles on none of your TV's apps are dimmed
+price. A TMDB token puts well-known US titles first. An optional MDBList key adds review scores
+to each poster: the Rotten Tomatoes critics score (tomato, red when fresh at 60% or more) and
+audience score (popcorn), or the IMDb rating when Rotten Tomatoes has neither. One MDBList request
+covers a whole search, and its free 1,000 requests a day are plenty. Titles on none of your TV's apps are dimmed
 at the end. Press **Down** past the last row of apps to reach the results, then **OK** to open the
 title in its app. Links straight to a title are not yet confirmed on a TV, so an app may open on
 its home screen instead. Replies and posters are cached beside the preferences, so repeating a

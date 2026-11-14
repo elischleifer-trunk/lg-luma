@@ -8,6 +8,7 @@ WEBOSTV_DOMAIN = "webostv"
 # Streaming search keys, kept in the entry's options. Home Assistant is their source of truth.
 CONF_MOTN_KEY = "motn_api_key"
 CONF_TMDB_TOKEN = "tmdb_read_access_token"
+CONF_MDBLIST_KEY = "mdblist_api_key"
 
 SERVICE_SHOW_CAMERA = "show_camera"
 SERVICE_DISMISS = "dismiss"

@@ -1763,6 +1763,67 @@ fn library_grid(out: &mut Scene, state: &State, assets: &Assets) {
     }
 }
 
+/// Review scores over a poster's bottom-left corner: the Rotten Tomatoes critics score
+/// (tomato, red when fresh at 60% or more) and audience score (popcorn), or the IMDb rating
+/// (star) when Rotten Tomatoes has neither. Nothing when there are no scores at all.
+fn score_badge(out: &mut Scene, assets: &Assets, scores: &crate::mdblist::Scores, poster: Rect) {
+    let mut items: Vec<(&str, Color, String)> = Vec::new();
+    if let Some(critics) = scores.critics {
+        let fresh = critics >= 60;
+        items.push((
+            "tomato",
+            if fresh {
+                c(0xf2412c, 1.)
+            } else {
+                c(0x8fb04a, 1.)
+            },
+            format!("{critics}%"),
+        ));
+    }
+    if let Some(audience) = scores.audience {
+        items.push(("popcorn", c(0xf6c344, 1.), format!("{audience}%")));
+    }
+    if items.is_empty()
+        && let Some(imdb) = scores.imdb
+    {
+        items.push(("star-filled", c(0xf5c518, 1.), format!("{imdb:.1}")));
+    }
+    if items.is_empty() {
+        return;
+    }
+    let style = text(17.6, 650, -0.01).leading(1.2);
+    let (icon, gap, pad, height) = (20., 5., 10., 34.);
+    let widths: Vec<f32> = items
+        .iter()
+        .map(|(_, _, label)| icon + gap + assets.width(label, style) + 2.)
+        .collect();
+    let width = pad * 2. + widths.iter().sum::<f32>() + 12. * (items.len() - 1) as f32;
+    let badge = Rect::new(
+        poster.x + 10.,
+        poster.y + poster.h - height - 10.,
+        width,
+        height,
+    );
+    out.shape(badge, height / 2., c(0x0b0e12, 0.82));
+    let mut x = badge.x + pad;
+    for ((name, color, label), item) in items.iter().zip(widths) {
+        out.icon(
+            assets,
+            name,
+            Rect::new(x, badge.y + (height - icon) / 2., icon, icon),
+            *color,
+        );
+        out.text(
+            label.as_str(),
+            Rect::new(x + icon + gap, badge.y + (height - 21.12) / 2., item, 21.12),
+            style,
+            WHITE,
+            false,
+        );
+        x += item + 12.;
+    }
+}
+
 /// Movie and show results follow the Apps search once a Movie of the Night key is stored.
 fn titles_shown(state: &State) -> bool {
     state.streaming_keys.motn && !state.titles.query().is_empty()
@@ -1902,6 +1963,9 @@ fn streaming_titles(out: &mut Scene, state: &State, assets: &Assets, top: f32) {
                     true,
                 );
             }
+        }
+        if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
+            score_badge(out, assets, scores, rect);
         }
         if focused {
             out.ring(rect, 19.2);

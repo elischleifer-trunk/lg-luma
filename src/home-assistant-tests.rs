@@ -1279,6 +1279,7 @@ fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
     let _ = h.events.try_iter().count();
     let motn = "motn-key-0123456789abcdef";
     let tmdb = "eyJhbGciOiJIUzI1NiJ9.e30.signature";
+    let mdblist = "abcdefghij0123456789wxyz";
 
     // Only paired servers may set keys.
     let refused = h.call("PUT", "/api/streaming-keys", None, json!({"motn": motn}));
@@ -1289,27 +1290,39 @@ fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
         "PUT",
         "/api/streaming-keys",
         Some(&token),
-        json!({"motn": motn, "tmdb": tmdb}),
+        json!({"motn": motn, "tmdb": tmdb, "mdblist": mdblist}),
     );
     assert_eq!(saved.status, 200, "{:?}", saved.body);
-    assert_eq!(saved.body, json!({"motn": true, "tmdb": true}));
+    assert_eq!(
+        saved.body,
+        json!({"motn": true, "tmdb": true, "mdblist": true})
+    );
     let stored = crate::streaming_keys::load(&keys_path);
-    assert_eq!((stored.motn.as_str(), stored.tmdb.as_str()), (motn, tmdb));
+    assert_eq!(
+        (
+            stored.motn.as_str(),
+            stored.tmdb.as_str(),
+            stored.mdblist.as_str()
+        ),
+        (motn, tmdb, mdblist)
+    );
     assert!(stored.home_assistant);
     assert_eq!(
         h.events.try_recv(),
         Ok(Event::StreamingKeys(crate::streaming_keys::Status {
             motn: true,
             tmdb: true,
+            mdblist: true,
             home_assistant: true,
         }))
     );
     // Keys are never echoed back to Home Assistant, but status says which it holds.
     assert!(!saved.body.to_string().contains("0123456789"));
+    assert!(!saved.body.to_string().contains("abcdefghij"));
     let status = h.call("GET", "/api/status", Some(&token), json!({}));
     assert_eq!(
         status.body["streaming_keys"],
-        json!({"motn": true, "tmdb": true, "home_assistant": true})
+        json!({"motn": true, "tmdb": true, "mdblist": true, "home_assistant": true})
     );
     assert!(!status.body.to_string().contains("0123456789"));
 
@@ -1318,13 +1331,20 @@ fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
         "PUT",
         "/api/streaming-keys",
         Some(&token),
-        json!({"motn": "", "tmdb": null}),
+        json!({"motn": "", "tmdb": null, "mdblist": ""}),
     );
-    assert_eq!(cleared.body, json!({"motn": true, "tmdb": true}));
+    assert_eq!(
+        cleared.body,
+        json!({"motn": true, "tmdb": true, "mdblist": true})
+    );
     assert_eq!(crate::streaming_keys::load(&keys_path), stored);
     assert!(h.events.try_recv().is_err());
 
-    for bad in [json!({"motn": 5}), json!({"tmdb": "has spaces in it"})] {
+    for bad in [
+        json!({"motn": 5}),
+        json!({"tmdb": "has spaces in it"}),
+        json!({"mdblist": ["not", "a", "string"]}),
+    ] {
         assert_eq!(
             h.call("PUT", "/api/streaming-keys", Some(&token), bad)
                 .status,
