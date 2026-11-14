@@ -140,6 +140,47 @@ fn services_without_an_installed_app_are_ignored() {
 }
 
 #[test]
+fn add_on_channels_are_not_a_way_to_watch() {
+    // Only on a paid channel inside Prime Video: on none of the TV's apps.
+    let channel_only = show(
+        "6",
+        "The Super",
+        "movie",
+        vec![option("prime", "addon", None)],
+    );
+    assert_eq!(pick(&channel_only, "us", &services()), (None, vec![]));
+    // A rental is offered rather than the channel, even on a less recently used app.
+    let rentable = show(
+        "7",
+        "Ghost",
+        "movie",
+        vec![
+            option("prime", "addon", None),
+            option("apple", "rent", Some("3.99")),
+        ],
+    );
+    let (picked, _) = pick(&rentable, "us", &services());
+    let picked = picked.unwrap();
+    assert_eq!(
+        (picked.service_id.as_str(), picked.access),
+        ("apple", Access::Rent)
+    );
+    // Hulu sold inside another app is also listed under Hulu's own app, which is the pick.
+    let own_app = show(
+        "8",
+        "Shogun",
+        "series",
+        vec![
+            option("prime", "addon", None),
+            option("hulu", "subscription", None),
+        ],
+    );
+    let (picked, also) = pick(&own_app, "us", &services());
+    assert_eq!(picked.unwrap().service_id, "hulu");
+    assert!(also.is_empty());
+}
+
+#[test]
 fn results_rank_included_then_paid_then_unavailable_keeping_relevance_order() {
     let shows = vec![
         show(

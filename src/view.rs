@@ -1948,7 +1948,7 @@ fn clamp_lines(assets: &Assets, value: &str, style: TextStyle, width: f32, lines
 
 /// Whether watching costs money, in the poster's top right corner: a check when an app on
 /// this TV includes the title (every installed app counts as subscribed), else "$" for a
-/// rental, purchase or add-on channel. Which app, and the price, are said for the selected
+/// rental or purchase. Which app, and the price, are said for the selected
 /// title, above the posters. Titles on none of the TV's apps have no mark.
 fn cost_badge(out: &mut Scene, assets: &Assets, ranked: &crate::streaming::Ranked, poster: Rect) {
     use crate::streaming::Access;
@@ -1987,7 +1987,6 @@ fn availability(state: &State, ranked: &crate::streaming::Ranked) -> String {
         .map_or(pick.service_id.as_str(), |app| app.title.as_str());
     let key = match pick.access {
         Access::Included => "titleOn",
-        Access::Addon => "titleAddon",
         Access::Rent => "titleRent",
         Access::Buy => "titleBuy",
     };

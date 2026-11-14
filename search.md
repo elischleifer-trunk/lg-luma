@@ -84,6 +84,13 @@ TV" in [agents.md](agents.md).
 
 ## Decisions
 
+- **2026-11:** Add-on channels (a paid channel inside another app) are ignored: the household
+  has none, and the services sold that way that it does subscribe to (Hulu inside Disney+, HBO
+  Max inside Prime Video) have their own apps and are listed under them too. In the captured
+  searches 16 of about 220 titles had an add-on as their best option, mostly niche channels
+  (Shout! TV, Hi-YAH!, BritBox). If the household ever buys one, add a setting for which
+  channels it has rather than counting them all.
+
 - **2026-11:** Measured from a data centre: a TLS connection to Movie of the Night takes
   0.3–0.6 s, its title search 0.45–0.75 s, a show lookup 40 ms on an open connection; TMDB
   answers in 45 ms on an open connection and 130 ms on a new one. Each search used to build new

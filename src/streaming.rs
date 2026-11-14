@@ -7,9 +7,12 @@
 //!    one of them come first; shows with no option on an installed app come last.
 //! 2. When several of our services carry a show, the most recently used app wins (system recent
 //!    history first, then favorites order, then any other installed app).
-//! 3. Included access (subscription or free) beats paying more (add-on channel, rent, buy), even
-//!    on a less recently used app. Rentals and purchases are still offered when nothing is
-//!    included.
+//! 3. Included access (subscription or free) beats paying more (rent, buy), even on a less
+//!    recently used app. Rentals and purchases are still offered when nothing is included.
+//! 4. Add-on channels (a paid channel inside another app: Shout! TV on Prime Video) are not a
+//!    way to watch: the household has none. A service sold that way that it does have (Hulu
+//!    inside Disney+) is listed under its own app too. A title only on add-on channels is on
+//!    none of the TV's apps. To support one later, let the owner say which channels they have.
 use crate::branding;
 pub use crate::motn_api::{Show, StreamingOptionType};
 use std::{
@@ -55,8 +58,6 @@ pub fn year(show: &Show) -> Option<i64> {
 pub enum Access {
     /// Covered by a subscription or free with ads: no extra money.
     Included,
-    /// A paid channel inside the service (e.g. a Prime Video channel).
-    Addon,
     Rent,
     Buy,
 }
@@ -64,10 +65,10 @@ pub enum Access {
 fn access(kind: StreamingOptionType) -> Option<Access> {
     match kind {
         StreamingOptionType::Subscription | StreamingOptionType::Free => Some(Access::Included),
-        StreamingOptionType::Addon => Some(Access::Addon),
         StreamingOptionType::Rent => Some(Access::Rent),
         StreamingOptionType::Buy => Some(Access::Buy),
-        StreamingOptionType::Unknown => None,
+        // An add-on channel is another subscription to buy: see rule 4.
+        StreamingOptionType::Addon | StreamingOptionType::Unknown => None,
     }
 }
 
