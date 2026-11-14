@@ -4,14 +4,12 @@
 //! that fails validation, opens the app's home screen instead.
 //!
 //! Formats marked `Unverified` are best-known community formats that have not been confirmed on
-//! a TV yet. Confirm them with `pnpm deeplink:probe` (tools/deeplink-probe.mjs) and flip them to
+//! a TV. Confirm them with `pnpm deeplink:probe` (tools/deeplink-probe.mjs) and flip them to
 //! `Verified` here; the probe's candidate list is where alternatives are tried.
 use serde_json::{Value, json};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Confidence {
-    // No format has been confirmed on a TV yet.
-    #[allow(dead_code)]
     Verified,
     Unverified,
 }
@@ -60,10 +58,20 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
                 "contentTarget": format!("m=https://www.netflix.com/title/{id}&source_type=4")
             }))
         }
-        // Apps that take the title's web URL as their DIAL/contentTarget.
-        "prime" | "disney" | "hbo" | "hulu" | "apple" | "peacock" | "paramount" => {
+        // Apple TV takes the title's web URL as its contentTarget (confirmed on a TV, 2026-11).
+        "apple" => Some(Launch {
+            params: json!({ "contentTarget": link }),
+            confidence: Confidence::Verified,
+        }),
+        // Apps believed to take the title's web URL as their DIAL/contentTarget.
+        "disney" | "hbo" | "hulu" | "peacock" | "paramount" => {
             unverified(json!({ "contentTarget": link }))
         }
+        // Prime Video ignores every format tried on a TV (2026-11): the web link, the bare ID
+        // as contentTarget/contentId/asin, primevideo.com and app.primevideo.com links, and
+        // amzn:// URLs. Links made it show the profile picker and then its home screen, so
+        // it opens without one: straight to the last profile's home screen.
+        "prime" => None,
         _ => None,
     }
 }
@@ -120,6 +128,25 @@ mod tests {
         let result = launch("hulu", link).unwrap();
         assert_eq!(result.params, json!({"contentTarget": link}));
         assert_eq!(result.confidence, Confidence::Unverified);
+    }
+
+    #[test]
+    fn apple_tv_links_are_confirmed() {
+        let link = "https://tv.apple.com/us/movie/f1-the-movie/umc.cmc.3t6dvnnr87zwd4wmvpdx5came";
+        let result = launch("apple", link).unwrap();
+        assert_eq!(result.params, json!({"contentTarget": link}));
+        assert_eq!(result.confidence, Confidence::Verified);
+    }
+
+    #[test]
+    fn prime_video_opens_without_a_link() {
+        assert!(
+            launch(
+                "prime",
+                "https://www.amazon.com/gp/video/detail/0RKGLH6H9R32WPJVRA3LIGSTRJ"
+            )
+            .is_none()
+        );
     }
 
     #[test]
