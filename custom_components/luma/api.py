@@ -6,7 +6,7 @@ from typing import Any
 
 import aiohttp
 
-from .const import DEFAULT_PORT
+from .const import DEFAULT_PORT, INTEGRATION_API, INTEGRATION_HEADER
 
 TIMEOUT = aiohttp.ClientTimeout(total=10)
 
@@ -49,7 +49,7 @@ class LumaClient:
     async def _request(
         self, method: str, path: str, payload: dict[str, Any] | None = None, auth: bool = True
     ) -> dict[str, Any]:
-        headers = {}
+        headers = {INTEGRATION_HEADER: str(INTEGRATION_API)}
         if auth:
             if not self.token:
                 raise LumaAuthError("Not paired")

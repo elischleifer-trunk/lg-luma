@@ -18,7 +18,13 @@ import {
 } from '../tools/release-notes.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
-const metadata = ['appinfo.json', 'Cargo.toml', 'Cargo.lock', 'readme.md'];
+const metadata = [
+  'appinfo.json',
+  'Cargo.toml',
+  'Cargo.lock',
+  'readme.md',
+  'custom_components/luma/manifest.json',
+];
 
 async function fixture(t, version = '2.0.4') {
   const scratch = path.join(root, '.build');
@@ -29,9 +35,10 @@ async function fixture(t, version = '2.0.4') {
   project.version = '1.2.3';
   await fs.writeFile(path.join(directory, 'package.json'), JSON.stringify(project));
   await Promise.all(
-    metadata.map((filename) =>
-      fs.copyFile(path.join(root, filename), path.join(directory, filename)),
-    ),
+    metadata.map(async (filename) => {
+      await fs.mkdir(path.dirname(path.join(directory, filename)), { recursive: true });
+      await fs.copyFile(path.join(root, filename), path.join(directory, filename));
+    }),
   );
   await syncVersions(directory);
   project.version = version;
@@ -63,6 +70,8 @@ test('version sync changes only release versions and is idempotent', async (t) =
     after[3],
     before[3].replaceAll(`com.ecklf.luma_${previous}_arm.ipk`, 'com.ecklf.luma_3.1.0_arm.ipk'),
   );
+  assert.equal(after[4], before[4].replace(`"version": "${previous}"`, '"version": "3.1.0"'));
+  assert.equal(JSON.parse(after[4]).domain, 'luma');
   assert.deepEqual((await syncVersions(directory, { check: true })).changed, []);
   assert.deepEqual((await syncVersions(directory)).changed, []);
 });

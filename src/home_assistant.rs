@@ -39,7 +39,16 @@ pub const PORT: u16 = 5862;
 /// Opens HACS on the owner's Home Assistant with this repository's integration ready to install.
 pub const HACS_LINK: &str = "https://my.home-assistant.io/redirect/hacs_repository/?owner=elischleifer-trunk&repository=lg-luma&category=integration";
 pub const OVERLAY_ID: &str = luma_tv_helper::overlay::OVERLAY;
+/// What this Luma's API offers. Raise it only when Home Assistant can tell an older TV is missing
+/// something it needs; it compares this with its own minimum and asks the owner to update Luma.
 const API_VERSION: u32 = 1;
+/// The oldest Home Assistant integration this Luma works with, by the level the integration sends
+/// as `X-Luma-Integration`. Raise it only when an older integration cannot work with this TV: the
+/// servers below it are named in Settings, and Home Assistant reads it from `/api/status`.
+const MIN_INTEGRATION: u32 = 1;
+/// The level of an integration that sends no `X-Luma-Integration` header: every integration from
+/// before the header existed.
+const INTEGRATION_UNSTATED: u32 = 1;
 const MAX_BODY: usize = 32 * 1024;
 /// Cameras kept from Home Assistant's list; more are dropped.
 pub const MAX_CAMERAS: usize = 32;
@@ -134,6 +143,9 @@ pub enum Event {
     },
     /// Home Assistant saved streaming search keys; Settings shows the new status.
     StreamingKeys(crate::streaming_keys::Status),
+    /// The names of paired servers whose Luma integration is older than this TV needs; sent
+    /// whenever the list changes, including at startup when a stored server is outdated.
+    IntegrationOutdated(Vec<String>),
     /// The camera video closed: Back, a doorbell card replacing it, a key the gallery carries on
     /// with, or (`failed`) the video could not be played, so the gallery keeps its own picture.
     VideoClosed(crate::cameras::Closed),
@@ -322,8 +334,22 @@ pub struct Client {
     /// Home Assistant's instance ID, which tells the server apart when it pairs again.
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub server: String,
+    /// The integration level this server last sent with a request (see [`MIN_INTEGRATION`]).
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub integration: u32,
     #[serde(flatten)]
     pub extra: serde_json::Map<String, Value>,
+}
+
+fn is_zero(value: &u32) -> bool {
+    *value == 0
+}
+
+/// The integration level a request states in `X-Luma-Integration`.
+fn integration_level(header: Option<&str>) -> u32 {
+    header
+        .and_then(|value| value.trim().parse().ok())
+        .unwrap_or(INTEGRATION_UNSTATED)
 }
 
 struct Pairing {
@@ -353,6 +379,8 @@ pub struct Request<'a> {
     pub query: &'a str,
     pub authorization: Option<&'a str>,
     pub origin: Option<&'a str>,
+    /// `X-Luma-Integration`: the Home Assistant integration's level.
+    pub integration: Option<&'a str>,
     pub peer: IpAddr,
     pub body: &'a [u8],
 }
@@ -524,6 +552,11 @@ pub struct Api<T: Tv> {
     cameras: Vec<(String, Vec<Camera>)>,
     overlay_ready: Arc<AtomicBool>,
     preparing: Arc<AtomicBool>,
+    /// The last [`Event::IntegrationOutdated`] list, so it is sent only when it changes. The SDL
+    /// thread starts with none outdated.
+    outdated: Vec<String>,
+    /// [`MIN_INTEGRATION`]; tests raise it.
+    min_integration: u32,
 }
 
 impl<T: Tv> Api<T> {
@@ -549,11 +582,14 @@ impl<T: Tv> Api<T> {
             cameras: Vec::new(),
             overlay_ready: Arc::new(AtomicBool::new(false)),
             preparing: Arc::new(AtomicBool::new(false)),
+            outdated: Vec::new(),
+            min_integration: MIN_INTEGRATION,
         };
         if api.store.device_id.len() != 32 {
             api.store.device_id = random_hex(16)?;
             api.save();
         }
+        api.send_outdated();
         Ok(api)
     }
 
@@ -601,6 +637,34 @@ impl<T: Tv> Api<T> {
         gallery.names.clear();
         if self.store != before {
             self.save();
+        }
+        self.send_outdated();
+    }
+
+    /// Tells the SDL thread which paired servers need a newer integration, when that changed.
+    fn send_outdated(&mut self) {
+        let outdated: Vec<String> = self
+            .store
+            .clients
+            .iter()
+            .filter(|client| client.integration != 0 && client.integration < self.min_integration)
+            .map(|client| client.name.clone())
+            .collect();
+        if self.outdated != outdated {
+            let _ = self
+                .events
+                .send(Event::IntegrationOutdated(outdated.clone()));
+            self.outdated = outdated;
+        }
+    }
+
+    /// Records the integration level a paired server sent with a request.
+    fn integration_seen(&mut self, client: usize, request: &Request) {
+        let level = integration_level(request.integration);
+        if self.store.clients[client].integration != level {
+            self.store.clients[client].integration = level;
+            self.save();
+            self.send_outdated();
         }
     }
 
@@ -705,10 +769,11 @@ impl<T: Tv> Api<T> {
                     "name": "Luma",
                     "version": env!("CARGO_PKG_VERSION"),
                     "api": API_VERSION,
+                    "min_integration": self.min_integration,
                 }),
             ),
             ("POST", "/api/pair") => self.pair(&body, now),
-            ("POST", "/api/pair/confirm") => self.confirm(&body, now),
+            ("POST", "/api/pair/confirm") => self.confirm(&body, request, now),
             // OK on a doorbell card: full screen, it stays until the owner closes it.
             ("POST", "/api/overlay/expand") => {
                 if !request.peer.is_loopback() {
@@ -761,6 +826,7 @@ impl<T: Tv> Api<T> {
                 let Some(client) = self.authorized(request) else {
                     return error(401, "Pair this Home Assistant server with the TV again");
                 };
+                self.integration_seen(client, request);
                 match (method, path) {
                     ("DELETE", "/api/pair") => {
                         let removed = self.store.clients.remove(client);
@@ -768,11 +834,17 @@ impl<T: Tv> Api<T> {
                         self.store.gallery.unpaired(client, &removed);
                         self.save();
                         self.send_cameras(false);
+                        self.send_outdated();
                         reply(200, json!({"paired": false}))
                     }
                     ("GET", "/api/status") => reply(
                         200,
                         json!({
+                            // Home Assistant compares these with its own levels and asks the
+                            // owner to update whichever side is too old.
+                            "version": env!("CARGO_PKG_VERSION"),
+                            "api": API_VERSION,
+                            "min_integration": self.min_integration,
                             "overlay": self.session.as_ref().map(|s| s.id.as_str()),
                             "overlay_ready": self.overlay_ready.load(Ordering::Acquire),
                             // This server's own cameras, so each one notices a TV that
@@ -872,7 +944,7 @@ impl<T: Tv> Api<T> {
         )
     }
 
-    fn confirm(&mut self, body: &Value, now: Instant) -> Reply {
+    fn confirm(&mut self, body: &Value, request: &Request, now: Instant) -> Reply {
         let Some(pairing) = self
             .pairing
             .as_mut()
@@ -902,6 +974,7 @@ impl<T: Tv> Api<T> {
             token: digest_hex(&token),
             paired: unix_now(),
             server: pairing.server,
+            integration: integration_level(request.integration),
             extra: Default::default(),
         };
         self.store
@@ -909,6 +982,7 @@ impl<T: Tv> Api<T> {
             .restore(self.store.clients.len(), &client);
         self.store.clients.push(client);
         self.save();
+        self.send_outdated();
         let _ = self.events.send(Event::Paired(pairing.name));
         let _ = self.tv.toast("Home Assistant paired with Luma");
         self.prepare();
@@ -1577,6 +1651,10 @@ fn serve<T: Tv>(api: &mut Api<T>, mut stream: TcpStream, peer: SocketAddr) {
                 query,
                 authorization: request.headers.get("authorization").map(String::as_str),
                 origin: request.headers.get("origin").map(String::as_str),
+                integration: request
+                    .headers
+                    .get("x-luma-integration")
+                    .map(String::as_str),
                 peer: peer.ip(),
                 body: &body,
             },

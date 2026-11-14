@@ -3392,17 +3392,29 @@ fn home_assistant_settings(out: &mut Scene, state: &State, assets: &Assets) {
         },
     );
     if state.preferences.home_assistant {
+        // The setup page's code opens HACS, where an outdated integration is updated.
+        let outdated = (!state.home_assistant_outdated.is_empty()).then(|| {
+            language.format(
+                "homeAssistantOutdated",
+                &[("name", &state.home_assistant_outdated.join(", "))],
+            )
+        });
         row(
             out,
             state,
             assets,
             Row {
                 target: Target::HomeAssistantCode,
-                rect: Rect::new(640., 267.5 - state.scroll, 1120., 72.),
+                rect: Rect::new(
+                    640.,
+                    267.5 - state.scroll,
+                    1120.,
+                    if outdated.is_some() { 90.7 } else { 72. },
+                ),
                 title: language.t("homeAssistantSetup"),
                 icon: None,
                 value: None,
-                description: None,
+                description: outdated.as_deref(),
                 selected: false,
                 chevron: true,
             },

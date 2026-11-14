@@ -322,6 +322,8 @@ pub struct State {
     pub home_assistant_paired: Option<String>,
     /// Focus to return to when the setup dialog opened by itself for a pairing code.
     pub home_assistant_restore: Option<Target>,
+    /// Paired servers whose Luma integration is older than this TV needs.
+    pub home_assistant_outdated: Vec<String>,
     /// The Cameras app was opened; the main loop asks the Home Assistant service.
     pub show_cameras: bool,
     pub cameras: crate::cameras::Gallery,
@@ -382,6 +384,7 @@ impl State {
             home_assistant_code: None,
             home_assistant_paired: None,
             home_assistant_restore: None,
+            home_assistant_outdated: Vec::new(),
             show_cameras: false,
             cameras: crate::cameras::Gallery::default(),
             update: crate::update::InstallStatus::default(),

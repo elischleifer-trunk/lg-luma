@@ -2,6 +2,13 @@
 
 DOMAIN = "luma"
 DEFAULT_PORT = 5862
+# This integration's API level, sent with every request as INTEGRATION_HEADER. Raise it only when
+# a TV must tell this integration apart from older ones; Luma names servers below its own minimum
+# in Settings. Not the release version.
+INTEGRATION_API = 1
+INTEGRATION_HEADER = "X-Luma-Integration"
+# The oldest TV API level (`api` in Luma's status) this integration works with.
+MIN_TV_API = 1
 CONF_TOKEN = "token"
 CONF_DEVICE_ID = "device_id"
 WEBOSTV_DOMAIN = "webostv"
