@@ -451,7 +451,7 @@ fn installing_or_removing_an_app_searches_the_current_text_again() {
 }
 
 #[test]
-fn every_poster_shows_the_app_ok_opens_and_what_it_costs_there() {
+fn every_poster_says_whether_watching_costs_money() {
     use crate::streaming::Access;
     let mut state = typed("dune");
     answer(&mut state, "dune");
@@ -459,47 +459,30 @@ fn every_poster_shows_the_app_ok_opens_and_what_it_costs_there() {
         .titles
         .results
         .iter()
+        .take(TITLE_COLUMNS * 2)
         .filter_map(|result| result.pick.clone())
         .collect();
-    assert!(!picks.is_empty(), "the demo TV has apps that carry Dune");
-    let draw = scene(&state).draw;
-    // One small app tile per result an installed app carries: its logo, contained in a tile
-    // far smaller than those on the Apps page.
-    let brand = |app_id: &str| {
-        let app = state
-            .inventory
-            .apps
-            .iter()
-            .find(|a| a.id == app_id)
-            .unwrap();
-        format!("logos/{}.lvec", app.brand)
-    };
-    for pick in &picks {
-        let logo = brand(&pick.app_id);
-        assert!(
-            draw.iter().any(|draw| matches!(
-                draw,
-                Draw::Image(path, rect, ..) if path.ends_with(&logo) && rect.w <= 84.
-            )),
-            "{logo}"
-        );
-    }
-    // A rental says its price on the poster; an included title says nothing more.
-    let paid = picks
+    let included = picks
         .iter()
-        .find(|pick| pick.access != Access::Included)
-        .and_then(|pick| pick.price.clone());
-    if let Some(price) = paid {
-        assert!(shows_text(&state, &price), "{price}");
-    }
-    // Titles on none of the TV's apps have no tile.
-    let tiles = draw
-        .iter()
-        .filter(|draw| matches!(draw, Draw::Image(path, rect, ..) if path.contains("logos/") && rect.w <= 84.))
+        .filter(|pick| pick.access == Access::Included)
         .count();
+    assert!(included > 0 && included < picks.len(), "both kinds");
+    let draw = scene(&state).draw;
+    // A check for each title on screen that an app includes; the app itself is named for the
+    // selected title.
+    let checks = draw
+        .iter()
+        .filter(|draw| matches!(draw, Draw::TintedImage(path, rect, ..) if path.ends_with("check.lvec") && rect.w <= 16.))
+        .count();
+    assert_eq!(checks, included);
     assert!(
-        tiles >= 1 && tiles <= picks.len(),
-        "{tiles} of {}",
-        picks.len()
+        !draw
+            .iter()
+            .any(|draw| matches!(draw, Draw::Image(path, ..) if path.contains("logos/")))
     );
+    // A rental says its price; a paid title without one says "$".
+    for pick in picks.iter().filter(|pick| pick.access != Access::Included) {
+        let label = pick.price.as_deref().unwrap_or("$");
+        assert!(shows_text(&state, label), "{label}");
+    }
 }
