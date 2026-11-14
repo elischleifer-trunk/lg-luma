@@ -99,6 +99,7 @@ fn camera(id: &str) -> Camera {
         stream: Some(format!("http://ha/stream/{id}")),
         snapshot: Some(format!("http://ha/snap/{id}")),
         hls: None,
+        live: None,
         history: None,
         hidden: false,
         label: None,

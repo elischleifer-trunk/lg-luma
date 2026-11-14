@@ -108,6 +108,8 @@ pub struct Camera {
     pub snapshot: Option<String>,
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
+    /// The integration's relay of the camera's own video, for the TV's decoder (see `live`).
+    pub live: Option<String>,
     /// The integration's endpoint into what UniFi Protect recorded of this camera.
     pub history: Option<String>,
     pub hidden: bool,
@@ -229,6 +231,17 @@ pub enum Video {
     Playing(String),
     /// The overlay app plays what Protect recorded, from the replay position.
     Recorded(String),
+}
+
+/// The enlarged camera's own video on the TV's decoder (see `live`).
+#[derive(Clone, Debug, Default, PartialEq)]
+pub enum Native {
+    #[default]
+    Off,
+    /// Connecting to the relay and loading the decoder; the motion-JPEG stream shows meanwhile.
+    Starting(String),
+    /// The decoder has pictures: the gallery leaves its window transparent over them.
+    Showing(String),
 }
 
 /// How the overlay app's camera video closed. A video left by a key the gallery handles
@@ -468,7 +481,7 @@ impl Service {
             .name("camera-warm".into())
             .spawn(move || {
                 let started = Instant::now();
-                match hls_address(&agent(), &endpoint) {
+                match fetch(&agent(), &endpoint) {
                     Ok(_) => crate::telemetry::log_info!(
                         "cameras",
                         "{id}: video stream started ahead in {} ms",
@@ -680,7 +693,7 @@ fn hls_address(agent: &ureq::Agent, endpoint: &str) -> Result<String, String> {
     Ok(format!("{}{path}", origin(endpoint)))
 }
 
-fn agent() -> ureq::Agent {
+pub(crate) fn agent() -> ureq::Agent {
     ureq::Agent::config_builder()
         .max_redirects(2)
         .timeout_connect(Some(Duration::from_secs(3)))
@@ -1098,6 +1111,15 @@ pub struct Gallery {
     /// The arrangement to save, taken by the main loop for the Home Assistant service.
     pub save: Option<Value>,
     pub video: Video,
+    /// This TV has a decoder Luma can feed (set once by the main loop).
+    pub decoder: bool,
+    pub native: Native,
+    /// Cameras whose own video could not be decoded: they play HLS video instead.
+    pub native_failed: Vec<String>,
+    /// For the main loop: decode this camera's relayed video (id, URL).
+    pub start_native: Option<(String, String)>,
+    /// For the main loop: stop decoding.
+    pub stop_native: bool,
     /// Cameras whose HLS video could not be played: they stay on the motion-JPEG stream.
     pub video_failed: Vec<String>,
     /// For the main loop: start this camera's HLS stream (id, endpoint).
@@ -1223,6 +1245,7 @@ impl Gallery {
     fn shrink(&mut self) {
         self.enlarged = None;
         self.enlarged_at = None;
+        self.end_native();
         if matches!(
             std::mem::take(&mut self.video),
             Video::Playing(_) | Video::Recorded(_)
@@ -1247,6 +1270,22 @@ impl Gallery {
         let Some(id) = self.enlarged.clone() else {
             return;
         };
+        // The camera's own video on the TV's decoder, where both exist: no HLS, no overlay app.
+        if self.live
+            && self.decoder
+            && self.native == Native::Off
+            && self.video == Video::Off
+            && !self.native_failed.contains(&id)
+            && let Some(url) = self.camera(&id).and_then(|c| c.live.clone())
+        {
+            self.native = Native::Starting(id.clone());
+            self.stop_native = false;
+            self.start_native = Some((id, url));
+            return;
+        }
+        if self.native != Native::Off {
+            return;
+        }
         if self.live
             && self.video == Video::Off
             && !self.video_failed.contains(&id)
@@ -1255,6 +1294,21 @@ impl Gallery {
             self.video = Video::Resolving(id.clone());
             self.resolve = Some((id, endpoint));
         }
+    }
+
+    /// Stops decoding the camera's own video.
+    fn end_native(&mut self) {
+        if std::mem::take(&mut self.native) != Native::Off {
+            self.stop_native = true;
+        }
+        self.start_native = None;
+    }
+
+    /// The decoder's picture shows: the gallery draws nothing over it but its controls.
+    pub fn see_through(&self) -> bool {
+        matches!(self.native, Native::Showing(_))
+            && self.enlarged.is_some()
+            && self.playback == Playback::Live
     }
 
     /// The enlarged camera's endpoint into what Protect recorded.
@@ -1451,6 +1505,10 @@ impl Gallery {
                 format!("{history}&events=1&start={start}&end={unix}"),
             ));
         }
+        // Paused or rewound: the decoder's live video gives way to the gallery's own pictures.
+        if self.playback != Playback::Live {
+            self.end_native();
+        }
         let lag = self.lag(now);
         let speed = self.speed();
         if let Playback::Replay { .. } = self.playback {
@@ -1635,6 +1693,7 @@ impl State {
             gallery.cameras = cameras;
             gallery.live = live;
             gallery.unavailable.clear();
+            gallery.native_failed.clear();
             gallery.video_failed.clear();
             gallery.recorded_failed.clear();
             gallery.shrink();
@@ -1819,6 +1878,37 @@ impl State {
         self.dirty = true;
     }
 
+    /// What the decoder's video did (see `live`), for the camera it was started for.
+    pub fn camera_native(&mut self, id: &str, event: crate::live::Event) {
+        let gallery = &mut self.cameras;
+        if !matches!(&gallery.native, Native::Starting(now) | Native::Showing(now) if now == id) {
+            return;
+        }
+        match event {
+            crate::live::Event::Opened { .. } => {}
+            crate::live::Event::Showing => {
+                if let Some(at) = gallery.enlarged_at {
+                    crate::telemetry::log_info!(
+                        "cameras",
+                        "{id}: decoded video {} ms after it was enlarged",
+                        at.elapsed().as_millis()
+                    );
+                }
+                gallery.native = Native::Showing(id.to_owned());
+            }
+            // The camera plays Home Assistant's HLS video instead, for the rest of this visit.
+            crate::live::Event::Failed(error) => {
+                crate::telemetry::log_warn!("cameras", "{id}: no decoded video: {error}");
+                gallery.end_native();
+                gallery.native_failed.push(id.to_owned());
+                if gallery.playback == Playback::Live {
+                    gallery.request_video();
+                }
+            }
+        }
+        self.dirty = true;
+    }
+
     /// The overlay app's video closed. Back there also leaves the enlarged camera; a video that
     /// could not play leaves the motion-JPEG stream on screen for the rest of this visit.
     pub fn camera_video_closed(&mut self, closed: Closed) {
@@ -1925,7 +2015,14 @@ impl State {
                 return None;
             }
         };
-        let endpoint = gallery.camera(focused)?.hls.clone()?;
+        // The relay when this TV decodes the camera's own video, else Home Assistant's HLS.
+        let camera = gallery.camera(focused)?;
+        let relayed = camera
+            .live
+            .as_ref()
+            .filter(|_| gallery.decoder && !gallery.native_failed.contains(focused))
+            .map(|url| format!("{url}&warm=1"));
+        let endpoint = relayed.or_else(|| camera.hls.clone())?;
         if gallery.warm.as_ref().is_none_or(|warm| warm.id != *focused) {
             gallery.warm = Some(Warm {
                 id: focused.clone(),

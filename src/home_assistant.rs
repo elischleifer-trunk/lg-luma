@@ -171,6 +171,8 @@ pub struct Camera {
     pub snapshot: Option<String>,
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
+    /// The integration's relay of the camera's own video.
+    pub live: Option<String>,
     /// The integration's endpoint into what UniFi Protect recorded of this camera.
     pub history: Option<String>,
 }
@@ -1343,6 +1345,7 @@ impl<T: Tv> Api<T> {
                 let stream = camera_url(entry, "stream_url")?;
                 let snapshot = camera_url(entry, "snapshot_url")?;
                 let hls = camera_url(entry, "hls_url")?;
+                let live = camera_url(entry, "live_url")?;
                 let history = camera_url(entry, "history_url")?;
                 if stream.is_none() && snapshot.is_none() {
                     return Err(error(400, "stream_url or snapshot_url is required"));
@@ -1354,6 +1357,7 @@ impl<T: Tv> Api<T> {
                     stream,
                     snapshot,
                     hls,
+                    live,
                     history,
                 })
             })();
@@ -1499,6 +1503,7 @@ impl<T: Tv> Api<T> {
                 stream: camera.stream.clone(),
                 snapshot: camera.snapshot.clone(),
                 hls: camera.hls.clone(),
+                live: camera.live.clone(),
                 history: camera.history.clone(),
             })
             .collect()

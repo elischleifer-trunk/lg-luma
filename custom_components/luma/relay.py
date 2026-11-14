@@ -33,6 +33,7 @@ import json
 import logging
 import struct
 import threading
+import time
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from typing import Any
@@ -178,16 +179,23 @@ def read_source(source: str, options: dict[str, str]) -> Iterator[tuple[str, int
         if context.extradata and parameters is None:
             to_annex_b = BitStreamFilterContext(f"{codec}_mp4toannexb", stream)
         yield codec, context.width, context.height
+        started = time.monotonic()
         for packet in container.demux(stream):
-            if packet.dts is None:
+            if packet.size == 0:
                 continue
             for out in to_annex_b.filter(packet) if to_annex_b else (packet,):
                 data = bytes(out)
                 keyframe = bool(out.is_keyframe)
                 if keyframe and parameters and not has_parameter_sets(data, codec):
                     data = parameters + data
-                pts = out.pts if out.pts is not None else out.dts
-                yield Frame(data, int(pts * out.time_base * 1_000_000), keyframe)
+                stamp = out.pts if out.pts is not None else out.dts
+                # A stream without timestamps is stamped as it arrives.
+                pts = (
+                    int(stamp * out.time_base * 1_000_000)
+                    if stamp is not None and out.time_base
+                    else int((time.monotonic() - started) * 1_000_000)
+                )
+                yield Frame(data, pts, keyframe)
     raise ValueError("the stream ended")
 
 
