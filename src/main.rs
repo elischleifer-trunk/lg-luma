@@ -35,6 +35,7 @@ mod sdl_events;
 mod signal_watch;
 mod state;
 mod storage;
+mod telemetry;
 // Not wired into the UI yet; remove once the search screen uses it.
 #[allow(dead_code)]
 #[path = "motn-api.rs"]
@@ -355,7 +356,7 @@ fn effects(
         match effect {
             Effect::Save => {
                 if let Err(error) = storage::save(preferences, &state.preferences) {
-                    eprintln!("{error}");
+                    crate::telemetry::log_error!("preferences", "{error}");
                     state.notify(state.preferences.language.t("savedError"));
                 } else {
                     platform.sync_splash(state.preferences.splash_background());
@@ -514,7 +515,7 @@ fn wallpaper_upload_active(state: &State, webos: bool, focused: bool, visible: b
 /// only: the card still shows the console for this session.
 fn save_remembered_inputs(state: &State, preferences: &std::path::Path) {
     if let Err(error) = storage::save(preferences, &state.preferences) {
-        eprintln!("{error}");
+        crate::telemetry::log_error!("preferences", "{error}");
     }
 }
 
@@ -652,8 +653,9 @@ fn run() -> Result<(), String> {
     let webos = cfg!(feature = "webos");
     let startup_stage = |stage: &str| {
         if webos {
-            eprintln!(
-                "Luma startup: {stage} after {} ms",
+            crate::telemetry::log_info!(
+                "startup",
+                "{stage} after {} ms",
                 startup.elapsed().as_millis()
             );
         }
@@ -677,7 +679,7 @@ fn run() -> Result<(), String> {
             std::env::set_var("APPID", surface_id);
             std::env::set_var("SDL_VIDEO_WAYLAND_WMCLASS", surface_id);
         }
-        eprintln!("Luma webOS surface: {surface_id}");
+        crate::telemetry::log_info!("startup", "webOS surface: {surface_id}");
         sdl2::hint::set("SDL_WEBOS_ACCESS_POLICY_KEYS_BACK", "true");
         // Magic Remotes send the separate Exit key for a long Back press.
         // Claim it before video init so the compositor does not close Luma.
@@ -761,6 +763,7 @@ fn run() -> Result<(), String> {
     if webos && options.weather_test_server.is_some() {
         return Err("Weather test servers are only available in desktop builds".into());
     }
+    telemetry::start(preferences_path.parent());
     let weather_cache = weather_service::cache_path(&preferences_path);
     state.weather.cache = weather_service::load_cache(&weather_cache);
     let weather_service = weather_service::Service::new(
@@ -810,7 +813,11 @@ fn run() -> Result<(), String> {
             std::env::var_os("WAYLAND_DISPLAY"),
         )
     })?;
-    eprintln!("Luma SDL video driver: {}", video.current_video_driver());
+    crate::telemetry::log_info!(
+        "startup",
+        "SDL video driver: {}",
+        video.current_video_driver()
+    );
     startup_stage("SDL video");
     let attributes = video.gl_attr();
     if webos {
@@ -851,9 +858,11 @@ fn run() -> Result<(), String> {
         std::env::var("LUMA_MSAA").ok().as_deref(),
         std::env::var("LUMA_EMBOLDEN").ok().as_deref(),
     );
-    eprintln!(
-        "Luma text rendering: {:?}, embolden {} px",
-        text_config.mode, text_config.embolden
+    crate::telemetry::log_info!(
+        "startup",
+        "text rendering: {:?}, embolden {} px",
+        text_config.mode,
+        text_config.embolden
     );
     for &samples in text_config.sample_counts {
         attributes.set_multisample_buffers(u8::from(samples > 0));
@@ -873,10 +882,10 @@ fn run() -> Result<(), String> {
     }
     let mut samples = 0;
     unsafe { gl::GetIntegerv(gl::SAMPLES, &mut samples) };
-    eprintln!("Luma GL multisampling: {samples} samples");
+    crate::telemetry::log_info!("startup", "GL multisampling: {samples} samples");
     startup_stage("window and GL context");
     if let Err(error) = video.gl_set_swap_interval(1) {
-        eprintln!("VSync: {error}");
+        crate::telemetry::log_warn!("startup", "VSync: {error}");
     }
     let mut renderer =
         renderer::Renderer::new(&assets.root.join("font.ttf"), webos, text_config.embolden)?;
@@ -885,8 +894,9 @@ fn run() -> Result<(), String> {
     let partial = (std::env::var("LUMA_PARTIAL").as_deref() != Ok("0"))
         .then(egl_damage::PartialUpdate::load)
         .flatten();
-    eprintln!(
-        "Luma partial redraw: {}",
+    crate::telemetry::log_info!(
+        "startup",
+        "partial redraw: {}",
         partial
             .as_ref()
             .map_or("off", egl_damage::PartialUpdate::describe)
@@ -913,102 +923,104 @@ fn run() -> Result<(), String> {
     #[cfg(not(all(feature = "webos", target_os = "linux", target_arch = "arm")))]
     let (lifecycle_event, end_registration): (Option<u32>, Option<EndRegistration>) = (None, None);
     #[cfg(all(feature = "webos", target_os = "linux", target_arch = "arm"))]
-    let (lifecycle_event, end_registration): (Option<u32>, Option<EndRegistration>) =
-        if webos && options.webos_home {
-            let subsystem = sdl.event()?;
-            // SAFETY: registers one SDL user event type before any are pushed.
-            let event_type = unsafe { subsystem.register_event()? };
-            let pusher = move |sender: sdl2::event::EventSender| {
-                move |lifecycle: platform::Lifecycle| {
-                    let code = match lifecycle {
-                        platform::Lifecycle::Relaunch => 1,
-                        platform::Lifecycle::Close => 2,
-                    };
-                    let _ = sender.push_event(Event::User {
-                        timestamp: 0,
-                        window_id: 0,
-                        type_: event_type,
-                        code,
-                        data1: std::ptr::null_mut(),
-                        data2: std::ptr::null_mut(),
-                    });
-                }
-            };
-            // SAFETY: geteuid has no preconditions.
-            let as_root = unsafe { libc::geteuid() } == 0;
-            if platform::runs_as_lg_home() {
-                // In place of LG's Home executable (webOS 5/6), LG's role is bound to that path,
-                // so Luma registers through lifecycle v2 on its own connection.
-                let push = pusher(subsystem.event_sender());
-                luna::subscribe(
-                    Some(platform::home_id()),
-                    "luna://com.webos.applicationManager/registerApp",
-                    &serde_json::json!({"id": platform::home_id()}),
-                    // sam answers "registered" at once; without it sam would end Home later.
-                    Duration::from_secs(10),
-                    move |message| {
-                        eprintln!("Luma lifecycle: {message}");
-                        let refused = message
-                            .get("returnValue")
-                            .and_then(serde_json::Value::as_bool)
-                            == Some(false);
-                        match platform::Lifecycle::from_reply(&message) {
-                            Some(lifecycle) => push(lifecycle),
-                            // Registration lost (e.g. sam restarted): quit, so sam starts Home
-                            // afresh.
-                            None if refused => push(platform::Lifecycle::Close),
-                            None => {}
-                        }
-                    },
-                )?;
-                (Some(event_type), None)
-            } else if !as_root {
-                (None, None)
-            } else if std::path::Path::new(platform::HOME_LIFECYCLE_OFF).exists() {
-                eprintln!(
-                    "Luma lifecycle: {} exists; Home stays unregistered",
-                    platform::HOME_LIFECYCLE_OFF
-                );
-                (None, None)
-            } else {
-                // A staged Home manifest (webOS 10/11) runs Luma's own executable as root under
-                // LG's app-ID based Home role, which Luma's connection cannot claim. Hold the
-                // registration as that app through `luna-send -a`; sam then expects lifecycle v1.
-                // This does not wait for sam: until it answers, Home is simply unregistered.
-                let push = pusher(subsystem.event_sender());
-                let close = pusher(subsystem.event_sender());
-                match luna::subscribe_as_app(
-                    platform::home_id(),
-                    "luna://com.webos.applicationManager/registerNativeApp",
-                    &serde_json::json!({}),
-                    Duration::from_secs(10),
-                    move |message| {
-                        eprintln!("Luma lifecycle: {message}");
-                        if let Some(lifecycle) = platform::Lifecycle::from_reply(&message) {
-                            push(lifecycle);
-                        }
-                    },
-                    // A registration sam had accepted is gone: quit, so sam starts Home afresh.
-                    // Never accepted: stay, unregistered, as before.
-                    move |registered| {
-                        if registered {
-                            close(platform::Lifecycle::Close);
-                        }
-                    },
-                ) {
-                    Ok(subscription) => (
-                        Some(event_type),
-                        Some(Box::new(move || subscription.end()) as EndRegistration),
-                    ),
-                    Err(error) => {
-                        eprintln!("Luma lifecycle: {error}; Home stays unregistered");
-                        (None, None)
+    let (lifecycle_event, end_registration): (Option<u32>, Option<EndRegistration>) = if webos
+        && options.webos_home
+    {
+        let subsystem = sdl.event()?;
+        // SAFETY: registers one SDL user event type before any are pushed.
+        let event_type = unsafe { subsystem.register_event()? };
+        let pusher = move |sender: sdl2::event::EventSender| {
+            move |lifecycle: platform::Lifecycle| {
+                let code = match lifecycle {
+                    platform::Lifecycle::Relaunch => 1,
+                    platform::Lifecycle::Close => 2,
+                };
+                let _ = sender.push_event(Event::User {
+                    timestamp: 0,
+                    window_id: 0,
+                    type_: event_type,
+                    code,
+                    data1: std::ptr::null_mut(),
+                    data2: std::ptr::null_mut(),
+                });
+            }
+        };
+        // SAFETY: geteuid has no preconditions.
+        let as_root = unsafe { libc::geteuid() } == 0;
+        if platform::runs_as_lg_home() {
+            // In place of LG's Home executable (webOS 5/6), LG's role is bound to that path,
+            // so Luma registers through lifecycle v2 on its own connection.
+            let push = pusher(subsystem.event_sender());
+            luna::subscribe(
+                Some(platform::home_id()),
+                "luna://com.webos.applicationManager/registerApp",
+                &serde_json::json!({"id": platform::home_id()}),
+                // sam answers "registered" at once; without it sam would end Home later.
+                Duration::from_secs(10),
+                move |message| {
+                    crate::telemetry::log_info!("lifecycle", "{message}");
+                    let refused = message
+                        .get("returnValue")
+                        .and_then(serde_json::Value::as_bool)
+                        == Some(false);
+                    match platform::Lifecycle::from_reply(&message) {
+                        Some(lifecycle) => push(lifecycle),
+                        // Registration lost (e.g. sam restarted): quit, so sam starts Home
+                        // afresh.
+                        None if refused => push(platform::Lifecycle::Close),
+                        None => {}
                     }
+                },
+            )?;
+            (Some(event_type), None)
+        } else if !as_root {
+            (None, None)
+        } else if std::path::Path::new(platform::HOME_LIFECYCLE_OFF).exists() {
+            crate::telemetry::log_info!(
+                "lifecycle",
+                "{} exists; Home stays unregistered",
+                platform::HOME_LIFECYCLE_OFF
+            );
+            (None, None)
+        } else {
+            // A staged Home manifest (webOS 10/11) runs Luma's own executable as root under
+            // LG's app-ID based Home role, which Luma's connection cannot claim. Hold the
+            // registration as that app through `luna-send -a`; sam then expects lifecycle v1.
+            // This does not wait for sam: until it answers, Home is simply unregistered.
+            let push = pusher(subsystem.event_sender());
+            let close = pusher(subsystem.event_sender());
+            match luna::subscribe_as_app(
+                platform::home_id(),
+                "luna://com.webos.applicationManager/registerNativeApp",
+                &serde_json::json!({}),
+                Duration::from_secs(10),
+                move |message| {
+                    crate::telemetry::log_info!("lifecycle", "{message}");
+                    if let Some(lifecycle) = platform::Lifecycle::from_reply(&message) {
+                        push(lifecycle);
+                    }
+                },
+                // A registration sam had accepted is gone: quit, so sam starts Home afresh.
+                // Never accepted: stay, unregistered, as before.
+                move |registered| {
+                    if registered {
+                        close(platform::Lifecycle::Close);
+                    }
+                },
+            ) {
+                Ok(subscription) => (
+                    Some(event_type),
+                    Some(Box::new(move || subscription.end()) as EndRegistration),
+                ),
+                Err(error) => {
+                    crate::telemetry::log_warn!("lifecycle", "{error}; Home stays unregistered");
+                    (None, None)
                 }
             }
-        } else {
-            (None, None)
-        };
+        }
+    } else {
+        (None, None)
+    };
     // Whether a staged Home's relaunch reached the front; see platform::ForegroundCheck.
     let mut foreground = platform::ForegroundCheck::default();
     let mut focused = true;
@@ -1071,7 +1083,7 @@ fn run() -> Result<(), String> {
                         && matches!(state.overlay, Some(Overlay::WallpaperUpload)) =>
                 {
                     if let Err(error) = &result {
-                        eprintln!("Luma wallpaper upload: {error}");
+                        crate::telemetry::log_warn!("wallpapers", "upload: {error}");
                     }
                     state.wallpaper_upload = Some(result);
                     state.dirty = true;
@@ -1112,7 +1124,7 @@ fn run() -> Result<(), String> {
                         && matches!(state.overlay, Some(Overlay::TileEditor)) =>
                 {
                     if let Err(error) = &result {
-                        eprintln!("Luma tile editor: {error}");
+                        crate::telemetry::log_warn!("tile-editor", "{error}");
                     }
                     state.tile_editor = Some(result);
                     state.dirty = true;
@@ -1143,7 +1155,7 @@ fn run() -> Result<(), String> {
                         && matches!(state.overlay, Some(Overlay::StreamingKeys)) =>
                 {
                     if let Err(error) = &result {
-                        eprintln!("Luma key editor: {error}");
+                        crate::telemetry::log_warn!("key-editor", "{error}");
                     }
                     state.key_editor = Some(result);
                     state.dirty = true;
@@ -1184,7 +1196,7 @@ fn run() -> Result<(), String> {
                 startup_cycle_pending = false;
             }
             if cycled && let Err(error) = storage::save(&preferences_path, &state.preferences) {
-                eprintln!("{error}");
+                crate::telemetry::log_error!("preferences", "{error}");
             }
         }
         while let Ok(response) = updates.receiver.try_recv() {
@@ -1230,8 +1242,9 @@ fn run() -> Result<(), String> {
                 }
                 Response::Inventory(Err(error)) => {
                     if let Some(delay) = state.inventory_failed(error) {
-                        eprintln!(
-                            "Luma TV inventory: retry {} in {} s",
+                        crate::telemetry::log_warn!(
+                            "inventory",
+                            "retry {} in {} s",
                             state.inventory_failures,
                             delay.as_secs()
                         );
@@ -1243,16 +1256,21 @@ fn run() -> Result<(), String> {
                 }
                 Response::Inputs(result) => {
                     if let Err(error) = input_refresh.completed(Instant::now(), result) {
-                        eprintln!("Luma HDMI refresh: {error}");
+                        crate::telemetry::log_warn!("inputs", "HDMI refresh: {error}");
                     }
                 }
                 Response::Signal(result) => match signal_watch.completed(Instant::now(), result) {
                     Ok(true) => {
-                        eprintln!("Luma: the HDMI source in front lost its signal; going Home");
+                        crate::telemetry::log_info!(
+                            "inputs",
+                            "the HDMI source in front lost its signal; going Home"
+                        );
                         platform.send(Request::GoHome);
                     }
                     Ok(false) => {}
-                    Err(error) => eprintln!("Luma HDMI signal watch: {error}"),
+                    Err(error) => {
+                        crate::telemetry::log_warn!("inputs", "HDMI signal watch: {error}")
+                    }
                 },
                 Response::Launched(result) => {
                     let pending = state.launch_response(result);
@@ -1339,7 +1357,7 @@ fn run() -> Result<(), String> {
                     notice
                 }
                 home_assistant::Event::Failed(error) => {
-                    eprintln!("Luma Home Assistant: {error}");
+                    crate::telemetry::log_error!("home-assistant", "{error}");
                     language.t("homeAssistantFailed").to_owned()
                 }
                 home_assistant::Event::Notice(key) => language.t(key).to_owned(),
@@ -1402,7 +1420,7 @@ fn run() -> Result<(), String> {
             let key = match result {
                 Ok(()) => "tileSent",
                 Err(error) => {
-                    eprintln!("Luma webhook {title}: {error}");
+                    crate::telemetry::log_warn!("webhook", "{title}: {error}");
                     "tileFailed"
                 }
             };
@@ -1526,6 +1544,7 @@ fn run() -> Result<(), String> {
                             pending = state.finish_text_input();
                         }
                         profile.pause();
+                        telemetry::frames_paused();
                     }
                     WindowEvent::FocusLost => {
                         if webos {
@@ -2017,8 +2036,9 @@ fn run() -> Result<(), String> {
                     startup_stage("first frame");
                     if webos {
                         let stats = renderer.stats();
-                        eprintln!(
-                            "Luma vector text: {} glyphs, {} text runs, {} KiB glyph geometry, {} KiB GPU text",
+                        crate::telemetry::log_info!(
+                            "startup",
+                            "vector text: {} glyphs, {} text runs, {} KiB glyph geometry, {} KiB GPU text",
                             stats.cached_glyphs,
                             stats.cached_text_runs,
                             stats.glyph_geometry_bytes / 1024,
@@ -2028,6 +2048,10 @@ fn run() -> Result<(), String> {
                 }
                 presented += 1;
                 last_present = Instant::now();
+                telemetry::frame(
+                    last_present,
+                    compose_ms + renderer.stats().cpu_submission_ms + swap_ms,
+                );
                 if options.profile_frames.is_some() {
                     profile.record(
                         Instant::now(),
@@ -2071,12 +2095,13 @@ fn run() -> Result<(), String> {
         {
             // Fall back to the restart sam does for an unregistered Home: remember that and
             // end the registration, which quits Luma so sam starts it afresh.
-            eprintln!(
-                "Luma lifecycle: a relaunch did not bring Luma to the front; creating {}",
+            crate::telemetry::log_warn!(
+                "lifecycle",
+                "a relaunch did not bring Luma to the front; creating {}",
                 platform::HOME_LIFECYCLE_OFF
             );
             if let Err(error) = std::fs::write(platform::HOME_LIFECYCLE_OFF, b"") {
-                eprintln!("Luma lifecycle: {error}");
+                crate::telemetry::log_warn!("lifecycle", "{error}");
             }
             end_registration();
         }
@@ -2094,8 +2119,9 @@ fn run() -> Result<(), String> {
                 let (width, height) = window.drawable_size();
                 renderer.prepare(&hidden.draw, width, height);
                 if webos {
-                    eprintln!(
-                        "Luma prewarm: {page:?} in {} ms",
+                    crate::telemetry::log_info!(
+                        "startup",
+                        "prewarm {page:?} in {} ms",
                         started.elapsed().as_millis()
                     );
                 }

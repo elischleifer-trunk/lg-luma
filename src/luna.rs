@@ -202,7 +202,11 @@ impl Connection {
         // SAFETY: handle/token belong to this live request. Even a refused cancel
         // leaves its callback allocation alive until unregistering on drop.
         if !unsafe { LSCallCancel(self.handle, token, &mut cancel_error) } {
-            eprintln!("{}", cancel_error.describe("timeout cancellation"));
+            crate::telemetry::log_warn!(
+                "luna",
+                "{}",
+                cancel_error.describe("timeout cancellation")
+            );
         }
         Err("The TV service timed out".into())
     }
@@ -214,7 +218,7 @@ impl Drop for Connection {
             let mut error = Error::new();
             // SAFETY: unregister before freeing the context or callback storage.
             if !unsafe { LSUnregister(self.handle, &mut error) } {
-                eprintln!("{}", error.describe("unregistration"));
+                crate::telemetry::log_warn!("luna", "{}", error.describe("unregistration"));
                 // A refused unregister can retain the callback. Preserve its
                 // context and heap slot rather than leave dangling pointers.
                 std::mem::forget(self.reply.take());
@@ -258,7 +262,7 @@ extern "C" fn deliver(_handle: *mut c_void, message: *mut c_void, userdata: *mut
             let sink = &mut *userdata.cast::<Sink>();
             // A panic must not unwind into LS2's C frames, which would abort the process.
             if catch_unwind(AssertUnwindSafe(|| sink(value))).is_err() {
-                eprintln!("Luna subscription: handler panicked");
+                crate::telemetry::log_error!("luna", "subscription handler panicked");
             }
         }
     }

@@ -426,7 +426,7 @@ impl State {
                 }
             }
             Err(error) => {
-                eprintln!("Luma update check: {error}");
+                crate::telemetry::log_warn!("update", "check: {error}");
                 self.update_status = crate::update::Status::Failed;
             }
         }
@@ -471,7 +471,7 @@ impl State {
                         self.update_status = crate::update::Status::Unchecked;
                     }
                     Err(error) => {
-                        eprintln!("Luma update: {error}");
+                        crate::telemetry::log_warn!("update", "{error}");
                         self.update = InstallStatus::Failed(error);
                         self.update_status = crate::update::Status::Failed;
                         self.notify(self.preferences.language.t("updateError"));
@@ -793,7 +793,7 @@ impl State {
         let id = self.launch_requested.take();
         match result {
             Err(error) => {
-                eprintln!("{error}");
+                crate::telemetry::log_warn!("apps", "launch: {error}");
                 self.notify(self.preferences.language.t("appOpenError"));
                 vec![]
             }
@@ -1087,7 +1087,7 @@ impl State {
         }
         self.deleting_wallpaper = None;
         if let Err(error) = result {
-            eprintln!("Luma background deletion: {error}");
+            crate::telemetry::log_warn!("wallpapers", "background deletion: {error}");
             self.notify(self.preferences.language.t("deleteBackgroundError"));
             return;
         }
@@ -1844,7 +1844,7 @@ impl State {
         self.uninstalling = None;
         self.dirty = true;
         if let Err(error) = result {
-            eprintln!("Luma uninstall: {error}");
+            crate::telemetry::log_warn!("apps", "uninstall: {error}");
             self.notify(self.preferences.language.t("deleteAppError"));
             if matches!(&self.overlay, Some(Overlay::Delete { id: current, .. } | Overlay::Options { id: current, .. }) if current == &id)
             {

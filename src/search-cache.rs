@@ -97,7 +97,7 @@ impl DiskCache {
         })();
         match result {
             Ok(()) => self.evict(),
-            Err(error) => eprintln!("Luma streaming cache: {error}"),
+            Err(error) => crate::telemetry::log_warn!("streaming", "cache: {error}"),
         }
     }
 

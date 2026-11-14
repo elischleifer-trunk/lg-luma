@@ -250,6 +250,43 @@ video, or its motion-JPEG feed when it has none, with no countdown. Full screen,
 closes it, and a paused show resumes. Other remote keys, such as play/pause, may not reach
 the app underneath until it closes. How webOS routes keys to overlay windows depends on firmware.
 
+## What the TV reports
+
+The TV tells Home Assistant what went wrong and how smoothly Luma is running. Home Assistant
+keeps a live connection to it while the TV is on, and catches up on anything it missed after it
+restarts or the TV wakes up.
+
+- **Home Assistant's log** (**Settings → System → Logs**) shows Luma's warnings and errors, such
+  as a camera that has no HLS stream or a camera card that did not open, under
+  `custom_components.luma.tv`. To see everything Luma records, including what went right (startup
+  timings, how long each camera card took to open), add this to `configuration.yaml`:
+
+  ```yaml
+  logger:
+    logs:
+      custom_components.luma.tv: info
+  ```
+
+- **Diagnostic sensors** on the TV's device page:
+  - **Frame time**: the 95th percentile of how long a frame took to draw, in milliseconds.
+  - **Dropped frames**: frames that missed a refresh while Luma was animating.
+  - **Memory** and **CPU**: how much Luma uses.
+  - **Last problem**: the last warning or error.
+
+  Luma reports these once a minute while it is drawing and every ten minutes when idle. Home
+  Assistant's history graphs them over time.
+
+- **A `luma_event` event** for each entry, with `level` (`info`, `warning` or `error`), `area`
+  (such as `cameras`, `overlay` or `inventory`), `message`, `time` and `config_entry_id`.
+  Automations can use it, for example to send you a notification when Luma logs an error.
+- **Download diagnostics** on the TV's device page saves one file with everything together: the
+  history Home Assistant kept (the last 1,000 entries and 12 hours of performance), and what the
+  TV still holds. Attach it when you report a problem. Tokens and keys are removed from it.
+
+The TV keeps its last 500 entries in memory. If Home Assistant is away long enough for more than
+that to pile up, the log says some were lost. If Luma stops because of an internal error, it
+reports the error the next time it starts.
+
 ## Security
 
 - The port (`5862`) only exists while **Home Assistant** is on in Luma. It answers only devices on
@@ -262,6 +299,8 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
 - Camera URLs must be `http` or `https`. The TV loads them as images only.
 - Streaming search keys are stored on the TV in a file only Luma can read. The API never sends
   them back: `status` only says which keys the TV holds.
+- What the TV reports about itself goes only to paired servers. Unpairing a server ends its
+  event stream.
 
 ## API
 
@@ -280,6 +319,17 @@ Home Assistant uses this API. You can script it too: send JSON bodies, with
 | `POST /api/notify`        | `message` (up to 300 characters)                      | Shows a webOS toast                                     |
 | `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list                         |
 | `PUT /api/streaming-keys` | `motn`, `tmdb`; empty or missing keeps the TV's key   | Which keys the TV holds                                 |
+| `GET /api/events`         | `?after=` the last event's `id`                       | Luma's log as server-sent events (below)                |
+| `GET /api/diagnostics`    |                                                       | Everything the TV kept of its log, and its state        |
+
+`GET /api/events` stays open. It sends a `hello` event (`boot`, `version`, `uptime_s`, and
+`restarted` when Luma restarted since the `after` cursor), then what the TV kept after the cursor,
+then each new entry as it happens. A `log` event's data has `seq`, `time` (Unix milliseconds),
+`level`, `area` and `message`. A `metrics` event has the same fields plus `data` with `presented`,
+`dropped`, `work_p50_ms`, `work_p95_ms`, `work_max_ms`, `rss_mb`, `cpu_percent` and `uptime_s`.
+Each of these events has an `id` (`boot:seq`). Pass the last one as `after` to resume. A `missed`
+event says that entries after the cursor were already dropped. A comment line arrives every 15
+seconds. Each server has at most one stream: connecting again replaces the earlier one.
 
 ## Troubleshooting
 

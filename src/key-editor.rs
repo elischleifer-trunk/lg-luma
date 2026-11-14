@@ -271,14 +271,14 @@ fn worker(
                             .map_err(|_| "Launcher stopped".to_owned())
                     };
                     if let Err(error) = serve(&mut stream, &host, &token, path, valid, store) {
-                        eprintln!("Luma key editor: {error}");
+                        crate::telemetry::log_warn!("key-editor", "{error}");
                     }
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
                     thread::sleep(Duration::from_millis(25))
                 }
                 Err(error) => {
-                    eprintln!("Luma key editor server: {error}");
+                    crate::telemetry::log_warn!("key-editor", "server: {error}");
                     break;
                 }
             }

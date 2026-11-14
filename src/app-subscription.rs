@@ -101,7 +101,7 @@ pub fn subscribe(
         Box::new(move || {
             // A disconnect means the reader already finished; only silence ends the child here.
             if let Err(mpsc::RecvTimeoutError::Timeout) = handshake.recv_timeout(timeout) {
-                eprintln!("Luna app subscription: no reply");
+                crate::telemetry::log_warn!("apps", "subscription: no reply");
                 end_child(&waiting);
             }
         }),
@@ -129,17 +129,20 @@ pub fn subscribe(
                     registered = !refused;
                 }
                 if refused {
-                    eprintln!("Luna app subscription refused: {value}");
+                    crate::telemetry::log_warn!("apps", "subscription refused: {value}");
                     break;
                 }
                 if catch_unwind(AssertUnwindSafe(|| on_message(value))).is_err() {
-                    eprintln!("Luna app subscription: handler panicked");
+                    crate::telemetry::log_error!("apps", "subscription handler panicked");
                 }
             }
             end_child(&reader);
-            eprintln!("Luna app subscription ended (was registered: {registered})");
+            crate::telemetry::log_info!(
+                "apps",
+                "subscription ended (was registered: {registered})"
+            );
             if catch_unwind(AssertUnwindSafe(|| on_end(registered))).is_err() {
-                eprintln!("Luna app subscription: end handler panicked");
+                crate::telemetry::log_error!("apps", "subscription end handler panicked");
             }
         }),
     );

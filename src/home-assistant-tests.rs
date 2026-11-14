@@ -670,6 +670,80 @@ fn the_listener_answers_info_over_http() {
 }
 
 #[test]
+fn paired_servers_stream_luma_s_log_until_unpaired() {
+    use std::io::{BufRead, BufReader};
+    let mut h = Harness::new();
+    let token = h.pair();
+    assert_eq!(h.call("GET", "/api/events", None, json!({})).status, 401);
+    // Connecting again replaces the server's earlier stream.
+    let first = h.call("GET", "/api/events", Some(&token), json!({}));
+    let second = h.call("GET", "/api/events", Some(&token), json!({}));
+    let (first, second) = (first.events.unwrap(), second.events.unwrap());
+    assert_eq!(first.owner, second.owner);
+    assert_eq!(
+        h.api.streams.lock().unwrap().get(&first.owner),
+        Some(&second.id)
+    );
+    assert_ne!(first.id, second.id);
+    let diagnostics = h.call("GET", "/api/diagnostics", Some(&token), json!({}));
+    assert_eq!(diagnostics.status, 200);
+    assert_eq!(diagnostics.body["boot"], crate::telemetry::boot());
+    assert_eq!(diagnostics.body["paired_servers"], 1);
+    crate::telemetry::log_warn!("cameras", "stream test: before connecting");
+    let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).unwrap();
+    let address = listener.local_addr().unwrap();
+    let request =
+        format!("GET /api/events HTTP/1.1\r\nHost: tv\r\nAuthorization: Bearer {token}\r\n\r\n");
+    let client = thread::spawn(move || {
+        let mut stream = TcpStream::connect(address).unwrap();
+        stream.write_all(request.as_bytes()).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_secs(10)))
+            .unwrap();
+        BufReader::new(stream)
+    });
+    let (stream, peer) = listener.accept().unwrap();
+    serve(&mut h.api, stream, peer);
+    let mut reader = client.join().unwrap();
+    let mut read_until = |needle: &str| {
+        let mut seen = String::new();
+        let mut line = String::new();
+        while !seen.contains(needle) {
+            line.clear();
+            assert!(
+                reader.read_line(&mut line).unwrap() > 0,
+                "stream ended: {seen}"
+            );
+            seen.push_str(&line);
+        }
+        seen
+    };
+    let opening = read_until("stream test: before connecting");
+    assert!(opening.starts_with("HTTP/1.1 200 OK\r\n"), "{opening}");
+    assert!(opening.contains("Content-Type: text/event-stream"));
+    assert!(opening.contains("event: hello\ndata: {"));
+    assert!(opening.contains(&format!("id: {}:", crate::telemetry::boot())));
+    // Entries recorded while connected arrive live.
+    crate::telemetry::log_error!("overlay", "stream test: while connected");
+    let live = read_until("stream test: while connected");
+    assert!(live.contains("event: log\n"), "{live}");
+    assert!(
+        live.contains(r#""level":"error","area":"overlay""#),
+        "{live}"
+    );
+    // Unpairing ends the stream once the next entry wakes it.
+    assert_eq!(
+        h.call("DELETE", "/api/pair", Some(&token), json!({}))
+            .status,
+        200
+    );
+    crate::telemetry::log_info!("cameras", "stream test: after unpairing");
+    let mut rest = String::new();
+    let ended = std::io::Read::read_to_string(&mut reader, &mut rest);
+    assert!(ended.is_ok(), "the stream stayed open: {rest}");
+}
+
+#[test]
 fn the_gallery_arrangement_is_saved_and_applied_to_later_lists() {
     let mut h = Harness::new();
     let token = h.pair();

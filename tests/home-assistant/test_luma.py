@@ -22,7 +22,14 @@ try:
 except ImportError:  # pragma: no cover
     from homeassistant.components.ssdp import SsdpServiceInfo
 
+from custom_components.luma import events as luma_events
+from custom_components.luma.api import LumaAuthError, LumaClient
 from custom_components.luma.const import DOMAIN
+from custom_components.luma.diagnostics import async_get_config_entry_diagnostics
+
+# The autouse `silent_tv_events` fixture turns the stream off; these tests turn it back on.
+REAL_EVENTS = LumaClient.events
+REAL_FOLLOW = luma_events.LumaEvents._follow
 
 HOST = "192.168.1.50"
 TV = f"http://{HOST}:5862"
@@ -839,3 +846,145 @@ async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert (len(key_pushes(aioclient_mock)) > before) is pushed
+
+
+SSE = (
+    "retry: 5000\n\n"
+    'event: hello\ndata: {"boot":"ab","version":"2.28.0","restarted":true,"latest":2}\n\n'
+    ": ping\n\n"
+    'id: ab:1\nevent: log\ndata: {"seq":1,"time":1700000000000,"level":"warning",\n'
+    'data: "area":"cameras","message":"camera.door: no HLS stream"}\n\n'
+    'id: ab:2\nevent: metrics\ndata: {"seq":2,"area":"metrics","data":{"work_p95_ms":9.5}}\n\n'
+    "event: log\ndata: not json\n\n"
+)
+
+
+async def test_the_event_stream_is_read_as_server_sent_events(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+    client = LumaClient(async_get_clientsession(hass), HOST, 5862, TOKEN)
+    aioclient_mock.get(f"{TV}/api/events", params={"after": "ab:0"}, text=SSE)
+    received = [event async for event in REAL_EVENTS(client, "ab:0")]
+    assert [(event, event_id) for event, event_id, _ in received] == [
+        ("hello", None),
+        ("log", "ab:1"),
+        ("metrics", "ab:2"),
+    ]
+    assert received[1][2]["message"] == "camera.door: no HLS stream"
+    assert aioclient_mock.mock_calls[-1][3]["Authorization"] == f"Bearer {TOKEN}"
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.get(f"{TV}/api/events", status=401, json={"error": "Pair again"})
+    with pytest.raises(LumaAuthError):
+        _ = [event async for event in REAL_EVENTS(client)]
+
+
+def tv_events(monkeypatch: pytest.MonkeyPatch, *streams: list[tuple[str, str | None, dict]]):
+    """The TV's event stream: each connection sends the next list, the last one stays open.
+    Returns the cursor each connection asked for."""
+    asked: list[str | None] = []
+
+    async def events(self, after=None):
+        asked.append(after)
+        for event in streams[min(len(asked), len(streams)) - 1]:
+            yield event
+        if len(asked) >= len(streams):
+            await asyncio.Event().wait()
+
+    monkeypatch.setattr(LumaClient, "events", events)
+    monkeypatch.setattr(luma_events.LumaEvents, "_follow", REAL_FOLLOW)
+    monkeypatch.setattr(luma_events, "RETRY_FIRST", 0)
+    return asked
+
+
+HELLO = ("hello", None, {"boot": "ab", "version": "2.28.0", "uptime_s": 5, "restarted": False})
+PROBLEM = (
+    "log",
+    "ab:7",
+    {
+        "seq": 7,
+        "time": 1700000000000,
+        "level": "error",
+        "area": "overlay",
+        "message": "the camera card did not open: no overlay app",
+    },
+)
+METRICS = (
+    "metrics",
+    "ab:8",
+    {
+        "seq": 8,
+        "area": "metrics",
+        "data": {"work_p95_ms": 12.5, "dropped": 3, "rss_mb": 84.2, "cpu_percent": 7.5},
+    },
+)
+
+
+async def test_tv_events_reach_the_log_sensors_bus_and_diagnostics(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from pytest_homeassistant_custom_component.common import async_capture_events
+
+    tv_events(monkeypatch, [HELLO, PROBLEM, METRICS])
+    fired = async_capture_events(hass, "luma_event")
+    config = await setup(hass, aioclient_mock)
+    await hass.async_block_till_done()
+
+    assert "Living room TV [overlay] the camera card did not open: no overlay app" in caplog.text
+    record = next(r for r in caplog.records if "camera card did not open" in r.getMessage())
+    assert (record.name, record.levelname) == ("custom_components.luma.tv", "ERROR")
+    assert [(event.data["level"], event.data["area"]) for event in fired] == [("error", "overlay")]
+    assert fired[0].data["config_entry_id"] == config.entry_id
+    assert fired[0].data["time"] == "2023-11-14T22:13:20+00:00"
+
+    assert hass.states.get("sensor.living_room_tv_frame_time").state == "12.5"
+    assert hass.states.get("sensor.living_room_tv_dropped_frames").state == "3"
+    assert hass.states.get("sensor.living_room_tv_memory").state == "84.2"
+    assert hass.states.get("sensor.living_room_tv_cpu").state == "7.5"
+    problem = hass.states.get("sensor.living_room_tv_last_problem")
+    assert problem.state == "the camera card did not open: no overlay app"
+    assert problem.attributes["area"] == "overlay"
+
+    aioclient_mock.get(f"{TV}/api/diagnostics", json={"boot": "ab", "entries": []})
+    diagnostics = await async_get_config_entry_diagnostics(hass, config)
+    assert diagnostics["entry"]["data"]["token"] == "**REDACTED**"
+    assert diagnostics["stream"]["connected"] is True
+    assert diagnostics["stream"]["cursor"] == "ab:8"
+    assert diagnostics["stream"]["logs"] == [PROBLEM[2]]
+    assert diagnostics["tv"]["boot"] == "ab"
+
+
+async def test_the_stream_resumes_from_its_cursor_and_keeps_it_across_restarts(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    monkeypatch: pytest.MonkeyPatch,
+    hass_storage,
+) -> None:
+    # The first connection drops after one entry; the sensors wait for the TV to come back.
+    asked = tv_events(monkeypatch, [HELLO, PROBLEM], [])
+    config = await setup(hass, aioclient_mock)
+    for _ in range(5):
+        await asyncio.sleep(0)
+    await hass.async_block_till_done()
+    assert asked == [None, "ab:7"]
+    assert hass.states.get("sensor.living_room_tv_frame_time").state == "unavailable"
+    # The last problem stays, even with the TV away.
+    assert hass.states.get("sensor.living_room_tv_last_problem").state.startswith("the camera")
+
+    assert await hass.config_entries.async_unload(config.entry_id)
+    await hass.async_block_till_done()
+    stored = hass_storage[f"luma.events.{config.entry_id}"]["data"]
+    assert stored["cursor"] == "ab:7"
+    assert stored["logs"] == [PROBLEM[2]]
+
+    asked = tv_events(monkeypatch, [HELLO])
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done()
+    assert asked == ["ab:7"]
+    problem = hass.states.get("sensor.living_room_tv_last_problem")
+    assert problem.state.startswith("the camera card did not open")

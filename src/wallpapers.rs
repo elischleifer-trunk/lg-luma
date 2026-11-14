@@ -505,14 +505,14 @@ fn worker(
                             }
                         }
                         Ok(false) => {}
-                        Err(error) => eprintln!("Luma wallpaper upload: {error}"),
+                        Err(error) => crate::telemetry::log_warn!("wallpapers", "upload: {error}"),
                     }
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
                     thread::sleep(Duration::from_millis(25))
                 }
                 Err(error) => {
-                    eprintln!("Luma wallpaper server: {error}");
+                    crate::telemetry::log_warn!("wallpapers", "server: {error}");
                     break;
                 }
             }

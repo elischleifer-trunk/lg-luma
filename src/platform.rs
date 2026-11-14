@@ -327,7 +327,10 @@ impl Platform {
                                             }
                                             Ok(false) => {}
                                             Err(read_error) => {
-                                                eprintln!("Luma uninstall inventory: {read_error}");
+                                                crate::telemetry::log_warn!(
+                                                    "inventory",
+                                                    "uninstall: {read_error}"
+                                                );
                                                 break;
                                             }
                                         }
@@ -366,7 +369,7 @@ impl Platform {
                         {
                             match sync_splash(&background) {
                                 Ok(()) => splash_background = Some(background),
-                                Err(error) => eprintln!("Luma splash: {error}"),
+                                Err(error) => crate::telemetry::log_warn!("splash", "{error}"),
                             }
                         }
                         continue;
@@ -644,7 +647,7 @@ fn call(uri: &str, payload: Value) -> Result<Value, String> {
         .and_then(checked_response)
         .map_err(|error| {
             let error = format!("{uri}: {error}");
-            eprintln!("Luma TV service: {error}");
+            crate::telemetry::log_warn!("tv-service", "{error}");
             error
         })
 }
@@ -693,7 +696,7 @@ fn service_read(uri: &str, field: &str) -> Result<Value, String> {
     )?;
     command_reply(&envelope).map_err(|error| {
         let error = format!("{uri}: {error}");
-        eprintln!("Luma TV inventory: {error}");
+        crate::telemetry::log_warn!("inventory", "{error}");
         error
     })
 }
@@ -833,8 +836,9 @@ fn inventory() -> Result<(Inventory, Option<String>), String> {
     let inputs = input_inventory();
     match inputs {
         Ok(inputs) => {
-            eprintln!(
-                "Luma TV inventory: {} apps, {} inputs, LG search {}",
+            crate::telemetry::log_info!(
+                "inventory",
+                "{} apps, {} inputs, LG search {}",
                 apps.len(),
                 inputs.len(),
                 search.as_deref().unwrap_or("not found")
@@ -931,7 +935,7 @@ pub fn lg_search_app(raw: &Value) -> Option<String> {
         .filter(|id| id.contains("search") || id.contains("voice"))
         .collect();
     if !seen.is_empty() {
-        eprintln!("Luma LG search candidates: {}", seen.join(", "));
+        crate::telemetry::log_info!("inventory", "LG search candidates: {}", seen.join(", "));
     }
     LG_SEARCH_IDS
         .iter()
