@@ -940,6 +940,10 @@ async def test_tv_events_reach_the_log_sensors_bus_and_diagnostics(
     assert (record.name, record.levelname) == ("custom_components.luma.tv", "ERROR")
     assert [(event.data["level"], event.data["area"]) for event in fired] == [("error", "overlay")]
     assert fired[0].data["config_entry_id"] == config.entry_id
+    from homeassistant.helpers import device_registry as dr
+
+    device = dr.async_get(hass).async_get_device(identifiers={(DOMAIN, DEVICE)})
+    assert fired[0].data["device_id"] == device.id
     assert fired[0].data["time"] == "2023-11-14T22:13:20+00:00"
 
     assert hass.states.get("sensor.living_room_tv_frame_time").state == "12.5"
@@ -988,3 +992,9 @@ async def test_the_stream_resumes_from_its_cursor_and_keeps_it_across_restarts(
     assert asked == ["ab:7"]
     problem = hass.states.get("sensor.living_room_tv_last_problem")
     assert problem.state.startswith("the camera card did not open")
+
+    # Removing the TV removes its history.
+    aioclient_mock.delete(f"{TV}/api/pair", json={"paired": False})
+    assert await hass.config_entries.async_remove(config.entry_id)
+    await hass.async_block_till_done()
+    assert f"luma.events.{config.entry_id}" not in hass_storage

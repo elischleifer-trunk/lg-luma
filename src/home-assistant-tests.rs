@@ -731,13 +731,12 @@ fn paired_servers_stream_luma_s_log_until_unpaired() {
         live.contains(r#""level":"error","area":"overlay""#),
         "{live}"
     );
-    // Unpairing ends the stream once the next entry wakes it.
+    // Unpairing wakes the stream, which ends without waiting for another entry.
     assert_eq!(
         h.call("DELETE", "/api/pair", Some(&token), json!({}))
             .status,
         200
     );
-    crate::telemetry::log_info!("cameras", "stream test: after unpairing");
     let mut rest = String::new();
     let ended = std::io::Read::read_to_string(&mut reader, &mut rest);
     assert!(ended.is_ok(), "the stream stayed open: {rest}");

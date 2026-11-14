@@ -64,6 +64,7 @@ from .const import (
     SIZES,
 )
 from .events import LumaEvents
+from .events import store as events_store
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.BUTTON, Platform.NOTIFY, Platform.SENSOR]
@@ -129,7 +130,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         _LOGGER.debug("Luma at %s is not reachable yet: %s", client.host, err)
     events = LumaEvents(hass, entry, client)
     entry.runtime_data = LumaData(client, events)
-    await events.async_start()
     _track_cameras(hass, entry, client)
     # Home Assistant holds the streaming search keys: send them now and whenever they change.
     entry.async_create_background_task(
@@ -137,6 +137,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     )
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # After the platforms, so the TV's device exists for the first events' device_id.
+    await events.async_start()
     return True
 
 
@@ -233,7 +235,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> boo
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Tell the TV to forget this server's token; best effort, the TV may be off."""
+    """Tell the TV to forget this server's token; best effort, the TV may be off. The history
+    of what the TV reported goes too."""
+    await events_store(hass, entry.entry_id).async_remove()
     client = LumaClient(
         async_get_clientsession(hass),
         entry.data[CONF_HOST],

@@ -678,14 +678,31 @@ fn run(
             let _ = sender.send(update);
         }
     };
+    // Frames that failed to decode in a row: the first is logged, the run's length once it ends,
+    // so a stream of bad frames cannot flood the log.
+    let undecoded = std::cell::Cell::new(0u64);
     let deliver = |bytes: &[u8], live: bool| {
         let Watch { size, record, .. } = watch();
         if record && !stop.load(Ordering::Acquire) {
             replay.lock().push(&id, Instant::now(), bytes);
         }
         match gate.run(|| decode(bytes, size)) {
-            Some(pixels) => send(Update::Frame(Arc::new(Frame::new(&id, pixels, live)))),
-            None => crate::telemetry::log_warn!("cameras", "{id}: a frame could not be decoded"),
+            Some(pixels) => {
+                let failed = undecoded.replace(0);
+                if failed > 1 {
+                    crate::telemetry::log_info!(
+                        "cameras",
+                        "{id}: frames decode again after {failed} could not be decoded"
+                    );
+                }
+                send(Update::Frame(Arc::new(Frame::new(&id, pixels, live))));
+            }
+            None => {
+                undecoded.set(undecoded.get() + 1);
+                if undecoded.get() == 1 {
+                    crate::telemetry::log_warn!("cameras", "{id}: a frame could not be decoded");
+                }
+            }
         }
     };
     // Snapshots from whatever URL the watch holds now, which Home Assistant rotates.

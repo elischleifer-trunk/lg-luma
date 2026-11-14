@@ -598,6 +598,7 @@ impl<T: Tv> Api<T> {
     /// Forgets every paired server, e.g. when the setting is turned off.
     pub fn forget(&mut self) {
         self.pairings.fetch_add(1, Ordering::AcqRel);
+        crate::telemetry::wake_streams();
         if self.session.is_some() {
             let _ = self.tv.close_overlay();
             self.end_session();
@@ -792,6 +793,7 @@ impl<T: Tv> Api<T> {
                 match (method, path) {
                     ("DELETE", "/api/pair") => {
                         self.pairings.fetch_add(1, Ordering::AcqRel);
+                        crate::telemetry::wake_streams();
                         let removed = self.store.clients.remove(client);
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
                         self.store.gallery.unpaired(client, &removed);
@@ -815,6 +817,7 @@ impl<T: Tv> Api<T> {
                             .lock()
                             .unwrap_or_else(std::sync::PoisonError::into_inner)
                             .insert(owner.clone(), self.next_stream);
+                        crate::telemetry::wake_streams();
                         Reply {
                             events: Some(Box::new(Subscription {
                                 cursor: crate::telemetry::Cursor::parse(&after),

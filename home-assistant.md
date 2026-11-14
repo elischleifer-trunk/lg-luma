@@ -277,7 +277,8 @@ restarts or the TV wakes up.
   Assistant's history graphs them over time.
 
 - **A `luma_event` event** for each entry, with `level` (`info`, `warning` or `error`), `area`
-  (such as `cameras`, `overlay` or `inventory`), `message`, `time` and `config_entry_id`.
+  (such as `cameras`, `overlay` or `inventory`), `message`, `time`, `device_id` (the TV's device)
+  and `config_entry_id`.
   Automations can use it, for example to send you a notification when Luma logs an error.
 - **Download diagnostics** on the TV's device page saves one file with everything together: the
   history Home Assistant kept (the last 1,000 entries and 12 hours of performance), and what the

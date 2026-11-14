@@ -413,6 +413,13 @@ fn summaries() {
     }
 }
 
+/// Wakes every open stream, so one whose server was unpaired or replaced ends now rather than at
+/// its next entry or heartbeat.
+pub fn wake_streams() {
+    let _guard = ring();
+    log().changed.notify_all();
+}
+
 static STREAMS: AtomicUsize = AtomicUsize::new(0);
 
 /// Whether another stream may open; the caller then hands its connection to [`stream`].
@@ -466,6 +473,10 @@ fn serve_stream(
         "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream; charset=utf-8\r\nCache-Control: no-store\r\nConnection: close\r\nX-Accel-Buffering: no\r\n\r\nretry: 5000\n\nevent: hello\ndata: {hello}\n\n"
     )?;
     loop {
+        // Checked before every write: an unpaired server never gets another entry.
+        if !alive() {
+            return Ok(());
+        }
         let (entries, missed) = ring().since(after);
         let mut out = String::new();
         if let Some(Missed(through)) = missed {
@@ -481,16 +492,13 @@ fn serve_stream(
         if !out.is_empty() {
             connection.write_all(out.as_bytes())?;
         }
-        if !alive() {
-            return Ok(());
-        }
         let ring = ring();
         let (ring, timeout) = log()
             .changed
-            .wait_timeout_while(ring, HEARTBEAT, |ring| ring.latest() <= after)
+            .wait_timeout_while(ring, HEARTBEAT, |ring| ring.latest() <= after && alive())
             .unwrap_or_else(|poisoned| poisoned.into_inner());
         drop(ring);
-        if timeout.timed_out() {
+        if timeout.timed_out() && alive() {
             connection.write_all(b": ping\n\n")?;
         }
     }

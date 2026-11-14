@@ -19,6 +19,7 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
@@ -46,6 +47,11 @@ def signal(entry_id: str) -> str:
     return f"{DOMAIN}_events_{entry_id}"
 
 
+def store(hass: HomeAssistant, entry_id: str) -> Store[dict[str, Any]]:
+    """The saved cursor and history of one TV's config entry."""
+    return Store(hass, STORAGE_VERSION, f"{DOMAIN}.events.{entry_id}")
+
+
 def entry_time(entry: dict[str, Any]) -> str | None:
     """An entry's Unix milliseconds as an ISO time."""
     try:
@@ -67,9 +73,7 @@ class LumaEvents:
         self.connected = False
         self.luma: dict[str, Any] = {}
         self.last_problem: dict[str, Any] | None = None
-        self._store: Store[dict[str, Any]] = Store(
-            hass, STORAGE_VERSION, f"{DOMAIN}.events.{entry.entry_id}"
-        )
+        self._store = store(hass, entry.entry_id)
 
     async def async_start(self) -> None:
         stored = await self._store.async_load() or {}
@@ -79,6 +83,8 @@ class LumaEvents:
         self.last_problem = next(
             (entry for entry in reversed(self.logs) if entry.get("level") != "info"), None
         )
+        # The sensors were added before the history loaded: show the last problem now.
+        self._changed()
         self.entry.async_create_background_task(
             self.hass, self._follow(), f"{DOMAIN} events {self.entry.entry_id}"
         )
@@ -153,11 +159,14 @@ class LumaEvents:
             area = str(data.get("area", ""))
             message = str(data.get("message", ""))
             TV_LOGGER.log(LEVELS.get(level, logging.INFO), "%s [%s] %s", title, area, message)
+            luma_id = self.entry.data.get(CONF_DEVICE_ID)
+            device = dr.async_get(self.hass).async_get_device(identifiers={(DOMAIN, luma_id)})
             self.hass.bus.async_fire(
                 EVENT_LUMA,
                 {
                     "config_entry_id": self.entry.entry_id,
-                    "device_id": self.entry.data.get(CONF_DEVICE_ID),
+                    # Home Assistant's device, as device triggers and device_attr() expect.
+                    "device_id": device.id if device else None,
                     "level": level,
                     "area": area,
                     "message": message,
