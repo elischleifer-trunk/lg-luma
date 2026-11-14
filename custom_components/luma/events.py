@@ -74,6 +74,7 @@ class LumaEvents:
         self.luma: dict[str, Any] = {}
         self.last_problem: dict[str, Any] | None = None
         self._store = store(hass, entry.entry_id)
+        self._save_pending = False
 
     async def async_start(self) -> None:
         stored = await self._store.async_load() or {}
@@ -178,7 +179,22 @@ class LumaEvents:
                 self._changed()
         else:
             return
-        self._store.async_delay_save(self._data, SAVE_DELAY)
+        self._schedule_save()
+
+    @callback
+    def _schedule_save(self) -> None:
+        """Save at most SAVE_DELAY after the first unsaved entry. Calling async_delay_save again
+        would restart its timer, and a summary every minute would then postpone it for as long
+        as Luma is on screen, leaving an old cursor to replay from after a crash."""
+        if self._save_pending:
+            return
+        self._save_pending = True
+        self._store.async_delay_save(self._saved_data, SAVE_DELAY)
+
+    @callback
+    def _saved_data(self) -> dict[str, Any]:
+        self._save_pending = False
+        return self._data()
 
     @callback
     def _changed(self) -> None:

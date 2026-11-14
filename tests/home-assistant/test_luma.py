@@ -1094,3 +1094,26 @@ async def test_a_tv_without_an_endpoint_asks_for_a_luma_update_until_luma_change
     assert issues(hass) == {"tv_outdated"}
     await hass.config_entries.async_remove(config.entry_id)
     assert issues(hass) == set()
+
+
+async def test_a_steady_stream_does_not_postpone_saving_the_cursor(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    monkeypatch: pytest.MonkeyPatch,
+    hass_storage,
+) -> None:
+    # A summary a minute would keep restarting a delayed save; the first entry's save stands.
+    tv_events(monkeypatch, [HELLO, PROBLEM])
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    config = await setup(hass, aioclient_mock)
+    await hass.async_block_till_done()
+    events = config.runtime_data.events
+    for minute in range(1, 6):
+        events._handle("metrics", f"ab:{100 + minute}", {"seq": 100 + minute, "data": {}})
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=minute))
+        await hass.async_block_till_done()
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=luma_events.SAVE_DELAY + 1))
+    await hass.async_block_till_done()
+    stored = hass_storage[f"luma.events.{config.entry_id}"]["data"]
+    assert stored["cursor"] is not None
+    assert stored["logs"] == [PROBLEM[2]]
