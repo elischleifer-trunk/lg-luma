@@ -487,4 +487,3 @@ fn every_poster_says_whether_watching_costs_money() {
         .count();
     assert_eq!(paid, picks.len() - included);
 }
-}
