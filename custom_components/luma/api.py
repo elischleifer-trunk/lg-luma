@@ -8,7 +8,7 @@ from typing import Any
 
 import aiohttp
 
-from .const import DEFAULT_PORT
+from .const import DEFAULT_PORT, INTEGRATION_API, INTEGRATION_HEADER
 
 TIMEOUT = aiohttp.ClientTimeout(total=10)
 # The event stream stays open; Luma sends a heartbeat every 15 seconds, so a longer silence means
@@ -54,7 +54,7 @@ class LumaClient:
     async def _request(
         self, method: str, path: str, payload: dict[str, Any] | None = None, auth: bool = True
     ) -> dict[str, Any]:
-        headers = {}
+        headers = {INTEGRATION_HEADER: str(INTEGRATION_API)}
         if auth:
             if not self.token:
                 raise LumaAuthError("Not paired")
@@ -150,7 +150,11 @@ class LumaClient:
         if not self.token:
             raise LumaAuthError("Not paired")
         url = f"http://{self.host}:{self.port}/api/events"
-        headers = {"Authorization": f"Bearer {self.token}", "Accept": "text/event-stream"}
+        headers = {
+            INTEGRATION_HEADER: str(INTEGRATION_API),
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "text/event-stream",
+        }
         try:
             async with self._session.get(
                 url,

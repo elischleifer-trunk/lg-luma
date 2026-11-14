@@ -12,7 +12,9 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import instance_id
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
@@ -24,7 +26,7 @@ except ImportError:  # pragma: no cover
 
 from custom_components.luma import events as luma_events
 from custom_components.luma.api import LumaAuthError, LumaClient
-from custom_components.luma.const import DOMAIN
+from custom_components.luma.const import DOMAIN, INTEGRATION_API
 from custom_components.luma.diagnostics import async_get_config_entry_diagnostics
 
 # The autouse `silent_tv_events` fixture turns the stream off; these tests turn it back on.
@@ -998,3 +1000,97 @@ async def test_the_stream_resumes_from_its_cursor_and_keeps_it_across_restarts(
     assert await hass.config_entries.async_remove(config.entry_id)
     await hass.async_block_till_done()
     assert f"luma.events.{config.entry_id}" not in hass_storage
+
+
+def issues(hass: HomeAssistant) -> set[str]:
+    return {
+        issue.translation_key
+        for (domain, _), issue in ir.async_get(hass).issues.items()
+        if domain == DOMAIN
+    }
+
+
+async def test_every_request_states_the_integration_level(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    await setup(hass, aioclient_mock)
+    assert aioclient_mock.mock_calls
+    for call in aioclient_mock.mock_calls:
+        assert call[3]["X-Luma-Integration"] == str(INTEGRATION_API)
+
+
+async def test_the_device_shows_the_luma_version_and_repairs_name_the_side_to_update(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = entry(hass)
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    status = {"overlay": None, "overlay_ready": True, "version": "2.30.0", "api": 1}
+    status["min_integration"] = INTEGRATION_API + 1
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    device = dr.async_get(hass).async_get_device(identifiers={(DOMAIN, DEVICE)})
+    assert device is not None
+    assert device.sw_version == "2.30.0"
+    assert issues(hass) == {"integration_outdated"}
+
+    # The TV is older than this integration needs.
+    monkeypatch.setattr("custom_components.luma.versions.MIN_TV_API", 2)
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    aioclient_mock.get(
+        f"{TV}/api/status",
+        json={"overlay": None, "version": "2.31.0", "api": 1, "min_integration": 1},
+    )
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert issues(hass) == {"tv_outdated"}
+    assert dr.async_get(hass).async_get(device.id).sw_version == "2.31.0"
+
+    # Both up to date: the issues clear themselves, and go with the entry.
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    aioclient_mock.get(
+        f"{TV}/api/status",
+        json={"overlay": None, "version": "2.32.0", "api": 2, "min_integration": 1},
+    )
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=2, seconds=2))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert issues(hass) == set()
+
+
+async def test_a_tv_without_an_endpoint_asks_for_a_luma_update_until_luma_changes(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    config = entry(hass)
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    hass.config_entries.async_update_entry(config, options={"motn_api_key": MOTN})
+    # A Luma from before streaming search and before its status reported a version.
+    aioclient_mock.get(f"{TV}/api/status", json={"overlay": None, "api": 1})
+    aioclient_mock.put(f"{TV}/api/streaming-keys", status=404, json={"error": "Unknown endpoint"})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert issues(hass) == {"tv_outdated"}
+
+    # The same Luma, polled again: still outdated.
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert issues(hass) == {"tv_outdated"}
+
+    # Luma was updated.
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    aioclient_mock.get(
+        f"{TV}/api/status",
+        json={"overlay": None, "version": "2.30.0", "api": 1, "min_integration": 1},
+    )
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=2, seconds=2))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert issues(hass) == set()
+
+    aioclient_mock.delete(f"{TV}/api/pair", json={"paired": False})
+    aioclient_mock.put(f"{TV}/api/streaming-keys", status=404, json={})
+    config.runtime_data.compatibility.missing_endpoint()
+    assert issues(hass) == {"tv_outdated"}
+    await hass.config_entries.async_remove(config.entry_id)
+    assert issues(hass) == set()
