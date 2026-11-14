@@ -11,5 +11,5 @@
   "issue_tracker": "https://github.com/elischleifer-trunk/lg-luma/issues",
   "requirements": [],
   "ssdp": [{ "st": "urn:lge-com:service:webos-second-screen:1" }],
-  "version": "0.1.0"
+  "version": "2.27.0"
 }

@@ -78,6 +78,16 @@
     },
     "notify": { "toast": { "name": "Toast" } }
   },
+  "issues": {
+    "tv_outdated": {
+      "title": "Update Luma on {name}",
+      "description": "The Luma app on {name} is older than this Home Assistant integration needs, so some features will not work. Update Luma from its Settings on the TV, then this notice goes away on its own."
+    },
+    "integration_outdated": {
+      "title": "Update the Luma integration for {name}",
+      "description": "Luma on {name} needs a newer version of this integration. Update Luma for LG webOS in HACS and restart Home Assistant, then this notice goes away on its own."
+    }
+  },
   "selector": {
     "mode": {
       "options": {

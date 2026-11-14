@@ -49,7 +49,7 @@ from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
-from . import keyboard, streaming_keys
+from . import keyboard, streaming_keys, versions
 from .api import LumaAuthError, LumaClient, LumaError
 from .const import (
     CONF_TOKEN,
@@ -105,6 +105,7 @@ EXAMPLE_IMAGE = Path(__file__).parent / "example.jpg"
 @dataclass
 class LumaData:
     client: LumaClient
+    compatibility: versions.Compatibility
     # Whether the TV was last asked to report its text fields to this entry's webhook.
     keyboard: bool = False
 
@@ -119,18 +120,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         entry.data.get(CONF_PORT, DEFAULT_PORT),
         entry.data[CONF_TOKEN],
     )
+    compatibility = versions.Compatibility(hass, entry)
     # The TV may be off; only a definite "not paired" stops setup. Calls fail individually.
     try:
-        await client.status()
+        status = await client.status()
     except LumaAuthError as err:
         raise ConfigEntryAuthFailed("Luma no longer knows this Home Assistant server") from err
     except LumaError as err:
         _LOGGER.debug("Luma at %s is not reachable yet: %s", client.host, err)
+    else:
+        compatibility.status(status)
     if CONF_WEBHOOK_ID not in entry.data:
         hass.config_entries.async_update_entry(
             entry, data={**entry.data, CONF_WEBHOOK_ID: webhook.async_generate_id()}
         )
-    entry.runtime_data = LumaData(client)
+    entry.runtime_data = LumaData(client, compatibility)
     keyboard.setup(hass, entry, client)
     if keyboard.phones(entry):
         entry.async_create_background_task(
@@ -140,20 +144,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         )
     _track_cameras(hass, entry, client)
     # Home Assistant holds the streaming search keys: send them now and whenever they change.
-    entry.async_create_background_task(
-        hass, streaming_keys.push(client, dict(entry.options)), f"{DOMAIN} keys {entry.entry_id}"
-    )
+    entry.async_create_background_task(hass, _push_keys(entry), f"{DOMAIN} keys {entry.entry_id}")
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
 async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
-    client = entry.runtime_data.client
-    await streaming_keys.push(client, dict(entry.options))
+    await _push_keys(entry)
     # Only when phone typing is on, or was: turning it off tells the TV to stop calling.
     if keyboard.phones(entry) or entry.runtime_data.keyboard:
-        await keyboard.register(hass, entry, client, partial(local_url, hass))
+        await keyboard.register(hass, entry, entry.runtime_data.client, partial(local_url, hass))
+
+
+async def _push_keys(entry: LumaConfigEntry) -> None:
+    data = entry.runtime_data
+    await streaming_keys.push(data.client, dict(entry.options), data.compatibility.missing_endpoint)
 
 
 def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
@@ -219,20 +225,18 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
 
     async def check(_now) -> None:
         # After the TV or Luma restarts it reports no cameras; send the list again then.
-        # The same status says whether the TV lost or replaced the streaming search keys.
-        cameras = not pending and bool(camera_list(hass))
-        has_keys = any(streaming_keys.keys(entry.options))
-        # Phone typing is checked even when it is off, so a TV still calling is told to stop.
-        if not (cameras or has_keys or keyboard.phones(entry) or entry.runtime_data.keyboard):
-            return
+        # The same status says whether the TV lost or replaced the streaming search keys, and
+        # which Luma it runs: an update shows on the device page, or calls for one in Repairs.
+        # Whether the TV still holds the keyboard webhook, after a restart or turning it off.
         try:
             status = await client.status()
         except LumaError:
             return
-        if cameras and status.get("cameras") == 0:
+        entry.runtime_data.compatibility.status(status)
+        if not pending and status.get("cameras") == 0 and camera_list(hass):
             schedule()
         if streaming_keys.needs_push(dict(entry.options), status):
-            await streaming_keys.push(client, dict(entry.options))
+            await _push_keys(entry)
         if keyboard.needs_register(entry, status):
             await keyboard.register(hass, entry, client, partial(local_url, hass))
 
@@ -249,6 +253,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> boo
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Tell the TV to forget this server's token; best effort, the TV may be off."""
+    versions.remove(hass, entry)
     client = LumaClient(
         async_get_clientsession(hass),
         entry.data[CONF_HOST],

@@ -120,9 +120,11 @@ async def register(
         await client.keyboard_hook(url)
         entry.runtime_data.keyboard = url is not None
     except LumaApiError as err:
-        # A Luma from before phone typing answers 404: leave it alone.
+        # A Luma from before phone typing answers 404: Repairs asks for a Luma update, but only
+        # when phone typing was turned on, so removing a webhook never raises it.
+        if err.status == 404 and url:
+            entry.runtime_data.compatibility.missing_endpoint()
         _LOGGER.debug("Luma at %s cannot report text fields: %s", client.host, err)
-        return
     except LumaError as err:
         _LOGGER.debug("Could not register the keyboard webhook with %s: %s", client.host, err)
 
