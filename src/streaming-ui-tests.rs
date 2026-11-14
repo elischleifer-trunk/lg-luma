@@ -449,3 +449,41 @@ fn installing_or_removing_an_app_searches_the_current_text_again() {
     state.set_inventory(inventory, None);
     assert!(state.titles.deadline().is_none());
 }
+
+#[test]
+fn every_poster_says_whether_watching_costs_money() {
+    use crate::streaming::Access;
+    let mut state = typed("dune");
+    answer(&mut state, "dune");
+    let picks: Vec<_> = state
+        .titles
+        .results
+        .iter()
+        .take(TITLE_COLUMNS * 2)
+        .filter_map(|result| result.pick.clone())
+        .collect();
+    let included = picks
+        .iter()
+        .filter(|pick| pick.access == Access::Included)
+        .count();
+    assert!(included > 0 && included < picks.len(), "both kinds");
+    let draw = scene(&state).draw;
+    // A check for each title on screen that an app includes; the app itself is named for the
+    // selected title.
+    let checks = draw
+        .iter()
+        .filter(|draw| matches!(draw, Draw::TintedImage(path, rect, ..) if path.ends_with("check.lvec") && rect.w <= 16.))
+        .count();
+    assert_eq!(checks, included);
+    assert!(
+        !draw
+            .iter()
+            .any(|draw| matches!(draw, Draw::Image(path, ..) if path.contains("logos/")))
+    );
+    // A "$" for each that costs money there; the price is said for the selected title only.
+    let paid = draw
+        .iter()
+        .filter(|draw| matches!(draw, Draw::Text(text, ..) if text == "$"))
+        .count();
+    assert_eq!(paid, picks.len() - included);
+}

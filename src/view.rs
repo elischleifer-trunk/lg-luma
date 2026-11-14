@@ -1946,6 +1946,31 @@ fn clamp_lines(assets: &Assets, value: &str, style: TextStyle, width: f32, lines
     format!("{}…", words[..low].join(" "))
 }
 
+/// Whether watching costs money, in the poster's top right corner: a check when an app on
+/// this TV includes the title (every installed app counts as subscribed), else "$" for a
+/// rental or purchase. Which app, and the price, are said for the selected
+/// title, above the posters. Titles on none of the TV's apps have no mark.
+fn cost_badge(out: &mut Scene, assets: &Assets, ranked: &crate::streaming::Ranked, poster: Rect) {
+    use crate::streaming::Access;
+    let Some(pick) = &ranked.pick else {
+        return;
+    };
+    let size = 28.;
+    let pill = Rect::new(poster.x + poster.w - size - 8., poster.y + 8., size, size);
+    out.shape(pill, size / 2., c(0x0b0e12, 0.82));
+    if pick.access == Access::Included {
+        out.icon(assets, "check", pill.inset(6.), c(0x5ae08c, 1.));
+    } else {
+        out.text(
+            "$",
+            Rect::new(pill.x, pill.y + 4., pill.w, 19.2),
+            text(16., 650, -0.01).leading(1.2),
+            WHITE,
+            true,
+        );
+    }
+}
+
 /// Where a title plays on this TV and what it costs there ("On HBO Max", "Rent on Apple TV ·
 /// $3.99"), or that none of the TV's apps has it.
 fn availability(state: &State, ranked: &crate::streaming::Ranked) -> String {
@@ -1962,7 +1987,6 @@ fn availability(state: &State, ranked: &crate::streaming::Ranked) -> String {
         .map_or(pick.service_id.as_str(), |app| app.title.as_str());
     let key = match pick.access {
         Access::Included => "titleOn",
-        Access::Addon => "titleAddon",
         Access::Rent => "titleRent",
         Access::Buy => "titleBuy",
     };
@@ -2041,6 +2065,7 @@ fn search_page(out: &mut Scene, state: &State, assets: &Assets) {
         if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
             score_badge(out, assets, scores, rect);
         }
+        cost_badge(out, assets, ranked, rect);
         if focused {
             out.ring(rect, 16.);
         }
