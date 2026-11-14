@@ -17,6 +17,10 @@
 //! stores the arrangement the gallery sends back. For an enlarged camera with Home Assistant's
 //! HLS stream, it opens the same overlay app as a full-screen video player and reports back
 //! ([`Event::VideoClosed`]) when that closes.
+//!
+//! The only calls the TV makes to Home Assistant are keyboard webhooks: a server that registered
+//! one (`PUT /api/keyboard`) is told when a text field opens or closes, so it can offer to type on
+//! a phone, and sends the typed text back with `POST /api/keyboard/text` ([`Event::Typed`]).
 use crate::companion;
 use ring::digest;
 use serde::{Deserialize, Serialize};
@@ -58,6 +62,8 @@ const MAX_CLIENTS: usize = 8;
 /// Arrangements kept for servers that are no longer paired; the oldest go first.
 const MAX_PARKED: usize = 16;
 const MAX_URL: usize = 4096;
+/// Text typed on a phone, as long as Luma's longest field.
+const MAX_TYPED: usize = 120;
 const PAIRING_TTL: Duration = Duration::from_secs(120);
 const PAIRING_ATTEMPTS: u8 = 5;
 const PAIRING_COOLDOWN: Duration = Duration::from_secs(3);
@@ -149,6 +155,11 @@ pub enum Event {
     /// The camera video closed: Back, a doorbell card replacing it, a key the gallery carries on
     /// with, or (`failed`) the video could not be played, so the gallery keeps its own picture.
     VideoClosed(crate::cameras::Closed),
+    /// Text typed on a phone for the open text field; `submit` closes the keyboard after it.
+    Typed {
+        text: String,
+        submit: bool,
+    },
 }
 
 /// One Home Assistant camera, with URLs the TV can load directly.
@@ -570,6 +581,13 @@ pub struct Api<T: Tv> {
     /// Each server's current event stream, by token digest.
     streams: Arc<std::sync::Mutex<std::collections::BTreeMap<String, u64>>>,
     next_stream: u64,
+    /// Each paired server's keyboard webhook, keyed by its token digest. Kept in memory only:
+    /// Home Assistant registers it again when `status` says the TV has none.
+    keyboard_hooks: Vec<(String, String)>,
+    /// The text field open on the TV, by [`crate::state::TextField::key`].
+    keyboard: Option<&'static str>,
+    /// Webhook calls waiting for the sender thread: URL and JSON body.
+    outbox: Vec<(String, Value)>,
     /// The last [`Event::IntegrationOutdated`] list, so it is sent only when it changes. The SDL
     /// thread starts with none outdated.
     outdated: Vec<String>,
@@ -603,6 +621,9 @@ impl<T: Tv> Api<T> {
             pairings: Arc::new(AtomicU64::new(0)),
             streams: Arc::default(),
             next_stream: 0,
+            keyboard_hooks: Vec::new(),
+            keyboard: None,
+            outbox: Vec::new(),
             outdated: Vec::new(),
             min_integration: MIN_INTEGRATION,
         };
@@ -646,6 +667,9 @@ impl<T: Tv> Api<T> {
             self.cameras.clear();
             self.send_cameras(false);
         }
+        self.keyboard_hooks.clear();
+        self.keyboard = None;
+        self.outbox.clear();
         let before = self.store.clone();
         // Gallery IDs name servers by pairing order, which starts over; each server's
         // arrangement is parked until it pairs again.
@@ -862,6 +886,8 @@ impl<T: Tv> Api<T> {
                         crate::telemetry::wake_streams();
                         let removed = self.store.clients.remove(client);
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
+                        self.keyboard_hooks
+                            .retain(|(owner, _)| *owner != removed.token);
                         self.store.gallery.unpaired(client, &removed);
                         self.save();
                         self.send_cameras(false);
@@ -929,8 +955,14 @@ impl<T: Tv> Api<T> {
                                     "home_assistant": status.home_assistant,
                                 })
                             }),
+                            // Whether this server's keyboard webhook is registered, so it
+                            // registers again after Luma restarts.
+                            "keyboard_hook": self.keyboard_hooks.iter()
+                                .any(|(owner, _)| *owner == self.store.clients[client].token),
                         }),
                     ),
+                    ("PUT", "/api/keyboard") => self.set_keyboard_hook(client, &body),
+                    ("POST", "/api/keyboard/text") => self.typed(&body),
                     ("POST", "/api/cameras") => self.set_cameras(client, &body),
                     ("PUT", "/api/streaming-keys") => self.set_streaming_keys(&body),
                     ("POST", "/api/overlay") => self.show(&body, now),
@@ -960,6 +992,61 @@ impl<T: Tv> Api<T> {
                 }
             }
         }
+    }
+
+    /// Registers (or with no `webhook`, removes) this server's keyboard webhook. A field that is
+    /// already open is announced to the new webhook straight away.
+    fn set_keyboard_hook(&mut self, client: usize, body: &Value) -> Reply {
+        let url = match camera_url(body, "webhook") {
+            Ok(url) => url,
+            Err(reply) => return reply,
+        };
+        let owner = self.store.clients[client].token.clone();
+        self.keyboard_hooks.retain(|(o, _)| *o != owner);
+        if let Some(url) = url {
+            if let Some(field) = self.keyboard {
+                self.outbox.push((url.clone(), keyboard_body(Some(field))));
+            }
+            self.keyboard_hooks.push((owner, url));
+        }
+        reply(200, json!({"keyboard": self.keyboard}))
+    }
+
+    /// Text typed on a phone, for whichever field is open now.
+    fn typed(&mut self, body: &Value) -> Reply {
+        let text = match text(body, "text", MAX_TYPED) {
+            Ok(Some(text)) => text,
+            Ok(None) => return error(400, "text is required"),
+            Err(reply) => return reply,
+        };
+        let submit = match body.get("submit") {
+            None | Some(Value::Null) => true,
+            Some(Value::Bool(submit)) => *submit,
+            Some(_) => return error(400, "submit must be true or false"),
+        };
+        if self.keyboard.is_none() {
+            return error(409, "No text field is open on the TV");
+        }
+        let _ = self.events.send(Event::Typed { text, submit });
+        reply(200, json!({"typed": true}))
+    }
+
+    /// A text field opened (`Some`) or closed on the TV: tell every keyboard webhook once.
+    pub fn keyboard_changed(&mut self, field: Option<&'static str>) {
+        if self.keyboard == field {
+            return;
+        }
+        // Moving straight from one field to another closes the first for the phones too.
+        let body = keyboard_body(field);
+        self.keyboard = field;
+        for (_, url) in &self.keyboard_hooks {
+            self.outbox.push((url.clone(), body.clone()));
+        }
+    }
+
+    /// Webhook calls for the sender thread.
+    pub fn take_outbox(&mut self) -> Vec<(String, Value)> {
+        std::mem::take(&mut self.outbox)
     }
 
     fn pair(&mut self, body: &Value, now: Instant) -> Reply {
@@ -1559,6 +1646,7 @@ enum Command {
     Arrange(Value),
     Video(crate::cameras::VideoRequest),
     CloseVideo,
+    Keyboard(Option<&'static str>),
 }
 
 /// Owns the listener thread. Enabling binds the port; disabling closes it and forgets pairings.
@@ -1566,6 +1654,8 @@ pub struct Service {
     commands: mpsc::Sender<Command>,
     pub events: mpsc::Receiver<Event>,
     enabled: bool,
+    /// The field last reported to the listener thread, so each frame's report is sent once.
+    keyboard: Option<&'static str>,
 }
 
 impl Service {
@@ -1581,6 +1671,7 @@ impl Service {
             commands,
             events,
             enabled: false,
+            keyboard: None,
         }
     }
 
@@ -1612,9 +1703,20 @@ impl Service {
         }
     }
 
+    /// The text field open on the TV, by [`crate::state::TextField::key`], or None when closed.
+    /// Called every frame; only changes reach the listener thread.
+    pub fn keyboard(&mut self, field: Option<&'static str>) {
+        if self.enabled && field != self.keyboard {
+            self.keyboard = field;
+            let _ = self.commands.send(Command::Keyboard(field));
+        }
+    }
+
     pub fn set_enabled(&mut self, enabled: bool) {
         if enabled != self.enabled {
             self.enabled = enabled;
+            // Disabling forgets the open field; the next frame reports it again.
+            self.keyboard = None;
             let _ = self.commands.send(if enabled {
                 Command::Enable
             } else {
@@ -1639,6 +1741,7 @@ fn run<T: Tv>(
         }
     };
     let mut listener: Option<TcpListener> = None;
+    let webhooks = webhook_sender();
     loop {
         let command = if listener.is_some() {
             match commands.recv_timeout(Duration::from_millis(50)) {
@@ -1675,6 +1778,7 @@ fn run<T: Tv>(
             Some(Command::ShowCameras) => api.show_cameras(),
             Some(Command::Video(video)) => api.show_video(&video, Instant::now()),
             Some(Command::CloseVideo) => api.close_video(),
+            Some(Command::Keyboard(field)) => api.keyboard_changed(field),
             Some(Command::Arrange(arrangement)) => {
                 let saved = api.arrange(&arrangement);
                 if saved.status != 200 {
@@ -1691,7 +1795,39 @@ fn run<T: Tv>(
         while let Ok((stream, peer)) = bound.accept() {
             serve(&mut api, stream, peer);
         }
+        for call in api.take_outbox() {
+            let _ = webhooks.send(call);
+        }
     }
+}
+
+fn keyboard_body(field: Option<&'static str>) -> Value {
+    match field {
+        Some(field) => json!({"open": true, "field": field}),
+        None => json!({"open": false}),
+    }
+}
+
+/// Posts keyboard webhooks in order, off the listener thread. A server that is off or slow only
+/// delays the next call by the agent's timeout; nothing is retried.
+fn webhook_sender() -> mpsc::Sender<(String, Value)> {
+    let (sender, calls) = mpsc::channel::<(String, Value)>();
+    thread::Builder::new()
+        .name("home-assistant-webhooks".into())
+        .spawn(move || {
+            let agent = crate::webhook::agent();
+            while let Ok((url, body)) = calls.recv() {
+                let result = agent
+                    .post(&url)
+                    .header("Content-Type", "application/json")
+                    .send(body.to_string());
+                if let Err(error) = result {
+                    eprintln!("Luma Home Assistant keyboard webhook: {error}");
+                }
+            }
+        })
+        .expect("Home Assistant webhook thread");
+    sender
 }
 
 /// The address to type into Home Assistant, for the on-screen notice.

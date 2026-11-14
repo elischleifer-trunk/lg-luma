@@ -191,6 +191,15 @@ class LumaClient:
         except (aiohttp.ClientError, TimeoutError) as err:
             raise LumaConnectionError(f"Lost Luma's events at {self.host}:{self.port}") from err
 
+    async def keyboard_hook(self, url: str | None) -> dict[str, Any]:
+        """Register the webhook the TV calls when a text field opens or closes; None removes
+        it. Returns the field open now, if any."""
+        return await self._request("PUT", "/api/keyboard", {"webhook": url} if url else {})
+
+    async def type_text(self, text: str) -> None:
+        """Type into the TV's open text field and close its keyboard."""
+        await self._request("POST", "/api/keyboard/text", {"text": text})
+
 
 def _json(text: str) -> Any:
     try:

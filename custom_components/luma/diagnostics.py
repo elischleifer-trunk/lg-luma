@@ -5,13 +5,15 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.diagnostics import async_redact_data
+from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 
 from . import LumaConfigEntry
 from .api import LumaError
 from .const import CONF_MDBLIST_KEY, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_TOKEN
 
-REDACT = {CONF_TOKEN, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_MDBLIST_KEY}
+# The keyboard webhook's ID is its only secret: anyone who has it can call it.
+REDACT = {CONF_TOKEN, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_MDBLIST_KEY, CONF_WEBHOOK_ID}
 
 
 async def async_get_config_entry_diagnostics(
