@@ -545,6 +545,35 @@ motion and detection binary sensors and doorbell event entity (`event_spans`), t
 entity's own key (its unique ID after the MAC address), never by entity IDs that carry the device
 name.
 
+**The camera's own video on the TV's decoder.** Where the TV has LG's direct media decoder
+(`libNDL_directmedia`, webOS 5 and later, loaded with `dlopen` so Luma starts without it) and the
+camera has a `live_url`, an enlarged camera with **Live video** on skips HLS and the overlay app.
+The integration's `LiveView` (`/api/luma/live/<entity>?token=<camera token>`, checked like
+`StreamView`) answers from a relay (`custom_components/luma/relay.py`): one thread per camera
+reads the source Home Assistant's stream integration would read, with PyAV and the same options
+(`tls_verify` off unless the camera asks, since recorders use self-signed certificates), never
+decoding. The event loop keeps the frames since the last keyframe (at most 48 MB) and hands each
+listener that stretch flagged as earlier, then every frame as it arrives; a listener 240 frames
+behind skips to the next keyframe. The body is `LUMAVID1`, a length-prefixed JSON header (`codec`
+`h264` or `hevc`, `width`, `height`), then frames of `u32 length, u8 flags, i64 pts` (microseconds)
+and Annex B bytes with parameter sets before each keyframe. `&warm=1` only starts the relay, which
+stops by itself two minutes after its last listener; `State::camera_warm` asks that instead of the
+HLS endpoint when the TV will decode. On a TV, UniFi Protect cameras sent a keyframe every 5 s: a
+relay already reading delivered its first frame in 25-49 ms, one that had to connect in 1-2 s.
+
+`src/live.rs` reads that stream on a `camera-live` thread and feeds `NDL_DirectVideoPlay`. The
+decoder is initialised, loaded and unloaded on the SDL thread (`Live::poll`, `Drop`), because the
+library looks up the current GL window to export it; in a test app on a webOS 11.2 TV, loading took
+about 130 ms and frames showed as fast as they were fed, at twice real time without queueing.
+`cameras::Native` is `Starting` until three frames are fed, then `Showing`: `Gallery::see_through`
+makes the scene drop its wallpaper, backdrop and picture and the renderer clear to transparent
+(`Renderer::see_through`), so the video plane behind Luma's window shows with the controls over
+it. Pausing or scrubbing ends the decoder's video and the gallery's own pictures take over; going
+live starts it again. A relay or decoder failure puts the camera in `native_failed`, which plays
+HLS in the overlay app as before. The motion-JPEG worker keeps running underneath, for the frames
+the gallery rewinds through. There is no sound yet. The decoder inside Luma running as Home has
+not been verified on a TV.
+
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the
 integration adds `hls_url` to every camera with the stream feature while the `stream`

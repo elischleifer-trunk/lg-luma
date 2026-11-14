@@ -107,6 +107,11 @@ starting or if it cannot play, show Home Assistant's motion-JPEG stream, which f
 types is only about two pictures a second. Its badge says **Live** or **Snapshots**: if that
 stream fails or freezes, Luma switches to snapshots, several a second.
 
+On TVs with LG's direct video decoder (webOS 5 and later), Luma plays the camera's own video
+itself instead: Home Assistant passes the camera's stream straight on, starting from its last
+keyframe, so the picture appears almost at once. This video has no sound yet. If it cannot play,
+Luma uses the HLS stream described here.
+
 Home Assistant needs a few seconds to connect to a camera and prepare its first video, so Luma
 asks it to start as soon as a camera is focused in the grid: a camera you rest on for several
 seconds before pressing **OK** goes live almost at once. Two Home Assistant settings shorten the
