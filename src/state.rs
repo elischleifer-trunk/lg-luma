@@ -264,6 +264,8 @@ pub enum Effect {
     /// Fire-and-forget HTTP request for a custom tile, off the SDL thread.
     FireWebhook(CustomTile),
     Quit,
+    /// Make Luma Home again if the LG Home tile lifted the takeover.
+    ReclaimHome,
     Weather(weather::Command),
     UpdateDownload(String),
 }
@@ -881,13 +883,19 @@ impl State {
 
     /// Returns whether a newly reported console changed the saved preferences.
     pub fn set_inventory(&mut self, next: Inventory, warning: Option<String>) -> bool {
-        let apps_changed = self.inventory.apps.len() != next.apps.len()
-            || self
-                .inventory
+        // Built-in tiles are merged in below and never come from the TV, so compare only the
+        // TV's apps: otherwise every refresh would look like a change.
+        let apps_changed = !self
+            .inventory
+            .apps
+            .iter()
+            .filter(|app| !crate::model::is_builtin(&app.id))
+            .map(|app| &app.id)
+            .eq(next
                 .apps
                 .iter()
-                .zip(&next.apps)
-                .any(|(old, new)| old.id != new.id);
+                .filter(|app| !crate::model::is_builtin(&app.id))
+                .map(|app| &app.id));
         self.inventory.apps = next.apps;
         if apps_changed {
             // Remembered movie and show results chose among the old apps.
@@ -988,6 +996,14 @@ impl State {
                 mark: "camera",
             });
         }
+        self.inventory.apps.push(App {
+            id: crate::model::LG_HOME_APP.into(),
+            title: "LG Home".into(),
+            brand: "custom".into(),
+            category: "Utilities".into(),
+            icon: None,
+            mark: "tv",
+        });
         self.dirty = true;
     }
 
@@ -2815,6 +2831,14 @@ impl State {
                         return vec![];
                     }
                     2 => self.preferences.reduced_motion = !self.preferences.reduced_motion,
+                    11 => {
+                        self.preferences.luma_home = !self.preferences.luma_home;
+                        return if self.preferences.luma_home {
+                            vec![Effect::Save, Effect::ReclaimHome]
+                        } else {
+                            vec![Effect::Save]
+                        };
+                    }
                     8 => {
                         self.subpage = Some(Subpage::HomeAssistant);
                         self.focus = Target::HomeAssistantToggle;

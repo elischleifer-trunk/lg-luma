@@ -148,16 +148,75 @@ pub fn install_dir() -> Result<std::path::PathBuf, String> {
         .clone()
 }
 
-pub fn redirect_to_home() -> Result<bool, String> {
-    // The root-only integration mounts this marker with its native Home
-    // manifest, or writes it to /var/run on webOS 5/6, where it mounts this
-    // executable over LG's (a tile's jail sees /usr/bin without that mount).
-    // A normal tile launch then opens that same instance instead of starting
-    // a second renderer writing the same preferences.
+/// Whether the root Home integration currently has Luma in place of LG's Home. The integration
+/// mounts this marker with its native Home manifest, or writes it to /var/run on webOS 5/6, where
+/// it mounts this executable over LG's (a tile's jail sees /usr/bin without that mount).
+fn home_takeover_active() -> bool {
     let marked = |file| std::fs::read_to_string(file).is_ok_and(|marker| marker.trim() == APP_ID);
-    if marked("/usr/palm/applications/com.webos.app.home/.luma-home")
-        || marked("/var/run/luma-home")
-    {
+    marked("/usr/palm/applications/com.webos.app.home/.luma-home") || marked("/var/run/luma-home")
+}
+
+/// Written by `home.sh suspend` while the LG Home tile has lifted the takeover. /var/run is shared
+/// with a tile's jail and cleared at boot, when the boot hook applies the takeover anyway.
+const HOME_SUSPENDED: &str = "/var/run/luma-home-suspended";
+
+/// Run the installed `home.sh` with `command` as root, in its own systemd unit: the command may
+/// end this process, and Homebrew Channel's exec would end it when the call returns.
+fn home_script(command: &str) -> Result<(), String> {
+    let script = install_dir()?.join("home.sh");
+    let quote = |text: &str| format!("'{}'", text.replace('\'', "'\\''"));
+    let command = format!(
+        "systemd-run --unit=luma-home-{command} --collect /bin/sh {} {command}",
+        quote(&script.to_string_lossy())
+    );
+    let envelope = call(
+        "luna://org.webosbrew.hbchannel.service/exec",
+        json!({"command": command}),
+    )?;
+    for key in ["returnCode", "exitCode"] {
+        if let Some(code) = envelope.get(key)
+            && code != 0
+            && code != "0"
+        {
+            let stderr = envelope.get("stderrString").and_then(Value::as_str);
+            return Err(format!(
+                "home.sh {command} could not be started: {}",
+                output_excerpt(stderr.unwrap_or(""))
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// The normal instance started while the LG Home tile had lifted the takeover: `home.sh resume`
+/// closes it and applies the takeover again, opening Luma as Home.
+fn reclaim_home() -> Result<(), String> {
+    let suspended = std::fs::read_to_string(HOME_SUSPENDED).is_ok_and(|m| m.trim() == APP_ID);
+    if !suspended || home_takeover_active() || runs_as_lg_home() {
+        return Ok(());
+    }
+    home_script("resume")
+}
+
+/// Open LG's original Home. While Luma has replaced Home, `home.sh suspend` lifts the takeover
+/// (keeping it enabled, so the boot hook reapplies it at the next cold boot), stops this Home
+/// instance and opens LG's. It runs in its own systemd unit: it ends this process, and Homebrew
+/// Channel's exec would end it when the call returns.
+fn open_lg_home() -> Result<(), String> {
+    if !home_takeover_active() && !runs_as_lg_home() {
+        return call(
+            "luna://com.webos.applicationManager/launch",
+            json!({"id": HOME_ID}),
+        )
+        .map(|_| ());
+    }
+    home_script("suspend")
+}
+
+pub fn redirect_to_home() -> Result<bool, String> {
+    // A normal tile launch opens the Home instance instead of starting
+    // a second renderer writing the same preferences.
+    if home_takeover_active() {
         thread::spawn(|| {
             call(
                 "luna://com.webos.applicationManager/launch",
@@ -179,6 +238,8 @@ pub enum Request {
     WatchSignal,
     /// Bring Home to the front.
     GoHome,
+    /// Make Luma Home again if the LG Home tile lifted the takeover until the next boot.
+    ReclaimHome,
     Launch(String),
     /// Launch an app with webOS launch `params`, such as a streaming title to open.
     LaunchWith {
@@ -282,6 +343,12 @@ impl Platform {
                         }
                         continue;
                     }
+                    Request::ReclaimHome => {
+                        if webos && let Err(error) = reclaim_home() {
+                            crate::telemetry::log_warn!("home", "{error}");
+                        }
+                        continue;
+                    }
                     Request::Uninstall(id) => {
                         // Validate again at the worker boundary, not just in the UI.
                         let result = uninstall_request(&id).and_then(|(_, _)| {
@@ -353,7 +420,9 @@ impl Platform {
                         Response::Uninstalled { id, result }
                     }
                     Request::Launch(id) => Response::Launched(if webos {
-                        if crate::scroll_preview::is_placeholder(&id) {
+                        if id == crate::model::LG_HOME_APP {
+                            open_lg_home()
+                        } else if crate::scroll_preview::is_placeholder(&id) {
                             Err("Scroll preview cards cannot be launched".into())
                         } else if !valid_app_id(&id) {
                             Err("Invalid application identifier".into())

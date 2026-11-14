@@ -300,7 +300,7 @@ fn executable_apply_mounts_marks_and_launches_then_restore_unmounts() {
     assert!(system::same_file(&f, EXE, format!("{DIR}/luma")));
     assert_eq!(f.read("/var/run/luma-home"), format!("{APP}\n").as_bytes());
     assert_eq!(f.front.borrow().as_str(), home::HOME);
-    h.restore(&c).unwrap();
+    h.restore(&c, false).unwrap();
     assert!(!system::exists(&f, "/var/run/luma-home"));
     assert_eq!(f.read(EXE), format!("stock-{}", home::HOME).as_bytes());
 }
@@ -324,6 +324,85 @@ fn fullhome_round_trip_and_persisted_target_keep_their_identity() {
         b"stock-com.webos.app.fullhome"
     );
     assert!(!system::exists(&f, "/var/run/luma-home-target"));
+}
+#[test]
+fn suspend_opens_lg_home_and_keeps_the_takeover_for_the_next_boot() {
+    let f = Fixture::new();
+    assert!(
+        home::dispatch(&f, "suspend", None, None)
+            .unwrap_err()
+            .contains("not enabled")
+    );
+    home::dispatch(&f, "enable", Some(DIR), None).unwrap();
+    *f.front.borrow_mut() = "other.app".into();
+    let launches = |f: &Fixture| f.calls().iter().filter(|s| s.contains("/launch ")).count();
+    let before = launches(&f);
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    assert_eq!(f.read(EXE), b"stock-com.webos.app.home");
+    assert!(!system::exists(&f, "/var/run/luma-home"));
+    assert_eq!(launches(&f), before + 1);
+    assert_eq!(f.front.borrow().as_str(), home::HOME);
+    let c = home::load(&f).unwrap().unwrap();
+    assert!(c.enabled);
+    assert!(home::hook_owned(&f));
+    assert_eq!(
+        f.read("/var/run/luma-home-suspended"),
+        format!("{APP}\n").as_bytes()
+    );
+    // The boot hook's apply brings Luma back as Home.
+    home::dispatch(&f, "apply", None, None).unwrap();
+    assert!(system::same_file(&f, EXE, format!("{DIR}/luma")));
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+}
+#[test]
+fn resume_after_suspend_makes_luma_home_again_and_is_otherwise_a_no_op() {
+    let f = Fixture::new();
+    home::dispatch(&f, "enable", Some(DIR), None).unwrap();
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    *f.front.borrow_mut() = APP.into();
+    home::dispatch(&f, "resume", None, None).unwrap();
+    assert!(system::same_file(&f, EXE, format!("{DIR}/luma")));
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+    assert_eq!(f.front.borrow().as_str(), home::HOME);
+    // Without a suspension, resume changes nothing.
+    let calls = f.calls().len();
+    home::dispatch(&f, "resume", None, None).unwrap();
+    assert_eq!(f.calls().len(), calls);
+    // A disabled integration is never taken back.
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    home::dispatch(&f, "disable", None, None).unwrap();
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+    assert!(
+        home::dispatch(&f, "resume", None, None)
+            .unwrap_err()
+            .contains("not enabled")
+    );
+}
+#[test]
+fn resume_that_cannot_apply_keeps_the_open_luma_and_does_not_retry() {
+    let f = Fixture::new();
+    home::dispatch(&f, "enable", Some(DIR), None).unwrap();
+    // A failure that persists closes the normal instance at most once, and never before the
+    // takeover could apply.
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    f.put("/var/lib/other/launcher", b"foreign");
+    f.mount("/var/lib/other/launcher", EXE);
+    *f.front.borrow_mut() = APP.into();
+    f.normal.set(true);
+    let calls = f.calls().len();
+    assert!(
+        home::dispatch(&f, "resume", None, None)
+            .unwrap_err()
+            .contains("Another integration")
+    );
+    assert!(
+        !f.calls()[calls..]
+            .iter()
+            .any(|s| s.contains("closeByAppId"))
+    );
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+    home::dispatch(&f, "resume", None, None).unwrap();
+    assert!(f.normal.get());
 }
 #[test]
 fn installation_under_a_symlinked_temporary_parent_stays_inside_the_root() {
@@ -411,7 +490,7 @@ fn restoration_works_even_when_foreground_query_fails() {
     let c = f.config("executable", home::HOME);
     h.apply(&c, true).unwrap();
     f.reply("getForegroundAppInfo", Err("offline".into()));
-    h.restore(&c).unwrap();
+    h.restore(&c, false).unwrap();
     assert_eq!(f.read(EXE), b"stock-com.webos.app.home");
 }
 #[test]
@@ -421,7 +500,7 @@ fn busy_mounts_use_lazy_unmount_and_restore_reports_stuck_processes() {
     let c = f.config("executable", home::HOME);
     h.apply(&c, true).unwrap();
     f.fail_unmount.set(true);
-    h.restore(&c).unwrap();
+    h.restore(&c, false).unwrap();
     assert!(
         f.calls()
             .iter()
@@ -872,7 +951,7 @@ fn restoring_a_background_home_never_opens_over_another_app() {
     let h = home::Home::new(&f, home::HOME).unwrap();
     let c = f.config("executable", home::HOME);
     h.apply(&c, false).unwrap();
-    h.restore(&c).unwrap();
+    h.restore(&c, false).unwrap();
     assert_eq!(f.front.borrow().as_str(), "other.app");
     assert!(!f.calls().iter().any(|s| s.contains("/launch ")));
 }

@@ -317,10 +317,13 @@ pub const CUSTOM_TILE_PREFIX: &str = "custom.";
 /// Luma's built-in Cameras app: Home Assistant's cameras in the overlay app's gallery. It is
 /// listed while Home Assistant is on and never sent to the TV as a launch request.
 pub const CAMERAS_APP: &str = "luma.cameras";
+/// Luma's built-in tile for LG's original Home. While Luma has replaced Home, opening it lifts
+/// that takeover until the next cold boot (see `platform::open_lg_home`).
+pub const LG_HOME_APP: &str = "luma.lg-home";
 
-/// Apps Luma adds itself (shortcut tiles and Cameras); the TV never reports them.
+/// Apps Luma adds itself (shortcut tiles, Cameras and LG Home); the TV never reports them.
 pub fn is_builtin(id: &str) -> bool {
-    id.starts_with(CUSTOM_TILE_PREFIX) || id == CAMERAS_APP
+    id.starts_with(CUSTOM_TILE_PREFIX) || id == CAMERAS_APP || id == LG_HOME_APP
 }
 pub const TILE_LIMIT: usize = 64;
 pub const TILE_URL_LIMIT: usize = 512;
@@ -412,6 +415,8 @@ pub struct Preferences {
     pub wallpaper_gradient: bool,
     /// Accept camera overlays and notifications from paired Home Assistant servers.
     pub home_assistant: bool,
+    /// After the LG Home tile lifted Luma's Home takeover, opening Luma takes Home back.
+    pub luma_home: bool,
     /// Unix seconds of the last automatic or chosen wallpaper change, for the timed modes.
     pub wallpaper_changed: u64,
     /// Settings this build does not know, from a newer Luma. They are written back unchanged so
@@ -469,6 +474,7 @@ impl Default for Preferences {
             wallpaper_cycle: false,
             wallpaper_gradient: true,
             home_assistant: false,
+            luma_home: true,
             wallpaper_changed: 0,
             extra: serde_json::Map::new(),
         }
@@ -501,7 +507,8 @@ impl Preferences {
                 if ids.len() >= 6 {
                     break;
                 }
-                if !ids.contains(&app.id) {
+                // LG Home is an escape hatch in Apps, not a default favorite.
+                if !ids.contains(&app.id) && app.id != LG_HOME_APP {
                     ids.push(app.id.clone());
                 }
             }

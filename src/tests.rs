@@ -532,7 +532,13 @@ fn partial_refresh_preserves_valid_inputs_and_never_invents_tv_apps() {
         crate::model::Inventory::default(),
         Some("Inputs unavailable".into()),
     );
-    assert!(state.inventory.apps.is_empty());
+    assert!(
+        state
+            .inventory
+            .apps
+            .iter()
+            .all(|app| crate::model::is_builtin(&app.id))
+    );
     assert_eq!(state.inventory.inputs.len(), 3);
     // Preserved inputs still lead Home; no TV app is invented.
     assert_eq!(
@@ -1173,7 +1179,7 @@ fn system_category_owns_refresh_and_quit_and_restores_sidebar_focus() {
     assert_eq!(state.section, crate::state::SYSTEM_SECTION);
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::TvSettings);
-    for expected in [0, 4, 2, 8, 10, 7, 3] {
+    for expected in [0, 4, 2, 11, 8, 10, 7, 3] {
         state.direction(Direction::Down, &controls(&state));
         assert_eq!(state.focus, Target::Setting(expected));
     }
@@ -3642,6 +3648,40 @@ fn cameras_app_is_listed_only_while_home_assistant_is_on_and_opens_the_gallery()
     state.preferences.home_assistant = false;
     state.sync_custom_tiles();
     assert!(!listed(&state));
+}
+
+#[test]
+fn lg_home_tile_is_listed_once_and_launches_through_luma() {
+    use crate::model::LG_HOME_APP;
+    let mut state = ready();
+    state.sync_custom_tiles();
+    state.set_inventory(demo_inventory(), None);
+    let tiles: Vec<_> = state
+        .inventory
+        .apps
+        .iter()
+        .filter(|app| app.id == LG_HOME_APP)
+        .collect();
+    assert_eq!(tiles.len(), 1);
+    assert_eq!((tiles[0].title.as_str(), tiles[0].mark), ("LG Home", "tv"));
+    assert!(!crate::platform::can_uninstall(LG_HOME_APP));
+    state.focus = Target::App(LG_HOME_APP.into());
+    assert_eq!(state.activate(), vec![Effect::Launch(LG_HOME_APP.into())]);
+}
+
+#[test]
+fn luma_as_home_is_on_by_default_and_turning_it_on_reclaims_home() {
+    let mut state = ready();
+    assert!(state.preferences.luma_home);
+    state.section = crate::state::SYSTEM_SECTION;
+    state.focus = Target::Setting(11);
+    assert_eq!(state.activate(), vec![Effect::Save]);
+    assert!(!state.preferences.luma_home);
+    assert_eq!(state.activate(), vec![Effect::Save, Effect::ReclaimHome]);
+    assert!(state.preferences.luma_home);
+    // Older preference files without the key keep the default.
+    let preferences: Preferences = serde_json::from_value(serde_json::json!({})).unwrap();
+    assert!(preferences.luma_home);
 }
 
 #[test]

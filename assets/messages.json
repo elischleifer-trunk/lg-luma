@@ -989,6 +989,21 @@
     "nl": "Minder beweging",
     "sv": "Minskad rörelse"
   },
+  "lumaAsHome": {
+    "zh-tw": "設為預設主畫面應用程式",
+    "en": "Make this the default Home app",
+    "de": "Als Standard-Startbildschirm-App festlegen",
+    "es": "Usar como app de inicio predeterminada",
+    "zh": "设为默认主屏幕应用",
+    "pt": "Definir como app de início padrão",
+    "it": "Imposta come app Home predefinita",
+    "ru": "Сделать приложением главного экрана по умолчанию",
+    "pl": "Ustaw jako domyślną aplikację ekranu głównego",
+    "fr": "Définir comme app d’accueil par défaut",
+    "vi": "Đặt làm ứng dụng màn hình chính mặc định",
+    "nl": "Instellen als standaard startscherm-app",
+    "sv": "Gör till standardapp för hemskärmen"
+  },
   "homeAssistant": {
     "en": "Home Assistant",
     "de": "Home Assistant",
