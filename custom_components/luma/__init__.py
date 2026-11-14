@@ -223,7 +223,7 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
         cameras = not pending and bool(camera_list(hass))
         has_keys = any(streaming_keys.keys(entry.options))
         # Phone typing is checked even when it is off, so a TV still calling is told to stop.
-        if not (cameras or has_keys or keyboard.phones(entry)):
+        if not (cameras or has_keys or keyboard.phones(entry) or entry.runtime_data.keyboard):
             return
         try:
             status = await client.status()

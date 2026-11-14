@@ -920,11 +920,12 @@ async def test_phones_chosen_in_options_are_offered_typing_when_a_tv_field_opens
     for reply in [
         {"action": "LUMA_KEYBOARD_other", "reply_text": "Alien"},
         {"action": action["action"], "reply_text": "  "},
-        {"action": action["action"], "reply_text": " Dune "},
+        {"action": action["action"], "reply_text": " Dune\nPart\tTwo "},
     ]:
         hass.bus.async_fire("mobile_app_notification_action", reply)
     await hass.async_block_till_done()
-    assert keyboard_calls(aioclient_mock, "/api/keyboard/text") == [{"text": "Dune"}]
+    # Line breaks (Enter on Android) become spaces: the TV's fields are one line.
+    assert keyboard_calls(aioclient_mock, "/api/keyboard/text") == [{"text": "Dune Part Two"}]
 
     # The field closes: the notification is cleared.
     await client.post(f"/api/webhook/{webhook_id}", json={"open": False})

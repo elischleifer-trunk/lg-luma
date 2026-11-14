@@ -286,9 +286,10 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
   one exception is the overlay app reporting that it closed, which is accepted only from the TV
   itself and only with that overlay's random nonce.
 - Camera URLs must be `http` or `https`. The TV loads them as images only.
-- The keyboard webhook is the only call the TV makes to Home Assistant. It is kept in memory, sent
-  `{"open": true, "field": "search"}` or `{"open": false}`, and Home Assistant only accepts it from
-  the local network.
+- Besides loading the camera images and video Home Assistant signs for it, the keyboard webhook
+  is the only call the TV makes to Home Assistant on its own. The TV keeps it in memory and sends it
+  `{"open": true, "field": "search"}` or `{"open": false}`. Home Assistant only accepts it from the
+  local network. (Shortcut tiles you set up can also call Home Assistant webhooks.)
 - Streaming search keys are stored on the TV in a file only Luma can read. The API never sends
   them back: `status` only says which keys the TV holds.
 

@@ -166,7 +166,8 @@ def setup(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClient) -> No
     entry.async_on_unload(lambda: webhook.async_unregister(hass, webhook_id))
 
     async def replied(event: Event) -> None:
-        text = str(event.data.get("reply_text") or "").strip()
+        # A reply can hold line breaks (Enter on Android, pasted text); fields are one line.
+        text = " ".join(str(event.data.get("reply_text") or "").split())
         if not text:
             return
         try:
