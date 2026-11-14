@@ -10,6 +10,9 @@ rotation, so the TV always holds working URLs. Cameras that can stream also get 
 TV asks it, with the same camera token, to start Home Assistant's HLS stream (the camera's own
 H.264 video at full frame rate, which the TV decodes in hardware) and receives its address.
 
+The TV also reports on itself: Luma's log and performance arrive live over an event stream (see
+`events`), go to Home Assistant's log and diagnostic sensors, and fill the diagnostics download.
+
 Cameras from UniFi Protect also get a `history_url` into what Protect has recorded. The TV asks
 it, with the same camera token, for a picture at any past moment, a stretch of recorded video, or
 when Protect saw motion. Pictures and video come from the UniFi Protect integration's own views:
@@ -62,9 +65,11 @@ from .const import (
     SERVICE_SHOW_CAMERA,
     SIZES,
 )
+from .events import LumaEvents
+from .events import store as events_store
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = [Platform.BUTTON, Platform.NOTIFY]
+PLATFORMS = [Platform.BUTTON, Platform.NOTIFY, Platform.SENSOR]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 ATTR_CONFIG_ENTRY = "config_entry_id"
@@ -105,6 +110,7 @@ EXAMPLE_IMAGE = Path(__file__).parent / "example.jpg"
 @dataclass
 class LumaData:
     client: LumaClient
+    events: LumaEvents
     compatibility: versions.Compatibility
     # Whether the TV was last asked to report its text fields to this entry's webhook.
     keyboard: bool = False
@@ -134,7 +140,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         hass.config_entries.async_update_entry(
             entry, data={**entry.data, CONF_WEBHOOK_ID: webhook.async_generate_id()}
         )
-    entry.runtime_data = LumaData(client, compatibility)
+    events = LumaEvents(hass, entry, client)
+    entry.runtime_data = LumaData(client, events, compatibility)
     keyboard.setup(hass, entry, client)
     if keyboard.phones(entry):
         entry.async_create_background_task(
@@ -147,6 +154,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     entry.async_create_background_task(hass, _push_keys(entry), f"{DOMAIN} keys {entry.entry_id}")
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # After the platforms, so the TV's device exists for the first events' device_id.
+    await events.async_start()
     return True
 
 
@@ -252,7 +261,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> boo
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Tell the TV to forget this server's token; best effort, the TV may be off."""
+    """Tell the TV to forget this server's token; best effort, the TV may be off. The history
+    of what the TV reported goes too."""
+    await events_store(hass, entry.entry_id).async_remove()
     versions.remove(hass, entry)
     client = LumaClient(
         async_get_clientsession(hass),

@@ -596,6 +596,30 @@ ruff check . && ruff format --check .
 python -m pytest -p no:cacheprovider tests/home-assistant
 ```
 
+**What the TV reports.** `src/telemetry.rs` keeps Luma's log in memory: the last 500 entries, plus
+the last 120 performance summaries in a separate list so summaries never push failures out.
+Write diagnostics with `telemetry::log_info!`, `log_warn!` or `log_error!(area, format…)` rather
+than `eprintln!`. They still print `Luma {area}: …` to stderr. Entry numbers start at 1 on each
+run, which gets a random `boot` ID, so `boot:seq` is a cursor. `telemetry::frame` counts
+presented frames on the SDL thread: the CPU time to compose, render and swap, and as dropped
+any interval from 25 ms to 250 ms (longer gaps are idle). A `telemetry` thread records a summary
+each minute while frames were presented, every ten minutes otherwise, with resident memory and
+CPU from `/proc/self`. A panic hook records panics and writes `luma-panic.txt` beside the
+preferences; the next start reports and deletes it.
+
+`GET /api/events` is the one endpoint that does not answer and close: `serve` hands the
+connection to `telemetry::stream`, which writes server-sent events on its own thread (at most
+eight). It sends what was kept after the `after` cursor (all of it when `boot` differs), then
+waits on a condition variable for new entries, with a comment line every 15 seconds. Each stream
+ends when its server unpairs, Home Assistant is turned off in Luma, or the same server connects
+again (`Api::streams`). In Home Assistant, `custom_components/luma/events.py` keeps the stream
+open per config entry, reconnecting with backoff from 5 seconds to 5 minutes. It logs entries
+under `custom_components.luma.tv`, fires `luma_event`, feeds `sensor.py` and stores its cursor,
+the last 1,000 entries and 720 summaries in `.storage/luma.events.<entry_id>`.
+`diagnostics.py` adds those and `GET /api/diagnostics` to the diagnostics download. The tests
+turn the stream off by default (`silent_tv_events` in `tests/home-assistant/conftest.py`): a
+background task that never ends would hang `async_block_till_done(wait_background_tasks=True)`.
+
 Turning the setting on opens a dialog (`Overlay::HomeAssistantSetup`) with a QR code for
 `HACS_LINK`, a My Home Assistant redirect that opens HACS on the owner's server with this
 repository's integration; it shows the listener's address once bound. While the setting is on,

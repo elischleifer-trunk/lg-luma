@@ -31,7 +31,7 @@ use std::{
     path::PathBuf,
     sync::{
         Arc,
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         mpsc,
     },
     thread,
@@ -402,6 +402,17 @@ pub struct Reply {
     pub body: Value,
     /// Where a 302 redirects.
     pub location: Option<String>,
+    /// `GET /api/events`: the connection becomes a stream of Luma's log.
+    pub events: Option<Box<Subscription>>,
+}
+
+/// One server's event stream: where it resumes, and which of its streams it is. A server that
+/// connects again replaces its earlier stream, which may be a connection that died silently.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Subscription {
+    pub cursor: crate::telemetry::Cursor,
+    owner: String,
+    id: u64,
 }
 
 fn reply(status: u16, body: Value) -> Reply {
@@ -409,6 +420,7 @@ fn reply(status: u16, body: Value) -> Reply {
         status,
         body,
         location: None,
+        events: None,
     }
 }
 
@@ -563,6 +575,12 @@ pub struct Api<T: Tv> {
     cameras: Vec<(String, Vec<Camera>)>,
     overlay_ready: Arc<AtomicBool>,
     preparing: Arc<AtomicBool>,
+    /// Changes whenever a server is unpaired, which ends every open event stream; the servers
+    /// still paired reconnect from where they left off.
+    pairings: Arc<AtomicU64>,
+    /// Each server's current event stream, by token digest.
+    streams: Arc<std::sync::Mutex<std::collections::BTreeMap<String, u64>>>,
+    next_stream: u64,
     /// Each paired server's keyboard webhook, keyed by its token digest. Kept in memory only:
     /// Home Assistant registers it again when `status` says the TV has none.
     keyboard_hooks: Vec<(String, String)>,
@@ -600,6 +618,9 @@ impl<T: Tv> Api<T> {
             cameras: Vec::new(),
             overlay_ready: Arc::new(AtomicBool::new(false)),
             preparing: Arc::new(AtomicBool::new(false)),
+            pairings: Arc::new(AtomicU64::new(0)),
+            streams: Arc::default(),
+            next_stream: 0,
             keyboard_hooks: Vec::new(),
             keyboard: None,
             outbox: Vec::new(),
@@ -627,12 +648,14 @@ impl<T: Tv> Api<T> {
             .map_err(|e| e.to_string())
             .and_then(|bytes| write_private(path, &bytes));
         if let Err(error) = result {
-            eprintln!("Luma Home Assistant: could not save pairings: {error}");
+            crate::telemetry::log_error!("home-assistant", "could not save pairings: {error}");
         }
     }
 
     /// Forgets every paired server, e.g. when the setting is turned off.
     pub fn forget(&mut self) {
+        self.pairings.fetch_add(1, Ordering::AcqRel);
+        crate::telemetry::wake_streams();
         if self.session.is_some() {
             let _ = self.tv.close_overlay();
             self.end_session();
@@ -708,7 +731,7 @@ impl<T: Tv> Api<T> {
             match tv.prepare_overlay() {
                 Ok(()) => ready.store(true, Ordering::Release),
                 Err(error) => {
-                    eprintln!("Luma Home Assistant overlay install: {error}");
+                    crate::telemetry::log_error!("overlay", "install: {error}");
                     let _ = events.send(Event::Failed(error));
                 }
             }
@@ -744,7 +767,7 @@ impl<T: Tv> Api<T> {
         if let Some(media) = session.media
             && let Err(error) = self.tv.resume_media(&media)
         {
-            eprintln!("Luma Home Assistant resume: {error}");
+            crate::telemetry::log_warn!("overlay", "resume: {error}");
         }
     }
 
@@ -829,6 +852,12 @@ impl<T: Tv> Api<T> {
                             "ok" | "left" | "right" | "up" | "down" | "rewind" | "forward" | "live"
                         )
                     });
+                    if body["failed"] == true {
+                        crate::telemetry::log_warn!(
+                            "overlay",
+                            "the camera video could not play; the gallery keeps its own picture"
+                        );
+                    }
                     self.finish_session(crate::cameras::Closed {
                         failed: body["failed"] == true,
                         behind: body["behind"].as_f64().filter(|_| key.is_some()),
@@ -853,6 +882,8 @@ impl<T: Tv> Api<T> {
                 self.integration_seen(client, request);
                 match (method, path) {
                     ("DELETE", "/api/pair") => {
+                        self.pairings.fetch_add(1, Ordering::AcqRel);
+                        crate::telemetry::wake_streams();
                         let removed = self.store.clients.remove(client);
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
                         self.keyboard_hooks
@@ -862,6 +893,40 @@ impl<T: Tv> Api<T> {
                         self.send_cameras(false);
                         self.send_outdated();
                         reply(200, json!({"paired": false}))
+                    }
+                    // Luma's log, live: what it kept since the cursor `after`, then each
+                    // entry as it happens. `serve` hands the connection to its own thread.
+                    ("GET", "/api/events") => {
+                        if !crate::telemetry::stream_available() {
+                            return error(503, "Too many event streams are open");
+                        }
+                        let after = query(request.query, "after")
+                            .unwrap_or_default()
+                            .replace("%3A", ":")
+                            .replace("%3a", ":");
+                        let owner = self.store.clients[client].token.clone();
+                        self.next_stream += 1;
+                        self.streams
+                            .lock()
+                            .unwrap_or_else(std::sync::PoisonError::into_inner)
+                            .insert(owner.clone(), self.next_stream);
+                        crate::telemetry::wake_streams();
+                        Reply {
+                            events: Some(Box::new(Subscription {
+                                cursor: crate::telemetry::Cursor::parse(&after),
+                                owner,
+                                id: self.next_stream,
+                            })),
+                            ..reply(200, json!({}))
+                        }
+                    }
+                    ("GET", "/api/diagnostics") => {
+                        let mut snapshot = crate::telemetry::snapshot();
+                        snapshot["overlay_ready"] =
+                            json!(self.overlay_ready.load(Ordering::Acquire));
+                        snapshot["paired_servers"] = json!(self.store.clients.len());
+                        snapshot["cameras"] = json!(self.all_cameras().len());
+                        reply(200, snapshot)
                     }
                     ("GET", "/api/status") => reply(
                         200,
@@ -906,7 +971,7 @@ impl<T: Tv> Api<T> {
                         // watching full screen in the Cameras app.
                         if self.session.as_ref().is_some_and(|session| !session.video) {
                             if let Err(error) = self.tv.close_overlay() {
-                                eprintln!("Luma Home Assistant close: {error}");
+                                crate::telemetry::log_warn!("overlay", "close: {error}");
                             }
                             self.end_session();
                         }
@@ -1015,7 +1080,7 @@ impl<T: Tv> Api<T> {
             .tv
             .toast(&format!("Home Assistant pairing code: {code}"))
         {
-            eprintln!("Luma Home Assistant pairing toast: {e}");
+            crate::telemetry::log_warn!("home-assistant", "pairing toast: {e}");
         }
         self.pairing = Some(Pairing {
             id: id.clone(),
@@ -1129,7 +1194,7 @@ impl<T: Tv> Api<T> {
         let mut media = replaced.and_then(|session| session.media);
         if pause && media.is_none() {
             media = self.tv.pause_media().unwrap_or_else(|error| {
-                eprintln!("Luma Home Assistant pause: {error}");
+                crate::telemetry::log_warn!("overlay", "pause: {error}");
                 None
             });
         }
@@ -1160,10 +1225,25 @@ impl<T: Tv> Api<T> {
             video: false,
             recorded: None,
         });
+        let launching = Instant::now();
         if let Err(e) = self.tv.launch_overlay(&params) {
             self.end_session();
+            crate::telemetry::log_error!("overlay", "the camera card did not open: {e}");
             return error(502, &format!("The TV did not open the overlay: {e}"));
         }
+        crate::telemetry::log_info!(
+            "overlay",
+            "camera card opened in {} ms ({}{})",
+            launching.elapsed().as_millis(),
+            if hls.is_some() {
+                "HLS"
+            } else if stream.is_some() {
+                "motion-JPEG"
+            } else {
+                "snapshots"
+            },
+            if paused { ", show paused" } else { "" }
+        );
         reply(200, json!({"session": id, "paused": paused}))
     }
 
@@ -1208,7 +1288,10 @@ impl<T: Tv> Api<T> {
             };
         if next != current {
             if let Err(message) = crate::streaming_keys::save(&path, &next) {
-                eprintln!("Luma Home Assistant: could not save streaming keys: {message}");
+                crate::telemetry::log_error!(
+                    "home-assistant",
+                    "could not save streaming keys: {message}"
+                );
                 return error(500, "Could not save the keys");
             }
             let _ = self.events.send(Event::StreamingKeys(next.status()));
@@ -1436,6 +1519,7 @@ impl<T: Tv> Api<T> {
             status: 302,
             body: json!({}),
             location: Some(format!("{history}&start={start}&end={end}")),
+            events: None,
         }
     }
 
@@ -1498,7 +1582,7 @@ impl<T: Tv> Api<T> {
             video: true,
         });
         if let Err(error) = self.tv.launch_overlay(&params) {
-            eprintln!("Luma Home Assistant video: {error}");
+            crate::telemetry::log_warn!("overlay", "video: {error}");
             self.finish_session(crate::cameras::Closed {
                 failed: true,
                 ..Default::default()
@@ -1518,7 +1602,7 @@ impl<T: Tv> Api<T> {
             if let Some(media) = session.media
                 && let Err(error) = self.tv.resume_media(&media)
             {
-                eprintln!("Luma Home Assistant resume: {error}");
+                crate::telemetry::log_warn!("overlay", "resume: {error}");
             }
         }
     }
@@ -1698,7 +1782,7 @@ fn run<T: Tv>(
             Some(Command::Arrange(arrangement)) => {
                 let saved = api.arrange(&arrangement);
                 if saved.status != 200 {
-                    eprintln!("Luma Home Assistant cameras: {}", saved.body);
+                    crate::telemetry::log_warn!("cameras", "arrangement not saved: {}", saved.body);
                 }
             }
             _ => {}
@@ -1798,6 +1882,20 @@ fn serve<T: Tv>(api: &mut Api<T>, mut stream: TcpStream, peer: SocketAddr) {
         ))
     })();
     let reply = result.unwrap_or_else(|(status, message)| error(status, &message));
+    if let (200, Some(subscription)) = (reply.status, reply.events.clone()) {
+        let (pairings, streams) = (api.pairings.clone(), api.streams.clone());
+        let generation = pairings.load(Ordering::Acquire);
+        let Subscription { cursor, owner, id } = *subscription;
+        crate::telemetry::stream(stream, cursor, move || {
+            pairings.load(Ordering::Acquire) == generation
+                && streams
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .get(&owner)
+                    == Some(&id)
+        });
+        return;
+    }
     if let (302, Some(location)) = (reply.status, &reply.location) {
         use std::io::Write;
         let _ = write!(

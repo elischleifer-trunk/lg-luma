@@ -346,7 +346,7 @@ impl State {
         self.dirty = true;
         match result {
             Err(error) => {
-                eprintln!("Luma recent apps: {error}");
+                crate::telemetry::log_warn!("recents", "{error}");
                 if let Command::Close(id) = &command {
                     for dismissal in &mut self.recents.dismissals {
                         if &dismissal.entry.app.id == id {

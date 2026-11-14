@@ -488,7 +488,7 @@ impl Renderer {
                 true
             }
             Err(error) => {
-                eprintln!("{error}");
+                crate::telemetry::log_warn!("fonts", "{error}");
                 self.failed_fonts.insert(id);
                 false
             }
@@ -898,7 +898,7 @@ impl Renderer {
                     }
                 }
                 Err(error) => {
-                    eprintln!("Luma glyph {c:?}: {error}");
+                    crate::telemetry::log_warn!("fonts", "glyph {c:?}: {error}");
                     failures += 1;
                 }
             }
@@ -909,7 +909,7 @@ impl Renderer {
             match vector::Mesh::upload(1., 1., &vertices) {
                 Ok(mesh) => Some(mesh),
                 Err(error) => {
-                    eprintln!("Luma text: {error}");
+                    crate::telemetry::log_warn!("fonts", "text: {error}");
                     failures += 1;
                     None
                 }
@@ -999,7 +999,7 @@ impl Renderer {
                     Some(texture(image.width(), image.height(), image.as_raw()))
                 }
                 Err(error) => {
-                    eprintln!("Artwork {path}: {error}");
+                    crate::telemetry::log_warn!("artwork", "{path}: {error}");
                     None
                 }
             });
@@ -1043,7 +1043,7 @@ impl Renderer {
             match vector::Mesh::load(Path::new(path)) {
                 Ok(mesh) => Some(mesh),
                 Err(error) => {
-                    eprintln!("{error}");
+                    crate::telemetry::log_warn!("artwork", "{error}");
                     None
                 }
             }
@@ -1803,8 +1803,9 @@ fn load_font(directory: &Path, id: u16) -> Result<Font, String> {
         .map_err(|e| format!("Font {}: {e}. Regenerate native assets.", path.display()))?;
     let font = Font::from_bytes(bytes).map_err(|e| format!("Font {}: {e}", path.display()))?;
     if cfg!(feature = "webos") {
-        eprintln!(
-            "Luma font: {name} loaded in {} ms",
+        crate::telemetry::log_info!(
+            "fonts",
+            "{name} loaded in {} ms",
             started.elapsed().as_millis()
         );
     }

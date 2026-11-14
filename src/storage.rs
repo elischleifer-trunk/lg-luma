@@ -129,8 +129,9 @@ fn tv_path_in(mut candidates: [PathBuf; 3], legacy: &Path, user: u32) -> Result<
                         })?;
                     preferences.sanitize();
                     save(&path, &preferences)?;
-                    eprintln!(
-                        "Luma preferences migrated from {} to {}",
+                    crate::telemetry::log_info!(
+                        "preferences",
+                        "migrated from {} to {}",
                         legacy.display(),
                         path.display()
                     );
@@ -149,10 +150,10 @@ fn tv_path_in(mut candidates: [PathBuf; 3], legacy: &Path, user: u32) -> Result<
                 && let Some(reading) = crate::weather_service::load_cache(&old_cache)
                 && let Err(error) = crate::weather_service::save_cache(&cache, &reading)
             {
-                eprintln!("Luma weather cache migration: {error}");
+                crate::telemetry::log_warn!("preferences", "weather cache migration: {error}");
             }
         }
-        eprintln!("Luma persistent storage: {}", directory.display());
+        crate::telemetry::log_info!("preferences", "persistent storage: {}", directory.display());
         return Ok(path);
     }
     Err(format!(
