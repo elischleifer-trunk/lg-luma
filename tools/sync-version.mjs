@@ -61,9 +61,16 @@ async function planVersions(directory, bump) {
     throw new Error(`Unknown version bump "${bump}". Use minor or major.`);
   }
 
-  const filenames = ['appinfo.json', 'Cargo.toml', 'Cargo.lock', 'readme.md'];
+  const filenames = [
+    'appinfo.json',
+    'Cargo.toml',
+    'Cargo.lock',
+    'readme.md',
+    'custom_components/luma/manifest.json',
+  ];
   const sources = await Promise.all(filenames.map(read));
   JSON.parse(sources[0]);
+  JSON.parse(sources[4]);
   const ipkPattern = /\bcom\.ecklf\.luma_\d+\.\d+\.\d+_arm\.ipk\b/g;
   if (![...sources[3].matchAll(ipkPattern)].length) {
     throw new Error('Expected versioned Luma IPK examples in readme.md.');
@@ -93,6 +100,17 @@ async function planVersions(directory, bump) {
       filename: 'readme.md',
       source: sources[3],
       updated: sources[3].replace(ipkPattern, `com.ecklf.luma_${version}_arm.ipk`),
+    },
+    // The Home Assistant integration ships with each release; HACS shows this version.
+    {
+      filename: 'custom_components/luma/manifest.json',
+      source: sources[4],
+      updated: replaceVersion(
+        sources[4],
+        /^([ \t]*"version"[ \t]*:[ \t]*")[^"\r\n]+(")/gm,
+        version,
+        'custom_components/luma/manifest.json',
+      ),
     },
   ];
   if (bump !== undefined) {

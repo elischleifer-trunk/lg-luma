@@ -35,7 +35,8 @@ the change. A raised minimum makes Home Assistant Repairs (and Luma's Settings) 
 update. Leave version bumps to the manual Release workflow,
 which releases the next minor version by default or a major version when chosen. Its
 `pnpm version:bump` command synchronizes `package.json`, `appinfo.json`, the root `Cargo.toml`,
-the `luma` entry in `Cargo.lock` and README IPK examples. Supporting Rust crates retain
+the `luma` entry in `Cargo.lock`, README IPK examples and the Home Assistant integration's
+`custom_components/luma/manifest.json`. Supporting Rust crates retain
 independent versions. `pnpm version:check` checks consistency without writing files. PRs need no
 changelog or version files: release notes are generated from merged pull requests.
 
