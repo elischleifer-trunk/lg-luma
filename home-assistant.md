@@ -243,6 +243,20 @@ example after a reset, or if they were changed on the TV. Clearing a field in Ho
 leaves the TV's key in place. Without Home Assistant, enter them on the TV under **Settings →
 System → Streaming search keys**, which shows a QR code for your phone.
 
+## Keeping Luma and the integration in step
+
+Home Assistant's device page for the TV shows which Luma version it runs. When the TV and the
+integration no longer fit together, both say which one to update:
+
+- **Luma on the TV is too old:** Home Assistant shows **Update Luma on _TV_** under **Settings →
+  Repairs**. Update Luma from its settings on the TV.
+- **The integration is too old:** Home Assistant shows **Update the Luma integration for _TV_**
+  under Repairs, Luma shows a notice, and **Settings → System → Home Assistant** on the TV names
+  the server. Update **Luma for LG webOS** in HACS and restart Home Assistant.
+
+Both notices go away on their own once the update is installed. They compare API levels, not
+release versions, so an ordinary release of either side never raises them.
+
 ## While the card is showing
 
 The card has key focus, so **Back** closes it and **OK** shows the camera full screen: its live
@@ -267,19 +281,22 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
 
 Home Assistant uses this API. You can script it too: send JSON bodies, with
 `Authorization: Bearer TOKEN` on every endpoint except `info` and the two pairing steps.
+Home Assistant also sends `X-Luma-Integration: LEVEL`, its integration's API level; requests
+without it count as level 1. `api` in a reply is the TV's own API level and `min_integration`
+the lowest integration level it works with.
 
-| Endpoint                  | Body                                                  | Reply                                                   |
-| ------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
-| `GET /api/info`           |                                                       | `id`, `name`, `version`, `api`                          |
-| `POST /api/pair`          | `name`                                                | `pairing_id`; the TV shows a code                       |
-| `POST /api/pair/confirm`  | `pairing_id`, `code`                                  | `token`, `id`                                           |
-| `DELETE /api/pair`        |                                                       | Unpairs this token                                      |
-| `GET /api/status`         |                                                       | `overlay`, `overlay_ready`, `cameras`, `streaming_keys` |
-| `POST /api/overlay`       | As `luma.show_camera`, using URLs                     | `session`, `paused`                                     |
-| `DELETE /api/overlay`     |                                                       | Closes the card, resumes playback                       |
-| `POST /api/notify`        | `message` (up to 300 characters)                      | Shows a webOS toast                                     |
-| `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list                         |
-| `PUT /api/streaming-keys` | `motn`, `tmdb`; empty or missing keeps the TV's key   | Which keys the TV holds                                 |
+| Endpoint                  | Body                                                  | Reply                                                                                        |
+| ------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GET /api/info`           |                                                       | `id`, `name`, `version`, `api`, `min_integration`                                            |
+| `POST /api/pair`          | `name`                                                | `pairing_id`; the TV shows a code                                                            |
+| `POST /api/pair/confirm`  | `pairing_id`, `code`                                  | `token`, `id`                                                                                |
+| `DELETE /api/pair`        |                                                       | Unpairs this token                                                                           |
+| `GET /api/status`         |                                                       | `version`, `api`, `min_integration`, `overlay`, `overlay_ready`, `cameras`, `streaming_keys` |
+| `POST /api/overlay`       | As `luma.show_camera`, using URLs                     | `session`, `paused`                                                                          |
+| `DELETE /api/overlay`     |                                                       | Closes the card, resumes playback                                                            |
+| `POST /api/notify`        | `message` (up to 300 characters)                      | Shows a webOS toast                                                                          |
+| `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list                                                              |
+| `PUT /api/streaming-keys` | `motn`, `tmdb`; empty or missing keeps the TV's key   | Which keys the TV holds                                                                      |
 
 ## Troubleshooting
 

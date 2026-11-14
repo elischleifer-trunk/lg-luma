@@ -1355,6 +1355,23 @@ fn run() -> Result<(), String> {
                     state.camera_video_closed(closed);
                     continue;
                 }
+                // Settings keeps naming them; a notice only for a server newly found outdated.
+                home_assistant::Event::IntegrationOutdated(names) => {
+                    let new: Vec<&str> = names
+                        .iter()
+                        .filter(|name| !state.home_assistant_outdated.contains(name))
+                        .map(String::as_str)
+                        .collect();
+                    let notice = (!new.is_empty()).then(|| {
+                        language.format("homeAssistantOutdated", &[("name", &new.join(", "))])
+                    });
+                    state.home_assistant_outdated = names;
+                    state.dirty = true;
+                    match notice {
+                        Some(notice) => notice,
+                        None => continue,
+                    }
+                }
                 // Sent only when the keys changed, so a reconnect does not repeat the notice.
                 home_assistant::Event::StreamingKeys(status) => {
                     state.streaming_keys = status;
