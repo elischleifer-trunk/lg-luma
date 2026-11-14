@@ -72,6 +72,11 @@ impl Keys {
     /// A Movie of the Night client for whichever kind of key this is: Developers Platform keys
     /// go to api.movieofthenight.com, RapidAPI keys to RapidAPI (their docs' rule).
     pub fn motn(&self) -> Option<motn_api::Client> {
+        self.motn_http().map(motn_api::Client::new)
+    }
+
+    /// The connection [`Keys::motn`] calls through; clones share its open connections.
+    pub fn motn_http(&self) -> Option<Http> {
         if self.motn.is_empty() {
             return None;
         }
@@ -91,7 +96,7 @@ impl Keys {
                 MOTN_LIMIT,
             )
         };
-        Some(motn_api::Client::new(http))
+        Some(http)
     }
 
     pub fn mdblist(&self) -> Option<crate::mdblist::Client> {
@@ -99,12 +104,17 @@ impl Keys {
     }
 
     pub fn tmdb(&self) -> Option<tmdb_api::Client> {
+        self.tmdb_http().map(tmdb_api::Client::new)
+    }
+
+    /// The connection [`Keys::tmdb`] calls through; clones share its open connections.
+    pub fn tmdb_http(&self) -> Option<Http> {
         (!self.tmdb.is_empty()).then(|| {
-            tmdb_api::Client::new(Http::new(
+            Http::new(
                 tmdb_api::SERVERS[0],
                 vec![("Authorization", format!("Bearer {}", self.tmdb))],
                 TMDB_LIMIT,
-            ))
+            )
         })
     }
 }

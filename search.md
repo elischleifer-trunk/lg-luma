@@ -26,11 +26,17 @@ title you are thinking of comes first, often before you finish typing it.
 5. **Punctuation and spacing do not matter.** "oceans" finds _Ocean's Eleven_, "spiderman" finds
    _Spider-Man_, "super man" finds _Superman_.
 6. **Type-ahead.** A partial word should find titles that start with it: "sup" → _Superman_,
-   _Supergirl_, _Superbad_; "fan" → _Fantasia_, _Fantastic Four_. **Not yet met**: see below.
+   _Supergirl_, _Superbad_; "fan" → _Fantasia_, _Fantastic Four_. **Partly met**: a half-typed
+   word that can only become one word is completed ("ghostb" → _Ghostbusters_, "star w" →
+   _Star Wars_); short, ambiguous text is not. See below.
 7. **OK opens the title itself**, not the app's home screen, in an app the TV has. Where it
    streams is a tiebreaker for ranking, never a reason to rank an unrelated title higher.
 8. **Cheap.** Repeating a search costs nothing (disk cache). Movie of the Night calls are
-   metered, so extra lookups are capped; TMDB calls are free but still cached.
+   metered (the free plan's reply headers say 1,000 a month), so extra lookups are capped, a
+   half-typed word is completed from TMDB rather than searched letter by letter, and a search
+   the user has typed past stops before its next call. TMDB calls are free but still cached.
+9. **Quick.** Connections to both services open when the Search tab does and stay open
+   between searches; a new connection to Movie of the Night costs more than the search on it.
 
 ## Example searches
 
@@ -46,6 +52,7 @@ more without re-fetching the rest).
 | gho          | _Ghosts_ (US) above _Ghosts_ (UK); no Marathi or Kannada titles           | `english_language_work_from_abroad_stays_but_ranks_below_…` |
 | amélie       | _Amélie_ first, though it is French                                       | `foreign_language_titles_from_abroad_are_filtered_out_…`    |
 | sup          | Nothing matches yet: keep the near misses rather than show nothing        | `when_nothing_matches_the_near_misses_stay`                 |
+| ghostb       | The "ghostbusters" results, from one metered search for the whole word    | `half_a_word_is_completed_before_the_metered_search`        |
 
 ## Opening a title (deep links)
 
@@ -60,14 +67,31 @@ TV" in [agents.md](agents.md).
 
 ## Known gaps and next steps
 
-- **Type-ahead (goal 6).** Neither Movie of the Night nor TMDB searches by prefix: "sup" never
-  returns _Superman_, and "super" misses _Supergirl_. Plan: build a local title index from TMDB's
-  free daily ID exports (titles with popularity), complete the typed prefix against it, and look
-  up the top few completions in Movie of the Night (metered, so capped and cached).
+- **Type-ahead (goal 6).** Movie of the Night matches whole words. TMDB's search does match the
+  start of the last word, but lists exact words first, so its first page for "sup" is obscure
+  titles called "Sup" and never _Superman_. `relevance::complete` uses that page when it is
+  decisive (one word has 80% of the matching titles' votes) and otherwise searches as typed, so
+  "sup", "gho" and "supe" behave as before. To cover those: a local title index from TMDB's free
+  daily ID exports (titles with popularity), or TMDB's later pages, with the top few completions
+  looked up in Movie of the Night (metered, so capped and cached).
+- **Each keystroke after a pause is still a search.** On the remote's keyboard every letter is
+  followed by a pause, so an ambiguous or whole-word prefix ("gho", "ghost") costs a metered
+  call each. Movie of the Night is needed only for where a title streams and its deep link;
+  TMDB's free `watch/providers` could list results while typing and leave the metered call for
+  the title that is opened.
 - **Deep links** for Netflix, Disney+, Max, Hulu, Peacock and Paramount+ are unconfirmed.
 - Prime links with older ASIN-style IDs (`B0FV8FQK6M`) cannot be converted and open the app.
 
 ## Decisions
+
+- **2026-11:** Measured from a data centre: a TLS connection to Movie of the Night takes
+  0.3–0.6 s, its title search 0.45–0.75 s, a show lookup 40 ms on an open connection; TMDB
+  answers in 45 ms on an open connection and 130 ms on a new one. Each search used to build new
+  clients, so it paid for the connections every time, twenty at once for details. Clients now
+  live as long as the keys do. Movie of the Night does not compress replies (290 KB a search,
+  half of it image links); TMDB's gzipped details are a quarter of the size.
+- **2026-11:** Movie of the Night counts every authenticated call, `/genres` included, but not a
+  request without a key (401), which is what opens the connection ahead of the first search.
 
 - **2026-11:** Dropping results by their own title alone hid _Andor_ and _The Mandalorian_ for
   "star wars". English alternative titles (appended to the TMDB details call, no extra request)

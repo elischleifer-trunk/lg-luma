@@ -791,10 +791,9 @@ fn run() -> Result<(), String> {
         search_cache::DiskCache::beside(&preferences_path),
     );
     let posters = posters::Service::new(search_cache::DiskCache::posters_beside(&preferences_path));
+    let mut search_was_open = false;
     let scores = mdblist::Service::new(
-        mdblist::Live {
-            keys: keys_path.clone(),
-        },
+        mdblist::Live::new(keys_path.clone()),
         search_cache::DiskCache::beside(&preferences_path),
     );
     let mut key_editor_service =
@@ -2017,6 +2016,12 @@ fn run() -> Result<(), String> {
         }
         weather_tick(&mut state, &weather_service, visible);
         // Movies and shows for the Apps search: network and disk stay on the search worker.
+        // Opening Search connects to the APIs while the first letters are still being typed.
+        let search_open = state.page == state::Page::Search && state.streaming_keys.motn;
+        if search_open && !search_was_open {
+            streaming_search.warm();
+        }
+        search_was_open = search_open;
         if let Some(request) = state.sync_titles(Instant::now()) {
             streaming_search.send(streaming_search::Job {
                 request,
