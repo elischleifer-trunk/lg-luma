@@ -1079,6 +1079,21 @@
     "nl": "Koppelcode voor Home Assistant: {code}",
     "sv": "Kopplingskod för Home Assistant: {code}"
   },
+  "homeAssistantOutdated": {
+    "en": "Update the Luma integration in {name}",
+    "de": "Luma-Integration in {name} aktualisieren",
+    "es": "Actualiza la integración de Luma en {name}",
+    "zh": "请在 {name} 中更新 Luma 集成",
+    "zh-tw": "請在 {name} 中更新 Luma 整合",
+    "pt": "Atualize a integração do Luma em {name}",
+    "it": "Aggiorna l’integrazione Luma in {name}",
+    "ru": "Обновите интеграцию Luma в {name}",
+    "pl": "Zaktualizuj integrację Luma w {name}",
+    "fr": "Mettez à jour l’intégration Luma dans {name}",
+    "vi": "Hãy cập nhật tích hợp Luma trong {name}",
+    "nl": "Werk de Luma-integratie bij in {name}",
+    "sv": "Uppdatera Luma-integrationen i {name}"
+  },
   "homeAssistantPaired": {
     "en": "Paired with {name}",
     "de": "Gekoppelt mit {name}",

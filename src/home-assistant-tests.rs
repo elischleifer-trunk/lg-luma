@@ -78,6 +78,7 @@ impl Harness {
                 query: "",
                 authorization: authorization.as_deref(),
                 origin: None,
+                integration: None,
                 peer: LAN,
                 body: body.as_bytes(),
             },
@@ -206,6 +207,7 @@ fn protected_endpoints_need_a_paired_token_and_reject_browsers_and_remote_peers(
         query: "",
         authorization: Some(&authorization),
         origin,
+        integration: None,
         peer,
         body: body.as_bytes(),
     };
@@ -345,6 +347,7 @@ fn pausing_resumes_once_when_the_overlay_reports_closing() {
                 query: "",
                 authorization: None,
                 origin: Some("null"),
+                integration: None,
                 peer,
                 body: body.as_bytes(),
             },
@@ -359,6 +362,7 @@ fn pausing_resumes_once_when_the_overlay_reports_closing() {
             query: "",
             authorization: None,
             origin: Some("null"),
+            integration: None,
             peer: LOOPBACK,
             body: closed.as_bytes(),
         },
@@ -667,6 +671,69 @@ fn the_listener_answers_info_over_http() {
     assert_eq!(body["name"], "Luma");
     assert_eq!(body["api"], API_VERSION);
     assert_eq!(body["id"], h.api.store().device_id.as_str());
+}
+
+#[test]
+fn status_reports_versions_and_settings_name_servers_whose_integration_is_too_old() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(status.body["version"], env!("CARGO_PKG_VERSION"));
+    assert_eq!(status.body["api"], API_VERSION);
+    assert_eq!(status.body["min_integration"], MIN_INTEGRATION);
+    // An integration from before the header is level 1, which this Luma still accepts.
+    assert_eq!(h.api.store().clients[0].integration, INTEGRATION_UNSTATED);
+    assert!(
+        !h.events
+            .try_iter()
+            .any(|event| matches!(event, Event::IntegrationOutdated(_)))
+    );
+
+    let call = |h: &mut Harness, level: &str| {
+        let authorization = format!("Bearer {token}");
+        h.api.handle(
+            &Request {
+                method: "GET",
+                path: "/api/status",
+                query: "",
+                authorization: Some(&authorization),
+                origin: None,
+                integration: Some(level),
+                peer: LAN,
+                body: b"",
+            },
+            h.now,
+        )
+    };
+    h.api.min_integration = 3;
+    let status = call(&mut h, "2");
+    assert_eq!(status.body["min_integration"], 3);
+    assert_eq!(h.api.store().clients[0].integration, 2);
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::IntegrationOutdated(vec!["HA".into()]))
+    );
+    // Only changes are reported.
+    call(&mut h, "2");
+    assert!(h.events.try_recv().is_err());
+    call(&mut h, "3");
+    assert_eq!(h.events.try_recv(), Ok(Event::IntegrationOutdated(vec![])));
+    call(&mut h, "2");
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::IntegrationOutdated(vec!["HA".into()]))
+    );
+    // Unpairing the server clears the note.
+    assert_eq!(
+        h.call("DELETE", "/api/pair", Some(&token), json!({}))
+            .status,
+        200
+    );
+    assert!(
+        h.events
+            .try_iter()
+            .any(|event| event == Event::IntegrationOutdated(vec![]))
+    );
 }
 
 #[test]
@@ -1003,6 +1070,7 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
                 query: "",
                 authorization: None,
                 origin: Some("null"),
+                integration: None,
                 peer: LOOPBACK,
                 body: body.as_bytes(),
             },
@@ -1106,6 +1174,7 @@ fn ok_on_a_doorbell_card_keeps_it_full_screen_until_closed() {
                 query: "",
                 authorization: None,
                 origin: Some("null"),
+                integration: None,
                 peer,
                 body: body.as_bytes(),
             },
@@ -1192,6 +1261,7 @@ fn recorded_video_loads_piece_by_piece_with_the_cameras_current_token() {
                 query: &query,
                 authorization: None,
                 origin: None,
+                integration: None,
                 peer: LOOPBACK,
                 body: b"",
             },
@@ -1232,6 +1302,7 @@ fn recorded_video_loads_piece_by_piece_with_the_cameras_current_token() {
             query: &format!("{auth}&start=100&end=400"),
             authorization: None,
             origin: None,
+            integration: None,
             peer: LAN,
             body: b"",
         },
@@ -1250,6 +1321,7 @@ fn recorded_video_loads_piece_by_piece_with_the_cameras_current_token() {
             query: "",
             authorization: None,
             origin: Some("null"),
+            integration: None,
             peer: LOOPBACK,
             body: body.as_bytes(),
         },
