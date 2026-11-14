@@ -1947,34 +1947,28 @@ fn clamp_lines(assets: &Assets, value: &str, style: TextStyle, width: f32, lines
 }
 
 /// Whether watching costs money, in the poster's top right corner: a check when an app on
-/// this TV includes the title (every installed app counts as subscribed), else the price, or
-/// "$" when the service gives none (an add-on channel). Which app it is is said for the
-/// selected title, above the posters. Titles on none of the TV's apps have no mark.
+/// this TV includes the title (every installed app counts as subscribed), else "$" for a
+/// rental, purchase or add-on channel. Which app, and the price, are said for the selected
+/// title, above the posters. Titles on none of the TV's apps have no mark.
 fn cost_badge(out: &mut Scene, assets: &Assets, ranked: &crate::streaming::Ranked, poster: Rect) {
     use crate::streaming::Access;
     let Some(pick) = &ranked.pick else {
         return;
     };
-    let height = 28.;
-    let (x, y) = (poster.x + poster.w - 8., poster.y + 8.);
+    let size = 28.;
+    let pill = Rect::new(poster.x + poster.w - size - 8., poster.y + 8., size, size);
+    out.shape(pill, size / 2., c(0x0b0e12, 0.82));
     if pick.access == Access::Included {
-        let pill = Rect::new(x - height, y, height, height);
-        out.shape(pill, height / 2., c(0x0b0e12, 0.82));
         out.icon(assets, "check", pill.inset(6.), c(0x5ae08c, 1.));
-        return;
+    } else {
+        out.text(
+            "$",
+            Rect::new(pill.x, pill.y + 4., pill.w, 19.2),
+            text(16., 650, -0.01).leading(1.2),
+            WHITE,
+            true,
+        );
     }
-    let label = pick.price.as_deref().unwrap_or("$");
-    let style = text(16., 650, -0.01).leading(1.2);
-    let width = (assets.width(label, style) + 20.).max(height);
-    let pill = Rect::new(x - width, y, width, height);
-    out.shape(pill, height / 2., c(0x0b0e12, 0.82));
-    out.text(
-        label,
-        Rect::new(pill.x, pill.y + 4., pill.w, 19.2),
-        style,
-        WHITE,
-        true,
-    );
 }
 
 /// Where a title plays on this TV and what it costs there ("On HBO Max", "Rent on Apple TV ·

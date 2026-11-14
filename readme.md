@@ -275,7 +275,7 @@ and a short pause, results appear as posters, two rows of eight on screen. Above
 lines describe the selected title: year, US rating (PG-13, TV-14), length or seasons, genres,
 review scores, the app on your TV that carries it with what it costs there (included, an add-on
 channel, or rent or buy with the price), and what it is about. Each poster is marked in its corner: a check when one of your TV's apps includes the title, or
-the price when it is a rental, purchase or add-on channel there. Titles on none of your TV's
+**$** when it is a rental, purchase or add-on channel there. Titles on none of your TV's
 apps have no mark and are dimmed at the end.
 
 An optional MDBList key adds review scores: the Rotten Tomatoes critics score (tomato, red when

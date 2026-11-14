@@ -1137,7 +1137,7 @@ become one word is completed (`relevance::complete`) and searched as that word, 
 keystrokes that follow reuse one Movie of the Night reply. Details are fetched six at a time,
 and a search the user has typed past gives up between steps. OK launches the
 picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Every
-poster says whether that costs money (`view::cost_badge`: a check when included, else the price);
+poster says whether that costs money (`view::cost_badge`: a check when included, else "$");
 the app is named for the selected title. Every installed app counts as subscribed. Posters come
 from the signed `cdn.movieofthenight.com` links in each result (no other host is fetched): three
 `posters` workers fetch them with the weather rules (timeout, no redirects or proxy, 1 MiB limit),

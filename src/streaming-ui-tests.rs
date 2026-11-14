@@ -480,9 +480,11 @@ fn every_poster_says_whether_watching_costs_money() {
             .iter()
             .any(|draw| matches!(draw, Draw::Image(path, ..) if path.contains("logos/")))
     );
-    // A rental says its price; a paid title without one says "$".
-    for pick in picks.iter().filter(|pick| pick.access != Access::Included) {
-        let label = pick.price.as_deref().unwrap_or("$");
-        assert!(shows_text(&state, label), "{label}");
-    }
+    // A "$" for each that costs money there; the price is said for the selected title only.
+    let paid = draw
+        .iter()
+        .filter(|draw| matches!(draw, Draw::Text(text, ..) if text == "$"))
+        .count();
+    assert_eq!(paid, picks.len() - included);
+}
 }
