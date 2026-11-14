@@ -602,22 +602,38 @@ fn text(size: f32, weight: u16, tracking: f32) -> TextStyle {
 
 pub struct Navigation {
     pub surface: Rect,
-    pub items: [Rect; 3],
+    /// Tab rectangles by tab index (Home, Apps, Settings, Search), not drawn order.
+    pub items: [Rect; 4],
 }
-pub fn navigation(assets: &Assets, language: Language) -> Navigation {
-    let widths = ["home", "apps", "settings"]
-        .map(|key| (assets.width(language.t(key), text(20.8, 550, -0.02)) + 46.4).max(99.2));
-    let width = widths.iter().sum::<f32>() + 25.6 + 19.6;
+
+/// The Search tab's width on the Search page, where it is the search field.
+pub const SEARCH_FIELD_WIDTH: f32 = 560.;
+/// The field never grows into the clock.
+const SEARCH_FIELD_MIN_X: f32 = 300.;
+
+/// Header tabs, centred, in the order Search, Home, Apps, Settings. On the Search page
+/// (`search_open`) the Search tab grows leftward into the search field; the other tabs keep
+/// their places, so only the pill and the left edge of the surface move.
+pub fn navigation(assets: &Assets, language: Language, search_open: bool) -> Navigation {
+    let keys = ["home", "apps", "settings", "search"];
+    let widths =
+        keys.map(|key| (assets.width(language.t(key), text(20.8, 550, -0.02)) + 46.4).max(99.2));
+    let width = widths.iter().sum::<f32>() + 12.8 * 3. + 19.6;
     let mut x = (1920. - width) / 2. + 9.8;
-    let items = widths.map(|width| {
-        let rect = Rect::new(x, 52.3, width, 49.);
-        x += width + 12.8;
-        rect
-    });
-    Navigation {
-        surface: Rect::new((1920. - width) / 2., 42.5, width, 68.6),
-        items,
+    let mut items = [Rect::default(); 4];
+    for tab in crate::state::TAB_ORDER {
+        items[tab] = Rect::new(x, 52.3, widths[tab], 49.);
+        x += widths[tab] + 12.8;
     }
+    let mut surface = Rect::new((1920. - width) / 2., 42.5, width, 68.6);
+    if search_open {
+        let home = items[0];
+        let left = (home.x - 12.8 - SEARCH_FIELD_WIDTH).max(SEARCH_FIELD_MIN_X);
+        items[crate::state::SEARCH_TAB] = Rect::new(left, 52.3, home.x - 12.8 - left, 49.);
+        surface.w += surface.x - (left - 9.8);
+        surface.x = left - 9.8;
+    }
+    Navigation { surface, items }
 }
 
 /// Fully shown Recents is drawn instead of the page, which is then not part of the scene.
@@ -686,6 +702,7 @@ pub fn scene_with_pill(
         Page::Home => home(&mut out, state, assets, now),
         Page::Apps => library(&mut out, state, assets),
         Page::Settings => settings(&mut out, state, assets, now),
+        Page::Search => search_page(&mut out, state, assets),
     }
     if let Some(error) = &state.error
         && !state.inventory.apps.is_empty()
@@ -869,8 +886,17 @@ fn header(
         WHITE,
         false,
     );
-    let layout = navigation(assets, language);
-    let nav = layout.surface;
+    let search_page = state.page == Page::Search;
+    let layout = navigation(assets, language, search_page);
+    let mut nav = layout.surface;
+    // The surface's left edge follows the pill while the search field grows or shrinks.
+    let collapsed = navigation(assets, language, false).surface;
+    let left = (pill_x - 9.8).min(collapsed.x);
+    nav.w += nav.x - left;
+    nav.x = left;
+    if !search_page {
+        nav.w = collapsed.x + collapsed.w - left;
+    }
     out.shadow(nav, 48., 18., 4., 0.06);
     out.shape(nav, 48., c(0x171c20, 0.72));
     out.border(nav, 48., 1., c(0xffffff, 0.07));
@@ -886,8 +912,16 @@ fn header(
         // the destination tab's control rectangle.
         out.border(pill.inset(-5.), 37., 2., c(0xf0f0f0, 0.95));
     }
-    for (index, key) in ["home", "apps", "settings"].into_iter().enumerate() {
+    for (index, key) in ["home", "apps", "settings", "search"]
+        .into_iter()
+        .enumerate()
+    {
         let rect = layout.items[index];
+        if index == crate::state::SEARCH_TAB && search_page {
+            search_field(out, state, assets, pill);
+            out.control(Target::Nav(index), rect, false);
+            continue;
+        }
         out.text(
             language.t(key),
             Rect::new(rect.x, 64.3, rect.w, 25.),
@@ -903,6 +937,58 @@ fn header(
     }
     if state.inventory.search.is_some() {
         lg_search_button(out, state, assets);
+    }
+}
+
+/// The Search tab as the search field: an icon, then what is typed, or a placeholder, with a
+/// caret while the keyboard is up. Drawn inside the pill so it grows with it.
+fn search_field(out: &mut Scene, state: &State, assets: &Assets, pill: Rect) {
+    let language = state.preferences.language;
+    let ink = c(0x2c2c2c, 1.);
+    out.icon(
+        assets,
+        "search",
+        Rect::new(pill.x + 18., pill.y + 14.5, 20., 20.),
+        ink,
+    );
+    let x = pill.x + 48.;
+    let available = (pill.x + pill.w - 20. - x).max(0.);
+    let style = text(20.8, 550, -0.02);
+    let typing = state.text_input_active() && state.keyboard_field == TextField::Titles;
+    let query = state.title_query.as_str();
+    let (value, color) = if query.is_empty() {
+        (language.t("moviesAndShows").to_owned(), c(0x2c2c2c, 0.55))
+    } else {
+        // The end of a long query stays in view, as in a text box.
+        let mut shown = query.to_owned();
+        while assets.width(&shown, style) > available - 8. && !shown.is_empty() {
+            shown.remove(0);
+        }
+        (shown, ink)
+    };
+    let value = if query.is_empty() {
+        ellipsize(assets, &value, style, available)
+    } else {
+        value
+    };
+    out.text(
+        value.as_str(),
+        Rect::new(x, 64.3, available, 25.),
+        style,
+        color,
+        false,
+    );
+    if typing && available > 0. {
+        let end = if query.is_empty() {
+            0.
+        } else {
+            assets.width(&value, style)
+        };
+        out.shape(
+            Rect::new((x + end + 2.).min(x + available), 63., 2., 27.),
+            1.,
+            c(0x2c2c2c, 0.85),
+        );
     }
 }
 
@@ -1651,19 +1737,26 @@ fn library_toolbar(out: &mut Scene, state: &State, assets: &Assets) {
         Rect::new(search.x + 19.4, search.y + 18.4, 19.2, 19.2),
         c(0xeeeeee, 0.73),
     );
+    let placeholder = language.t("findApp");
+    let field_width = if state.query.is_empty() { 234. } else { 202. };
     out.text(
         if state.query.is_empty() {
-            language.t("findApp")
+            placeholder
         } else {
             &state.query
         },
         Rect::new(
             search.x + 49.8,
             search.y + (search.h - 29.12) / 2.,
-            if state.query.is_empty() { 234. } else { 202. },
+            field_width,
             29.12,
         ),
-        text(20.8, 550, -0.02).leading(1.4),
+        if state.query.is_empty() {
+            assets.fit_text(placeholder, text(20.8, 550, -0.02), field_width)
+        } else {
+            text(20.8, 550, -0.02)
+        }
+        .leading(1.4),
         c(0xeeeeee, if state.query.is_empty() { 0.73 } else { 1. }),
         false,
     );
@@ -1746,6 +1839,476 @@ fn library_grid(out: &mut Scene, state: &State, assets: &Assets) {
         }
         y += row_height + 38.4;
     }
+}
+
+/// Review scores over a poster's bottom-left corner: the Rotten Tomatoes critics score
+/// (tomato, red when fresh at 60% or more) and audience score (popcorn), or the IMDb rating
+/// (star) when Rotten Tomatoes has neither. Nothing when there are no scores at all.
+fn score_badge(out: &mut Scene, assets: &Assets, scores: &crate::mdblist::Scores, poster: Rect) {
+    let mut items: Vec<(&str, Color, String)> = Vec::new();
+    if let Some(critics) = scores.critics {
+        let fresh = critics >= 60;
+        items.push((
+            "tomato",
+            if fresh {
+                c(0xf2412c, 1.)
+            } else {
+                c(0x8fb04a, 1.)
+            },
+            format!("{critics}%"),
+        ));
+    }
+    if let Some(audience) = scores.audience {
+        items.push(("popcorn", c(0xf6c344, 1.), format!("{audience}%")));
+    }
+    if items.is_empty()
+        && let Some(imdb) = scores.imdb
+    {
+        items.push(("star-filled", c(0xf5c518, 1.), format!("{imdb:.1}")));
+    }
+    if items.is_empty() {
+        return;
+    }
+    let style = text(17.6, 650, -0.01).leading(1.2);
+    let (icon, gap, pad, height) = (20., 5., 10., 34.);
+    let widths: Vec<f32> = items
+        .iter()
+        .map(|(_, _, label)| icon + gap + assets.width(label, style) + 2.)
+        .collect();
+    let width = pad * 2. + widths.iter().sum::<f32>() + 12. * (items.len() - 1) as f32;
+    let badge = Rect::new(
+        poster.x + 10.,
+        poster.y + poster.h - height - 10.,
+        width,
+        height,
+    );
+    out.shape(badge, height / 2., c(0x0b0e12, 0.82));
+    let mut x = badge.x + pad;
+    for ((name, color, label), item) in items.iter().zip(widths) {
+        out.icon(
+            assets,
+            name,
+            Rect::new(x, badge.y + (height - icon) / 2., icon, icon),
+            *color,
+        );
+        out.text(
+            label.as_str(),
+            Rect::new(x + icon + gap, badge.y + (height - 21.12) / 2., item, 21.12),
+            style,
+            WHITE,
+            false,
+        );
+        x += item + 12.;
+    }
+}
+
+/// Shortens `value` with an ellipsis to fit `width` on one line.
+fn ellipsize(assets: &Assets, value: &str, style: TextStyle, width: f32) -> String {
+    if assets.width(value, style) <= width {
+        return value.into();
+    }
+    let mut chars: Vec<char> = value.chars().collect();
+    while !chars.is_empty() {
+        chars.pop();
+        let candidate = format!("{}…", chars.iter().collect::<String>().trim_end());
+        if assets.width(&candidate, style) <= width {
+            return candidate;
+        }
+    }
+    "…".into()
+}
+
+/// The Movies & shows section under the Apps grid: a heading with the search status, then
+/// a poster grid in the app grid's columns. Under each poster: the title, then its year and the
+/// app it opens in, with what it costs there.
+/// Poster cards on the Search page: eight across, lined up with the content margins.
+const SEARCH_POSTER: (f32, f32) = (196., 294.);
+const SEARCH_PITCH: f32 = 222.3;
+const SEARCH_ROW: f32 = 294. + 12. + 26. + 34.;
+
+/// At most `lines` wrapped lines of `value` in `width`, ending with an ellipsis when cut.
+fn clamp_lines(assets: &Assets, value: &str, style: TextStyle, width: f32, lines: usize) -> String {
+    if assets.lines(value, style, width) <= lines {
+        return value.to_owned();
+    }
+    let words: Vec<&str> = value.split_whitespace().collect();
+    let (mut low, mut high) = (0, words.len());
+    // The most words that still fit with an ellipsis.
+    while low < high {
+        let middle = (low + high).div_ceil(2);
+        let candidate = format!("{}…", words[..middle].join(" "));
+        if assets.lines(&candidate, style, width) <= lines {
+            low = middle;
+        } else {
+            high = middle - 1;
+        }
+    }
+    format!("{}…", words[..low].join(" "))
+}
+
+/// Where a title plays on this TV and what it costs there ("On HBO Max", "Rent on Apple TV ·
+/// $3.99"), or that none of the TV's apps has it.
+fn availability(state: &State, ranked: &crate::streaming::Ranked) -> String {
+    use crate::streaming::Access;
+    let language = state.preferences.language;
+    let Some(pick) = &ranked.pick else {
+        return language.t("titleNotOnApps").to_owned();
+    };
+    let app = state
+        .inventory
+        .apps
+        .iter()
+        .find(|a| a.id == pick.app_id)
+        .map_or(pick.service_id.as_str(), |app| app.title.as_str());
+    let key = match pick.access {
+        Access::Included => "titleOn",
+        Access::Addon => "titleAddon",
+        Access::Rent => "titleRent",
+        Access::Buy => "titleBuy",
+    };
+    let place = language.format(key, &[("app", app)]);
+    match &pick.price {
+        Some(price) if pick.access != Access::Included => format!("{place} · {price}"),
+        _ => place,
+    }
+}
+
+fn years(show: &crate::motn_api::Show) -> String {
+    match (crate::streaming::year(show), show.last_air_year) {
+        (Some(first), Some(last)) if last > first => format!("{first}–{last}"),
+        (Some(first), _) => first.to_string(),
+        _ => String::new(),
+    }
+}
+
+/// The Search page: the selected title large at the top, then the results as posters.
+fn search_page(out: &mut Scene, state: &State, assets: &Assets) {
+    let titles = &state.titles;
+    match state.selected_title() {
+        Some(selected) => search_hero(out, state, assets, selected),
+        None => search_status(out, state),
+    }
+    let viewport = state.search_viewport();
+    out.draw.push(Draw::Clip(Some(viewport)));
+    let s = state.scroll;
+    let (width, height) = SEARCH_POSTER;
+    let columns = crate::state::TITLE_COLUMNS;
+    for (index, ranked) in titles.results.iter().enumerate() {
+        let (column, row) = ((index % columns) as f32, (index / columns) as f32);
+        let rect = Rect::new(
+            84. + column * SEARCH_PITCH,
+            crate::state::SEARCH_GRID_TOP + row * SEARCH_ROW - s,
+            width,
+            height,
+        );
+        let target = Target::Title(index);
+        out.control(
+            target.clone(),
+            Rect::new(rect.x, rect.y, rect.w, SEARCH_ROW - 34.),
+            true,
+        );
+        if rect.y + SEARCH_ROW < viewport.y || rect.y > 1080. {
+            continue;
+        }
+        let focused = state.focus == target;
+        let show = &ranked.show;
+        let start = out.draw.len();
+        out.shadow(
+            rect,
+            16.,
+            if focused { 30. } else { 20. },
+            if focused { 12. } else { 8. },
+            if focused { 0.4 } else { 0.165 },
+        );
+        match state.posters.get(&show.id) {
+            Some(Some(poster)) => {
+                out.draw
+                    .push(Draw::Camera(poster.clone(), rect, 16., false, WHITE))
+            }
+            // Loading or no poster: the title on a plain card.
+            _ => {
+                out.shape(rect, 16., c(0x2a2f35, 0.92));
+                out.border(rect, 16., 1., c(0xffffff, 0.07));
+                out.text(
+                    show.title.as_str(),
+                    Rect::new(rect.x + 16., rect.y + 100., rect.w - 32., 90.),
+                    text(20.8, 650, -0.02).leading(1.3),
+                    c(0xffffff, 0.85),
+                    true,
+                );
+            }
+        }
+        if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
+            score_badge(out, assets, scores, rect);
+        }
+        if focused {
+            out.ring(rect, 16.);
+        }
+        let style = text(18.4, if focused { 600 } else { 550 }, -0.01).leading(1.4);
+        out.text(
+            ellipsize(assets, &show.title, style, rect.w - 4.),
+            Rect::new(rect.x + 2., rect.y + rect.h + 12., rect.w - 4., 25.76),
+            style,
+            if focused {
+                c(0xffffff, 1.)
+            } else {
+                c(0xececec, 0.75)
+            },
+            false,
+        );
+        if ranked.pick.is_none() {
+            out.fade(start, 0.55, 1.);
+        }
+        if state.pressed.as_ref() == Some(&target) {
+            out.fade(start, 1., 0.85);
+        }
+    }
+    out.draw.push(Draw::Clip(None));
+}
+
+/// What the top of the Search page says when there is no title to show.
+fn search_status(out: &mut Scene, state: &State) {
+    use crate::streaming::MIN_QUERY_CHARS;
+    let language = state.preferences.language;
+    let titles = &state.titles;
+    let (heading, detail) = if !state.streaming_keys.motn {
+        (
+            language.t("moviesAndShows").to_owned(),
+            language.t("titlesNoKey").to_owned(),
+        )
+    } else if titles.query().is_empty() {
+        (
+            language.t("moviesAndShows").to_owned(),
+            language.t("titlesStart").to_owned(),
+        )
+    } else if titles.query().chars().count() < MIN_QUERY_CHARS {
+        (
+            language.t("moviesAndShows").to_owned(),
+            language.t("titlesKeepTyping").to_owned(),
+        )
+    } else if titles.searching || titles.deadline().is_some() {
+        (language.t("titlesSearching").to_owned(), String::new())
+    } else if titles.error.is_some() {
+        (
+            language.t("moviesAndShows").to_owned(),
+            language.t("titlesError").to_owned(),
+        )
+    } else {
+        (
+            language.t("moviesAndShows").to_owned(),
+            language.format("titlesNone", &[("query", &state.title_query)]),
+        )
+    };
+    out.text(
+        heading,
+        Rect::new(88., 200., 1700., 52.),
+        text(40., 650, -0.03).leading(1.3),
+        c(0xffffff, 0.92),
+        false,
+    );
+    if !detail.is_empty() {
+        out.text(
+            detail,
+            Rect::new(88., 262., 1200., 64.),
+            text(22.4, 500, -0.01).leading(1.4),
+            c(0xeeeeee, 0.65),
+            false,
+        );
+    }
+}
+
+/// The selected title at the top of the Search page, kept to four short lines so two rows of
+/// posters fit below: its name; year, US rating (boxed), length or seasons, kind and genres;
+/// review scores and where it plays on this TV with what it costs; and two lines about it.
+fn search_hero(
+    out: &mut Scene,
+    state: &State,
+    assets: &Assets,
+    selected: &crate::streaming::Ranked,
+) {
+    let language = state.preferences.language;
+    let show = &selected.show;
+    let x = 88.;
+    let right = 1832.;
+    let mut width = right - x;
+    // While a search is pending, or it failed, say so at the right of the title line: the
+    // results may be a local narrowing of an earlier reply.
+    let titles = &state.titles;
+    let status = if titles.error.is_some() {
+        Some(language.t("titlesError"))
+    } else if titles.searching || titles.deadline().is_some() {
+        Some(language.t("titlesSearching"))
+    } else {
+        None
+    };
+    if let Some(status) = status {
+        let style = text(20.8, 550, -0.01).leading(1.4);
+        let w = assets.width(status, style).min(width / 2.) + 2.;
+        out.text(
+            ellipsize(assets, status, style, w),
+            Rect::new(right - w, 140., w, 29.12),
+            style,
+            c(0xeeeeee, 0.65),
+            false,
+        );
+        width -= w + 32.;
+    }
+    let title_style = text(40., 650, -0.035).leading(1.2);
+    out.text(
+        ellipsize(assets, &show.title, title_style, width),
+        Rect::new(x, 126., width, 48.),
+        title_style,
+        WHITE,
+        false,
+    );
+
+    let length = match show.show_type {
+        crate::motn_api::ShowType::Series => match show.season_count {
+            Some(1) => language.t("seasonOne").to_owned(),
+            Some(count) if count > 1 => {
+                language.format("seasonCount", &[("count", &count.to_string())])
+            }
+            _ => String::new(),
+        },
+        _ => match show.runtime {
+            Some(minutes) if minutes >= 60 => format!("{}h {:02}m", minutes / 60, minutes % 60),
+            Some(minutes) if minutes > 0 => format!("{minutes}m"),
+            _ => String::new(),
+        },
+    };
+    let kind = language.t(match show.show_type {
+        crate::motn_api::ShowType::Series => "titleSeries",
+        _ => "titleMovie",
+    });
+    let genres: Vec<&str> = show
+        .genres
+        .iter()
+        .map(|g| g.name.as_str())
+        .take(3)
+        .collect();
+    // (text, boxed): the rating is boxed, as on a cinema listing.
+    let segments = [
+        (years(show), false),
+        (selected.rating.clone().unwrap_or_default(), true),
+        (length, false),
+        (kind.to_owned(), false),
+        (genres.join(", "), false),
+    ];
+    let meta_style = text(20.8, 550, -0.01).leading(1.4);
+    let mut cursor = x;
+    let y = 182.;
+    for (value, boxed) in segments.iter().filter(|(value, _)| !value.is_empty()) {
+        if cursor >= right {
+            break;
+        }
+        if *boxed {
+            let w = assets.width(value, meta_style) + 20.;
+            let chip = Rect::new(cursor, y - 1., w, 31.);
+            out.border(chip, 6., 1.5, c(0xffffff, 0.55));
+            out.text(
+                value.as_str(),
+                Rect::new(chip.x, y, chip.w, 29.12),
+                meta_style,
+                c(0xffffff, 0.92),
+                true,
+            );
+            cursor += w + 16.;
+        } else {
+            let value = ellipsize(assets, value, meta_style, right - cursor);
+            let w = assets.width(&value, meta_style) + 2.;
+            out.text(
+                value.as_str(),
+                Rect::new(cursor, y, w, 29.12),
+                meta_style,
+                c(0xeeeeee, 0.72),
+                false,
+            );
+            cursor += w + 16.;
+        }
+    }
+
+    let y = 222.;
+    let mut cursor = x;
+    if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
+        cursor += hero_scores(out, assets, scores, x, y);
+    }
+    let width = right - x;
+    let where_style = text(20.8, 650, -0.01).leading(1.4);
+    let place = ellipsize(
+        assets,
+        &availability(state, selected),
+        where_style,
+        right - cursor,
+    );
+    out.text(
+        place.as_str(),
+        Rect::new(cursor, y + 1., right - cursor, 29.12),
+        where_style,
+        if selected.pick.is_some() {
+            WHITE
+        } else {
+            c(0xeeeeee, 0.55)
+        },
+        false,
+    );
+
+    if !show.overview.is_empty() {
+        let style = text(19.2, 450, -0.005).leading(1.45);
+        out.text(
+            clamp_lines(assets, &show.overview, style, width, 2),
+            Rect::new(x, 262., width, 56.),
+            style,
+            c(0xeeeeee, 0.72),
+            false,
+        );
+    }
+}
+
+/// Review scores for the selected title, on one line from `x`; returns the width used, with a
+/// gap before what follows.
+fn hero_scores(
+    out: &mut Scene,
+    assets: &Assets,
+    scores: &crate::mdblist::Scores,
+    x: f32,
+    y: f32,
+) -> f32 {
+    let mut items: Vec<(&str, Color, String)> = Vec::new();
+    if let Some(critics) = scores.critics {
+        items.push((
+            "tomato",
+            if critics >= 60 {
+                c(0xf2412c, 1.)
+            } else {
+                c(0x8fb04a, 1.)
+            },
+            format!("{critics}%"),
+        ));
+    }
+    if let Some(audience) = scores.audience {
+        items.push(("popcorn", c(0xf6c344, 1.), format!("{audience}%")));
+    }
+    if let Some(imdb) = scores.imdb {
+        items.push(("star-filled", c(0xf5c518, 1.), format!("{imdb:.1}")));
+    }
+    if items.is_empty() {
+        return 0.;
+    }
+    let style = text(20.8, 650, -0.01).leading(1.4);
+    let mut cursor = x;
+    for (icon, color, label) in items {
+        out.icon(assets, icon, Rect::new(cursor, y + 4., 22., 22.), color);
+        let w = assets.width(&label, style) + 2.;
+        out.text(
+            label.as_str(),
+            Rect::new(cursor + 29., y + 1., w, 29.12),
+            style,
+            WHITE,
+            false,
+        );
+        cursor += 29. + w + 20.;
+    }
+    cursor - x + 12.
 }
 
 fn filter(out: &mut Scene, state: &State, target: Target, rect: Rect, label: &str, selected: bool) {
@@ -3721,6 +4284,7 @@ fn keyboard(out: &mut Scene, state: &State, assets: &Assets) {
             TextField::InputName => language.t("inputName"),
             TextField::CameraName => language.t("cameraName"),
             TextField::Apps => language.t("findApp"),
+            TextField::Titles => language.t("moviesAndShows"),
         },
         Rect::new(389., 324., 1000., 44.),
         text(37.6, 500, -0.055).leading(1.1),

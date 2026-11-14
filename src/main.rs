@@ -9,8 +9,6 @@ mod cameras;
 mod clock;
 mod companion;
 mod damage;
-// Not wired into the UI yet; remove once the search screen uses it.
-#[allow(dead_code)]
 mod deeplink;
 mod diagnostics;
 mod egl_damage;
@@ -23,8 +21,10 @@ mod input_refresh;
 mod key_editor;
 #[cfg(all(feature = "webos", target_os = "linux", target_arch = "arm"))]
 mod luna;
+mod mdblist;
 mod model;
 mod platform;
+mod posters;
 mod raster;
 mod recents;
 mod renderer;
@@ -35,28 +35,25 @@ mod sdl_events;
 mod signal_watch;
 mod state;
 mod storage;
-// Not wired into the UI yet; remove once the search screen uses it.
+// Generated from the whole OpenAPI spec; search uses only part of it.
 #[allow(dead_code)]
 #[path = "motn-api.rs"]
 mod motn_api;
+// Generated from the whole OpenAPI spec; search uses only part of it.
 #[allow(dead_code)]
 mod openapi;
-#[allow(dead_code)]
 mod relevance;
-#[allow(dead_code)]
 #[path = "search-cache.rs"]
 mod search_cache;
-#[allow(dead_code)]
 mod streaming;
-#[allow(dead_code)]
 #[path = "streaming-keys.rs"]
 mod streaming_keys;
-#[allow(dead_code)]
 #[path = "streaming-search.rs"]
 mod streaming_search;
 mod text_rendering;
 #[path = "tile-editor.rs"]
 mod tile_editor;
+// Generated from the whole OpenAPI spec; search uses only part of it.
 #[allow(dead_code)]
 #[path = "tmdb-api.rs"]
 mod tmdb_api;
@@ -399,6 +396,37 @@ fn effects(
                     }
                 }
             }
+            Effect::LaunchTitle { app, params } => {
+                if state.launching {
+                    continue;
+                }
+                if platform.webos {
+                    state.launching = true;
+                    state.launch_requested = Some(app.clone());
+                    state.notify(state.preferences.language.t("opening"));
+                    platform.send(match params {
+                        Some(params) => Request::LaunchWith { id: app, params },
+                        None => Request::Launch(app),
+                    });
+                } else {
+                    eprintln!(
+                        "Luma desktop preview: would open {app} with {}",
+                        params.map_or_else(|| "no parameters".into(), |p| p.to_string())
+                    );
+                    let title = state
+                        .inventory
+                        .apps
+                        .iter()
+                        .find(|a| a.id == app)
+                        .map_or(app.as_str(), |app| app.title.as_str());
+                    state.notify(
+                        state
+                            .preferences
+                            .language
+                            .format("desktopPreview", &[("app", title)]),
+                    );
+                }
+            }
             Effect::FireWebhook(tile) => webhook.send(tile),
             Effect::UpdateDownload(release) => updates.request(update::Request::Download(release)),
             Effect::Quit => return false,
@@ -435,6 +463,10 @@ fn script(
             state.open(1);
             vec![]
         }
+        "search" => {
+            state.open(state::SEARCH_TAB);
+            vec![]
+        }
         "settings" => {
             state.open(2);
             vec![]
@@ -464,6 +496,7 @@ fn script(
                     Some(state::Subpage::Greeting) => state::TextField::Name,
                     Some(state::Subpage::WeatherLocation) => state::TextField::Location,
                     Some(state::Subpage::Input(_)) => state::TextField::InputName,
+                    _ if state.page == state::Page::Search => state::TextField::Titles,
                     _ => state::TextField::Apps,
                 }
             };
@@ -474,6 +507,7 @@ fn script(
             vec![]
         }
         "await-search" => vec![],
+        "await-titles" => vec![],
         "await-weather" => vec![],
         "await-recents" => vec![],
         "await-upload" => vec![],
@@ -749,6 +783,17 @@ fn run() -> Result<(), String> {
     let mut tile_editor_service = tile_editor::Service::new(!webos && !options.script.is_empty())?;
     let keys_path = streaming_keys::path(&preferences_path);
     state.streaming_keys = streaming_keys::load(&keys_path).status();
+    let streaming_search = streaming_search::Service::new(
+        keys_path.clone(),
+        search_cache::DiskCache::beside(&preferences_path),
+    );
+    let posters = posters::Service::new(search_cache::DiskCache::posters_beside(&preferences_path));
+    let scores = mdblist::Service::new(
+        mdblist::Live {
+            keys: keys_path.clone(),
+        },
+        search_cache::DiskCache::beside(&preferences_path),
+    );
     let mut key_editor_service =
         key_editor::Service::new(keys_path, !webos && !options.script.is_empty())?;
     if options.test_extra_apps > 0 {
@@ -1014,7 +1059,11 @@ fn run() -> Result<(), String> {
     let mut focused = true;
     let mut press: Option<Press> = None;
     let mut back_button = BackButton::default();
-    let initial_nav = view::navigation(&assets, state.preferences.language);
+    let initial_nav = view::navigation(
+        &assets,
+        state.preferences.language,
+        state.page == state::Page::Search,
+    );
     let mut pill = initial_nav.items[0].x;
     let mut pill_width = initial_nav.items[0].w;
     if options.frames.is_some() {
@@ -1862,6 +1911,8 @@ fn run() -> Result<(), String> {
             && frame.is_multiple_of(3)
             && !options.script.front().is_some_and(|action| {
                 (action == "await-search" && state.weather.searching)
+                    || (action == "await-titles"
+                        && (state.titles.searching || state.titles.deadline().is_some()))
                     || (action == "await-weather" && state.weather.fetching())
                     || (action == "await-recents" && state.recents.pending.is_some())
                     || (action == "await-upload"
@@ -1924,6 +1975,31 @@ fn run() -> Result<(), String> {
             platform.send(Request::WatchSignal);
         }
         weather_tick(&mut state, &weather_service, visible);
+        // Movies and shows for the Apps search: network and disk stay on the search worker.
+        if let Some(request) = state.sync_titles(Instant::now()) {
+            streaming_search.send(streaming_search::Job {
+                request,
+                services: state.streaming_services(),
+            });
+        }
+        for (request, reply) in streaming_search.receiver.try_iter() {
+            state.accept_titles(&request, reply);
+        }
+        if let Some(requests) = state.poster_requests() {
+            posters.want(state.titles.results.iter().map(|r| r.show.id.as_str()));
+            for request in requests {
+                posters.send(request);
+            }
+        }
+        for (show_id, poster) in posters.receiver.try_iter() {
+            state.accept_poster(&show_id, poster);
+        }
+        if let Some(ids) = state.score_requests() {
+            scores.send(ids);
+        }
+        for reply in scores.receiver.try_iter() {
+            state.accept_scores(reply);
+        }
         // SDL-webOS disables text input when its own panel is dismissed, even
         // if it did not forward a Back/Return key to the application.
         if text_active
@@ -1954,7 +2030,11 @@ fn run() -> Result<(), String> {
         }
         let dt = clock::since(last_frame).as_secs_f32().min(0.1);
         last_frame = clock::now();
-        let navigation = view::navigation(&assets, state.preferences.language);
+        let navigation = view::navigation(
+            &assets,
+            state.preferences.language,
+            state.page == state::Page::Search,
+        );
         let target = navigation.items[state.page_index()].x;
         let target_width = navigation.items[state.page_index()].w;
         if state.preferences.reduced_motion

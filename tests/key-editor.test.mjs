@@ -6,6 +6,7 @@ import { change, checkKeys, describeKey, loadKeys, post } from '../assets/key-ed
 const keys = {
   motn: { set: true, hint: '…cdef' },
   tmdb: { set: false, hint: '' },
+  mdblist: { set: true, hint: '…wxyz' },
 };
 
 test('key status is read without caching and rejected when malformed', async () => {
@@ -23,6 +24,7 @@ test('key status is read without caching and rejected when malformed', async () 
   );
   assert.throws(() => checkKeys({ motn: { set: 'yes', hint: '' }, tmdb: keys.tmdb }), /Invalid/);
   assert.throws(() => checkKeys({ motn: keys.motn }), /Invalid/);
+  assert.throws(() => checkKeys({ motn: keys.motn, tmdb: keys.tmdb }), /Invalid/);
 });
 
 test('stored keys are described by their last characters only', () => {
@@ -32,6 +34,7 @@ test('stored keys are described by their last characters only', () => {
 
 test('blank fields keep stored keys instead of erasing them', () => {
   assert.deepEqual(change({ motn: '  motn-key-abc  ', tmdb: '   ' }), { motn: 'motn-key-abc' });
+  assert.deepEqual(change({ mdblist: ' abc123 ' }), { mdblist: 'abc123' });
   assert.deepEqual(change({ motn: '', tmdb: '' }), {});
   assert.deepEqual(change({}), {});
 });
@@ -69,5 +72,5 @@ test('the page loads only its own scripts and links out only to key providers', 
   const scripts = [...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(scripts, ['app.js']);
   const links = [...html.matchAll(/href="(https?:[^"]+)"/g)].map((m) => new URL(m[1]).host);
-  assert.deepEqual(links.sort(), ['www.movieofthenight.com', 'www.themoviedb.org']);
+  assert.deepEqual(links.sort(), ['mdblist.com', 'www.movieofthenight.com', 'www.themoviedb.org']);
 });

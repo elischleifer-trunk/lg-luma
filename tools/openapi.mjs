@@ -52,7 +52,8 @@ const APIS = [
       'find-by-id',
     ],
     // Corrections where the upstream spec disagrees with what the API sends, found by
-    // decoding captured fixtures. Each is a path into the spec and the value to put there.
+    // decoding captured fixtures. Each is a path into the spec and the value to put there;
+    // `add` patches describe fields the spec leaves out, such as `append_to_response` blocks.
     patches: [
       {
         // Season ratings are decimals such as 7.9, not integers.
@@ -73,6 +74,77 @@ const APIS = [
           'type',
         ],
         value: 'number',
+      },
+      {
+        // `append_to_response=release_dates`: certifications by country (PG-13 in the US).
+        add: true,
+        path: [
+          'paths',
+          '/3/movie/{movie_id}',
+          'get',
+          'responses',
+          '200',
+          'content',
+          'application/json',
+          'schema',
+          'properties',
+          'release_dates',
+        ],
+        value: {
+          type: 'object',
+          properties: {
+            results: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  iso_3166_1: { type: 'string' },
+                  release_dates: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        certification: { type: 'string' },
+                        type: { type: 'integer' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        // `append_to_response=content_ratings`: TV ratings by country (TV-14 in the US).
+        add: true,
+        path: [
+          'paths',
+          '/3/tv/{series_id}',
+          'get',
+          'responses',
+          '200',
+          'content',
+          'application/json',
+          'schema',
+          'properties',
+          'content_ratings',
+        ],
+        value: {
+          type: 'object',
+          properties: {
+            results: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  iso_3166_1: { type: 'string' },
+                  rating: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
       },
     ],
   },
@@ -146,7 +218,9 @@ async function fetchSpec(api) {
   for (const patch of api.patches ?? []) {
     const parent = patch.path.slice(0, -1).reduce((value, key) => value?.[key], trimmed);
     const key = patch.path.at(-1);
-    if (!parent || !(key in parent)) throw new Error(`${api.name}: stale patch ${patch.path}`);
+    if (!parent || (!patch.add && !(key in parent)) || (patch.add && key in parent)) {
+      throw new Error(`${api.name}: stale patch ${patch.path}`);
+    }
     parent[key] = patch.value;
   }
   if (api.patches?.length) trimmed.info['x-luma-patches'] = api.patches;
