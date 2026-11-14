@@ -293,7 +293,9 @@ impl<'a, S: System> Home<'a, S> {
         }
         Err("Close Luma before enabling Home integration".into())
     }
-    pub fn restore(&self, config: &Config) -> Result<()> {
+    /// Restore LG Home's files and stop Luma's Home. `open` launches LG Home afterwards even if
+    /// Home was not in front.
+    pub fn restore(&self, config: &Config, open: bool) -> Result<()> {
         let was_home = match self.foreground() {
             Ok(id) => id == self.id,
             Err(e) => {
@@ -327,7 +329,7 @@ impl<'a, S: System> Home<'a, S> {
             )?)?;
         }
         self.stop_home(&config.app_dir)?;
-        if was_home {
+        if was_home || open {
             self.launch()?;
         }
         Ok(())
@@ -392,7 +394,7 @@ impl<'a, S: System> Home<'a, S> {
             Ok(())
         })();
         if let Err(error) = result {
-            return match self.restore(config) {
+            return match self.restore(config, false) {
                 Ok(()) => Err(error),
                 Err(recovery) => Err(format!("{error}\nRestore also failed: {recovery}")),
             };
@@ -619,11 +621,20 @@ pub fn dispatch(
             } else {
                 config.enabled = false;
                 system::write_json(system, CONFIG, &config)?;
-                home.restore(&config)?;
+                home.restore(&config, false)?;
                 if hook_owned(system) {
                     system::remove(system, HOOK)?;
                 }
             }
+            Ok(json!({"returnValue":true}))
+        }
+        // Open LG's original Home until the next cold boot: the integration stays enabled and
+        // its boot hook in place, so `apply` brings Luma back as Home then.
+        "suspend" => {
+            let config = saved
+                .filter(|c| c.enabled)
+                .ok_or("Luma Home is not enabled")?;
+            home.restore(&config, true)?;
             Ok(json!({"returnValue":true}))
         }
         _ => Err("Unknown Home integration command".into()),

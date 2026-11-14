@@ -317,10 +317,13 @@ pub const CUSTOM_TILE_PREFIX: &str = "custom.";
 /// Luma's built-in Cameras app: Home Assistant's cameras in the overlay app's gallery. It is
 /// listed while Home Assistant is on and never sent to the TV as a launch request.
 pub const CAMERAS_APP: &str = "luma.cameras";
+/// Luma's built-in tile for LG's original Home. While Luma has replaced Home, opening it lifts
+/// that takeover until the next cold boot (see `platform::open_lg_home`).
+pub const LG_HOME_APP: &str = "luma.lg-home";
 
-/// Apps Luma adds itself (shortcut tiles and Cameras); the TV never reports them.
+/// Apps Luma adds itself (shortcut tiles, Cameras and LG Home); the TV never reports them.
 pub fn is_builtin(id: &str) -> bool {
-    id.starts_with(CUSTOM_TILE_PREFIX) || id == CAMERAS_APP
+    id.starts_with(CUSTOM_TILE_PREFIX) || id == CAMERAS_APP || id == LG_HOME_APP
 }
 pub const TILE_LIMIT: usize = 64;
 pub const TILE_URL_LIMIT: usize = 512;
@@ -501,7 +504,8 @@ impl Preferences {
                 if ids.len() >= 6 {
                     break;
                 }
-                if !ids.contains(&app.id) {
+                // LG Home is an escape hatch in Apps, not a default favorite.
+                if !ids.contains(&app.id) && app.id != LG_HOME_APP {
                     ids.push(app.id.clone());
                 }
             }

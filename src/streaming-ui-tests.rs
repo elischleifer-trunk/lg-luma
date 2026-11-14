@@ -426,7 +426,12 @@ fn installing_or_removing_an_app_searches_the_current_text_again() {
     answer(&mut state, "dune");
     assert!(state.titles.deadline().is_none());
     let mut inventory = state.inventory.clone();
-    inventory.apps.pop();
+    let removed = inventory
+        .apps
+        .iter()
+        .rposition(|app| !crate::model::is_builtin(&app.id))
+        .unwrap();
+    inventory.apps.remove(removed);
     state.set_inventory(inventory.clone(), None);
     assert!(
         state.titles.deadline().is_some(),

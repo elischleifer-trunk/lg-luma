@@ -148,16 +148,55 @@ pub fn install_dir() -> Result<std::path::PathBuf, String> {
         .clone()
 }
 
-pub fn redirect_to_home() -> Result<bool, String> {
-    // The root-only integration mounts this marker with its native Home
-    // manifest, or writes it to /var/run on webOS 5/6, where it mounts this
-    // executable over LG's (a tile's jail sees /usr/bin without that mount).
-    // A normal tile launch then opens that same instance instead of starting
-    // a second renderer writing the same preferences.
+/// Whether the root Home integration currently has Luma in place of LG's Home. The integration
+/// mounts this marker with its native Home manifest, or writes it to /var/run on webOS 5/6, where
+/// it mounts this executable over LG's (a tile's jail sees /usr/bin without that mount).
+fn home_takeover_active() -> bool {
     let marked = |file| std::fs::read_to_string(file).is_ok_and(|marker| marker.trim() == APP_ID);
-    if marked("/usr/palm/applications/com.webos.app.home/.luma-home")
-        || marked("/var/run/luma-home")
-    {
+    marked("/usr/palm/applications/com.webos.app.home/.luma-home") || marked("/var/run/luma-home")
+}
+
+/// Open LG's original Home. While Luma has replaced Home, `home.sh suspend` lifts the takeover
+/// (keeping it enabled, so the boot hook reapplies it at the next cold boot), stops this Home
+/// instance and opens LG's. It runs in its own systemd unit: it ends this process, and Homebrew
+/// Channel's exec would end it when the call returns.
+fn open_lg_home() -> Result<(), String> {
+    if !home_takeover_active() && !runs_as_lg_home() {
+        return call(
+            "luna://com.webos.applicationManager/launch",
+            json!({"id": HOME_ID}),
+        )
+        .map(|_| ());
+    }
+    let script = install_dir()?.join("home.sh");
+    let quote = |text: &str| format!("'{}'", text.replace('\'', "'\\''"));
+    let command = format!(
+        "systemd-run --unit=luma-lg-home --collect /bin/sh {} suspend",
+        quote(&script.to_string_lossy())
+    );
+    let envelope = call(
+        "luna://org.webosbrew.hbchannel.service/exec",
+        json!({"command": command}),
+    )?;
+    for key in ["returnCode", "exitCode"] {
+        if let Some(code) = envelope.get(key)
+            && code != 0
+            && code != "0"
+        {
+            let stderr = envelope.get("stderrString").and_then(Value::as_str);
+            return Err(format!(
+                "LG Home could not be opened: {}",
+                output_excerpt(stderr.unwrap_or(""))
+            ));
+        }
+    }
+    Ok(())
+}
+
+pub fn redirect_to_home() -> Result<bool, String> {
+    // A normal tile launch opens the Home instance instead of starting
+    // a second renderer writing the same preferences.
+    if home_takeover_active() {
         thread::spawn(|| {
             call(
                 "luna://com.webos.applicationManager/launch",
@@ -353,7 +392,9 @@ impl Platform {
                         Response::Uninstalled { id, result }
                     }
                     Request::Launch(id) => Response::Launched(if webos {
-                        if crate::scroll_preview::is_placeholder(&id) {
+                        if id == crate::model::LG_HOME_APP {
+                            open_lg_home()
+                        } else if crate::scroll_preview::is_placeholder(&id) {
                             Err("Scroll preview cards cannot be launched".into())
                         } else if !valid_app_id(&id) {
                             Err("Invalid application identifier".into())

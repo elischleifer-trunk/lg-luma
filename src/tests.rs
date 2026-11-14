@@ -532,7 +532,13 @@ fn partial_refresh_preserves_valid_inputs_and_never_invents_tv_apps() {
         crate::model::Inventory::default(),
         Some("Inputs unavailable".into()),
     );
-    assert!(state.inventory.apps.is_empty());
+    assert!(
+        state
+            .inventory
+            .apps
+            .iter()
+            .all(|app| crate::model::is_builtin(&app.id))
+    );
     assert_eq!(state.inventory.inputs.len(), 3);
     // Preserved inputs still lead Home; no TV app is invented.
     assert_eq!(
@@ -3642,6 +3648,25 @@ fn cameras_app_is_listed_only_while_home_assistant_is_on_and_opens_the_gallery()
     state.preferences.home_assistant = false;
     state.sync_custom_tiles();
     assert!(!listed(&state));
+}
+
+#[test]
+fn lg_home_tile_is_listed_once_and_launches_through_luma() {
+    use crate::model::LG_HOME_APP;
+    let mut state = ready();
+    state.sync_custom_tiles();
+    state.set_inventory(demo_inventory(), None);
+    let tiles: Vec<_> = state
+        .inventory
+        .apps
+        .iter()
+        .filter(|app| app.id == LG_HOME_APP)
+        .collect();
+    assert_eq!(tiles.len(), 1);
+    assert_eq!((tiles[0].title.as_str(), tiles[0].mark), ("LG Home", "tv"));
+    assert!(!crate::platform::can_uninstall(LG_HOME_APP));
+    state.focus = Target::App(LG_HOME_APP.into());
+    assert_eq!(state.activate(), vec![Effect::Launch(LG_HOME_APP.into())]);
 }
 
 #[test]

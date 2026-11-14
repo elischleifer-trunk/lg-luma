@@ -954,6 +954,13 @@ instance and removes the boot hook. The copied restore scripts remain in `/var/l
 even if the installed package is removed. Disable the standalone `65-luma` cold-boot hook before
 enabling this integration.
 
+Apps always lists a built-in **LG Home** tile (`luma.lg-home`). Without the integration it simply
+launches `com.webos.app.home`. While Luma is Home, it runs the installed `home.sh suspend` in its
+own systemd unit through Homebrew Channel's exec: that removes the mount like `disable`, stops
+Luma's Home and opens LG's, but leaves the integration enabled and the boot hook in place. The
+Home key then opens LG Home until the next cold boot (standby with Quick Start+ is not one), when
+`64-luma-home` applies the takeover again. Run `home.sh apply` to bring Luma back sooner.
+
 Build and script checks cannot establish native Home compatibility. Manually verify Home, Back
 out of the last app, standby wake with the TV's chosen Quick Start+ setting, a full cold boot,
 saved preferences and restoring LG Home. The broader webOS 6+ app compatibility statement does

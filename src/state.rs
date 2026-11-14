@@ -988,6 +988,14 @@ impl State {
                 mark: "camera",
             });
         }
+        self.inventory.apps.push(App {
+            id: crate::model::LG_HOME_APP.into(),
+            title: "LG Home".into(),
+            brand: "custom".into(),
+            category: "Utilities".into(),
+            icon: None,
+            mark: "tv",
+        });
         self.dirty = true;
     }
 
