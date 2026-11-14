@@ -129,8 +129,19 @@ fn grid(out: &mut Scene, state: &State) {
         out.shape(frame, RADIUS, c(0x000000, 1.));
         match gallery.frames.get(&camera.id) {
             Some(picture) => {
-                out.draw
-                    .push(Draw::Camera(picture.clone(), frame, RADIUS, false, [1.; 4]))
+                // A picture from the last visit is dimmed until this one's first arrives.
+                let shade = if picture.serial < gallery.fresh {
+                    0.45
+                } else {
+                    1.
+                };
+                out.draw.push(Draw::Camera(
+                    picture.clone(),
+                    frame,
+                    RADIUS,
+                    false,
+                    [shade, shade, shade, 1.],
+                ))
             }
             None => status(
                 out,

@@ -827,6 +827,7 @@ fn run() -> Result<(), String> {
     let webhook_service = webhook::Service::new();
     // Pairings sit beside the preferences; a temporary --preferences profile keeps its own.
     let mut camera_service = cameras::Service::default();
+    let mut cameras_asked: Option<Instant> = None;
     let mut home_assistant = home_assistant::Service::new(
         home_assistant::Live { webos },
         Some(preferences_path.with_file_name("home-assistant.json")),
@@ -1381,6 +1382,7 @@ fn run() -> Result<(), String> {
         home_assistant.set_enabled(state.preferences.home_assistant);
         if std::mem::take(&mut state.show_cameras) {
             home_assistant.show_cameras();
+            cameras_asked = Some(Instant::now());
         }
         while let Ok(event) = home_assistant.events.try_recv() {
             let language = state.preferences.language;
@@ -1480,6 +1482,10 @@ fn run() -> Result<(), String> {
         // overlay app; close it when the gallery leaves the camera.
         if let Some((id, endpoint)) = state.cameras.resolve.take() {
             camera_service.resolve(id, endpoint);
+        }
+        // The focused camera's video stream starts ahead of OK.
+        if let Some((id, endpoint)) = state.camera_warm(visible, Instant::now()) {
+            camera_service.warm(id, endpoint);
         }
         if let Some(video) = state.cameras.play.take() {
             home_assistant.show_video(video);
@@ -2269,6 +2275,10 @@ fn run() -> Result<(), String> {
             || assets.artwork.pending()
         {
             8
+        } else if cameras_asked.is_some_and(|at| at.elapsed() < Duration::from_millis(300)) {
+            // The Home Assistant thread answers with the cameras at once: open without waiting
+            // out an idle screen's long wake.
+            4
         } else if state.cameras_visible() {
             // Camera frames arrive from worker threads, not as SDL events.
             16

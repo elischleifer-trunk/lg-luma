@@ -379,6 +379,8 @@ struct Session {
     ends: Instant,
     /// A camera video from the Cameras app rather than a doorbell card.
     video: bool,
+    /// When Luma asked the overlay app to open, for the log.
+    asked: Instant,
     /// Recorded video of this gallery camera, which the overlay app loads piece by piece.
     recorded: Option<String>,
 }
@@ -793,7 +795,10 @@ impl<T: Tv> Api<T> {
         }
         let closed = matches!(
             request.path,
-            "/api/overlay/closed" | "/api/overlay/expand" | "/api/overlay/recorded"
+            "/api/overlay/closed"
+                | "/api/overlay/expand"
+                | "/api/overlay/playing"
+                | "/api/overlay/recorded"
         );
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
@@ -836,6 +841,26 @@ impl<T: Tv> Api<T> {
                     session.ends = now + VIDEO_TTL;
                 }
                 reply(200, json!({"expanded": expanded}))
+            }
+            // A camera video shows its first frames: how long that took goes to the log.
+            ("POST", "/api/overlay/playing") => {
+                if !request.peer.is_loopback() {
+                    return error(403, "Only the overlay app reports playing");
+                }
+                let session = self.session.as_ref().filter(|session| {
+                    session.video
+                        && body["session"] == session.id.as_str()
+                        && body["nonce"] == session.nonce.as_str()
+                });
+                if let Some(session) = session {
+                    crate::telemetry::log_info!(
+                        "overlay",
+                        "camera video playing {} ms after Luma asked for it ({} ms of that in the overlay app)",
+                        now.saturating_duration_since(session.asked).as_millis(),
+                        body["waited"].as_u64().unwrap_or(0)
+                    );
+                }
+                reply(200, json!({"playing": session.is_some()}))
             }
             ("POST", "/api/overlay/closed") => {
                 if !request.peer.is_loopback() {
@@ -1223,6 +1248,7 @@ impl<T: Tv> Api<T> {
             media,
             ends: now + Duration::from_secs_f64(duration) + SESSION_GRACE,
             video: false,
+            asked: now,
             recorded: None,
         });
         let launching = Instant::now();
@@ -1580,6 +1606,7 @@ impl<T: Tv> Api<T> {
             media,
             ends: now + VIDEO_TTL,
             video: true,
+            asked: now,
         });
         if let Err(error) = self.tv.launch_overlay(&params) {
             crate::telemetry::log_warn!("overlay", "video: {error}");

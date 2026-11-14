@@ -102,12 +102,27 @@ again closes it.
 Full screen, a camera that can stream (most RTSP cameras: Generic, ONVIF, Reolink, UniFi Protect
 and others) plays Home Assistant's HLS stream: the camera's own video at its full frame rate,
 decoded by the TV, a second or two behind real time. This needs Home Assistant's **Stream**
-integration, which `default_config` includes. The video starts within a few seconds; to make it
-start at once for a camera you open often, turn on **Preload stream** in that camera entity's
-settings in Home Assistant, which keeps its stream running. Other cameras, and any camera while its stream is
+integration, which `default_config` includes. Other cameras, and any camera while its stream is
 starting or if it cannot play, show Home Assistant's motion-JPEG stream, which for most camera
 types is only about two pictures a second. Its badge says **Live** or **Snapshots**: if that
 stream fails or freezes, Luma switches to snapshots, several a second.
+
+Home Assistant needs a few seconds to connect to a camera and prepare its first video, so Luma
+asks it to start as soon as a camera is focused in the grid: a camera you rest on for several
+seconds before pressing **OK** goes live almost at once. Two Home Assistant settings shorten the
+wait further:
+
+- Shorter video segments. Home Assistant offers no video until one whole segment is ready, six
+  seconds by default. In `configuration.yaml`, then restart Home Assistant:
+
+  ```yaml
+  stream:
+    segment_duration: 2
+  ```
+
+- **Preload stream**, in a camera entity's settings in Home Assistant, keeps that camera's
+  stream running all the time, so it is always ready. This uses Home Assistant's processor and
+  network continuously; choose it for the cameras you open most.
 
 ### Rewinding and history
 

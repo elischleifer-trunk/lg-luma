@@ -1163,6 +1163,27 @@ fn camera_video_plays_in_the_overlay_and_reports_how_it_closed() {
     );
     assert_eq!(params["title"], "Door");
     assert_eq!(params["snapshot"], "http://ha/s");
+    // The page reports its first frames, for the log: only from the TV, for this video.
+    let mut playing = |peer, nonce: &Value| {
+        let body = json!({"session": params["session"], "nonce": nonce, "waited": 1200});
+        let body = body.to_string();
+        h.api.handle(
+            &Request {
+                method: "POST",
+                path: "/api/overlay/playing",
+                query: "",
+                authorization: None,
+                origin: Some("null"),
+                integration: None,
+                peer,
+                body: body.as_bytes(),
+            },
+            h.now,
+        )
+    };
+    assert_eq!(playing(LAN, &params["nonce"]).status, 403);
+    assert_eq!(playing(LOOPBACK, &json!("x")).body["playing"], false);
+    assert_eq!(playing(LOOPBACK, &params["nonce"]).body["playing"], true);
     assert_eq!(closed(&mut h, &params, true).body, json!({"ended": true}));
     assert_eq!(
         h.events.try_recv(),
