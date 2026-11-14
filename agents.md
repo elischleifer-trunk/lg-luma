@@ -84,14 +84,18 @@ Match the current native design without on-screen weather credits; attribution r
 ## Reaching the development TV
 
 The maintainer's rooted TV is reachable for root SSH through a Cloudflare Access tunnel at
-`tv.elischleifer.com`. Ask the maintainer before connecting; they add your key and approve the
-login. From a cloud session:
+`tv.elischleifer.com`. The maintainer wants agents to be able to use it for testing on the TV.
+From a cloud session:
 
 1. Install `openssh-client` and `cloudflared` (the official linux-amd64 release binary).
-2. `cloudflared access login https://tv.elischleifer.com`, then give the maintainer the printed
-   URL to approve; leave it running until it prints the token.
-3. Generate a key with comment `claude-cloud-session` and have the maintainer append the public
-   key to `/home/root/.ssh/authorized_keys` on the TV.
+2. SSH key: if the environment variable `TV_SSH_PRIVATE_KEY` is set (the key itself, or its
+   base64), write it to `~/.ssh/id_ed25519` with mode 600; its public key is already in the TV's
+   `/home/root/.ssh/authorized_keys`. Otherwise generate a key and ask the maintainer to append
+   the public key there.
+3. Cloudflare Access: if `TUNNEL_SERVICE_TOKEN_ID` and `TUNNEL_SERVICE_TOKEN_SECRET` are set,
+   `cloudflared access ssh` uses that service token and no login is needed. Otherwise run
+   `cloudflared access login https://tv.elischleifer.com` and give the maintainer the printed URL
+   to approve; leave it running until it prints the token. Never print either token.
 4. `~/.ssh/config`: `Host tv` → `HostName tv.elischleifer.com`, `User root`,
    `ProxyCommand cloudflared access ssh --hostname %h`.
 
