@@ -4,6 +4,7 @@
 //!
 //! API calls for a new query, cheapest first:
 //! 1. Movie of the Night title search and TMDB `search/multi`, in parallel (one call each).
+//!    Results whose titles do not contain the query are dropped ([`relevance::on_topic`]).
 //! 2. TMDB details for results the search summary did not already rule out (foreign or
 //!    little-seen titles are skipped), in parallel. TMDB has no batch endpoint; details are
 //!    cached for a month, so each title costs one call.
@@ -56,7 +57,8 @@ pub fn search(
         let shows = source.search(query, country);
         (shows, tmdb.join().unwrap_or(None))
     });
-    let mut shows = shows?;
+    // Before any TMDB details are fetched, so off-topic results cost no calls.
+    let mut shows = relevance::on_topic(query, shows?);
     let results = match tmdb {
         Some(Ok(results)) => results,
         Some(Err(error)) => {

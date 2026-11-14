@@ -1,0 +1,628 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "fan",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:36.578Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/x5p9DZBQikf4YKBk8JJYHzjRljZ.jpg",
+        "genre_ids": [
+          10767,
+          10762
+        ],
+        "id": 110898,
+        "name": "Fan School",
+        "original_language": "fr",
+        "original_name": "L'École des fans",
+        "overview": "Host Jacques Martin invites different talented children from various backgrounds to showcase their beautiful voices. The participants entertain and wow the audience with their lovely performances.",
+        "popularity": 36.2973,
+        "poster_path": "/lavhdK5loEnuCSJIRYHi2yAXlXV.jpg",
+        "first_air_date": "1977-01-30",
+        "softcore": false,
+        "vote_average": 7.2,
+        "vote_count": 2,
+        "media_type": "tv",
+        "origin_country": [
+          "FR"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/gANeXgFmd0Hd7vggjRw33ueXN4L.jpg",
+        "genre_ids": [
+          10767
+        ],
+        "id": 69193,
+        "name": "Fan Service",
+        "original_language": "en",
+        "original_name": "Fan Service",
+        "overview": "Gray Haddock, Kerry Shawcross, Miles Luna, and their friends discuss the latest news, trailers, and episodes from the world of Anime.",
+        "popularity": 5.6096,
+        "poster_path": "/cWUZSNdmFFAyMfdqCVua4cVrmIF.jpg",
+        "first_air_date": "2016-10-21",
+        "softcore": false,
+        "vote_average": 6,
+        "vote_count": 1,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/lUPAJ5t9RMHeVHxQilz9mLlJaU2.jpg",
+        "genre_ids": [
+          10751
+        ],
+        "id": 90049,
+        "name": "Fan club",
+        "original_language": "fr",
+        "original_name": "Fan club",
+        "overview": "",
+        "popularity": 4.8814,
+        "poster_path": "/27ZIXLZzYJniwHkDpi5ZMzBOPeo.jpg",
+        "first_air_date": "2008-08-28",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "CA"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/fmy7OLj4ObNctWS54KrEdkUZOLu.jpg",
+        "genre_ids": [
+          35
+        ],
+        "id": 69746,
+        "name": "La Fan",
+        "original_language": "es",
+        "original_name": "La Fan",
+        "overview": "La fan, is an upcoming American telenovela produced by Telemundo, is an original story written by Marcela Citterio and inspired by an original idea of history Angélica Vale. The story revolves around the life of a famous telenovelas actor and his faithful follower who is his number one fan.",
+        "popularity": 3.3942,
+        "poster_path": "/k8bHG4wsOKCFjwJZoUN68EC3BOy.jpg",
+        "first_air_date": "2017-01-17",
+        "softcore": false,
+        "vote_average": 7.7,
+        "vote_count": 32,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dISWllRkiQ1l5Nbn5JMZbz6RHoh.jpg",
+        "genre_ids": [
+          53,
+          18
+        ],
+        "id": 9566,
+        "title": "The Fan",
+        "original_language": "en",
+        "original_title": "The Fan",
+        "overview": "When the San Francisco Giants pay center-fielder, Bobby Rayburn $40 million to lead their team to the World Series, no one is happier or more supportive than #1 fan, Gil Renard.  When Rayburn becomes mired in the worst slump of his career, the obsessed Renard decides to stop at nothing to help his idol regain his former glory—not even murder.",
+        "popularity": 2.9694,
+        "poster_path": "/lu7CjP8YES5dJMCFg5O9o9jCkjl.jpg",
+        "release_date": "1996-08-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.986,
+        "vote_count": 927,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/3jsXJRxDr2rDItjeOtFcVcSvaHH.jpg",
+        "genre_ids": [
+          28,
+          12,
+          53
+        ],
+        "id": 377985,
+        "title": "Fan",
+        "original_language": "hi",
+        "original_title": "Fan",
+        "overview": "A man who bears a striking resemblance to a renowned movie star becomes an obsessive fan, but when his fierce love is spurned by the star, he decides to destroy the star's life and reputation.",
+        "popularity": 1.1786,
+        "poster_path": "/ui7DYyQB4wsbBvom97KPNkldYWa.jpg",
+        "release_date": "2016-04-14",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.249,
+        "vote_count": 291,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jSNMfS4Ouj7A0e0ai6ABtvC9I6V.jpg",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 34327,
+        "name": "Soy tu fan",
+        "original_language": "es",
+        "original_name": "Soy tu fan",
+        "overview": "We all have someone that we obsess over. We all are capable of loving irrationally what we don’t have and construct an unattainable charm in the people we admire. Sometimes we want to be someone else, to be with someone else. Sometimes we settle on appreciating from afar. Other times, we seek out an encounter. To be a fan means, by definition, to be on unequal terms. One loves beforehand, falling for a facade that could very well be invented. This mexican romcom explores these feelings in depth as examined through the eyes of a fan.",
+        "popularity": 3.1806,
+        "poster_path": "/bOgm5lY1z9KcgJmG9Cpxvppdw0X.jpg",
+        "first_air_date": "2010-04-28",
+        "softcore": false,
+        "vote_average": 7.9,
+        "vote_count": 94,
+        "media_type": "tv",
+        "origin_country": [
+          "MX"
+        ]
+      },
+      {
+        "adult": false,
+        "id": 1948101,
+        "name": "Fan Chengcheng",
+        "original_name": "范丞丞",
+        "popularity": 2.8065,
+        "media_type": "person",
+        "gender": 2,
+        "known_for_department": "Acting",
+        "profile_path": "/mmpJ9EcYweG9pr1iU5q5aqcsusG.jpg",
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/ch8rKF1a5WXFDcxi2AKfmnaMBk7.jpg",
+            "id": 1228891,
+            "title": "Pegasus 2",
+            "original_title": "飞驰人生2",
+            "overview": "Former champion driver Zhang Chi teaches at a driving school in troubled times, relying on his reputation to make ends meet. A failing automobile factory offers to sponsor Zhang Chi in the last Bayinbrook Rally.",
+            "poster_path": "/tYCsMelHCecCvhWsrvR9NsZcT1D.jpg",
+            "media_type": "movie",
+            "original_language": "zh",
+            "genre_ids": [
+              18,
+              35,
+              12
+            ],
+            "popularity": 2.3567,
+            "release_date": "2024-02-10",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.2,
+            "vote_count": 100
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/mvyh8tXxuuaAFGR6QGQEbxfsd1s.jpg",
+            "id": 1077295,
+            "title": "Godspeed",
+            "original_title": "人生路不熟",
+            "overview": "A family of four people experience a laughable and touching journey. Truck driver Zhou Donghai doesn't think Wan Yi Fan is good enough as his son-in-law-to-be. In order to make his future father-in-law happy, Wan Yifan has been trying hard but keeps doing wrong things.",
+            "poster_path": "/iddfS5fGtMeI2oexwCl7xPhBuhS.jpg",
+            "media_type": "movie",
+            "original_language": "zh",
+            "genre_ids": [
+              35
+            ],
+            "popularity": 1.0859,
+            "release_date": "2023-04-28",
+            "softcore": false,
+            "video": false,
+            "vote_average": 5.2,
+            "vote_count": 30
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/pCOzvvObjPUl55DpSNdgXxx3uMT.jpg",
+            "id": 1462229,
+            "title": "Pegasus 3",
+            "original_title": "飞驰人生3",
+            "overview": "Bearing the glory of being the 'King of Bayanbulak', Zhang Chi once again embarks on his racing journey, aiming not only to win the race but also to achieve something beyond the competition itself.",
+            "poster_path": "/7lA564Na4uofXpfqRUnVQdSa2bg.jpg",
+            "media_type": "movie",
+            "original_language": "zh",
+            "genre_ids": [
+              18,
+              35
+            ],
+            "popularity": 3.3339,
+            "release_date": "2026-02-17",
+            "softcore": false,
+            "video": false,
+            "vote_average": 6.926,
+            "vote_count": 54
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 64439,
+        "name": "Fan Bingbing",
+        "original_name": "范冰冰",
+        "popularity": 3.8009,
+        "media_type": "person",
+        "gender": 1,
+        "known_for_department": "Acting",
+        "profile_path": "/pV2wYJiiPd6cgHK580PKD0GM4Dc.jpg",
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/3czpqXzFy5UcNuD1AubecRLWkwD.jpg",
+            "id": 127585,
+            "title": "X-Men: Days of Future Past",
+            "original_title": "X-Men: Days of Future Past",
+            "overview": "The ultimate X-Men ensemble fights a war for the survival of the species across two time periods as they join forces with their younger selves in an epic battle that must change the past – to save our future.",
+            "poster_path": "/tYfijzolzgoMOtegh1Y7j2Enorg.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              28,
+              12,
+              878
+            ],
+            "popularity": 13.4841,
+            "release_date": "2014-05-15",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.539,
+            "vote_count": 16887
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/ot2LoRyfp73Mswc9Y5KrDJYcyU1.jpg",
+            "id": 1119878,
+            "title": "Ice Road: Vengeance",
+            "original_title": "Ice Road: Vengeance",
+            "overview": "Big rig ice road driver Mike McCann travels to Nepal to scatter his late brother’s ashes on Mt. Everest. While on a packed tour bus traversing the deadly 12,000 ft. terrain of the infamous Road to the Sky, McCann and his mountain guide encounter a group of mercenaries and must fight to save themselves, the busload of innocent travelers, and the local villagers’ homeland.",
+            "poster_path": "/cQN9rZj06rXMVkk76UF1DfBAico.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              28,
+              53,
+              18
+            ],
+            "popularity": 5.5183,
+            "release_date": "2025-06-27",
+            "softcore": false,
+            "video": false,
+            "vote_average": 6.161,
+            "vote_count": 695
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/tAl5nVeZe7Glx0LN93SxQDphl7Z.jpg",
+            "id": 270774,
+            "title": "Skiptrace",
+            "original_title": "Skiptrace",
+            "overview": "A detective from Hong Kong teams up with an American gambler to battle against a notorious Chinese criminal.",
+            "poster_path": "/jki396PIIGja0NoFjUq1AdBbMGc.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              28,
+              12,
+              80,
+              35
+            ],
+            "popularity": 2.8636,
+            "release_date": "2016-07-21",
+            "softcore": false,
+            "video": false,
+            "vote_average": 5.757,
+            "vote_count": 800
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/y1AMED7o1UC4zxsrC2wmXmC4BGv.jpg",
+        "genre_ids": [
+          18,
+          80
+        ],
+        "id": 106843,
+        "name": "Police Fan",
+        "original_language": "zh",
+        "original_name": "营盘镇警事",
+        "overview": "Fan Dangyu, the head of a small local police station, deals with challenging neighborhood issues and earns the trust of villagers with the help of his loyal friends. As personal and professional challenges arise, he faces increasing pressures in his efforts to serve his community.",
+        "popularity": 3.1781,
+        "poster_path": "/6jMH75Qr4hDoQWBDIY991hOaUIF.jpg",
+        "first_air_date": "2012-09-09",
+        "softcore": false,
+        "vote_average": 8,
+        "vote_count": 1,
+        "media_type": "tv",
+        "origin_country": [
+          "CN"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/11hefPVrqoCJol9RLEyQk5eXzPs.jpg",
+        "genre_ids": [
+          18
+        ],
+        "id": 88140,
+        "name": "Lady Fan",
+        "original_language": "cn",
+        "original_name": "烽火奇遇結良緣",
+        "overview": "The story is set during a time where the Tang Dynasty was at war with her neighbour. Lei Fa is the daughter of a respected Sai Leung general. Her martial art master, the Holy Mother of Lei Mountain, tells her that she is destined to marry a Tang citizen (who turns out to be Sit Ding San) and their marriage will unite the two kingdoms and bring about a time of peace and harmony.\n\nUnfortunately for her, her destined husband turns out to be Sit Ding San. His father is Sit Yan Kwai, a renowned and loyal general of the Tang Dynasty. The Sit family is very prejudiced against Sai Leung citizens, as they have long been at war against each other. Lei Fa undergoes a lot of trial and tribulations in order to win Ding San's love, his family's affections and the respect and loyalty of the Tang troops. (Wikipedia)",
+        "popularity": 3.4185,
+        "poster_path": "/kU2dlbzxmSdm0sHPVVWTGR04SaJ.jpg",
+        "first_air_date": "2004-02-09",
+        "softcore": false,
+        "vote_average": 5.5,
+        "vote_count": 2,
+        "media_type": "tv",
+        "origin_country": [
+          "HK"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/5XnCFHGrBCDsZCH4Aihr4PsNXBe.jpg",
+        "genre_ids": [
+          16,
+          35
+        ],
+        "id": 303870,
+        "name": "Kirio Fan Club",
+        "original_language": "ja",
+        "original_name": "霧尾ファンクラブ",
+        "overview": "What would you do if your crush had ear-splitting farts? For Aimi and Nami, the answer is to cry tears of joy for being able to pinpoint at a distance the object of their affections, Kirio, from a single toot. These are the kinds of deep, philosophical questions the two friends/rivals in romance pose to each other to prove their love for this boy who hardly seems to know they exist. That won't stop them from conducting nightly rituals to entice him into their dreams, though, or listing out what exactly they like about him, down to the very last organ. But when push comes to shove, will they choose their hilarious friendship over a shot at love?",
+        "popularity": 4.251,
+        "poster_path": "/jVTHFZnK5ApZqrLLabWjKnI6Jza.jpg",
+        "first_air_date": "2026-04-03",
+        "softcore": false,
+        "vote_average": 6,
+        "vote_count": 7,
+        "media_type": "tv",
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [],
+        "id": 83271,
+        "name": "Fan fini",
+        "original_language": "fr",
+        "original_name": "Fan fini",
+        "overview": "",
+        "popularity": 1.3402,
+        "poster_path": null,
+        "first_air_date": "2018-08-15",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "CA"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 916213,
+        "title": "Fan Fan",
+        "original_language": "en",
+        "original_title": "Fan Fan",
+        "overview": "The Japanese emperor's son, Hanki Pan (Francis Carpenter) is in love with beautiful Fan Fan (Virginia Lee Corbin) and is determined to marry her, even though his father has decreed that he shall wed the Ancient and Honorable Lady Shoo, an ugly hag.",
+        "popularity": 0.4451,
+        "poster_path": "/4gazfx4PwYdecb4vaO7sqqNEylg.jpg",
+        "release_date": "1918-11-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/99GAuQneRe5cooyaPf258I1CxGN.jpg",
+        "genre_ids": [],
+        "id": 322910,
+        "name": "Fan Fiction Story Time",
+        "original_language": "en",
+        "original_name": "Fan Fiction Story Time",
+        "overview": "We're reading fan fiction to you, and you can submit it to us to read! This show airs twice a month!",
+        "popularity": 3.1768,
+        "poster_path": "/opWgLgwaOBit8D8K21PvxFCCM9o.jpg",
+        "first_air_date": "2023-11-27",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35
+        ],
+        "id": 1569766,
+        "title": "FAN",
+        "original_language": "fr",
+        "original_title": "FAN",
+        "overview": "Victor is Camille’s table fan. Following a rough heatwave, she decides to replace him with an air conditioner. Victor will try to surmount this act of treason.",
+        "popularity": 0.3306,
+        "poster_path": "/rH8ByD7dOp4L4u7COtSgDXn5ozU.jpg",
+        "release_date": "2025-10-25",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "id": 2834895,
+        "name": "Fan Shuaiqi",
+        "original_name": "范帅琦",
+        "popularity": 2.0228,
+        "media_type": "person",
+        "gender": 1,
+        "known_for_department": "Acting",
+        "profile_path": "/k25r9xZc8Fx78xjz8ddwpY5SgEs.jpg",
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/c9rbvPGRWtm1RTZGNuxWfPjRAM3.jpg",
+            "id": 155441,
+            "name": "Reset",
+            "original_name": "开端",
+            "overview": "The lives of a college student and a video game designer are kept being reset after an explosion on a bus. During each reset, they have to work together to find out what the reason for the explosion is. Will these two be able to save themselves and their fellow passengers? Will they be able to close the time-loop?",
+            "poster_path": "/ceAOKLPjGUbCOYtxXK7pQfpVVwb.jpg",
+            "media_type": "tv",
+            "original_language": "zh",
+            "genre_ids": [
+              18,
+              9648,
+              10765
+            ],
+            "popularity": 5.167,
+            "first_air_date": "2022-01-11",
+            "softcore": false,
+            "vote_average": 8.092,
+            "vote_count": 130,
+            "origin_country": [
+              "CN"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/4Tl4kaUVr6oT1YL7b7OQ9ghJefI.jpg",
+            "id": 216424,
+            "name": "Meet Yourself",
+            "original_name": "去有风的地方",
+            "overview": "Grieving the premature death of her closest friend, a despondent young Chinese woman quits her job to fulfill the friend's dying wish of visiting an area in southern China. What began as a three-month recuperative stay in a village far from the madding crowd gradually reveals the potential of life-changing camaraderie, romance, and purpose.",
+            "poster_path": "/qIPAvmgFlOYVoKMmMGsiSBsdAgh.jpg",
+            "media_type": "tv",
+            "original_language": "zh",
+            "genre_ids": [
+              18
+            ],
+            "popularity": 7.86,
+            "first_air_date": "2023-01-03",
+            "softcore": false,
+            "vote_average": 8.2,
+            "vote_count": 43,
+            "origin_country": [
+              "CN"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/w93cn9cDI9qR2Jp57T58EaZwvXj.jpg",
+            "id": 125305,
+            "name": "Love Crossed",
+            "original_name": "完美的他",
+            "overview": "A heartbroken woman escapes into a virtual reality world of perfect men, only to uncover a sinister secret that blurs the lines between fantasy and reality.",
+            "poster_path": "/10t1aDQ2IpYZBcNOZlMeXB8QpFr.jpg",
+            "media_type": "tv",
+            "original_language": "zh",
+            "genre_ids": [
+              18,
+              35,
+              9648,
+              10765
+            ],
+            "popularity": 4.7341,
+            "first_air_date": "2021-05-10",
+            "softcore": false,
+            "vote_average": 7.4,
+            "vote_count": 15,
+            "origin_country": [
+              "CN"
+            ]
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8MTk7ErYPf7huu4Caxg3GdEucMF.jpg",
+        "genre_ids": [
+          18,
+          27
+        ],
+        "id": 105184,
+        "title": "The Fan",
+        "original_language": "de",
+        "original_title": "Der Fan",
+        "overview": "The hero-worship that Simone has for a pop singer is built to a crescendo until she passes out when she finally sees him up-close in a crowd of fans. She is later shocked when he lets her know that he does not love her.",
+        "popularity": 0.981,
+        "poster_path": "/igLYepYwgDtA4jqUN3LWsnRddv4.jpg",
+        "release_date": "1982-06-04",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.6,
+        "vote_count": 79,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6fahH80eQUCDggTGtUiLsNhPn1h.jpg",
+        "genre_ids": [
+          18,
+          35,
+          10759
+        ],
+        "id": 153432,
+        "name": "Legend of Fan Liwa",
+        "original_language": "zh",
+        "original_name": "大唐女将樊梨花",
+        "overview": "",
+        "popularity": 3.6804,
+        "poster_path": "/iIHDSS47CFasqJNKjgk2WUTQn7z.jpg",
+        "first_air_date": "2011-09-07",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "CN"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/iznPd7PLnCBA1G50M4DuA9wvCIy.jpg",
+        "genre_ids": [
+          35
+        ],
+        "id": 1307520,
+        "title": "The Biggest Fan",
+        "original_language": "es",
+        "original_title": "La más fan",
+        "overview": "Canceled in Hollywood, star Lana Cruz heads to her hometown for a comeback. Enter Polly, her fan-turned-frenemy. Can Lana dodge drama and reclaim her fame?",
+        "popularity": 1.2014,
+        "poster_path": "/wgUmsekYPOt9ZQ8ero91qRnmhQY.jpg",
+        "release_date": "2025-04-30",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.4,
+        "vote_count": 45,
+        "media_type": "movie"
+      }
+    ],
+    "total_pages": 500,
+    "total_results": 10000
+  }
+}

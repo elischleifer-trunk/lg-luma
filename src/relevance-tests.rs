@@ -241,3 +241,15 @@ fn ranked_results_carry_the_rating_of_their_details() {
         .unwrap();
     assert_eq!(first.rating.as_deref(), Some("PG-13"));
 }
+
+#[test]
+fn a_title_matches_by_its_own_name_or_its_original_one() {
+    let (shows, _) = search("fan");
+    let by = |title: &str| shows.iter().find(|s| s.title == title).unwrap();
+    assert!(matches("fan", by("Captain Fantastic")));
+    // Matched by Movie of the Night through a title in another language.
+    assert!(!matches("fan", by("One Piece")));
+    assert!(!matches("fan", by("Rumble in the Bronx")));
+    // "Number One Fan" is French; the English title matches, so it is on topic.
+    assert!(matches("fan", by("Number One Fan")));
+}

@@ -1,0 +1,76 @@
+{
+  "request": {
+    "path": "/3/movie/1113119",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:24.782Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/3Zd6Z87HPY5SDhwtTalgX2SALxv.jpg",
+    "belongs_to_collection": {
+      "id": 591956,
+      "name": "Thi Baan The Series",
+      "poster_path": "/ly0NveA4qlKnvu46jaltzm0nlS8.jpg",
+      "backdrop_path": null
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "",
+    "id": 1113119,
+    "imdb_id": "tt29633446",
+    "origin_country": [
+      "TH"
+    ],
+    "original_language": "th",
+    "original_title": "สัปเหร่อ",
+    "overview": "Cherd, a 25-year-old law graduate, is hesitant to take over his father's undertaker business because he is afraid of ghosts. However, his father's condition is worsening, and he has no choice but to help.",
+    "popularity": 0.9189,
+    "poster_path": "/uYUnXT9P9HIm3TH2dGdb1B011OR.jpg",
+    "production_companies": [
+      {
+        "id": 171542,
+        "logo_path": "/btra6uhQW5PYoa60IPCEGQDCfcO.png",
+        "name": "TAIBAAN STUDIO",
+        "origin_country": "TH"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TH",
+        "name": "Thailand"
+      }
+    ],
+    "release_date": "2023-10-05",
+    "revenue": 20000000,
+    "runtime": 125,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Thai",
+        "iso_639_1": "th",
+        "name": "ภาษาไทย"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Death is The Truth.",
+    "title": "The Undertaker",
+    "video": false,
+    "vote_average": 6.6,
+    "vote_count": 11
+  }
+}

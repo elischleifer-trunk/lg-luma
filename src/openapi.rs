@@ -235,7 +235,7 @@ mod tests {
             result.unwrap_or_else(|e| panic!("{}: {e}", file.display()));
             checked += 1;
         }
-        assert_eq!(checked, 19);
+        assert_eq!(checked, 22);
     }
 
     /// Every captured TMDB reply decodes into the generated type for its endpoint. This is how

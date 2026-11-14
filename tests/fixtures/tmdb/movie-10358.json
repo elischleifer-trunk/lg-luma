@@ -1,0 +1,79 @@
+{
+  "request": {
+    "path": "/3/movie/10358",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:35.331Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/5kPMUjtfDemu8MvKoa37cYoo5iJ.jpg",
+    "belongs_to_collection": null,
+    "budget": 24000000,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 10749,
+        "name": "Romance"
+      }
+    ],
+    "homepage": "http://www.zackandmiri.com",
+    "id": 10358,
+    "imdb_id": "tt1007028",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Zack and Miri Make a Porno",
+    "overview": "Lifelong platonic friends Zack and Miri look to solve their respective cash-flow problems by making an adult film together. As the cameras roll, however, the duo begin to sense that they may have more feelings for each other than they previously thought.",
+    "popularity": 5.4398,
+    "poster_path": "/ipePhKf87FixwfAVJ8MMWK53caI.jpg",
+    "production_companies": [
+      {
+        "id": 2599,
+        "logo_path": null,
+        "name": "Blue Askew",
+        "origin_country": ""
+      },
+      {
+        "id": 16934,
+        "logo_path": "/avyTgdxs372vSnOAPt7isdnzIWQ.png",
+        "name": "View Askew Productions",
+        "origin_country": "US"
+      },
+      {
+        "id": 308,
+        "logo_path": "/e8F3mQM7DkJ5SfYYDp8FYzPBOGX.png",
+        "name": "The Weinstein Company",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2008-09-18",
+    "revenue": 42105111,
+    "runtime": 102,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "What would you do to get out of debt?",
+    "title": "Zack and Miri Make a Porno",
+    "video": false,
+    "vote_average": 6.327,
+    "vote_count": 2794
+  }
+}

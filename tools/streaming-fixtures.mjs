@@ -35,6 +35,9 @@ const QUERIES = [
   ['amelie', 'amélie'], // non-ASCII title
   ['bluey', 'bluey'], // kids, Disney+
   ['the', 'the'], // very broad prefix
+  ['fan', 'fan'], // short prefix: the API pads with titles in other languages (One Piece)
+  ['sup', 'sup'], // short prefix with no whole-word matches
+  ['super', 'super'], // Super 8, Superbad; Superman is not a whole-word match
   ['no-results', 'zzqxjvw'], // empty result list
 ];
 

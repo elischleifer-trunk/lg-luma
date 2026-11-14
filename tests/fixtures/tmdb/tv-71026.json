@@ -1,0 +1,414 @@
+{
+  "request": {
+    "path": "/3/tv/71026",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.731Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/vwgC68MFTgrLaTBaXFnsVAb6y1W.jpg",
+    "created_by": [
+      {
+        "id": 2570772,
+        "credit_id": "5e72d3b88e2e000012a759ad",
+        "name": "Jung Gil-hoon",
+        "original_name": "정길훈",
+        "gender": 2,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      12
+    ],
+    "first_air_date": "2014-09-01",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10762,
+        "name": "Kids"
+      }
+    ],
+    "homepage": "",
+    "id": 71026,
+    "in_production": true,
+    "languages": [
+      "ko"
+    ],
+    "last_air_date": "2026-10-30",
+    "last_episode_to_air": {
+      "id": 7714964,
+      "name": "Episode 20",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-10-30",
+      "episode_number": 20,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 12,
+      "season_number": 22,
+      "show_id": 71026,
+      "still_path": "/6dNG0YrIiv6vD4nbJHpD36G2RNQ.jpg"
+    },
+    "name": "Super Wings",
+    "next_episode_to_air": {
+      "id": 8125769,
+      "name": "Episode 1",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-12-04",
+      "episode_number": 1,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 13,
+      "season_number": 23,
+      "show_id": 71026,
+      "still_path": null
+    },
+    "networks": [
+      {
+        "id": 1330,
+        "logo_path": "/fNxBFqWr7eWEgNeBDvvCxsSItXx.png",
+        "name": "iQiyi",
+        "origin_country": "CN"
+      },
+      {
+        "id": 1419,
+        "logo_path": "/w2TeR3fvPZ9a617tNIF1oOfyPtk.png",
+        "name": "Youku",
+        "origin_country": "CN"
+      },
+      {
+        "id": 1796,
+        "logo_path": "/vM4FN2WU2JU1mCiZw2BtqJ27zxR.png",
+        "name": "EBS 1",
+        "origin_country": "KR"
+      },
+      {
+        "id": 2007,
+        "logo_path": "/6Lfll43wYG2eyereOBjpYFRSGs4.png",
+        "name": "Tencent Video",
+        "origin_country": "CN"
+      }
+    ],
+    "number_of_episodes": 665,
+    "number_of_seasons": 23,
+    "origin_country": [
+      "KR"
+    ],
+    "original_language": "ko",
+    "original_name": "출동! 슈퍼윙스",
+    "overview": "An action-packed preschool series about an adorable jet plane named Jett who travels the world delivering packages to children. On every delivery, Jett encounters a new problem that the he and his friends the Super Wings must work together to solve!",
+    "popularity": 60.6393,
+    "poster_path": "/lu2DNsIQgn1Jb6djHvrqJSUQXXl.jpg",
+    "production_companies": [
+      {
+        "id": 130472,
+        "logo_path": "/9FPrOgQiMwNwIMqEO9a5xsZXC2N.png",
+        "name": "FunnyFlux Entertainment",
+        "origin_country": "KR"
+      },
+      {
+        "id": 81908,
+        "logo_path": "/9hRXFr2fmAoVRrbTwXTRwvTcjrj.png",
+        "name": "Little Airplane Productions",
+        "origin_country": "US"
+      },
+      {
+        "id": 130474,
+        "logo_path": null,
+        "name": "Qianqi Animation",
+        "origin_country": "CN"
+      },
+      {
+        "id": 10464,
+        "logo_path": "/bibwqB8U1QGwotLpX4QL4dvisxG.png",
+        "name": "Korea Educational Broadcasting System (EBS)",
+        "origin_country": "KR"
+      },
+      {
+        "id": 106343,
+        "logo_path": "/qyBiY6gtl6OpO0bsDfyBCGY1fVe.png",
+        "name": "Timewise Investment",
+        "origin_country": "KR"
+      },
+      {
+        "id": 88607,
+        "logo_path": null,
+        "name": "Union Investment Partners",
+        "origin_country": "KR"
+      },
+      {
+        "id": 130779,
+        "logo_path": "/5dz5jAmgXeW2IwIUlQ7Clgt7yMk.png",
+        "name": "Alpha Group",
+        "origin_country": "CN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      },
+      {
+        "iso_3166_1": "KR",
+        "name": "South Korea"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2014-09-01",
+        "episode_count": 52,
+        "id": 86859,
+        "name": "Season 1",
+        "overview": "The series follows a basic format where Jett interacts with other Super Wings at World Airport before being called to a delivery, where Jimbo gives Jett some facts about the location and some of the local language. Using this knowledge, he interacts with the kid or kids ordering the packages until they reach a problem, and then he calls for help from one or more of the Super Wings. The additional help would aid in solving the problem before they leave with Jett.",
+        "poster_path": "/lu2DNsIQgn1Jb6djHvrqJSUQXXl.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2017-04-03",
+        "episode_count": 52,
+        "id": 93459,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/xwWTrvYkk5lAnZOrRG5Z1fYu5Hr.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2018-09-01",
+        "episode_count": 40,
+        "id": 111901,
+        "name": "Mission Teams",
+        "overview": "",
+        "poster_path": "/kzHzTKfArt9MIe0g0iYsNM6XnGz.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-08-03",
+        "episode_count": 40,
+        "id": 111902,
+        "name": "Supercharge",
+        "overview": "",
+        "poster_path": "/77u5meOKhZejFVmPLcjslRCxa25.jpg",
+        "season_number": 4,
+        "vote_average": 1
+      },
+      {
+        "air_date": "2020-11-02",
+        "episode_count": 40,
+        "id": 167470,
+        "name": "Super Pets",
+        "overview": "",
+        "poster_path": "/knfP1pZjsMeAdIBu7Fn9Exyhggz.jpg",
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-05-17",
+        "episode_count": 40,
+        "id": 156916,
+        "name": "World Guardians",
+        "overview": "",
+        "poster_path": "/w3QtBD9kCzSsOp88jkvKQLrvdM1.jpg",
+        "season_number": 6,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-11-08",
+        "episode_count": 40,
+        "id": 183398,
+        "name": "Super Pets Adventures",
+        "overview": "",
+        "poster_path": "/mz2LUpDML8F2ENBqDrPXN05M3KZ.jpg",
+        "season_number": 7,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-12-01",
+        "episode_count": 40,
+        "id": 156917,
+        "name": "Electric Heroes",
+        "overview": "",
+        "poster_path": "/pQQFyAQtaQXczQmDS4xAdm6ZkfW.jpg",
+        "season_number": 8,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-02-24",
+        "episode_count": 40,
+        "id": 181235,
+        "name": "Super Combo",
+        "overview": "",
+        "poster_path": "/dM98SCcHbpDc6Kxf45wn5zuJd7K.jpg",
+        "season_number": 9,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-12-06",
+        "episode_count": 40,
+        "id": 206963,
+        "name": "Save The World",
+        "overview": "",
+        "poster_path": "/yjrbZ6K1XrWZ1B8aOjvY09b8IX1.jpg",
+        "season_number": 10,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-12-10",
+        "episode_count": 20,
+        "id": 292243,
+        "name": "Season 11",
+        "overview": "",
+        "poster_path": "/6qsGIyGKD4eeRPHk6GcDzXe8l7X.jpg",
+        "season_number": 11,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2022-05-26",
+        "episode_count": 20,
+        "id": 296136,
+        "name": "Season 12",
+        "overview": "",
+        "poster_path": "/gYdzxv44eLtdxjnjonjJII5Qi88.jpg",
+        "season_number": 12,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2022-11-25",
+        "episode_count": 20,
+        "id": 331142,
+        "name": "Season 13",
+        "overview": "",
+        "poster_path": "/s93ybpSZ187GXnvT6GdtBg86Vw2.jpg",
+        "season_number": 13,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-05-11",
+        "episode_count": 20,
+        "id": 342239,
+        "name": "Season 14",
+        "overview": "",
+        "poster_path": "/7owDdUnZYVjSr0JO1CjqMyIqpnO.jpg",
+        "season_number": 14,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-12-01",
+        "episode_count": 20,
+        "id": 372713,
+        "name": "Season 15",
+        "overview": "",
+        "poster_path": "/5ZEU30W4Vic6GSihEu98lEjqQB4.jpg",
+        "season_number": 15,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2024-04-29",
+        "episode_count": 20,
+        "id": 394343,
+        "name": "Season 16",
+        "overview": "",
+        "poster_path": "/zoiENvy7ZwMjtORXnc5L9OBOqzI.jpg",
+        "season_number": 16,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2024-11-28",
+        "episode_count": 20,
+        "id": 432628,
+        "name": "Season 17",
+        "overview": "",
+        "poster_path": "/qYnViVwzfO2Lwf3CD7JcbQfh7Hf.jpg",
+        "season_number": 17,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-05-16",
+        "episode_count": 20,
+        "id": 456039,
+        "name": "Season 18",
+        "overview": "",
+        "poster_path": "/gOx4p43y7wn54QUkcvfQsS5btvk.jpg",
+        "season_number": 18,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-12-05",
+        "episode_count": 20,
+        "id": 487336,
+        "name": "Season 19",
+        "overview": "",
+        "poster_path": "/vDvZezI9IP1OHg47NK7rBV42pvk.jpg",
+        "season_number": 19,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-04-29",
+        "episode_count": 20,
+        "id": 511456,
+        "name": "Season 20",
+        "overview": "",
+        "poster_path": "/oDDhQS9HHzEYWpAQ1gLQk2PtwbE.jpg",
+        "season_number": 20,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-08-21",
+        "episode_count": 20,
+        "id": 536317,
+        "name": "Season 21",
+        "overview": "",
+        "poster_path": "/cBSJS5j7mEJajh0xiFKUt3Y0tYY.jpg",
+        "season_number": 21,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-10-23",
+        "episode_count": 20,
+        "id": 538064,
+        "name": "Season 22",
+        "overview": "",
+        "poster_path": "/cStwJPZZfci0AQw10os2G3Dm12y.jpg",
+        "season_number": 22,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-12-04",
+        "episode_count": 5,
+        "id": 557184,
+        "name": "Season 23",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 23,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Korean",
+        "iso_639_1": "ko",
+        "name": "한국어/조선말"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.3,
+    "vote_count": 21
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "request": {
+    "path": "/3/tv/106843",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:37.258Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/y1AMED7o1UC4zxsrC2wmXmC4BGv.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      41
+    ],
+    "first_air_date": "2012-09-09",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "",
+    "id": 106843,
+    "in_production": false,
+    "languages": [
+      "zh"
+    ],
+    "last_air_date": "2012-09-22",
+    "last_episode_to_air": {
+      "id": 2374937,
+      "name": "Episode 28",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2012-09-22",
+      "episode_number": 28,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 45,
+      "season_number": 1,
+      "show_id": 106843,
+      "still_path": null
+    },
+    "name": "Police Fan",
+    "next_episode_to_air": null,
+    "networks": [],
+    "number_of_episodes": 28,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "zh",
+    "original_name": "营盘镇警事",
+    "overview": "Fan Dangyu, the head of a small local police station, deals with challenging neighborhood issues and earns the trust of villagers with the help of his loyal friends. As personal and professional challenges arise, he faces increasing pressures in his efforts to serve his community.",
+    "popularity": 3.1781,
+    "poster_path": "/6jMH75Qr4hDoQWBDIY991hOaUIF.jpg",
+    "production_companies": [
+      {
+        "id": 91974,
+        "logo_path": "/paJ1JqfQ9S7xWX2KwWpm8eh6yX6.png",
+        "name": "China Television Production Center 中国电视剧制作中心 (CTPC)",
+        "origin_country": "CN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2012-09-09",
+        "episode_count": 28,
+        "id": 157926,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/6jMH75Qr4hDoQWBDIY991hOaUIF.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 8,
+    "vote_count": 1
+  }
+}

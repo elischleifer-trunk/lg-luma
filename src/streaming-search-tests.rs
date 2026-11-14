@@ -157,7 +157,7 @@ fn without_tmdb_results_keep_the_order_of_where_they_stream() {
         let shows: Vec<Show> = Fixtures::default()
             .read("streaming", "search-title-gho")
             .unwrap();
-        streaming::rank(&shows, "us", &services)
+        streaming::rank(&relevance::on_topic("gho", shows), "us", &services)
     };
     for source in [
         Fixtures {
@@ -212,4 +212,63 @@ fn generated_types_survive_the_cache_round_trip() {
         serde_json::from_slice(&serde_json::to_vec(&movie).unwrap()).unwrap();
     assert_eq!(shows_again, shows);
     assert_eq!(movie_again, movie);
+}
+
+fn titles(results: &[Ranked]) -> Vec<&str> {
+    results.iter().map(|r| r.show.title.as_str()).collect()
+}
+
+#[test]
+fn fan_lists_only_titles_with_fan_in_them() {
+    let source = Fixtures::default();
+    let results = search(&source, "fan", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    // Movie of the Night pads its 20 results with titles that match in other languages.
+    for gone in [
+        "One Piece",
+        "Shin Ultraman",
+        "Rumble in the Bronx",
+        "Zack and Miri Make a Porno",
+    ] {
+        assert!(!titles.contains(&gone), "{gone}: {titles:#?}");
+    }
+    assert!(!titles.is_empty());
+    for title in &titles {
+        assert!(title.to_lowercase().contains("fan"), "{titles:#?}");
+    }
+    // Off-topic titles are dropped before details are fetched, so they cost no TMDB calls.
+    assert!(
+        source.calls("tmdb/tv-37854").is_empty(),
+        "One Piece looked up"
+    );
+}
+
+#[test]
+fn super_drops_titles_that_do_not_say_super() {
+    let source = Fixtures::default();
+    let results = search(&source, "super", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    for gone in [
+        "8MM",
+        "The Bad Guys 2",
+        "Dog Man",
+        "Argylle",
+        "Sonic the Hedgehog 3",
+    ] {
+        assert!(!titles.contains(&gone), "{gone}: {titles:#?}");
+    }
+    for kept in ["Superman", "Super 8", "Superbad"] {
+        assert!(titles.contains(&kept), "{kept}: {titles:#?}");
+    }
+}
+
+#[test]
+fn when_nothing_matches_the_near_misses_stay() {
+    let shows = Fixtures::default()
+        .search("sup", "us")
+        .unwrap()
+        .into_iter()
+        .filter(|show| !relevance::matches("sup", show))
+        .collect::<Vec<_>>();
+    assert_eq!(relevance::on_topic("sup", shows.clone()), shows);
 }

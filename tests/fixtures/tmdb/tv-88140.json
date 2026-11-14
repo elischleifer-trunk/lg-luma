@@ -1,0 +1,105 @@
+{
+  "request": {
+    "path": "/3/tv/88140",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:37.365Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/11hefPVrqoCJol9RLEyQk5eXzPs.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      42
+    ],
+    "first_air_date": "2004-02-09",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://www.mytvsuper.com/en/programme/ladyfan0001_119575/LADY-FAN/",
+    "id": 88140,
+    "in_production": false,
+    "languages": [
+      "cn"
+    ],
+    "last_air_date": "2004-03-05",
+    "last_episode_to_air": {
+      "id": 3467817,
+      "name": "Episode 20",
+      "overview": "SHAN flees from the imprisonment and searches for FA in Sai Leung. When FA sees him, she loses her sanity and demands his life. SHAN injures FA in the chaos but manages to take a bound FA to SING MO. Even the master cannot break her curse. FA tricks SHAN into releasing her restraints and wields her killing sword at him again. YEUNG appears to applaud FA’s killing of SHAN, incognizant of the fact that it is a trap. YEUNG tries to restore the balance of qi in his body but the inner devil gets the better of him. He perishes in flames. SHAN speeds to the execution ground, trying to stop the execution of KWAI and others. Though YEUNG has died, his hostility has taken a new host in CHUNG. LUNG timely arrives to protect the emperor from CHUNG’s harm. FA and SHAN follow the hostile air to the forest. SHAN is bewildered by the two visions of FA.… ...",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2004-03-05",
+      "episode_number": 20,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 45,
+      "season_number": 1,
+      "show_id": 88140,
+      "still_path": null
+    },
+    "name": "Lady Fan",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 48,
+        "logo_path": "/v78f4q6DYdRB8dLj4rQBpqQG8pW.png",
+        "name": "TVB Jade",
+        "origin_country": "HK"
+      }
+    ],
+    "number_of_episodes": 20,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "HK"
+    ],
+    "original_language": "cn",
+    "original_name": "烽火奇遇結良緣",
+    "overview": "The story is set during a time where the Tang Dynasty was at war with her neighbour. Lei Fa is the daughter of a respected Sai Leung general. Her martial art master, the Holy Mother of Lei Mountain, tells her that she is destined to marry a Tang citizen (who turns out to be Sit Ding San) and their marriage will unite the two kingdoms and bring about a time of peace and harmony.\n\nUnfortunately for her, her destined husband turns out to be Sit Ding San. His father is Sit Yan Kwai, a renowned and loyal general of the Tang Dynasty. The Sit family is very prejudiced against Sai Leung citizens, as they have long been at war against each other. Lei Fa undergoes a lot of trial and tribulations in order to win Ding San's love, his family's affections and the respect and loyalty of the Tang troops. (Wikipedia)",
+    "popularity": 3.4185,
+    "poster_path": "/kU2dlbzxmSdm0sHPVVWTGR04SaJ.jpg",
+    "production_companies": [
+      {
+        "id": 79261,
+        "logo_path": "/4OKzkasr0IV8CSqejjgRfKw7e0m.png",
+        "name": "TVB",
+        "origin_country": "HK"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "HK",
+        "name": "Hong Kong"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2004-02-09",
+        "episode_count": 20,
+        "id": 121589,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/zeBW5NA0V72KacSbwz6OZsOJRaf.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Cantonese",
+        "iso_639_1": "cn",
+        "name": "广州话 / 廣州話"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 5.5,
+    "vote_count": 2
+  }
+}

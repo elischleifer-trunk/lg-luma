@@ -1,0 +1,112 @@
+{
+  "request": {
+    "path": "/3/collection/720879",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:31.134Z",
+  "response": {
+    "id": 720879,
+    "name": "Sonic the Hedgehog Collection",
+    "original_language": "en",
+    "original_name": "Sonic the Hedgehog Collection",
+    "overview": "Follows the adventures of Sonic the Hedgehog an anthropomorphic hedgehog born with the ability to run faster than the speed of sound, hence his name, and possesses lightning-fast reflexes to match his speed.",
+    "poster_path": "/1qtAVIWnx4vxmFEnZ3fDDbtMt8o.jpg",
+    "backdrop_path": "/ggDVF2DhqIQjJI0zUqsWMS2WTcF.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/xuLA0pii2IMJW2puT7EvJtgpg0H.jpg",
+        "genre_ids": [
+          28,
+          12,
+          10751,
+          35
+        ],
+        "id": 675353,
+        "title": "Sonic the Hedgehog 2",
+        "original_language": "en",
+        "original_title": "Sonic the Hedgehog 2",
+        "overview": "After settling in Green Hills, Sonic is eager to prove he has what it takes to be a true hero. His test comes when Dr. Robotnik returns, this time with a new partner, Knuckles, in search for an emerald that has the power to destroy civilizations. Sonic teams up with his own sidekick, Tails, and together they embark on a globe-trotting journey to find the emerald before it falls into the wrong hands.",
+        "popularity": 9.4429,
+        "poster_path": "/6DrHO1jr3qVrViUO6s6kFiAGM7.jpg",
+        "release_date": "2022-03-30",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.407,
+        "vote_count": 6088,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/stmYfCUGd8Iy6kAMBr6AmWqx8Bq.jpg",
+        "genre_ids": [
+          28,
+          878,
+          35,
+          10751
+        ],
+        "id": 454626,
+        "title": "Sonic the Hedgehog",
+        "original_language": "en",
+        "original_title": "Sonic the Hedgehog",
+        "overview": "Powered with incredible speed, Sonic The Hedgehog embraces his new home on Earth. That is, until Sonic sparks the attention of super-uncool evil genius Dr. Robotnik. Now it’s super-villain vs. super-sonic in an all-out race across the globe to stop Robotnik from using Sonic’s unique power for world domination.",
+        "popularity": 11.508,
+        "poster_path": "/aQvJ5WPzZgYVDrxLX4R6cLJCEaQ.jpg",
+        "release_date": "2020-02-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.262,
+        "vote_count": 10674,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg",
+        "genre_ids": [
+          28,
+          878,
+          35,
+          10751
+        ],
+        "id": 939243,
+        "title": "Sonic the Hedgehog 3",
+        "original_language": "en",
+        "original_title": "Sonic the Hedgehog 3",
+        "overview": "Sonic, Knuckles, and Tails reunite against a powerful new adversary, Shadow, a mysterious villain with powers unlike anything they have faced before. With their abilities outmatched in every way, Team Sonic must seek out an unlikely alliance in hopes of stopping Shadow and protecting the planet.",
+        "popularity": 17.7181,
+        "poster_path": "/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg",
+        "release_date": "2024-12-19",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.591,
+        "vote_count": 3546,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/4Sh2c33WHf1KxX8UYuYLIroaVEv.jpg",
+        "genre_ids": [
+          35,
+          28,
+          10751,
+          878
+        ],
+        "id": 1401586,
+        "title": "Sonic the Hedgehog 4",
+        "original_language": "en",
+        "original_title": "Sonic the Hedgehog 4",
+        "overview": "When a new threat emerges from a fractured timeline, Team Sonic find themselves facing an adventure unlike anything they've encountered before. With the Chaos Emeralds scattered across different periods in time, Sonic—alongside new friends and old—must journey through the past, present, and future to recover them before a dangerous alternate timeline becomes reality.",
+        "popularity": 10.7302,
+        "poster_path": "/t8uoHBODkFlSQJRL6qc4IclUBlH.jpg",
+        "release_date": "2027-03-11",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

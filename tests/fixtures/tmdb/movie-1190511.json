@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/1190511",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:28.047Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/pdbML7ol4HvsI1xWX0s9LZpUGfL.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1190511,
+    "imdb_id": "tt27235410",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_title": "सितारे ज़मीन पर",
+    "overview": "A disgraced basketball coach is given the chance to coach a team of players who are intellectually disabled as part of community services. Gulshan has apprehensions at first and feels out of place but soon realizes they just might have what it takes to make it to the national championships.",
+    "popularity": 2.2448,
+    "poster_path": "/adYjCJGSNiL7CIaDW3g0Bcg7r2Z.jpg",
+    "production_companies": [
+      {
+        "id": 2140,
+        "logo_path": "/yJIGEhIk3yAWAIiZ4p3xEV1dzwR.png",
+        "name": "Aamir Khan Productions",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2025-06-20",
+    "revenue": 3532430,
+    "runtime": 155,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Sabka Apna Apna Normal.",
+    "title": "Sitaare Zameen Par",
+    "video": false,
+    "vote_average": 6.881,
+    "vote_count": 59
+  }
+}

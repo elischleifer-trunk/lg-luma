@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/collection/387618",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.819Z",
+  "response": {
+    "id": 387618,
+    "name": "8MM Collection",
+    "original_language": "en",
+    "original_name": "8MM Collection",
+    "overview": "8mm is a 1999 mystery thriller film directed by Joel Schumacher and written by Andrew Kevin Walker. The film stars Nicolas Cage as a private investigator who delves into the world of snuff films. Joaquin Phoenix, James Gandolfini, Peter Stormare, and Anthony Heald appear in supporting roles.  8mm 2 is a 2005 direct-to-video thriller film directed by J. S. Cardone and starring Johnathon Schaech and Lori Heuring. When the film was in production, it was titled The Velvet Side of Hell. When Sony picked up the rights to distribute it, it was re-titled 8mm 2. Although this title suggests the film to be a sequel to the 1999 Nicolas Cage film 8mm, the film has no connective elements relating it to the first 8mm film.",
+    "poster_path": "/d1oI7vVVJfY3ZeGJHJuWTDgI3tD.jpg",
+    "backdrop_path": "/dupyCxtVaru1mziPGz4RVvMCh33.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/eEP8pyCmldfbnml0SFMvPK7kE4x.jpg",
+        "genre_ids": [
+          53,
+          80,
+          9648
+        ],
+        "id": 8224,
+        "title": "8MM",
+        "original_language": "en",
+        "original_title": "8MM",
+        "overview": "A small, seemingly innocuous plastic reel of film leads surveillance specialist Tom Welles down an increasingly dark and frightening path. With the help of the streetwise Max, he relentlessly follows a bizarre trail of evidence to determine the fate of a complete stranger. As his work turns into obsession, he drifts farther and farther away from his wife, family and simple life as a small-town PI.",
+        "popularity": 4.3453,
+        "poster_path": "/mhr9xRpjOBqlBjgDwtiOx6FsLvV.jpg",
+        "release_date": "1999-02-26",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.514,
+        "vote_count": 2437,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/taBSKBL12daKRfCmqaZPttWl5JS.jpg",
+        "genre_ids": [
+          53,
+          9648,
+          18
+        ],
+        "id": 7295,
+        "title": "8MM 2",
+        "original_language": "en",
+        "original_title": "8MM 2",
+        "overview": "Entering a steamy underground world of peep shows, nude clubs, and live Internet sex is David Huxley, an aspiring politician who has everything to lose. Secretly filmed in a steamy three-way with his fiancée Tish and a gorgeous young model, David is desperate to find the extortionist who's demanding an exorbitant amount of money for the negatives. But when the blackmail trail ends in murder and David is kidnapped, Tish must come up with $5 million ransom or her fiancé's once-promising career, and life, may come to a dead end.",
+        "popularity": 2.0368,
+        "poster_path": "/bSikt4O0ZrR8xVrsP8wliGybZwU.jpg",
+        "release_date": "2005-11-22",
+        "softcore": false,
+        "video": false,
+        "vote_average": 4.878,
+        "vote_count": 152,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

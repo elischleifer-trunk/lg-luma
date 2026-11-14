@@ -387,6 +387,26 @@ pub fn match_tier(query: &str, title: &str) -> u8 {
     4
 }
 
+/// Whether the query appears in the show's title, or its original title (*Amélie*). Movie of
+/// the Night matches titles in every language and fills its 20 results with near misses:
+/// "fan" brings back *One Piece* and *Rumble in the Bronx*, whose titles say nothing of fans.
+pub fn matches(query: &str, show: &Show) -> bool {
+    match_tier(query, &show.title) < 4 || match_tier(query, &show.original_title) < 4
+}
+
+/// Drops results whose titles do not contain the query. When none do, keeps them all: a
+/// near miss beats an empty screen (a misspelt title).
+pub fn on_topic(query: &str, shows: Vec<Show>) -> Vec<Show> {
+    if shows.iter().any(|show| matches(query, show)) {
+        shows
+            .into_iter()
+            .filter(|show| matches(query, show))
+            .collect()
+    } else {
+        shows
+    }
+}
+
 /// "Ghostbusters: Afterlife" and "Ghostbusters II" share the base title "ghostbusters".
 fn base_title(title: &str) -> String {
     let main = title.split([':', '(']).next().unwrap_or(title);

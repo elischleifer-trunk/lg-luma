@@ -1,0 +1,66 @@
+{
+  "request": {
+    "path": "/3/movie/1640818",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.262Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/x7d99Uk2ipRHLkVOCp7P5oEmEfz.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 14,
+        "name": "Fantasy"
+      }
+    ],
+    "homepage": "",
+    "id": 1640818,
+    "imdb_id": null,
+    "origin_country": [
+      "ID"
+    ],
+    "original_language": "id",
+    "original_title": "Sup Ayam",
+    "overview": "YOU will be brought to confusing dreams of Dimas—an uneventful event, a chicken soup, and god knows what else.",
+    "popularity": 0.0247,
+    "poster_path": "/nmIdOkuV9Q9rqKlUgQmtG7unh72.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2026-01-17",
+    "revenue": 0,
+    "runtime": 10,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Albanian",
+        "iso_639_1": "sq",
+        "name": "shqip"
+      },
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Indonesian",
+        "iso_639_1": "id",
+        "name": "Bahasa indonesia"
+      },
+      {
+        "english_name": "Javanese",
+        "iso_639_1": "jv",
+        "name": ""
+      }
+    ],
+    "status": "Released",
+    "tagline": "WHY CHICKEN SOUP",
+    "title": "Chicken Soup",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

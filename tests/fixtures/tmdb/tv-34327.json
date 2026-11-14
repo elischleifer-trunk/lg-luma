@@ -1,0 +1,139 @@
+{
+  "request": {
+    "path": "/3/tv/34327",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:37.110Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/jSNMfS4Ouj7A0e0ai6ABtvC9I6V.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2010-04-28",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "http://www.oncetv-ipn.net/soytufan/",
+    "id": 34327,
+    "in_production": false,
+    "languages": [
+      "es",
+      "en"
+    ],
+    "last_air_date": "2023-11-15",
+    "last_episode_to_air": {
+      "id": 3970307,
+      "name": "Episode 8",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2023-11-15",
+      "episode_number": 8,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 3,
+      "show_id": 34327,
+      "still_path": null
+    },
+    "name": "Soy tu fan",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1291,
+        "logo_path": "/qgsS2eHcJNWLCEKVQ9x9WWYcqXl.png",
+        "name": "Canal Once",
+        "origin_country": "MX"
+      }
+    ],
+    "number_of_episodes": 34,
+    "number_of_seasons": 3,
+    "origin_country": [
+      "MX"
+    ],
+    "original_language": "es",
+    "original_name": "Soy tu fan",
+    "overview": "We all have someone that we obsess over. We all are capable of loving irrationally what we don’t have and construct an unattainable charm in the people we admire. Sometimes we want to be someone else, to be with someone else. Sometimes we settle on appreciating from afar. Other times, we seek out an encounter. To be a fan means, by definition, to be on unequal terms. One loves beforehand, falling for a facade that could very well be invented. This mexican romcom explores these feelings in depth as examined through the eyes of a fan.",
+    "popularity": 3.1806,
+    "poster_path": "/bOgm5lY1z9KcgJmG9Cpxvppdw0X.jpg",
+    "production_companies": [
+      {
+        "id": 1719,
+        "logo_path": "/nCCpnwdybGqektBEjqpz6WX0cbF.png",
+        "name": "Canana",
+        "origin_country": "MX"
+      },
+      {
+        "id": 96809,
+        "logo_path": "/wIXZQfxz4mm3Ag0ieXDAf2L2C9f.png",
+        "name": "BTF Media",
+        "origin_country": "MX"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "MX",
+        "name": "Mexico"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2010-04-28",
+        "episode_count": 13,
+        "id": 195589,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/2bJ1IgFghqtZb39GYzoEtyofdr9.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2011-10-19",
+        "episode_count": 13,
+        "id": 195595,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/bOgm5lY1z9KcgJmG9Cpxvppdw0X.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-11-15",
+        "episode_count": 8,
+        "id": 309553,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      },
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.9,
+    "vote_count": 94
+  }
+}

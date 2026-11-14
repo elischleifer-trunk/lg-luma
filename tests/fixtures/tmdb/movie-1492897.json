@@ -1,0 +1,55 @@
+{
+  "request": {
+    "path": "/3/movie/1492897",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:25.420Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "",
+    "id": 1492897,
+    "imdb_id": "tt38588868",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Sup Weanie?!",
+    "overview": "A run-of-the-mill holdup blossoms into something more.",
+    "popularity": 0.0765,
+    "poster_path": "/lZNV711qOIlwNcVTwI4JZ9cNXbO.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2022-09-08",
+    "revenue": 0,
+    "runtime": 3,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Sup Weanie?!",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

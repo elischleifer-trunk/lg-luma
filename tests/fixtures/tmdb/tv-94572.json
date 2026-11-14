@@ -1,0 +1,139 @@
+{
+  "request": {
+    "path": "/3/tv/94572",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.182Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/onX2K0PQq275H9TbW4QRqkGrqNK.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      6
+    ],
+    "first_air_date": "2020-04-23",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 94572,
+    "in_production": false,
+    "languages": [
+      "ja",
+      "en"
+    ],
+    "last_air_date": "2020-09-07",
+    "last_episode_to_air": {
+      "id": 2366213,
+      "name": "Midnight at the Department Store",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2020-09-07",
+      "episode_number": 48,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 6,
+      "season_number": 1,
+      "show_id": 94572,
+      "still_path": "/etuq6uPcMdOM5GjffdPOuSx9oQI.jpg"
+    },
+    "name": "Super Shiro",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 103,
+        "logo_path": "/j3xAzk1SYQQwrQOD7acdSz675Wa.png",
+        "name": "tv asahi",
+        "origin_country": "JP"
+      }
+    ],
+    "number_of_episodes": 48,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_name": "SUPER SHIRO",
+    "overview": "The Nohara family dog Shiro becomes a superhero and protects the legendary bone \"Bobobobobone\" from the evil inventor dog Dekapoo and his ambitions of world domination.",
+    "popularity": 7.8683,
+    "poster_path": "/iDYOQEXxAx3t8sJXABVSNbwQfwh.jpg",
+    "production_companies": [
+      {
+        "id": 99494,
+        "logo_path": "/fpUFQKvrWPWTA8lbLWtWX65miPS.png",
+        "name": "Science SARU",
+        "origin_country": "JP"
+      },
+      {
+        "id": 5141,
+        "logo_path": "/fK2QKfHdSdw42Xx4MiD7KhDufBV.png",
+        "name": "Shin-Ei Animation",
+        "origin_country": "JP"
+      },
+      {
+        "id": 62866,
+        "logo_path": "/uYawQ0Lb8smRXNNCoq8gTHG92Pz.png",
+        "name": "Futabasha",
+        "origin_country": "JP"
+      },
+      {
+        "id": 4720,
+        "logo_path": "/7wQgZTA4FCkFMDedBYVZiVE87c7.png",
+        "name": "ADK",
+        "origin_country": "JP"
+      },
+      {
+        "id": 9300,
+        "logo_path": "/9sSD1XufVCJWAadNiC9Mwu994VD.png",
+        "name": "TV Asahi",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2020-04-23",
+        "episode_count": 48,
+        "id": 134139,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/cfi3VyZQLMj7aqhpMSLFjc7eCTk.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      },
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7,
+    "vote_count": 4
+  }
+}

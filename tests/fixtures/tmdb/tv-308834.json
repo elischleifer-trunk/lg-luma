@@ -1,0 +1,103 @@
+{
+  "request": {
+    "path": "/3/tv/308834",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:35.747Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/BXj7NG7OKLL7vW6qmL15Ru5rlI.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2026-06-19",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://ch3plus.com/drama/1811",
+    "id": 308834,
+    "in_production": false,
+    "languages": [
+      "th"
+    ],
+    "last_air_date": "2026-09-04",
+    "last_episode_to_air": {
+      "id": 7392509,
+      "name": "Episode 12",
+      "overview": "Two years after separating, Neen and Runch unexpectedly cross paths again, forcing them to confront the feelings they thought they'd left behind.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-09-04",
+      "episode_number": 12,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 45,
+      "season_number": 1,
+      "show_id": 308834,
+      "still_path": "/j5XAs18wkFFTVgixkFL11kjOMRn.jpg"
+    },
+    "name": "In Love Forever",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 344,
+        "logo_path": "/jjndRHOq412g8D6Hjm63rZMxAnO.png",
+        "name": "Channel 3",
+        "origin_country": "TH"
+      }
+    ],
+    "number_of_episodes": 12,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "TH"
+    ],
+    "original_language": "th",
+    "original_name": "วาดฝันวันวิวาห์",
+    "overview": "After a bitter divorce caused by family pressure and emotional manipulation, successful lawyer Runchlaphat and outspoken Gen-Z heiress Peeracha want nothing to do with each other. But when a high-stakes business opportunity requires them to appear as a happily married couple, the former lovers are forced back under the same roof.\n\nAs they struggle to maintain the illusion, unresolved feelings and painful memories begin to resurface. Meanwhile, Runchlaphat’s controlling mother, Gingkamol, remains determined to keep Peeracha out of the family at all costs. Surrounded by deception, pride, and lingering desire, the ex-wives find themselves trapped between the love they once shared and the wounds they never healed.",
+    "popularity": 3.9665,
+    "poster_path": "/28QpybDe3wN8oqecTWwREULuH4k.jpg",
+    "production_companies": [
+      {
+        "id": 26830,
+        "logo_path": "/eEOuPvqONusvlzWO8woxtKGp4Q9.png",
+        "name": "Channel 3",
+        "origin_country": "TH"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TH",
+        "name": "Thailand"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-06-19",
+        "episode_count": 12,
+        "id": 490591,
+        "name": "Season 1",
+        "overview": "Still drawn to each other but torn apart by Runch's mother, two women must pretend they're still happily married to close a high-stakes business deal.",
+        "poster_path": "/evCm4GPnr8WOZAqIc5iMv0QoaxJ.jpg",
+        "season_number": 1,
+        "vote_average": 10
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Thai",
+        "iso_639_1": "th",
+        "name": "ภาษาไทย"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "The real challenge begins after 'I do.'",
+    "type": "Scripted",
+    "vote_average": 7.4,
+    "vote_count": 8
+  }
+}

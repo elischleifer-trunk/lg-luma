@@ -1,0 +1,81 @@
+{
+  "request": {
+    "path": "/3/movie/74899",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:35.220Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/lQgglLMrEmotBToWUmdIcdCUwwl.jpg",
+    "belongs_to_collection": null,
+    "budget": 10000000,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 74899,
+    "imdb_id": "tt0082362",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Fan",
+    "overview": "A record store clerk is an obsessed fan of an actress of stage and screen. However, when faced with rejection, the fan strikes out in increasingly violent ways.",
+    "popularity": 1.2531,
+    "poster_path": "/uBUfrSpgQacEnjcMjpDszQTTqsL.jpg",
+    "production_companies": [
+      {
+        "id": 4,
+        "logo_path": "/jay6WcMgagAklUt7i9Euwj1pzTF.png",
+        "name": "Paramount Pictures",
+        "origin_country": "US"
+      },
+      {
+        "id": 3978,
+        "logo_path": "/kk8VINipfjy7osPd5DgFTfyxUI.png",
+        "name": "Robert Stigwood Organization",
+        "origin_country": "GB"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "1981-05-15",
+    "revenue": 3100000,
+    "runtime": 95,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "The final act is murder.",
+    "title": "The Fan",
+    "video": false,
+    "vote_average": 5.806,
+    "vote_count": 62
+  }
+}

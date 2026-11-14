@@ -1,0 +1,40 @@
+{
+  "request": {
+    "path": "/3/movie/1780495",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.149Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [],
+    "homepage": "",
+    "id": 1780495,
+    "imdb_id": null,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Sup Hangat",
+    "overview": "The lives of a child and a father are never truly the same after the loss of a mother. Jauhar, a vocational high school student with a passion for photography, is now trying to get closer to his father, who spends his time isolated in that quiet room.  Only a bowl of warm soup on the table serves as the bond between them. Curiosity and disappointment become the gateway to a conflict between the two.",
+    "popularity": 0.0368,
+    "poster_path": "/4Dtq49GHNbZ91TEvdQTO4m8eVLt.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "",
+    "revenue": 0,
+    "runtime": 0,
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Released",
+    "tagline": "",
+    "title": "Sup Hangat",
+    "video": true,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

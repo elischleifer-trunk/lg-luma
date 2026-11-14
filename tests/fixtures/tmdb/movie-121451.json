@@ -1,0 +1,68 @@
+{
+  "request": {
+    "path": "/3/movie/121451",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:26.093Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 121451,
+    "imdb_id": "tt0488931",
+    "origin_country": [
+      "HK"
+    ],
+    "original_language": "cn",
+    "original_title": "17歲的夏天",
+    "overview": "Chen Tian is a schoolgirl in Hong Kong about to leave to study at a university in Beijing. Before she leaves for good, she decided to spend an unforgettable trip with her best friend in a distant fishing village. There she discovers love for the first time. At the same village, Ah Mei who had a tough time in the city comes back home to the village to revisit her past. She finds herself reuniting with two boys from her childhood.",
+    "popularity": 0.2919,
+    "poster_path": null,
+    "production_companies": [
+      {
+        "id": 10934,
+        "logo_path": null,
+        "name": "Great Entertainment",
+        "origin_country": "HK"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "HK",
+        "name": "Hong Kong"
+      }
+    ],
+    "release_date": "2005-11-03",
+    "revenue": 0,
+    "runtime": 95,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      },
+      {
+        "english_name": "Cantonese",
+        "iso_639_1": "cn",
+        "name": "广州话 / 廣州話"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "A Side, B Side, Seaside",
+    "video": false,
+    "vote_average": 6.7,
+    "vote_count": 3
+  }
+}

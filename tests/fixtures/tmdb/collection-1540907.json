@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/collection/1540907",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:31.495Z",
+  "response": {
+    "id": 1540907,
+    "name": "Superman (DCU) Collection",
+    "original_language": "en",
+    "original_name": "Superman (DCU) Collection",
+    "overview": "A superhero film series following the adventures of Superman / Clark Kent in the DC Universe (DCU).",
+    "poster_path": "/xYbumhiT1vk6t5X8rI9hxneRJka.jpg",
+    "backdrop_path": "/r2qGBDJCX5zWo7SKRm21OSCktCN.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/eGX66zonvc4bXg3rM08RUxdYSDx.jpg",
+        "genre_ids": [
+          878,
+          12,
+          28
+        ],
+        "id": 1061474,
+        "title": "Superman",
+        "original_language": "en",
+        "original_title": "Superman",
+        "overview": "Superman, a journalist in Metropolis, embarks on a journey to reconcile his Kryptonian heritage with his human upbringing as Clark Kent.",
+        "popularity": 28.6034,
+        "poster_path": "/ombsmhYUqR4qqOLOxAyr5V8hbyv.jpg",
+        "release_date": "2025-07-09",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.314,
+        "vote_count": 5759,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/lX2TpAZxdIus6cnMCDBOrs96NBY.jpg",
+        "genre_ids": [
+          28,
+          878,
+          12
+        ],
+        "id": 1523140,
+        "title": "Man of Tomorrow",
+        "original_language": "en",
+        "original_title": "Man of Tomorrow",
+        "overview": "Superman and Lex Luthor find themselves forced to work together—to a certain degree—against a much, much bigger threat when Brainiac sets his sights on Earth.",
+        "popularity": 5.6493,
+        "poster_path": "/tYLgfKk3cEk7LskgxWyW37Nty01.jpg",
+        "release_date": "2027-07-07",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

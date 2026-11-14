@@ -1,0 +1,231 @@
+{
+  "request": {
+    "path": "/3/collection/591956",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:31.024Z",
+  "response": {
+    "id": 591956,
+    "name": "Thi Baan The Series",
+    "original_language": "th",
+    "original_name": "ไทบ้าน เดอะซีรีส์",
+    "overview": "The story of young Isan teenagers.",
+    "poster_path": "/ly0NveA4qlKnvu46jaltzm0nlS8.jpg",
+    "backdrop_path": null,
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/sgGbbnWLhnoELiKRWAvjprsf9p4.jpg",
+        "genre_ids": [
+          10749,
+          35
+        ],
+        "id": 445746,
+        "title": "Thi Baan The Series",
+        "original_language": "th",
+        "original_title": "ไทบ้านเดอะซีรีส์",
+        "overview": "A group of teen friends struggle with meeting girls and following their dreams in this first part of a comic film series about youth in rural Thailand.",
+        "popularity": 0.3509,
+        "poster_path": "/6Gc8fYuwqOAi7No6xr7J4PW854S.jpg",
+        "release_date": "2017-02-23",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.8,
+        "vote_count": 6,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/en8ycMSevK3XYUnfb61Tm1mQzju.jpg",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 509617,
+        "title": "Thi Baan The Series 2.1",
+        "original_language": "th",
+        "original_title": "ไทบ้านเดอะซีรีส์ 2.1",
+        "overview": "Life continues for Pong and friends as they face heartbreaks and pursue dreams in the second part of the comic film series about youth in rural Thailand.",
+        "popularity": 0.5027,
+        "poster_path": "/7w8Sn30UzguvObSObDEwMaxX9X0.jpg",
+        "release_date": "2018-02-22",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 5,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/5eWyvBsZsNGNaA4apiB4IDs5RHv.jpg",
+        "genre_ids": [
+          18,
+          35
+        ],
+        "id": 565150,
+        "title": "Thi Baan The Series 2.2",
+        "original_language": "th",
+        "original_title": "ไทบ้านเดอะซีรีส์ 2.2",
+        "overview": "Pong and friends grapple with love, death and success in this continuation of the comic film series about youth in rural Thailand.",
+        "popularity": 0.3807,
+        "poster_path": "/o26jf69fw3b3vm94aKtzucWCR8G.jpg",
+        "release_date": "2018-11-24",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.3,
+        "vote_count": 6,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/kGsBjYLVWHqAW9EiBTZfgkR4PtI.jpg",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 628012,
+        "title": "Thi Baan x BNK48",
+        "original_language": "th",
+        "original_title": "ไทบ้าน x BNK48 จากใจผู้สาวคนนี้",
+        "overview": "In order to come up with new music, a girl music group has to go to live in the countryside. By putting aside their city lives, perhaps life in the countryside can prove inspirational and help the girl band to produce a fresh, new sound.",
+        "popularity": 0.6353,
+        "poster_path": "/4fCnjHfBAUGE7oVXyDoMFOOu1TC.jpg",
+        "release_date": "2020-01-23",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.3,
+        "vote_count": 14,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/oaRK7LSaWvgaL6IZV9AtNIsMhcf.jpg",
+        "genre_ids": [
+          18,
+          35
+        ],
+        "id": 937735,
+        "title": "Thibaan the Series: Doctor Plawan",
+        "original_language": "th",
+        "original_title": "ไทบ้านเดอะซีรีส์ : หมอปลาวาฬ",
+        "overview": "Plawan is ready to open her heart for someone. Jarod wants to rekindle his friendship with Plawan. The more he tries, the deeper he falls for her. Jarod decides to prove his feelings with Plawan though he already has Kaew as a wife.",
+        "popularity": 0.3771,
+        "poster_path": "/b5088xlSC0voFaDuR46o2LpuNic.jpg",
+        "release_date": "2022-03-10",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8,
+        "vote_count": 1,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/3Zd6Z87HPY5SDhwtTalgX2SALxv.jpg",
+        "genre_ids": [
+          35,
+          18,
+          27
+        ],
+        "id": 1113119,
+        "title": "The Undertaker",
+        "original_language": "th",
+        "original_title": "สัปเหร่อ",
+        "overview": "Cherd, a 25-year-old law graduate, is hesitant to take over his father's undertaker business because he is afraid of ghosts. However, his father's condition is worsening, and he has no choice but to help.",
+        "popularity": 0.9189,
+        "poster_path": "/uYUnXT9P9HIm3TH2dGdb1B011OR.jpg",
+        "release_date": "2023-10-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.6,
+        "vote_count": 11,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/f7KI2Jt1NA0KGaaH8z1wWFJ6RXG.jpg",
+        "genre_ids": [
+          35,
+          18,
+          27
+        ],
+        "id": 1363620,
+        "title": "The Undertaker 2: Afterlife",
+        "original_language": "th",
+        "original_title": "สัปเหร่อ 2 โลกหลังความตาย",
+        "overview": "Following the passing of Baikaow and Sak, life in the village slowly returns to normal. This calm is disrupted when Grandma Joy is suddenly struck by lightning and miraculously revives.",
+        "popularity": 1.3339,
+        "poster_path": "/oiOxy2JtR23URJJEp6ryrMd8VH6.jpg",
+        "release_date": "2026-02-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.4,
+        "vote_count": 7,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/77ZMvm4UG57GqTGQrQsWw1eJEBY.jpg",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 1488899,
+        "title": "Nancy Boy",
+        "original_language": "th",
+        "original_title": "เทย ไทบ้านเดอะซีรีส์",
+        "overview": "A heartwarming and humorous tale of a tight-knit group of rural LGBTQ+ friends—known as the \"Isan Queer Gang\"—who may have different dreams but share one common goal: saving up for a trip to Japan.",
+        "popularity": 0.3687,
+        "poster_path": "/aRGHV4RrHaYo6IV8IsmyxyA8Peg.jpg",
+        "release_date": "2025-08-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7,
+        "vote_count": 2,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 1155767,
+        "title": "Thi Baan The Series 3",
+        "original_language": "th",
+        "original_title": "ไทบ้าน เดอะซีรีส์ 3",
+        "overview": "The sequel to the 2018 film. Plot TBA.",
+        "popularity": 0.1868,
+        "poster_path": "/4Lrmh5Yv6XDTuYX6NxePbRNZGqZ.jpg",
+        "release_date": "2027-02-11",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          18
+        ],
+        "id": 1155761,
+        "title": "The Undertaker 3",
+        "original_language": "th",
+        "original_title": "สัปเหร่อ 3",
+        "overview": "The sequel to the 2026 film. Plot TBA.",
+        "popularity": 0.114,
+        "poster_path": null,
+        "release_date": "",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

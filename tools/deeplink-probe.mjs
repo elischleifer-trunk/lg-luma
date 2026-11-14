@@ -29,7 +29,26 @@ const SERVICES = {
       ];
     },
   },
-  prime: { apps: ['amazon'], candidates: webLink },
+  // The plain web link opens the app's home screen (reported on a TV, 2026-11). Movie of the
+  // Night links look like https://www.amazon.com/gp/video/detail/<id>; try the ID in the
+  // shapes Prime Video's own apps and DIAL launches use.
+  prime: {
+    apps: ['amazon'],
+    candidates: (link) => {
+      const id = link.match(/\/(?:gp\/video\/detail|detail|dp)\/([A-Za-z0-9.]+)/)?.[1];
+      if (!id) return webLink(link);
+      return [
+        { contentTarget: id },
+        { contentTarget: `https://www.primevideo.com/detail/${id}` },
+        { contentTarget: `https://app.primevideo.com/detail?gti=${id}` },
+        { contentTarget: `intent://com.amazon.avod/detail?asin=${id}` },
+        { contentId: id },
+        { asin: id },
+        { gti: id },
+        ...webLink(link),
+      ];
+    },
+  },
   disney: { apps: ['com.disney.disneyplus-prod'], candidates: webLink },
   hbo: { apps: ['com.wbd.stream', 'com.hbo.hbomax', 'hbo-go-2'], candidates: webLink },
   hulu: { apps: ['hulu'], candidates: webLink },

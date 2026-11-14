@@ -1,0 +1,111 @@
+{
+  "request": {
+    "path": "/3/movie/575428",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:36.210Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/h9xzx7FteH3kFcED51qYjeHHUHD.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 575428,
+    "imdb_id": "tt9647768",
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "zh",
+    "original_title": "南方车站的聚会",
+    "overview": "A gangster ends up making a mistake that causes every gun on both sides of the law to point at him. While on the run, he comes across a mysterious woman who might get him out of trouble or make things worse.",
+    "popularity": 1.4344,
+    "poster_path": "/w49o4vmNFpCt4VFJp7ip6tjHh3x.jpg",
+    "production_companies": [
+      {
+        "id": 10949,
+        "logo_path": "/2JOR75Gaz14Vzim0XSTSCmGFYsD.png",
+        "name": "Memento Films International",
+        "origin_country": "FR"
+      },
+      {
+        "id": 94012,
+        "logo_path": null,
+        "name": "Green Ray Films",
+        "origin_country": ""
+      },
+      {
+        "id": 94,
+        "logo_path": "/huC7HqorvUThGIrENrbcHmQVUA0.png",
+        "name": "ARTE France Cinéma",
+        "origin_country": "FR"
+      },
+      {
+        "id": 97384,
+        "logo_path": null,
+        "name": "He Li Chen Guang International Culture Media Co",
+        "origin_country": ""
+      },
+      {
+        "id": 134095,
+        "logo_path": null,
+        "name": "Maisong Entertainment Investment",
+        "origin_country": ""
+      },
+      {
+        "id": 40891,
+        "logo_path": null,
+        "name": "Omnijoi Media 幸福蓝海影视文化",
+        "origin_country": "CN"
+      },
+      {
+        "id": 81620,
+        "logo_path": "/7LkIVuWBVScdujpKhBPx1TMnPQE.png",
+        "name": "Tencent Pictures",
+        "origin_country": "CN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      },
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "release_date": "2019-11-27",
+    "revenue": 0,
+    "runtime": 113,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Wild Goose Lake",
+    "video": false,
+    "vote_average": 6.632,
+    "vote_count": 389
+  }
+}

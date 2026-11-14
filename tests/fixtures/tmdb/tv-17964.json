@@ -1,0 +1,224 @@
+{
+  "request": {
+    "path": "/3/tv/17964",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.493Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/v7gHGoOMxilXGWt6i9AzXvYw6N4.jpg",
+    "created_by": [
+      {
+        "id": 6079459,
+        "credit_id": "69ba2d3980804128fd08fe3d",
+        "name": "Pradeep Milroy Peter",
+        "original_name": "Pradeep Milroy Peter",
+        "gender": 0,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      60
+    ],
+    "first_air_date": "2006-04-28",
+    "genres": [
+      {
+        "id": 10764,
+        "name": "Reality"
+      }
+    ],
+    "homepage": "https://www.hotstar.com/in/shows/super-singer/4207",
+    "id": 17964,
+    "in_production": true,
+    "languages": [
+      "ta"
+    ],
+    "last_air_date": "2026-02-01",
+    "last_episode_to_air": {
+      "id": 7043762,
+      "name": "Grand Finale",
+      "overview": "The wait is over! Seven finalists face off in one last epic showdown for the crown. Who will become the next Super Singer?",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-02-01",
+      "episode_number": 52,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 232,
+      "season_number": 11,
+      "show_id": 17964,
+      "still_path": "/sK0vQQFJEJ5vzHTvAYR8SgTPsLn.jpg"
+    },
+    "name": "Super Singer",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 501,
+        "logo_path": "/rFW7EeC4QDo24oaXLY2QgoGL0hC.png",
+        "name": "STAR Vijay",
+        "origin_country": "IN"
+      }
+    ],
+    "number_of_episodes": 596,
+    "number_of_seasons": 12,
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "ta",
+    "original_name": "சூப்பர் சிங்கர்",
+    "overview": "Super Singer is a reality-based Indian singing competition in Tamil language that aired on STAR Vijay. The program seeks to discover the best singing talent in Tamil Nadu through a series of statewide auditions. The show is sponsored by the mobile service provider, Airtel. The show debuted in 2006 and has completed its three seasons,presently in fourth season. The winner of event gets a chance to sing a Tamil movie song.\n\nThe show usually airs on All Weekday nights in India and is telecast worldwide through partner broadcasting networks.",
+    "popularity": 14.3781,
+    "poster_path": "/vThkUfJOferJ69yuCCniB7AFRT8.jpg",
+    "production_companies": [
+      {
+        "id": 184202,
+        "logo_path": "/iARscKlsmr6IQEE2w623Y6oXouS.png",
+        "name": "Media Masons",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2006-04-28",
+        "episode_count": 1,
+        "id": 185891,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2008-07-07",
+        "episode_count": 1,
+        "id": 505740,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2010-07-12",
+        "episode_count": 1,
+        "id": 505741,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2013-02-04",
+        "episode_count": 1,
+        "id": 505742,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 4,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2015-06-01",
+        "episode_count": 254,
+        "id": 505743,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2018-01-21",
+        "episode_count": 50,
+        "id": 28702,
+        "name": "Season 6",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 6,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-04-27",
+        "episode_count": 57,
+        "id": 28703,
+        "name": "Season 7",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 7,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-01-24",
+        "episode_count": 63,
+        "id": 28704,
+        "name": "Season 8",
+        "overview": "",
+        "poster_path": "/qz6bKDc0DnDiraSc7Jd6KCdBiBE.jpg",
+        "season_number": 8,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2022-11-19",
+        "episode_count": 61,
+        "id": 505744,
+        "name": "Season 9",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 9,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-12-16",
+        "episode_count": 55,
+        "id": 505319,
+        "name": "Season 10",
+        "overview": "",
+        "poster_path": "/gdjks2XAY7LJxp9woFZkLP9WHE8.jpg",
+        "season_number": 10,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-08-02",
+        "episode_count": 52,
+        "id": 505256,
+        "name": "Season 11",
+        "overview": "",
+        "poster_path": "/wAUU4XYt2eREsVaHNi7hcHd9ZsP.jpg",
+        "season_number": 11,
+        "vote_average": 0
+      },
+      {
+        "air_date": null,
+        "episode_count": 0,
+        "id": 505318,
+        "name": "Season 12",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 12,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Tamil",
+        "iso_639_1": "ta",
+        "name": "தமிழ்"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "Thamizhagathil Brahmaanda Kuralukkaana Thedal",
+    "type": "Reality",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

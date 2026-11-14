@@ -1,0 +1,228 @@
+{
+  "request": {
+    "path": "/3/collection/552742",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.920Z",
+  "response": {
+    "id": 552742,
+    "name": "Oh My Ghost Collection",
+    "original_language": "th",
+    "original_name": "มหากาพย์หอแต๋วแตก",
+    "overview": "Oh My Ghosts! in Thailand.",
+    "poster_path": "/3sJqpj3itrnPR1jJh4te7M2Wa15.jpg",
+    "backdrop_path": "/oRF0vSJzpqDw8E3DLTRrYOKLwcz.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/2SbSU5MiMQgEDkKkb8AsSNkfq0b.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 105546,
+        "title": "Haunting Me",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก",
+        "overview": "Four aging drag queens who run a boarding house for boys try all sorts of crazy schemes to get rid of the ghosts haunting their dormitory.",
+        "popularity": 0.5831,
+        "poster_path": "/skcZCZNZxUd6jts4kn1EgE53y0.jpg",
+        "release_date": "2007-03-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 4.2,
+        "vote_count": 10,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/sctvVTdo0A9iuAAEnDOyCiKR1rS.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 249222,
+        "title": "Oh My Ghost",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกกระเจิง",
+        "overview": "A group of friends encounters a folk spirit in their apartment, and their harebrained attempts to banish the ghost soon backfire.",
+        "popularity": 0.7618,
+        "poster_path": "/wGs7D42mttDX7zLcbxlkjrbQ9fo.jpg",
+        "release_date": "2009-10-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.4,
+        "vote_count": 11,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/cjYzB25HzkvftbOtygZg0dVuanE.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 164859,
+        "title": "Oh My Ghost 2",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหวกชิมิ",
+        "overview": "The spirited trio are back to take on a new ghost-busting adventure at a mens residence, where spooky secrets lurk around every corner.",
+        "popularity": 0.6974,
+        "poster_path": "/n4HF7Ugry1AL1SmAjWUjkUmV0z4.jpg",
+        "release_date": "2011-01-06",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.2,
+        "vote_count": 6,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/tKkSpzkZFReBhrqMiP6GlxQ9A4k.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 249231,
+        "title": "Oh My Ghost 3",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกมว๊ากมว๊ากกก",
+        "overview": "After a body is discovered in their building, a vengeful, paranormal presence begins to affect Taew, Mod Dum and Cartoon's business.",
+        "popularity": 0.7304,
+        "poster_path": "/3bZBoNLMkvvdEMWSdWISQuRv6aL.jpg",
+        "release_date": "2012-10-23",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.7,
+        "vote_count": 5,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/4EB3YrfSV5HY3my59pT4RYzwuTK.jpg",
+        "genre_ids": [
+          27,
+          35
+        ],
+        "id": 418978,
+        "title": "Oh My Ghost 4",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกนะคะ",
+        "overview": "Ghosts wreak havoc at the old school, and a student communicates with the spirit while the team reckons with a power struggle.",
+        "popularity": 0.7094,
+        "poster_path": "/7X46xNDaNm6YZy4g0V7mRJx5WVP.jpg",
+        "release_date": "2015-10-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 4,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/vZJT84SITiiv8yJdffNNI3lHqh0.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 575415,
+        "title": "Oh My Ghost 6",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกต่อไม่รอแล้วนะ",
+        "overview": "Taew and friends are invited to a mansion which the mansion owner is choosing the new landlord. To win the mansion award, they have to dress up in Indian clothes and pretend to be Indian.",
+        "popularity": 0.5669,
+        "poster_path": "/gE86u6Ii6fFrN36II5mvqa07vv0.jpg",
+        "release_date": "2018-12-04",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 1,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/j1PSzM5RP9LaYwejZMKqUwXYcWo.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 889616,
+        "title": "Oh My Ghost! The Fierce Escape from Covid-19",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกโควิดปังปุริเย่",
+        "overview": "When the hotel run by Taew is found to have a COVID-19 case, it is shut down and everyone there must remain in quarantine for 14 days. The messy and spooky happenings wages on, even the zombies rise to chase people.",
+        "popularity": 0.7622,
+        "poster_path": "/Aen8582h7JbkZJHnF4VSP3TGMtq.jpg",
+        "release_date": "2021-12-02",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7,
+        "vote_count": 2,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/sf3Ptddg4EycHacQ75232hznE12.jpg",
+        "genre_ids": [
+          35
+        ],
+        "id": 711660,
+        "title": "Pojaman The Legacy",
+        "original_language": "th",
+        "original_title": "พจมาน สว่างคาตา",
+        "overview": "Pojamarn, a fair lady, moves from her village to study in Bangkok to satisfy her father's antemortem wish. She lives with her aunt, Mom Ampara, in a big mansion called Dokmaithong.",
+        "popularity": 0.5622,
+        "poster_path": "/jAHaviISxUirEeoaaKwlAkfpJub.jpg",
+        "release_date": "2020-06-03",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/7MjgRNq3RqQ8reT5DNprkYOd3LV.jpg",
+        "genre_ids": [
+          35,
+          27
+        ],
+        "id": 1216195,
+        "title": "Oh My Ghost : The Finale",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกสัปะหยด",
+        "overview": "Strange things begin happening to Kouy, the beloved son of Taew, prompting her to seek help from Panda, the calm twin of the mischievous ghost Pancake.",
+        "popularity": 1.5175,
+        "poster_path": "/h59dS8S28ANNfWj5nuga2PveHPP.jpg",
+        "release_date": "2024-03-14",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.9,
+        "vote_count": 35,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/3ZJhETCH5V37l8vtJwGywGiQixk.jpg",
+        "genre_ids": [
+          35
+        ],
+        "id": 1474687,
+        "title": "Hor Taew Tak: Split Li Hu",
+        "original_language": "th",
+        "original_title": "หอแต๋วแตก แหกหลีหู",
+        "overview": "When the Empress died with a mystery, causing the nobles to shut up and find a way to solve the situation and find clues about who is behind this incident.",
+        "popularity": 0.9827,
+        "poster_path": "/58wKVnZMK2owIbyPZFfuAfw4v7t.jpg",
+        "release_date": "2025-12-25",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

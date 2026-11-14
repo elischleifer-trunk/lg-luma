@@ -1,0 +1,770 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "sup",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:28.791Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35
+        ],
+        "id": 1391432,
+        "title": "Sup",
+        "original_language": "en",
+        "original_title": "Sup",
+        "overview": "A woman goes out on a paddleboard. Hijinks ensue.",
+        "popularity": 0.3718,
+        "poster_path": "/iI1RfLx0P55vSzqE9fdpAyNvvmc.jpg",
+        "release_date": "2024-11-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "id": 4798581,
+        "name": "Sup",
+        "original_name": "Sup",
+        "popularity": 0.0718,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Sound",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1309881,
+            "title": "Dolorosa",
+            "original_title": "Dolorosa",
+            "overview": "Between these walls, time seems to have stopped. Days, weeks, months maybe, the young woman doesn't know for how long she has been trapped in there. Alone and desperate, with no one but this gloved hand that brings her food each day and caresses her sometimes at night...her last link with the world of the living. And the demons of her past...",
+            "poster_path": "/c3rClXS7mio7t0HP5g683N7UyYR.jpg",
+            "media_type": "movie",
+            "original_language": "fr",
+            "genre_ids": [
+              18,
+              27
+            ],
+            "popularity": 0.176,
+            "release_date": "2009-10-24",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          },
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1592677,
+            "title": "La sangre del castigo",
+            "original_title": "La sangre del castigo",
+            "overview": "Emerging from the depths of the Amazon rainforest, death stalks and strikes in the heart of the city, leaving victims completely drained of blood. This creates a true nightmare for the medical examiner, who is increasingly affected by the murders—to the point of reliving them through harrowing flashbacks.",
+            "poster_path": "/sMYdGUorRdFohDsfmmvAFgB7DyQ.jpg",
+            "media_type": "movie",
+            "original_language": "es",
+            "genre_ids": [
+              27
+            ],
+            "popularity": 0.5771,
+            "release_date": "2005-06-17",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 4038141,
+        "name": "Young Sup Chung",
+        "original_name": "Young Sup Chung",
+        "popularity": 0.7268,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/6ja3HVez4A4XPNSMHhuOiu2UTXm.jpg",
+            "id": 11308,
+            "title": "The Hotel New Hampshire",
+            "original_title": "The Hotel New Hampshire",
+            "overview": "Over the course of several years beginning in the 1950s, a man and his oddball family run hotels in New England and Vienna, as unexpected events change their lives forever.",
+            "poster_path": "/9XGGGniMtBqhox7JAV5JujlUqFz.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              35,
+              18
+            ],
+            "popularity": 24.6276,
+            "release_date": "1984-03-09",
+            "softcore": false,
+            "video": false,
+            "vote_average": 5.7,
+            "vote_count": 141
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 5977942,
+        "name": "Sup",
+        "original_name": "Sup",
+        "popularity": 0.0951,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1626816,
+            "title": "Para os Guardados",
+            "original_title": "Para os Guardados",
+            "overview": "",
+            "poster_path": "/rOVkQTy7WnUMe9N2yWHhiO3xOzO.jpg",
+            "media_type": "movie",
+            "original_language": "pt",
+            "genre_ids": [],
+            "popularity": 0.0925,
+            "release_date": "2026-01-29",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35
+        ],
+        "id": 279042,
+        "title": "Sup de fric",
+        "original_language": "fr",
+        "original_title": "Sup de fric",
+        "overview": "Two business students hatch a perfect plan: buy their own school.",
+        "popularity": 0.4064,
+        "poster_path": "/cQJojPOYpU2fDhFYMztEtLduaA1.jpg",
+        "release_date": "1992-07-22",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.1,
+        "vote_count": 5,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35,
+          80
+        ],
+        "id": 1492897,
+        "title": "Sup Weanie?!",
+        "original_language": "en",
+        "original_title": "Sup Weanie?!",
+        "overview": "A run-of-the-mill holdup blossoms into something more.",
+        "popularity": 0.0765,
+        "poster_path": "/lZNV711qOIlwNcVTwI4JZ9cNXbO.jpg",
+        "release_date": "2022-09-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/tk9oJhaFKVS6dIc6SE4b206yUv2.jpg",
+        "genre_ids": [
+          99
+        ],
+        "id": 1741494,
+        "title": "American SUP",
+        "original_language": "es",
+        "original_title": "American SUP",
+        "overview": "",
+        "popularity": 0.1601,
+        "poster_path": "/a7nHuAK1K3AtvZ7JPvHK6pgCY7c.jpg",
+        "release_date": "2026-08-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [],
+        "id": 1780495,
+        "title": "Sup Hangat",
+        "original_language": "en",
+        "original_title": "Sup Hangat",
+        "overview": "The lives of a child and a father are never truly the same after the loss of a mother. Jauhar, a vocational high school student with a passion for photography, is now trying to get closer to his father, who spends his time isolated in that quiet room.  Only a bowl of warm soup on the table serves as the bond between them. Curiosity and disappointment become the gateway to a conflict between the two.",
+        "popularity": 0.0368,
+        "poster_path": "/4Dtq49GHNbZ91TEvdQTO4m8eVLt.jpg",
+        "release_date": "",
+        "softcore": false,
+        "video": true,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/x7d99Uk2ipRHLkVOCp7P5oEmEfz.jpg",
+        "genre_ids": [
+          14
+        ],
+        "id": 1640818,
+        "title": "Chicken Soup",
+        "original_language": "id",
+        "original_title": "Sup Ayam",
+        "overview": "YOU will be brought to confusing dreams of Dimas—an uneventful event, a chicken soup, and god knows what else.",
+        "popularity": 0.0247,
+        "poster_path": "/nmIdOkuV9Q9rqKlUgQmtG7unh72.jpg",
+        "release_date": "2026-01-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "id": 1689805,
+        "name": "Sup Yusup",
+        "original_name": "Sup Yusup",
+        "popularity": 0.1436,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 419912,
+            "title": "Tuyul Eee Ketemu Lagi",
+            "original_title": "Tuyul Eee Ketemu Lagi",
+            "overview": "Like a sequel to Tuyul (childlike ghost similar to goblin or imp), the Head tuyul is angry as one of their members died (as seen in the previous film). Therefore, he sends the black imp and white imp for revenge. These imps come to Bokir’s house by mistake. Bokir is crazy about a singer, who is signed by Karto, whose house is actually where these imps are meant to go. They are sent to kidnap the singer and to take all of the wealth. The disturbance of these imps can be solved by practising proper prayers. Bokir goes mad and unintentionally reveals the secret of his imps and causes his own death by falling from a high building. Upon his death, the imps are released. They fly with a magic carpet, but when they fly over a mosque, their flying carpet falls down.",
+            "poster_path": null,
+            "media_type": "movie",
+            "original_language": "id",
+            "genre_ids": [
+              14,
+              35
+            ],
+            "popularity": 0.4824,
+            "release_date": "1979-01-01",
+            "softcore": false,
+            "video": false,
+            "vote_average": 10,
+            "vote_count": 1
+          },
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 419616,
+            "title": "Night Screams",
+            "original_title": "Jeritan Malam",
+            "overview": "Beautiful Lina is gravely ill and in a coma so her husband decides to take her to a professor / supernatural researcher who has a collection of ghosts and monsters as research objects. Unfortunately, the professor’s research is tainted by his corrupt assistant so when Mrs. Lina needs blood, she is given a tainted blood transfusion which is the blood of Mrs. Kemangmang... a spirit who likes to suck human brains.",
+            "poster_path": null,
+            "media_type": "movie",
+            "original_language": "id",
+            "genre_ids": [
+              27,
+              35,
+              878
+            ],
+            "popularity": 0.2699,
+            "release_date": "1981-11-11",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          },
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 512921,
+            "title": "Traktor Benyamin",
+            "original_title": "Traktor Benyamin",
+            "overview": "Benny is a college student who studies farming. He gets an assignment to go to a village while he works on his thesis. On his way there, he meets Erni, a high school friend who is also heading to the same village. In the village, he stays in the house of the village chief and his daughter, Euis, is a beautiful young woman. During his work, the locals often distract Benny, since they want Euis’ attention. The relationship between Euis and Benny deteriorates further when Erni comes with her group. The misunderstanding is overcome when she realises that Erni comes to join the harvesting party in the village and to entertain them with her singing.",
+            "poster_path": "/akKbUiLskHgBnvzJORjuoX1RrBk.jpg",
+            "media_type": "movie",
+            "original_language": "id",
+            "genre_ids": [
+              35
+            ],
+            "popularity": 0.5077,
+            "release_date": "1975-01-01",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/k5ehljOjaf9kpgk1uFJvKNB86Fj.jpg",
+        "genre_ids": [
+          18
+        ],
+        "id": 1305142,
+        "title": "Sup Lidah Kambing",
+        "original_language": "ms",
+        "original_title": "Sup Lidah Kambing",
+        "overview": "A story of a son who tries to redeem himself after causing his parents to divorce.",
+        "popularity": 0.1093,
+        "poster_path": null,
+        "release_date": "2023-06-13",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          35
+        ],
+        "id": 437090,
+        "title": "Sup Sap Bup Dap",
+        "original_language": "cn",
+        "original_title": "十三不搭",
+        "overview": "A social satire on Hong Kong people’s obsession with gambling, told in 13 vignettes of various styles.",
+        "popularity": 0.5352,
+        "poster_path": "/yoPJLzqNJUv7u2nWIRuD7M9OSnt.jpg",
+        "release_date": "1975-09-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 9,
+        "vote_count": 1,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/lsrQcN33faIbPjWUET1Q7gPaCUD.jpg",
+        "genre_ids": [],
+        "id": 271094,
+        "name": "What Sup",
+        "original_language": "en",
+        "original_name": "Nautical Ch: What Sup",
+        "overview": "Musician, surfer and comedian Chris Hau talks with various celebrities. The catch? They are on Stand Up Paddleboards! Interviews, competitions, shows, concerts and more, this show is full of fun and laughs for the whole family.",
+        "popularity": 0.0565,
+        "poster_path": null,
+        "first_air_date": "2024-09-10",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "id": 1447427,
+        "name": "Chung Sup Yoon",
+        "original_name": "Chung Sup Yoon",
+        "popularity": 0.1559,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Directing",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/oG9dcGSSu13fjFp1Uly15ZXjRKV.jpg",
+            "id": 11970,
+            "title": "Hercules",
+            "original_title": "Hercules",
+            "overview": "Bestowed with superhuman strength, a young mortal named Hercules sets out to prove himself a hero in the eyes of his father, the great god Zeus. Along with his friends Pegasus, a flying horse, and Phil, a personal trainer, Hercules is tricked by the hilarious, hotheaded villain Hades, who's plotting to take over Mount Olympus!",
+            "poster_path": "/dK9rNoC97tgX3xXg5zdxFisdfcp.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              16,
+              10751,
+              14,
+              12,
+              35,
+              10749
+            ],
+            "popularity": 11.7796,
+            "release_date": "1997-06-13",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.497,
+            "vote_count": 8217
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/a0E1mbejev56Ii51hCnYUDj4tZS.jpg",
+            "id": 37135,
+            "title": "Tarzan",
+            "original_title": "Tarzan",
+            "overview": "Tarzan was a small orphan who was raised by an ape named Kala since he was a child. He believed that this was his family, but on an expedition Jane Porter is rescued by Tarzan. He then finds out that he's human. Now Tarzan must make the decision as to which family he should belong to...",
+            "poster_path": "/bTvHlcqiOjGa3lFtbrTLTM3zasY.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              16,
+              10751,
+              12
+            ],
+            "popularity": 10.6769,
+            "release_date": "1999-06-17",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.407,
+            "vote_count": 7583
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/y5tad0a4yRbxYgOHGllEIEeCCKt.jpg",
+            "id": 10198,
+            "title": "The Princess and the Frog",
+            "original_title": "The Princess and the Frog",
+            "overview": "A waitress, desperate to fulfill her dreams as a restaurant owner, is set on a journey to turn a frog prince back into a human being, but she has to face the same problem after she kisses him.",
+            "poster_path": "/yprv5PbnEksoVj2v6XEnDBg9joR.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              16,
+              10749,
+              14,
+              10751
+            ],
+            "popularity": 13.7846,
+            "release_date": "2009-12-08",
+            "softcore": false,
+            "video": false,
+            "vote_average": 7.24,
+            "vote_count": 6371
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 1239679,
+        "name": "Kim Young Sup",
+        "original_name": "Kim Young Sup",
+        "popularity": 0.1689,
+        "media_type": "person",
+        "gender": 2,
+        "known_for_department": "Production",
+        "profile_path": "/6Hz21IVIrJ5ZFimZDwIVd4Nvd6m.jpg",
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/gBjn4m2ERf76kcd8YorUbgxacDV.jpg",
+            "id": 39346,
+            "name": "City Hunter",
+            "original_name": "시티헌터",
+            "overview": "The story takes place in Seoul, 2011. Lee Yoon-sung is a talented MIT-graduate who's working on the international communications team at the Blue House. He encounters dangerous situations while solving a variety of cases, both big and small, for people who need his help, and eventually becomes a \"city hunter.\"",
+            "poster_path": "/dbvXhmKr18oHdY7kwkeRXAbfDvD.jpg",
+            "media_type": "tv",
+            "original_language": "ko",
+            "genre_ids": [
+              10759,
+              18,
+              80
+            ],
+            "popularity": 6.6474,
+            "first_air_date": "2011-05-25",
+            "softcore": false,
+            "vote_average": 7.5,
+            "vote_count": 106,
+            "origin_country": [
+              "KR"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/jM2dVpcfyIVoDb2q7n092wkxiE2.jpg",
+            "id": 6074,
+            "name": "My Girl",
+            "original_name": "마이걸",
+            "overview": "A woman with a gift for lying is employed by a chaebol heir to act as his long-lost cousin. To keep up the charade for his family, the two must live under the same roof, but their growing attraction to each other poses a problem for pretending to be relatives.",
+            "poster_path": "/72Su8fJNHMidt9wCcVWKkLJzHrS.jpg",
+            "media_type": "tv",
+            "original_language": "ko",
+            "genre_ids": [
+              35,
+              18
+            ],
+            "popularity": 6.055,
+            "first_air_date": "2005-12-14",
+            "softcore": false,
+            "vote_average": 7.7,
+            "vote_count": 31,
+            "origin_country": [
+              "KR"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/j9IlhhsM1ScVAPO70d8euJ85PUQ.jpg",
+            "id": 1127546,
+            "title": "Chabak - Night of Murder and Romance",
+            "original_title": "차박: 살인과 낭만의 밤",
+            "overview": "On their first wedding anniversary, a couple ventures into the mountains for a romantic Chabak (car-camping) trip, but their idyllic getaway turns into a living nightmare when they unknowingly cross paths with a bloodthirsty psychopath. The couple must confront the truth before it’s too late.",
+            "poster_path": "/3BXtJhRf7o2RCySbGQiPTh2N9Xg.jpg",
+            "media_type": "movie",
+            "original_language": "ko",
+            "genre_ids": [
+              27,
+              53
+            ],
+            "popularity": 0.5053,
+            "release_date": "2023-09-13",
+            "softcore": false,
+            "video": false,
+            "vote_average": 4.1,
+            "vote_count": 10
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 90960,
+        "name": "Ki Sup Lee",
+        "original_name": "Ki Sup Lee",
+        "popularity": 0.0728,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Visual Effects",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/qIkSCWFsXGDYInpQCqtKqCsatKl.jpg",
+            "id": 17337,
+            "title": "The Land Before Time VI: The Secret of Saurus Rock",
+            "original_title": "The Land Before Time VI: The Secret of Saurus Rock",
+            "overview": "Littlefoot's grandfather narrates the story about the Lone Dinosaur that killed a Sharptooth. A giant monolith formed after the fight and if it's destroyed, bad luck will loom over the valley.",
+            "poster_path": "/gULz0vkjx3VrN9aJGjQ7EduSNx8.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              16,
+              12,
+              10751
+            ],
+            "popularity": 2.4453,
+            "release_date": "1998-12-01",
+            "softcore": false,
+            "video": false,
+            "vote_average": 6.203,
+            "vote_count": 308
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 2721514,
+        "name": "Sup Fat Tin",
+        "original_name": "Sup Fat Tin",
+        "popularity": 0.1106,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Editing",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/4COZh2O6Xn2ISWrgagxBpnLpZsu.jpg",
+            "id": 449998,
+            "title": "The Invincible Dragon",
+            "original_title": "九龍不敗",
+            "overview": "The undercover agent with dragon tattoo Kowloon continually helped the police to solve mysterious cases, which made him known as a rising star. However, his impulsive personality dragged him into endless troubles. He got himself into fights with the Macau detective, as well as an American Army veteran Alexander who has a secret linkage to Kowloon’s background…",
+            "poster_path": "/15GQh5pUXzPSvZ0GmqsYeUSlhUw.jpg",
+            "media_type": "movie",
+            "original_language": "zh",
+            "genre_ids": [
+              28,
+              80,
+              53,
+              35
+            ],
+            "popularity": 1.5524,
+            "release_date": "2019-06-20",
+            "softcore": false,
+            "video": false,
+            "vote_average": 4.7,
+            "vote_count": 36
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 1239678,
+        "name": "Bae Tae Sup",
+        "original_name": "Bae Tae Sup",
+        "popularity": 0.1013,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Production",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": "/jM2dVpcfyIVoDb2q7n092wkxiE2.jpg",
+            "id": 6074,
+            "name": "My Girl",
+            "original_name": "마이걸",
+            "overview": "A woman with a gift for lying is employed by a chaebol heir to act as his long-lost cousin. To keep up the charade for his family, the two must live under the same roof, but their growing attraction to each other poses a problem for pretending to be relatives.",
+            "poster_path": "/72Su8fJNHMidt9wCcVWKkLJzHrS.jpg",
+            "media_type": "tv",
+            "original_language": "ko",
+            "genre_ids": [
+              35,
+              18
+            ],
+            "popularity": 6.055,
+            "first_air_date": "2005-12-14",
+            "softcore": false,
+            "vote_average": 7.7,
+            "vote_count": 31,
+            "origin_country": [
+              "KR"
+            ]
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/gluwqsix6ysvIFmj2Cqs8cQ9fxG.jpg",
+            "id": 38589,
+            "name": "Princess Ja Myung",
+            "original_name": "자명고",
+            "overview": "Based on a famous tale of Korean folklore story about a princess of Nak Rang of Nangnang Kingdom and Prince Hodong of the Goguryeo Kingdom.",
+            "poster_path": "/n3hTPrgvoj4Vutl9gzmxGTiwnO3.jpg",
+            "media_type": "tv",
+            "original_language": "ko",
+            "genre_ids": [
+              18
+            ],
+            "popularity": 5.1801,
+            "first_air_date": "2009-03-10",
+            "softcore": false,
+            "vote_average": 4.6,
+            "vote_count": 13,
+            "origin_country": [
+              "KR"
+            ]
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 4540377,
+        "name": "Kyo Sup Song",
+        "original_name": "Kyo Sup Song",
+        "popularity": 0.021,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Directing",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 1245866,
+            "title": "Foreigners",
+            "original_title": "Foreigners",
+            "overview": "`Korean food is hard to come by in the UK, so Kang and Shim make their living driving a mobile supermarket to Korean communities across the country. Travelling from Leeds to Bristol, they become the link between the stories of Hana and Sena - two young Korean women, trapped by memories of home and the circumstances of living in a foreign land. A story combining fact, fiction, noodles and sadness... ultimately a film about loneliness.' [NFTS]",
+            "poster_path": null,
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [],
+            "popularity": 0.0346,
+            "release_date": "2002-01-01",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          }
+        ]
+      },
+      {
+        "adult": false,
+        "id": 2985093,
+        "name": "Hae Sup Um",
+        "original_name": "Hae Sup Um",
+        "popularity": 0.1206,
+        "media_type": "person",
+        "gender": 0,
+        "known_for_department": "Acting",
+        "profile_path": null,
+        "known_for": [
+          {
+            "adult": false,
+            "backdrop_path": null,
+            "id": 544041,
+            "title": "Liquor Store Babies",
+            "original_title": "Liquor Store Babies",
+            "overview": "Liquor Store Babies explores the intersecting lives of two friends and their fathers, each of whom own liquor stores, as they take a real look at how their lives and dreams are cyclical and ever connected to one another.",
+            "poster_path": "/w7mvQhvhqRJijhUASwv0VXSwfi4.jpg",
+            "media_type": "movie",
+            "original_language": "en",
+            "genre_ids": [
+              99
+            ],
+            "popularity": 0.0832,
+            "release_date": "2018-06-22",
+            "softcore": false,
+            "video": false,
+            "vote_average": 0,
+            "vote_count": 0
+          },
+          {
+            "adult": false,
+            "backdrop_path": "/42gVtNDLA0FA5v0NO90AidRNbFv.jpg",
+            "id": 964920,
+            "title": "Liquor Store Dreams",
+            "original_title": "Liquor Store Dreams",
+            "overview": "So Yun Um’s debut feature is a moving portrait of two Korean American children of liquor store owners reconciling their dreams with those of their immigrant parents, against the backdrop of struggles for racial equity in Los Angeles.",
+            "poster_path": "/jRAFJIGcRdIm0SF0X0olCG0SXRk.jpg",
+            "media_type": "movie",
+            "original_language": "ko",
+            "genre_ids": [
+              99
+            ],
+            "popularity": 0.3342,
+            "release_date": "2022-06-10",
+            "softcore": false,
+            "video": false,
+            "vote_average": 8,
+            "vote_count": 2
+          }
+        ]
+      }
+    ],
+    "total_pages": 500,
+    "total_results": 10000
+  }
+}
