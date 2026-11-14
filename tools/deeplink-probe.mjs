@@ -29,24 +29,18 @@ const SERVICES = {
       ];
     },
   },
-  // The plain web link opens the app's home screen (reported on a TV, 2026-11). Movie of the
-  // Night links look like https://www.amazon.com/gp/video/detail/<id>; try the ID in the
-  // shapes Prime Video's own apps and DIAL launches use.
+  // Verified on a TV: the title's GTI, decoded from the compact ID in the link (see
+  // gti_from_compact in src/deeplink.rs). Web links and the compact ID open the home screen.
   prime: {
     apps: ['amazon'],
     candidates: (link) => {
-      const id = link.match(/\/(?:gp\/video\/detail|detail|dp)\/([A-Za-z0-9.]+)/)?.[1];
-      if (!id) return webLink(link);
-      return [
-        { contentTarget: id },
-        { contentTarget: `https://www.primevideo.com/detail/${id}` },
-        { contentTarget: `https://app.primevideo.com/detail?gti=${id}` },
-        { contentTarget: `intent://com.amazon.avod/detail?asin=${id}` },
-        { contentId: id },
-        { asin: id },
-        { gti: id },
-        ...webLink(link),
-      ];
+      const compact = link.match(/\/(?:detail|dp)\/([0-9A-Z]{26})(?:[/?#]|$)/)?.[1];
+      if (!compact) return webLink(link);
+      const hex = ([...compact].reduce((n, c) => n * 36n + BigInt(parseInt(c, 36)), 0n) - (1n << 128n))
+        .toString(16)
+        .padStart(32, '0');
+      const gti = `amzn1.dv.gti.${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+      return [{ contentTarget: gti }, ...webLink(link)];
     },
   },
   disney: { apps: ['com.disney.disneyplus-prod'], candidates: webLink },

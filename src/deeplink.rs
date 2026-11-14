@@ -69,10 +69,14 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
         }
         // Prime Video's appinfo.json declares `{"contentTarget":"$CONTENTID"}`, and LG's own
         // search fills it with the title's GTI (`amzn1.dv.gti.<uuid>`), captured with
-        // ls-monitor on a TV (2026-11). Web links and the compact ID open its home screen.
+        // ls-monitor on a TV (2026-11). A GTI converted from a Movie of the Night link opened
+        // the title on a TV; web links and the compact ID open its home screen.
         "prime" => {
             let compact = segment_after(path, &["detail", "dp"])?;
-            unverified(json!({ "contentTarget": gti_from_compact(compact)? }))
+            Some(Launch {
+                params: json!({ "contentTarget": gti_from_compact(compact)? }),
+                confidence: Confidence::Verified,
+            })
         }
         _ => None,
     }
@@ -191,8 +195,11 @@ mod tests {
         // The Hobbit: The Desolation of Smaug, as Movie of the Night links it.
         let link = "https://www.amazon.com/gp/video/detail/0O2PTZNG3GJQ205Y02FHPY7HGD?ref_=atv_dp";
         assert_eq!(
-            launch("prime", link).unwrap().params,
-            json!({"contentTarget": "amzn1.dv.gti.96a9f6e0-1128-c70c-e520-1986b41e8a1d"})
+            launch("prime", link).unwrap(),
+            Launch {
+                params: json!({"contentTarget": "amzn1.dv.gti.96a9f6e0-1128-c70c-e520-1986b41e8a1d"}),
+                confidence: Confidence::Verified,
+            }
         );
         // More pairs from amazon.com, including GTIs with leading zero bytes.
         for (compact, gti) in [
