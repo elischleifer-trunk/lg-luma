@@ -23,6 +23,9 @@ Assistant calls the TV; the TV never needs your Home Assistant password.
   camera, **OK** shows it full screen, **Back** returns to the grid and then closes it. Hold
   **OK** on a camera to move, rename or hide it; the settings button shows hidden cameras again.
   Five or more cameras show three across and two rows at a time; scroll down for the rest.
+- **Type on your phone**: when a text field opens on the TV, such as search, your phone gets a
+  notification. Reply to it and the text goes into the field, without opening an app or picking
+  letters with the remote. See [Type on your phone](#type-on-your-phone).
 - **Show example camera card** and **Show example toast** buttons: press them on the TV's device
   page to see what each popup looks like, before writing any automation. The example card shows a
   picture of a front door that comes with the integration, so it works without a camera.
@@ -233,6 +236,29 @@ through webOS's media service (most streaming apps) pause; Live TV and apps with
 may keep playing. To pause such apps another way, call `media_player.media_pause` on the LG webOS TV
 entity before `luma.show_camera`.
 
+## Type on your phone
+
+Typing with the remote is slow. With the [Home Assistant app](https://companion.home-assistant.io)
+on your phone, Luma can ask you for the text instead:
+
+1. In Home Assistant, open **Settings → Devices & services → Luma → Configure → Type on your
+   phone** and tick the phones that should be asked. Every phone signed in to the Home Assistant
+   app is listed.
+2. On the TV, open a text field: search, a weather location, your name or a new name for an input
+   or camera.
+3. The phones get a notification from the TV. Reply to it (on iPhone, press and hold it or swipe
+   down; on Android, tap **Type**), type, and send. The text goes into the field, and the TV's
+   keyboard closes.
+
+Closing the field on the TV clears the notification. On Android the notifications have their own
+**Luma keyboard** channel, so you can change their sound or silence them in the phone's settings.
+
+The TV tells Home Assistant about text fields through a webhook that only accepts calls from your
+local network. It only sends which kind of field opened, never what you typed on the TV. Typed text
+comes back over the same paired connection as everything else. Turning it off (no phones ticked)
+tells the TV to stop. Home Assistant needs a **local network URL** the TV can reach (**Settings →
+System → Network**), as for camera images.
+
 ## Streaming search keys
 
 Luma's streaming search uses a Movie of the Night key (where shows stream) and a TMDB API Read
@@ -260,6 +286,9 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
   one exception is the overlay app reporting that it closed, which is accepted only from the TV
   itself and only with that overlay's random nonce.
 - Camera URLs must be `http` or `https`. The TV loads them as images only.
+- The keyboard webhook is the only call the TV makes to Home Assistant. It is kept in memory, sent
+  `{"open": true, "field": "search"}` or `{"open": false}`, and Home Assistant only accepts it from
+  the local network.
 - Streaming search keys are stored on the TV in a file only Luma can read. The API never sends
   them back: `status` only says which keys the TV holds.
 
@@ -268,18 +297,20 @@ the app underneath until it closes. How webOS routes keys to overlay windows dep
 Home Assistant uses this API. You can script it too: send JSON bodies, with
 `Authorization: Bearer TOKEN` on every endpoint except `info` and the two pairing steps.
 
-| Endpoint                  | Body                                                  | Reply                                                   |
-| ------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
-| `GET /api/info`           |                                                       | `id`, `name`, `version`, `api`                          |
-| `POST /api/pair`          | `name`                                                | `pairing_id`; the TV shows a code                       |
-| `POST /api/pair/confirm`  | `pairing_id`, `code`                                  | `token`, `id`                                           |
-| `DELETE /api/pair`        |                                                       | Unpairs this token                                      |
-| `GET /api/status`         |                                                       | `overlay`, `overlay_ready`, `cameras`, `streaming_keys` |
-| `POST /api/overlay`       | As `luma.show_camera`, using URLs                     | `session`, `paused`                                     |
-| `DELETE /api/overlay`     |                                                       | Closes the card, resumes playback                       |
-| `POST /api/notify`        | `message` (up to 300 characters)                      | Shows a webOS toast                                     |
-| `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list                         |
-| `PUT /api/streaming-keys` | `motn`, `tmdb`; empty or missing keeps the TV's key   | Which keys the TV holds                                 |
+| Endpoint                  | Body                                                  | Reply                                                                    |
+| ------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| `GET /api/info`           |                                                       | `id`, `name`, `version`, `api`                                           |
+| `POST /api/pair`          | `name`                                                | `pairing_id`; the TV shows a code                                        |
+| `POST /api/pair/confirm`  | `pairing_id`, `code`                                  | `token`, `id`                                                            |
+| `DELETE /api/pair`        |                                                       | Unpairs this token                                                       |
+| `GET /api/status`         |                                                       | `overlay`, `overlay_ready`, `cameras`, `streaming_keys`, `keyboard_hook` |
+| `POST /api/overlay`       | As `luma.show_camera`, using URLs                     | `session`, `paused`                                                      |
+| `DELETE /api/overlay`     |                                                       | Closes the card, resumes playback                                        |
+| `POST /api/notify`        | `message` (up to 300 characters)                      | Shows a webOS toast                                                      |
+| `POST /api/cameras`       | `cameras`: `id`, `name`, `stream_url`, `snapshot_url` | Replaces the Cameras app's list                                          |
+| `PUT /api/streaming-keys` | `motn`, `tmdb`; empty or missing keeps the TV's key   | Which keys the TV holds                                                  |
+| `PUT /api/keyboard`       | `webhook`: a URL; missing removes it                  | `keyboard`: the field open now, or `null`                                |
+| `POST /api/keyboard/text` | `text` (up to 120 characters), `submit` (default on)  | Types into the open field; `409` when none is open                       |
 
 ## Troubleshooting
 

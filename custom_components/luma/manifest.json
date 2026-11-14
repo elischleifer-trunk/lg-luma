@@ -1,9 +1,10 @@
 {
   "domain": "luma",
   "name": "Luma for LG webOS",
-  "after_dependencies": ["camera", "http", "webostv"],
+  "after_dependencies": ["camera", "http", "mobile_app", "webostv"],
   "codeowners": [],
   "config_flow": true,
+  "dependencies": ["webhook"],
   "documentation": "https://github.com/elischleifer-trunk/lg-luma/blob/main/home-assistant.md",
   "integration_type": "device",
   "iot_class": "local_push",

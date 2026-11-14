@@ -3817,3 +3817,33 @@ fn streaming_keys_row_opens_a_phone_dialog_and_shows_only_whether_keys_are_set()
     state.direction(Direction::Right, &controls);
     assert!(matches!(state.overlay, Some(Overlay::StreamingKeys)));
 }
+
+#[test]
+fn text_typed_on_a_phone_replaces_the_open_field_and_commits_it() {
+    let mut state = ready();
+    // No field open: nothing changes.
+    state.set_editing_text("ignored");
+    assert_eq!(state.query, "");
+
+    state.open_keyboard(crate::state::TextField::Apps);
+    state.text("du");
+    state.set_editing_text("Dune\u{7}");
+    assert_eq!(state.query, "Dune");
+    state.set_editing_text(&"x".repeat(200));
+    assert_eq!(state.query.chars().count(), 120);
+
+    state.open(2);
+    state.subpage = Some(crate::state::Subpage::Input("HDMI_1".into()));
+    state.open_keyboard(crate::state::TextField::InputName);
+    state.set_editing_text("Console");
+    assert_eq!(state.finish_text_input(), vec![Effect::Save]);
+    assert_eq!(
+        state
+            .preferences
+            .input_names
+            .get("HDMI_1")
+            .map(String::as_str),
+        Some("Console")
+    );
+    assert!(!state.text_input_active());
+}

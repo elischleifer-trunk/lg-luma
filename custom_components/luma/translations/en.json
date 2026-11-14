@@ -38,6 +38,21 @@
   "options": {
     "step": {
       "init": {
+        "title": "Luma",
+        "menu_options": {
+          "phone_keyboard": "Type on your phone",
+          "streaming_keys": "Streaming search keys"
+        }
+      },
+      "phone_keyboard": {
+        "title": "Type on your phone",
+        "description": "When a text field opens on the TV, such as search, these phones get a notification. Reply to it to type into the TV instead of using the remote. Phones need the Home Assistant app.",
+        "data": { "keyboard_phones": "Phones" },
+        "data_description": {
+          "keyboard_phones": "None chosen turns this off. Phones only appear here once the Home Assistant app is signed in on them."
+        }
+      },
+      "streaming_keys": {
         "title": "Streaming search keys",
         "description": "Luma's search uses Movie of the Night to find where a show streams and TMDB to rank results. Keys are checked when you submit, then kept in sync with the TV.\n\nLeave a field empty to keep the key already on the TV.",
         "data": {

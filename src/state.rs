@@ -204,6 +204,19 @@ pub enum TextField {
     CameraName,
 }
 
+impl TextField {
+    /// How Home Assistant names the field when it offers to type it on a phone.
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Apps => "search",
+            Self::Location => "weather_location",
+            Self::Name => "greeting_name",
+            Self::InputName => "input_name",
+            Self::CameraName => "camera_name",
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub enum Direction {
     Up,
@@ -2168,6 +2181,22 @@ impl State {
             self.scroll = 0.;
         }
         self.dirty = true;
+    }
+
+    /// Replaces what the open field holds, e.g. with text typed on a phone. The usual limits
+    /// apply, as if it had been typed on the TV.
+    pub fn set_editing_text(&mut self, text: &str) {
+        if !self.text_input_active() {
+            return;
+        }
+        match self.keyboard_field {
+            TextField::Location => self.weather.edit(String::new()),
+            TextField::Name => self.greeting_name_draft.clear(),
+            TextField::InputName => self.input_name.clear(),
+            TextField::CameraName => self.cameras.name_draft.clear(),
+            TextField::Apps => self.query.clear(),
+        }
+        self.text(text);
     }
 
     pub fn editing_text(&self) -> &str {

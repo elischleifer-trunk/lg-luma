@@ -1334,3 +1334,109 @@ fn home_assistant_sets_streaming_keys_without_ever_erasing_one() {
     assert_eq!(crate::streaming_keys::load(&keys_path), stored);
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+#[test]
+fn keyboard_webhooks_hear_fields_open_and_close_and_typed_text_reaches_the_tv() {
+    let mut h = Harness::new();
+    let first = pair_as(&mut h, "Home", None);
+    let second = pair_as(&mut h, "Cabin", None);
+    let _ = h.events.try_iter().count();
+    let hook = "http://ha.local:8123/api/webhook/abc";
+
+    // Nothing is sent before a server registers a webhook.
+    h.api.keyboard_changed(Some("search"));
+    assert!(h.api.take_outbox().is_empty());
+    h.api.keyboard_changed(None);
+
+    let status = h.call("GET", "/api/status", Some(&first), json!({}));
+    assert_eq!(status.body["keyboard_hook"], false);
+    let bad = h.call(
+        "PUT",
+        "/api/keyboard",
+        Some(&first),
+        json!({"webhook": "ftp://x"}),
+    );
+    assert_eq!(bad.status, 400);
+    let saved = h.call(
+        "PUT",
+        "/api/keyboard",
+        Some(&first),
+        json!({"webhook": hook}),
+    );
+    assert_eq!(saved.status, 200, "{:?}", saved.body);
+    assert_eq!(saved.body, json!({"keyboard": null}));
+    let status = h.call("GET", "/api/status", Some(&first), json!({}));
+    assert_eq!(status.body["keyboard_hook"], true);
+    let status = h.call("GET", "/api/status", Some(&second), json!({}));
+    assert_eq!(status.body["keyboard_hook"], false);
+
+    // Each change is announced once, in order.
+    h.api.keyboard_changed(Some("search"));
+    h.api.keyboard_changed(Some("search"));
+    h.api.keyboard_changed(None);
+    assert_eq!(
+        h.api.take_outbox(),
+        vec![
+            (hook.to_owned(), json!({"open": true, "field": "search"})),
+            (hook.to_owned(), json!({"open": false})),
+        ]
+    );
+
+    // Typing needs an open field, a paired token and plain text.
+    let closed = h.call(
+        "POST",
+        "/api/keyboard/text",
+        Some(&first),
+        json!({"text": "dune"}),
+    );
+    assert_eq!(closed.status, 409);
+    h.api.keyboard_changed(Some("weather_location"));
+    let _ = h.api.take_outbox();
+    let refused = h.call("POST", "/api/keyboard/text", None, json!({"text": "dune"}));
+    assert_eq!(refused.status, 401);
+    for body in [
+        json!({}),
+        json!({"text": "a\nb"}),
+        json!({"text": "x", "submit": "yes"}),
+    ] {
+        let reply = h.call("POST", "/api/keyboard/text", Some(&second), body);
+        assert_eq!(reply.status, 400, "{:?}", reply.body);
+    }
+    let typed = h.call(
+        "POST",
+        "/api/keyboard/text",
+        Some(&second),
+        json!({"text": " Berlin "}),
+    );
+    assert_eq!(typed.status, 200, "{:?}", typed.body);
+    assert_eq!(
+        h.events.try_recv(),
+        Ok(Event::Typed {
+            text: "Berlin".into(),
+            submit: true
+        })
+    );
+
+    // A webhook registered while a field is open hears about it at once.
+    let other = "http://ha.local:8123/api/webhook/def";
+    let saved = h.call(
+        "PUT",
+        "/api/keyboard",
+        Some(&second),
+        json!({"webhook": other}),
+    );
+    assert_eq!(saved.body, json!({"keyboard": "weather_location"}));
+    assert_eq!(
+        h.api.take_outbox(),
+        vec![(
+            other.to_owned(),
+            json!({"open": true, "field": "weather_location"})
+        )]
+    );
+
+    // Removing a webhook, or unpairing, stops its calls.
+    h.call("PUT", "/api/keyboard", Some(&first), json!({}));
+    h.call("DELETE", "/api/pair", Some(&second), json!({}));
+    h.api.keyboard_changed(None);
+    assert!(h.api.take_outbox().is_empty());
+}
