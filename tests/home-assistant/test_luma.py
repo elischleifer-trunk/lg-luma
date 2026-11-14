@@ -1355,3 +1355,16 @@ async def test_tapping_the_notification_opens_a_page_that_types_on_the_tv(
     aioclient_mock.post(f"{TV}/api/keyboard/text", status=409, json={"error": "No field"})
     reply = await call(type="luma/keyboard/type", entry_id=config.entry_id, text="Alien")
     assert reply["error"]["code"] == "no_field"
+
+    # A TV that restarted with a field open never reported it closing: registering the webhook
+    # again says what is open now.
+    await client.post(
+        f"/api/webhook/{config.data['webhook_id']}", json={"open": True, "field": "search"}
+    )
+    aioclient_mock.get(
+        f"{TV}/api/status", json={"overlay": None, "cameras": 0, "keyboard_hook": False}
+    )
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert (await call(type="luma/keyboard/tvs"))["result"] == {"tvs": [{**tv, "prompt": None}]}

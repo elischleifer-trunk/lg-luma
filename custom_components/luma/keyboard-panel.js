@@ -82,11 +82,16 @@ class LumaKeyboardPanel extends HTMLElement {
     this._hass = null;
     this._tvs = [];
     // The TV the notification was for; the page also works opened by hand, for any TV.
-    this._entry = new URLSearchParams(window.location.search).get('entry');
+    this._linked = null;
+    this._entry = null;
+    this._route();
     this._sending = false;
     this._timer = null;
     this._refresh = () => {
-      if (document.visibilityState === 'visible') this._load();
+      if (document.visibilityState !== 'visible') return;
+      // Another TV's notification opens this same page with that TV in the address.
+      if (this._route()) this._render();
+      this._load();
     };
 
     const root = this.attachShadow({ mode: 'open' });
@@ -146,6 +151,9 @@ class LumaKeyboardPanel extends HTMLElement {
 
   connectedCallback() {
     document.addEventListener('visibilitychange', this._refresh);
+    // Home Assistant's frontend fires this when it navigates without loading a new page.
+    window.addEventListener('location-changed', this._refresh);
+    window.addEventListener('popstate', this._refresh);
     this._timer = setInterval(this._refresh, REFRESH_MS);
     // After the frontend has put the panel on screen, so the phone's keyboard comes up.
     requestAnimationFrame(() => this._input.focus());
@@ -153,7 +161,20 @@ class LumaKeyboardPanel extends HTMLElement {
 
   disconnectedCallback() {
     document.removeEventListener('visibilitychange', this._refresh);
+    window.removeEventListener('location-changed', this._refresh);
+    window.removeEventListener('popstate', this._refresh);
     clearInterval(this._timer);
+  }
+
+  /** Takes the TV from the address when it names a new one; whether the TV changed. */
+  _route() {
+    const linked = new URLSearchParams(window.location.search).get('entry');
+    if (linked === this._linked) return false;
+    this._linked = linked;
+    if (!linked || linked === this._entry) return false;
+    this._entry = linked;
+    if (this._select) this._select.value = linked;
+    return true;
   }
 
   _tv() {

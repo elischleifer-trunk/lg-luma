@@ -147,8 +147,11 @@ async def register(
             _LOGGER.warning("The TV cannot reach Home Assistant to ask for typing: %s", err)
             return
     try:
-        await client.keyboard_hook(url)
+        reply = await client.keyboard_hook(url)
         entry.runtime_data.keyboard = url is not None
+        # A TV that restarted or was switched off never reported its field closing.
+        held = reply.get("keyboard") if url else None
+        entry.runtime_data.field = held if isinstance(held, str) else None
     except LumaApiError as err:
         # A Luma from before phone typing answers 404: Repairs asks for a Luma update, but only
         # when phone typing was turned on, so removing a webhook never raises it.
