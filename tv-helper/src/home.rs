@@ -650,9 +650,11 @@ pub fn dispatch(
             if !system::exists(system, SUSPENDED) {
                 return Ok(json!({"returnValue":true}));
             }
-            system::remove(system, SUSPENDED)?;
+            // Keep the marker until Luma is Home again, so a failed attempt is retried on the
+            // next normal start.
             home.close_normal()?;
             home.apply(&config, true)?;
+            system::remove(system, SUSPENDED)?;
             Ok(json!({"returnValue":true}))
         }
         _ => Err("Unknown Home integration command".into()),

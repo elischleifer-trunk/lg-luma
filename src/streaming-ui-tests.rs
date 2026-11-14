@@ -437,9 +437,15 @@ fn installing_or_removing_an_app_searches_the_current_text_again() {
         state.titles.deadline().is_some(),
         "picks were made for the old apps"
     );
-    // The same apps again change nothing.
+    // The same apps again change nothing, also as the TV reports them: without Luma's
+    // built-in tiles.
     let request = state.sync_titles(Instant::now() + DEBOUNCE).unwrap();
     state.accept_titles(&request, Ok(state.titles.results.clone()));
+    state.set_inventory(inventory.clone(), None);
+    assert!(state.titles.deadline().is_none());
+    inventory
+        .apps
+        .retain(|app| !crate::model::is_builtin(&app.id));
     state.set_inventory(inventory, None);
     assert!(state.titles.deadline().is_none());
 }

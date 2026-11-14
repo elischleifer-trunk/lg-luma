@@ -883,13 +883,19 @@ impl State {
 
     /// Returns whether a newly reported console changed the saved preferences.
     pub fn set_inventory(&mut self, next: Inventory, warning: Option<String>) -> bool {
-        let apps_changed = self.inventory.apps.len() != next.apps.len()
-            || self
-                .inventory
+        // Built-in tiles are merged in below and never come from the TV, so compare only the
+        // TV's apps: otherwise every refresh would look like a change.
+        let apps_changed = !self
+            .inventory
+            .apps
+            .iter()
+            .filter(|app| !crate::model::is_builtin(&app.id))
+            .map(|app| &app.id)
+            .eq(next
                 .apps
                 .iter()
-                .zip(&next.apps)
-                .any(|(old, new)| old.id != new.id);
+                .filter(|app| !crate::model::is_builtin(&app.id))
+                .map(|app| &app.id));
         self.inventory.apps = next.apps;
         if apps_changed {
             // Remembered movie and show results chose among the old apps.
