@@ -1946,6 +1946,58 @@ fn clamp_lines(assets: &Assets, value: &str, style: TextStyle, width: f32, lines
     format!("{}…", words[..low].join(" "))
 }
 
+/// The size of the app tile in a poster's top right corner: the tile's own proportions.
+const SERVICE_BADGE: (f32, f32) = (84., 48.);
+
+/// The app OK opens, as its tile in the poster's corner, so every result says where it plays
+/// before it is selected. Under it, what that costs when the app does not include the title:
+/// the price, or "+" for an add-on channel without one.
+fn service_badge(
+    out: &mut Scene,
+    state: &State,
+    assets: &Assets,
+    ranked: &crate::streaming::Ranked,
+    poster: Rect,
+) {
+    use crate::streaming::Access;
+    let Some(pick) = &ranked.pick else {
+        return;
+    };
+    let Some(app) = state.inventory.apps.iter().find(|a| a.id == pick.app_id) else {
+        return;
+    };
+    let (width, height) = SERVICE_BADGE;
+    let face = Rect::new(
+        poster.x + poster.w - width - 8.,
+        poster.y + 8.,
+        width,
+        height,
+    );
+    out.shadow(face, 8., 10., 3., 0.35);
+    app_face(out, assets, app, face, state.preferences.language, 8.);
+    if pick.access == Access::Included {
+        return;
+    }
+    let label = pick.price.as_deref().unwrap_or("+");
+    let style = text(16., 650, -0.01).leading(1.2);
+    let pill_height = 28.;
+    let pill_width = (assets.width(label, style) + 20.).max(pill_height);
+    let pill = Rect::new(
+        face.x + face.w - pill_width,
+        face.y + face.h + 6.,
+        pill_width,
+        pill_height,
+    );
+    out.shape(pill, pill_height / 2., c(0x0b0e12, 0.82));
+    out.text(
+        label,
+        Rect::new(pill.x, pill.y + 4., pill.w, 19.2),
+        style,
+        WHITE,
+        true,
+    );
+}
+
 /// Where a title plays on this TV and what it costs there ("On HBO Max", "Rent on Apple TV ·
 /// $3.99"), or that none of the TV's apps has it.
 fn availability(state: &State, ranked: &crate::streaming::Ranked) -> String {
@@ -2041,6 +2093,7 @@ fn search_page(out: &mut Scene, state: &State, assets: &Assets) {
         if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
             score_badge(out, assets, scores, rect);
         }
+        service_badge(out, state, assets, ranked, rect);
         if focused {
             out.ring(rect, 16.);
         }

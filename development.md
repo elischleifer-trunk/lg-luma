@@ -1136,7 +1136,9 @@ does not wait for TLS. A search asks TMDB first (free): text that ends mid-word 
 become one word is completed (`relevance::complete`) and searched as that word, so the
 keystrokes that follow reuse one Movie of the Night reply. Details are fetched six at a time,
 and a search the user has typed past gives up between steps. OK launches the
-picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Posters come
+picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. That app
+is drawn on every poster (`view::service_badge`: its Apps tile at 84×48, then the price or "+"
+when it is not included); every installed app counts as subscribed. Posters come
 from the signed `cdn.movieofthenight.com` links in each result (no other host is fetched): three
 `posters` workers fetch them with the weather rules (timeout, no redirects or proxy, 1 MiB limit),
 keep the JPEG under `streaming-posters/` (48 MiB cap) keyed by the link without its signature,
