@@ -1081,9 +1081,9 @@ Mock servers accept only literal loopback HTTP origins and are refused in TV bui
 The Search tab (tab index 3, `state::SEARCH_TAB`, drawn left of Home so the other tabs keep their
 indices) turns into the search field and opens the keyboard (`TextField::Titles`). Its search
 follows `title_query` once a Movie of the Night key is stored. The selected result is shown at
-the top with its US rating, which comes from TMDB details fetched with `release_dates` or
-`content_ratings` appended (MDBList's certifications are not reliably American), and wide
-artwork loaded by `posters` like the posters.
+the top in four short lines, so two rows of posters fit below, with its US rating from TMDB
+details fetched with `release_dates` or `content_ratings` appended (MDBList's certifications are
+not reliably American).
 `streaming::Incremental` waits for three characters and a 350 ms pause, answers repeats from
 memory and drops replies for text that has since changed. `streaming_search::Service` runs each
 search on its own worker thread, reading `streaming-keys.json` per search so new keys apply at

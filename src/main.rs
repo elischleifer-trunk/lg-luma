@@ -1974,11 +1974,8 @@ fn run() -> Result<(), String> {
                 posters.send(request);
             }
         }
-        if let Some(request) = state.backdrop_request() {
-            posters.send(request);
-        }
-        for (show_id, kind, image) in posters.receiver.try_iter() {
-            state.accept_poster(&show_id, kind, image);
+        for (show_id, poster) in posters.receiver.try_iter() {
+            state.accept_poster(&show_id, poster);
         }
         if let Some(ids) = state.score_requests() {
             scores.send(ids);

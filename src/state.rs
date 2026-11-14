@@ -21,7 +21,8 @@ pub const INVENTORY_RETRY_DELAY: Duration = Duration::from_secs(2);
 pub const HOME_COLUMNS: usize = 6;
 pub const HOME_TILE_WIDTH: f32 = 256.;
 pub const HOME_TILE_PITCH: f32 = 281.6;
-/// Movie and show posters on the Search page, eight to a row under the selected title.
+/// Movie and show posters on the Search page, eight to a row under the selected title; two
+/// rows fit on screen.
 pub const TITLE_COLUMNS: usize = 8;
 /// The Search tab's index: drawn first, left of Home, but numbered after the original three
 /// tabs so Home, Apps and Settings keep their indices.
@@ -29,7 +30,7 @@ pub const SEARCH_TAB: usize = 3;
 /// Tab indices in the order the header draws them, left to right.
 pub const TAB_ORDER: [usize; 4] = [SEARCH_TAB, 0, 1, 2];
 /// Where the Search page's poster grid starts, under the selected title.
-pub const SEARCH_GRID_TOP: f32 = 600.;
+pub const SEARCH_GRID_TOP: f32 = 352.;
 pub const BACKGROUND_FADE: f32 = 0.4;
 pub const CYCLE_FADE: f32 = 1.6;
 
@@ -308,8 +309,6 @@ pub struct State {
     pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
     /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
     pub posters: std::collections::HashMap<String, Option<std::sync::Arc<crate::cameras::Frame>>>,
-    /// Wide artwork for the selected title, by show ID: None while loading or when none.
-    pub backdrops: std::collections::HashMap<String, Option<std::sync::Arc<crate::cameras::Frame>>>,
     /// Review scores for the shows in `titles`, by IMDb ID: None while loading. Only fetched
     /// once an MDBList key is stored.
     pub scores: std::collections::HashMap<String, Option<crate::mdblist::Scores>>,
@@ -378,7 +377,6 @@ impl State {
             titles: Default::default(),
             posters: Default::default(),
             scores: Default::default(),
-            backdrops: Default::default(),
             home_assistant_qr: None,
             home_assistant_address: None,
             home_assistant_code: None,
@@ -2405,7 +2403,6 @@ impl State {
                 requests.push(crate::posters::Request {
                     show_id: show.id.clone(),
                     url: url.to_owned(),
-                    kind: crate::posters::Kind::Poster,
                 });
             }
         }
@@ -2444,15 +2441,10 @@ impl State {
     pub fn accept_poster(
         &mut self,
         show_id: &str,
-        kind: crate::posters::Kind,
-        image: Option<std::sync::Arc<crate::cameras::Frame>>,
+        poster: Option<std::sync::Arc<crate::cameras::Frame>>,
     ) {
-        let images = match kind {
-            crate::posters::Kind::Poster => &mut self.posters,
-            crate::posters::Kind::Backdrop => &mut self.backdrops,
-        };
-        if let Some(slot) = images.get_mut(show_id) {
-            *slot = image;
+        if let Some(slot) = self.posters.get_mut(show_id) {
+            *slot = poster;
             self.dirty = true;
         }
     }
@@ -2464,28 +2456,6 @@ impl State {
             _ => 0,
         };
         self.titles.results.get(index)
-    }
-
-    /// The selected title's wide artwork to fetch, if it is not loaded or loading. Artwork of
-    /// shows no longer listed is dropped; artwork already seen stays while its show is listed.
-    pub fn backdrop_request(&mut self) -> Option<crate::posters::Request> {
-        let titles = &self.titles.results;
-        self.backdrops
-            .retain(|id, _| titles.iter().any(|result| &result.show.id == id));
-        if self.page != Page::Search {
-            return None;
-        }
-        let show = &self.selected_title()?.show;
-        if self.backdrops.contains_key(&show.id) {
-            return None;
-        }
-        let request = crate::posters::backdrop_url(show).map(|url| crate::posters::Request {
-            show_id: show.id.clone(),
-            url: url.to_owned(),
-            kind: crate::posters::Kind::Backdrop,
-        });
-        self.backdrops.insert(show.id.clone(), None);
-        request
     }
 
     /// Keeps focus on a result that still exists after the results change.

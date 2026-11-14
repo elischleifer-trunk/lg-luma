@@ -121,7 +121,7 @@ fn short_queries_ask_for_more_typing_and_send_nothing() {
 }
 
 #[test]
-fn results_are_reached_from_the_field_and_the_first_is_shown_large() {
+fn results_are_reached_from_the_field_and_the_first_is_described_on_top() {
     let mut state = typed("Dune");
     state.sync_titles(Instant::now());
     assert!(shows_text(&state, "Searching…"));
@@ -135,12 +135,12 @@ fn results_are_reached_from_the_field_and_the_first_is_shown_large() {
     assert_eq!(titles, state.titles.results.len());
     assert_eq!(state.first_content(), Target::Title(0));
 
-    // The first result is shown large until another is selected.
+    // The first result is described on top until another is selected.
     let first = state.titles.results[0].show.title.clone();
     let second = state.titles.results[1].show.title.clone();
     let large = |state: &State, title: &str| {
         scene(state).draw.iter().any(|draw| {
-            matches!(draw, Draw::Text(text, _, style, ..) if text == title && style.size > 40.)
+            matches!(draw, Draw::Text(text, _, style, ..) if text == title && style.size >= 40.)
         })
     };
     assert!(large(&state, &first));
@@ -186,13 +186,6 @@ fn the_selected_title_shows_its_us_rating_length_and_where_it_plays() {
     for text in ["2021", "PG-13", "2h 35m", "Movie"] {
         assert!(shows_text(&state, text), "{text}");
     }
-    // Wide artwork is asked for once, for the selected title only.
-    let request = state
-        .backdrop_request()
-        .expect("artwork for the selected title");
-    assert_eq!(request.show_id, state.titles.results[index].show.id);
-    assert_eq!(request.kind, crate::posters::Kind::Backdrop);
-    assert!(state.backdrop_request().is_none());
 }
 
 #[test]
@@ -299,7 +292,7 @@ fn posters_are_requested_once_per_result_and_dropped_with_it() {
         pixels: image::RgbaImage::new(2, 3),
         live: false,
     });
-    state.accept_poster(&first, crate::posters::Kind::Poster, Some(poster));
+    state.accept_poster(&first, Some(poster));
     let posters = scene(&state)
         .draw
         .iter()
@@ -307,7 +300,7 @@ fn posters_are_requested_once_per_result_and_dropped_with_it() {
         .count();
     assert_eq!(posters, 1);
     // A late poster for a show no longer listed is ignored.
-    state.accept_poster("gone", crate::posters::Kind::Poster, None);
+    state.accept_poster("gone", None);
     assert!(!state.posters.contains_key("gone"));
 
     state.title_query.clear();
@@ -385,5 +378,26 @@ fn scores_are_fetched_in_one_batch_only_with_an_mdblist_key() {
     assert!(
         state.scores.is_empty(),
         "scores are dropped with their results"
+    );
+}
+
+#[test]
+fn two_rows_of_posters_fit_under_the_selected_title() {
+    let mut state = typed("dune");
+    answer(&mut state, "dune");
+    assert!(state.titles.results.len() >= TITLE_COLUMNS * 2);
+    let second_row = controls(&state)
+        .into_iter()
+        .find(|control| control.target == Target::Title(TITLE_COLUMNS))
+        .unwrap();
+    assert!(
+        second_row.rect.y + second_row.rect.h <= 1068.,
+        "{:?}",
+        second_row.rect
+    );
+    state.focus = Target::Title(TITLE_COLUMNS);
+    assert!(
+        !state.reveal_focus(&controls(&state)),
+        "no scrolling to reach it"
     );
 }

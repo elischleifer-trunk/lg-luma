@@ -1925,8 +1925,6 @@ fn ellipsize(assets: &Assets, value: &str, style: TextStyle, width: f32) -> Stri
 const SEARCH_POSTER: (f32, f32) = (196., 294.);
 const SEARCH_PITCH: f32 = 222.3;
 const SEARCH_ROW: f32 = 294. + 12. + 26. + 34.;
-/// The selected title's artwork, top right, 16:9.
-const HERO_ART: Rect = Rect::new(1092., 136., 744., 418.5);
 
 /// At most `lines` wrapped lines of `value` in `width`, ending with an ellipsis when cut.
 fn clamp_lines(assets: &Assets, value: &str, style: TextStyle, width: f32, lines: usize) -> String {
@@ -2119,8 +2117,9 @@ fn search_status(out: &mut Scene, state: &State) {
     }
 }
 
-/// The selected title at the top of the Search page: its artwork, name, year, US rating,
-/// length, genres, review scores, where it plays on this TV and what it is about.
+/// The selected title at the top of the Search page, kept to four short lines so two rows of
+/// posters fit below: its name; year, US rating (boxed), length or seasons, kind and genres;
+/// review scores and where it plays on this TV with what it costs; and two lines about it.
 fn search_hero(
     out: &mut Scene,
     state: &State,
@@ -2129,29 +2128,18 @@ fn search_hero(
 ) {
     let language = state.preferences.language;
     let show = &selected.show;
-    match state.backdrops.get(&show.id) {
-        Some(Some(art)) => out
-            .draw
-            .push(Draw::Camera(art.clone(), HERO_ART, 19.2, false, WHITE)),
-        _ => {
-            out.shape(HERO_ART, 19.2, c(0x171c20, 0.72));
-            out.border(HERO_ART, 19.2, 1., c(0xffffff, 0.07));
-        }
-    }
     let x = 88.;
-    let width = HERO_ART.x - 48. - x;
-    let title_style = text(44.8, 650, -0.035).leading(1.2);
+    let right = 1832.;
+    let width = right - x;
+    let title_style = text(40., 650, -0.035).leading(1.2);
     out.text(
         ellipsize(assets, &show.title, title_style, width),
-        Rect::new(x, 140., width, 54.),
+        Rect::new(x, 126., width, 48.),
         title_style,
         WHITE,
         false,
     );
 
-    // Year, rating (boxed, as on a cinema listing), length or seasons, kind.
-    let meta_style = text(20.8, 550, -0.01).leading(1.4);
-    let meta_color = c(0xeeeeee, 0.75);
     let length = match show.show_type {
         crate::motn_api::ShowType::Series => match show.season_count {
             Some(1) => language.t("seasonOne").to_owned(),
@@ -2170,16 +2158,27 @@ fn search_hero(
         crate::motn_api::ShowType::Series => "titleSeries",
         _ => "titleMovie",
     });
+    let genres: Vec<&str> = show
+        .genres
+        .iter()
+        .map(|g| g.name.as_str())
+        .take(3)
+        .collect();
     // (text, boxed): the rating is boxed, as on a cinema listing.
     let segments = [
         (years(show), false),
         (selected.rating.clone().unwrap_or_default(), true),
         (length, false),
         (kind.to_owned(), false),
+        (genres.join(", "), false),
     ];
+    let meta_style = text(20.8, 550, -0.01).leading(1.4);
     let mut cursor = x;
-    let y = 210.;
+    let y = 182.;
     for (value, boxed) in segments.iter().filter(|(value, _)| !value.is_empty()) {
+        if cursor >= right {
+            break;
+        }
         if *boxed {
             let w = assets.width(value, meta_style) + 20.;
             let chip = Rect::new(cursor, y - 1., w, 31.);
@@ -2191,45 +2190,36 @@ fn search_hero(
                 c(0xffffff, 0.92),
                 true,
             );
-            cursor += w + 18.;
+            cursor += w + 16.;
         } else {
-            let w = assets.width(value, meta_style) + 2.;
+            let value = ellipsize(assets, value, meta_style, right - cursor);
+            let w = assets.width(&value, meta_style) + 2.;
             out.text(
                 value.as_str(),
                 Rect::new(cursor, y, w, 29.12),
                 meta_style,
-                meta_color,
+                c(0xeeeeee, 0.72),
                 false,
             );
-            cursor += w + 18.;
+            cursor += w + 16.;
         }
     }
 
-    let genres: Vec<&str> = show
-        .genres
-        .iter()
-        .map(|g| g.name.as_str())
-        .take(4)
-        .collect();
-    let mut y = 252.;
-    if !genres.is_empty() {
-        let style = text(19.2, 500, -0.01).leading(1.4);
-        out.text(
-            ellipsize(assets, &genres.join(", "), style, width),
-            Rect::new(x, y, width, 26.9),
-            style,
-            c(0xeeeeee, 0.55),
-            false,
-        );
-        y += 44.;
-    }
+    let y = 222.;
+    let mut cursor = x;
     if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
-        y += hero_scores(out, assets, scores, x, y);
+        cursor += hero_scores(out, assets, scores, x, y);
     }
-    let where_style = text(22.4, 600, -0.01).leading(1.4);
+    let where_style = text(20.8, 650, -0.01).leading(1.4);
+    let place = ellipsize(
+        assets,
+        &availability(state, selected),
+        where_style,
+        right - cursor,
+    );
     out.text(
-        ellipsize(assets, &availability(state, selected), where_style, width),
-        Rect::new(x, y, width, 31.4),
+        place.as_str(),
+        Rect::new(cursor, y + 1., right - cursor, 29.12),
         where_style,
         if selected.pick.is_some() {
             WHITE
@@ -2238,23 +2228,21 @@ fn search_hero(
         },
         false,
     );
-    y += 46.;
-    let overview_style = text(19.2, 450, -0.005).leading(1.45);
-    let lines = ((HERO_ART.y + HERO_ART.h - y) / (19.2 * 1.45))
-        .floor()
-        .max(0.) as usize;
-    if lines > 0 && !show.overview.is_empty() {
+
+    if !show.overview.is_empty() {
+        let style = text(19.2, 450, -0.005).leading(1.45);
         out.text(
-            clamp_lines(assets, &show.overview, overview_style, width, lines.min(4)),
-            Rect::new(x, y, width, HERO_ART.y + HERO_ART.h - y),
-            overview_style,
+            clamp_lines(assets, &show.overview, style, width, 2),
+            Rect::new(x, 262., width, 56.),
+            style,
             c(0xeeeeee, 0.72),
             false,
         );
     }
 }
 
-/// Larger review scores for the selected title; returns the height used.
+/// Review scores for the selected title, on one line from `x`; returns the width used, with a
+/// gap before what follows.
 fn hero_scores(
     out: &mut Scene,
     assets: &Assets,
@@ -2283,21 +2271,21 @@ fn hero_scores(
     if items.is_empty() {
         return 0.;
     }
-    let style = text(24., 650, -0.02).leading(1.2);
+    let style = text(20.8, 650, -0.01).leading(1.4);
     let mut cursor = x;
     for (icon, color, label) in items {
-        out.icon(assets, icon, Rect::new(cursor, y + 2., 28., 28.), color);
+        out.icon(assets, icon, Rect::new(cursor, y + 4., 22., 22.), color);
         let w = assets.width(&label, style) + 2.;
         out.text(
             label.as_str(),
-            Rect::new(cursor + 36., y + 1., w, 28.8),
+            Rect::new(cursor + 29., y + 1., w, 29.12),
             style,
             WHITE,
             false,
         );
-        cursor += 36. + w + 28.;
+        cursor += 29. + w + 20.;
     }
-    52.
+    cursor - x + 12.
 }
 
 fn filter(out: &mut Scene, state: &State, target: Target, rect: Rect, label: &str, selected: bool) {
