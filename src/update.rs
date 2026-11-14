@@ -541,7 +541,7 @@ impl Worker {
                                 let handoff =
                                     crate::platform::start_update(&release, &attempt, &ipk);
                                 if let Err(error) = &handoff {
-                                    eprintln!("Update handoff: {error}");
+                                    crate::telemetry::log_warn!("update", "handoff: {error}");
                                 }
                                 let _ =
                                     responses.send(Response::Installing(release.version.clone()));

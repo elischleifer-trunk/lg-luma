@@ -438,7 +438,7 @@ impl Service {
                 let _ = sender.send(Update::Video { id, result });
             });
         if let Err(error) = spawned {
-            eprintln!("Luma cameras: {error}");
+            crate::telemetry::log_warn!("cameras", "{error}");
         }
     }
 
@@ -461,7 +461,7 @@ impl Service {
             .spawn(move || play(&replay, &sender, &gate));
         match spawned {
             Ok(_) => self.replaying = true,
-            Err(error) => eprintln!("Luma cameras: {error}"),
+            Err(error) => crate::telemetry::log_warn!("cameras", "{error}"),
         }
     }
 
@@ -476,11 +476,14 @@ impl Service {
                         Ok(marks) => {
                             let _ = sender.send(Update::Marks { id, marks });
                         }
-                        Err(error) => eprintln!("Luma cameras {id}: no recorded events: {error}"),
+                        Err(error) => crate::telemetry::log_warn!(
+                            "cameras",
+                            "{id}: no recorded events: {error}"
+                        ),
                     },
                 );
         if let Err(error) = spawned {
-            eprintln!("Luma cameras: {error}");
+            crate::telemetry::log_warn!("cameras", "{error}");
         }
     }
 
@@ -537,7 +540,7 @@ impl Service {
                 .name("camera".into())
                 .spawn(move || run(&shared, &stop, &sender, &gate, &replay));
             if let Err(error) = spawned {
-                eprintln!("Luma cameras: {error}");
+                crate::telemetry::log_warn!("cameras", "{error}");
                 continue;
             }
             self.workers.insert(watch.id.clone(), worker);
@@ -613,7 +616,7 @@ fn play(replay: &Replay, sender: &mpsc::Sender<Update>, gate: &Gate) {
                 .run(|| decode(&bytes, FULL_SIZE))
                 .map(|pixels| Arc::new(Frame::new(&replay_key(&id), pixels, false))),
             Err(error) => {
-                eprintln!("Luma cameras {id}: no recorded picture: {error}");
+                crate::telemetry::log_warn!("cameras", "{id}: no recorded picture: {error}");
                 None
             }
         };
@@ -675,14 +678,31 @@ fn run(
             let _ = sender.send(update);
         }
     };
+    // Frames that failed to decode in a row: the first is logged, the run's length once it ends,
+    // so a stream of bad frames cannot flood the log.
+    let undecoded = std::cell::Cell::new(0u64);
     let deliver = |bytes: &[u8], live: bool| {
         let Watch { size, record, .. } = watch();
         if record && !stop.load(Ordering::Acquire) {
             replay.lock().push(&id, Instant::now(), bytes);
         }
         match gate.run(|| decode(bytes, size)) {
-            Some(pixels) => send(Update::Frame(Arc::new(Frame::new(&id, pixels, live)))),
-            None => eprintln!("Luma cameras {id}: a frame could not be decoded"),
+            Some(pixels) => {
+                let failed = undecoded.replace(0);
+                if failed > 1 {
+                    crate::telemetry::log_info!(
+                        "cameras",
+                        "{id}: frames decode again after {failed} could not be decoded"
+                    );
+                }
+                send(Update::Frame(Arc::new(Frame::new(&id, pixels, live))));
+            }
+            None => {
+                undecoded.set(undecoded.get() + 1);
+                if undecoded.get() == 1 {
+                    crate::telemetry::log_warn!("cameras", "{id}: a frame could not be decoded");
+                }
+            }
         }
     };
     // Snapshots from whatever URL the watch holds now, which Home Assistant rotates.
@@ -703,7 +723,7 @@ fn run(
                 Err(error) => {
                     failures += 1;
                     if failures == 1 {
-                        eprintln!("Luma cameras {id}: {error}");
+                        crate::telemetry::log_warn!("cameras", "{id}: {error}");
                     }
                     if failures >= 2 {
                         send(Update::Unavailable(id.clone()));
@@ -728,7 +748,9 @@ fn run(
             };
             match stream(&agent, &url, stop, |bytes| deliver(bytes, true)) {
                 Ok(()) => return,
-                Err(error) => eprintln!("Luma cameras {id}: live video stopped: {error}"),
+                Err(error) => {
+                    crate::telemetry::log_warn!("cameras", "{id}: live video stopped: {error}")
+                }
             }
             if stop.load(Ordering::Acquire) {
                 return;
@@ -1672,7 +1694,7 @@ impl State {
                         });
                     }
                     Err(error) => {
-                        eprintln!("Luma cameras {id}: no HLS stream: {error}");
+                        crate::telemetry::log_warn!("cameras", "{id}: no HLS stream: {error}");
                         gallery.video = Video::Off;
                         gallery.video_failed.push(id);
                     }

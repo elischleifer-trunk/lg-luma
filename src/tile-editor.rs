@@ -297,14 +297,14 @@ fn worker(
                         valid,
                         commit,
                     ) {
-                        eprintln!("Luma tile editor: {error}");
+                        crate::telemetry::log_warn!("tile-editor", "{error}");
                     }
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
                     thread::sleep(Duration::from_millis(25))
                 }
                 Err(error) => {
-                    eprintln!("Luma tile editor server: {error}");
+                    crate::telemetry::log_warn!("tile-editor", "server: {error}");
                     break;
                 }
             }

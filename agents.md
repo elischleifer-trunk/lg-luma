@@ -57,6 +57,8 @@ packages use `Architecture: arm`, preserve executable mode and include licenses/
 
 ## Runtime constraints
 
+Log diagnostics with `telemetry::log_info!`/`log_warn!`/`log_error!(area, …)`, not `eprintln!`:
+they reach paired Home Assistant servers as well as stderr (see `src/telemetry.rs`).
 Keep input/rendering on the SDL thread and TV/HTTP work off it. Luna requests originate from the
 native process, not `luna-send-pub -a` impersonation. Inventory failure must never substitute demo
 data on TV. Explicit `--test-extra-apps` is a labeled manual preview applied only after successful

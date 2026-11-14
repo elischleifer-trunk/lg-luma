@@ -174,7 +174,7 @@ pub fn path(preferences: &Path) -> PathBuf {
 pub fn load(path: &Path) -> Keys {
     match std::fs::read(path) {
         Ok(bytes) => serde_json::from_slice(&bytes).unwrap_or_else(|e| {
-            eprintln!("Luma streaming keys could not be read: {e}");
+            crate::telemetry::log_warn!("streaming", "keys could not be read: {e}");
             Keys::default()
         }),
         Err(_) => Keys::default(),

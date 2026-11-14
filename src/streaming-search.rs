@@ -60,7 +60,10 @@ pub fn search(
     let results = match tmdb {
         Some(Ok(results)) => results,
         Some(Err(error)) => {
-            eprintln!("Luma streaming search: TMDB unavailable, ranking without it: {error}");
+            crate::telemetry::log_warn!(
+                "streaming",
+                "search: TMDB unavailable, ranking without it: {error}"
+            );
             return Ok(streaming::rank(&shows, country, services));
         }
         None => return Ok(streaming::rank(&shows, country, services)),
