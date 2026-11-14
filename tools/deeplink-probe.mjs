@@ -36,7 +36,10 @@ const SERVICES = {
     candidates: (link) => {
       const compact = link.match(/\/(?:detail|dp)\/([0-9A-Z]{26})(?:[/?#]|$)/)?.[1];
       if (!compact) return webLink(link);
-      const hex = ([...compact].reduce((n, c) => n * 36n + BigInt(parseInt(c, 36)), 0n) - (1n << 128n))
+      const hex = (
+        [...compact].reduce((n, c) => n * 36n + BigInt(parseInt(c, 36)), 0n) -
+        (1n << 128n)
+      )
         .toString(16)
         .padStart(32, '0');
       const gti = `amzn1.dv.gti.${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
