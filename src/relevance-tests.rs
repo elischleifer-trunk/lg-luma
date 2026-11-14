@@ -209,3 +209,35 @@ fn studio_and_network_lists_have_no_duplicates() {
         assert_eq!(ids.len(), list.len());
     }
 }
+
+#[test]
+fn us_ratings_come_from_appended_release_dates_and_content_ratings() {
+    let dune: MovieDetailsResponse = fixture("tmdb", "rated-movie-438631").unwrap();
+    // The festival premiere has no certification; the theatrical release is PG-13.
+    assert_eq!(us_certification(&dune).as_deref(), Some("PG-13"));
+    assert_eq!(Signals::movie(&dune).rating.as_deref(), Some("PG-13"));
+    let office: TvSeriesDetailsResponse = fixture("tmdb", "rated-tv-2316").unwrap();
+    assert_eq!(us_tv_rating(&office).as_deref(), Some("TV-14"));
+    // Details fetched without ratings, as older cached ones were, have none.
+    let unrated: MovieDetailsResponse = fixture("tmdb", "movie-438631").unwrap();
+    assert_eq!(us_certification(&unrated), None);
+}
+
+#[test]
+fn ranked_results_carry_the_rating_of_their_details() {
+    let (shows, mut enrichment) = search("dune");
+    let dune: MovieDetailsResponse = fixture("tmdb", "rated-movie-438631").unwrap();
+    enrichment.add_movie(&dune);
+    let ranked = rank(
+        "dune",
+        &shows,
+        "us",
+        &Services::default(),
+        Some(&enrichment),
+    );
+    let first = ranked
+        .iter()
+        .find(|r| r.show.tmdb_id == "movie/438631")
+        .unwrap();
+    assert_eq!(first.rating.as_deref(), Some("PG-13"));
+}

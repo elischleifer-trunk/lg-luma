@@ -131,6 +131,48 @@ pub struct Signals {
     pub collection: Option<i64>,
     /// Release date for films, first air date for series (`YYYY-MM-DD`), when known.
     pub date: String,
+    /// The US rating (PG-13, TV-14), from details fetched with `append_to_response`.
+    pub rating: Option<String>,
+}
+
+/// The US certification of a film: the theatrical one when set, else any US release's.
+pub fn us_certification(details: &MovieDetailsResponse) -> Option<String> {
+    let us = details
+        .release_dates
+        .as_ref()?
+        .results
+        .iter()
+        .flatten()
+        .find(|result| result.iso_3166_1.as_deref() == Some("US"))?;
+    let dates = us.release_dates.iter().flatten();
+    let rated = |date: &&crate::tmdb_api::MovieDetailsResponseReleaseDatesResultReleaseDate| {
+        date.certification
+            .as_deref()
+            .is_some_and(|c| !c.trim().is_empty())
+    };
+    dates
+        .clone()
+        .filter(rated)
+        .find(|date| date.r#type == Some(3))
+        .or_else(|| dates.clone().find(rated))
+        .and_then(|date| date.certification.as_deref())
+        .map(|c| c.trim().to_owned())
+}
+
+/// The US TV rating of a series.
+pub fn us_tv_rating(details: &TvSeriesDetailsResponse) -> Option<String> {
+    details
+        .content_ratings
+        .as_ref()?
+        .results
+        .iter()
+        .flatten()
+        .find(|result| result.iso_3166_1.as_deref() == Some("US"))?
+        .rating
+        .as_deref()
+        .map(str::trim)
+        .filter(|rating| !rating.is_empty())
+        .map(str::to_owned)
 }
 
 impl Signals {
@@ -170,6 +212,7 @@ impl Signals {
             revenue: details.revenue.unwrap_or(0),
             collection: details.belongs_to_collection.as_ref().and_then(|c| c.id),
             date: details.release_date.clone().unwrap_or_default(),
+            rating: us_certification(details),
         }
     }
 
@@ -203,6 +246,7 @@ impl Signals {
             revenue: 0,
             collection: None,
             date: details.first_air_date.clone().unwrap_or_default(),
+            rating: us_tv_rating(details),
         }
     }
 
@@ -481,10 +525,14 @@ pub fn rank(
         .into_iter()
         .map(|candidate| {
             let (pick, also_included) = streaming::pick(&candidate.show, country, services);
+            let rating = tmdb_id(&candidate.show)
+                .and_then(|id| enrichment.signals.get(&id))
+                .and_then(|signals| signals.rating.clone());
             Ranked {
                 show: candidate.show,
                 pick,
                 also_included,
+                rating,
             }
         })
         .collect()

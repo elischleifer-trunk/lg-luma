@@ -130,6 +130,8 @@ pub struct Ranked {
     pub pick: Option<Pick>,
     /// Other installed apps where it is included, most recent first, excluding `pick`.
     pub also_included: Vec<String>,
+    /// The US rating (PG-13, TV-14) when TMDB details were fetched for the show.
+    pub rating: Option<String>,
 }
 
 /// Picks the best installed option for one show.
@@ -177,6 +179,7 @@ pub fn rank(shows: &[Show], country: &str, services: &Services) -> Vec<Ranked> {
                 show: show.clone(),
                 pick,
                 also_included,
+                rating: None,
             }
         })
         .collect();

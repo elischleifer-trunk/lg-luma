@@ -270,12 +270,14 @@ impl Source for Live {
         let tmdb = self.tmdb.as_ref().ok_or(Error::NotConfigured("TMDB"))?;
         cached(
             &self.cache,
-            &format!("tmdb:movie:{id}"),
+            // With its US rating appended; details cached before ratings were asked for
+            // are not reused.
+            &format!("tmdb:movie:{id}:rated"),
             ttl::TMDB_DETAILS,
             || {
                 tmdb.movie_details(&MovieDetailsParams {
                     movie_id: id,
-                    append_to_response: None,
+                    append_to_response: Some("release_dates".into()),
                     language: Some(LANGUAGE.into()),
                 })
             },
@@ -286,12 +288,14 @@ impl Source for Live {
         let tmdb = self.tmdb.as_ref().ok_or(Error::NotConfigured("TMDB"))?;
         cached(
             &self.cache,
-            &format!("tmdb:tv:{id}"),
+            // With its US rating appended; details cached before ratings were asked for
+            // are not reused.
+            &format!("tmdb:tv:{id}:rated"),
             ttl::TMDB_DETAILS,
             || {
                 tmdb.tv_series_details(&TvSeriesDetailsParams {
                     series_id: id,
-                    append_to_response: None,
+                    append_to_response: Some("content_ratings".into()),
                     language: Some(LANGUAGE.into()),
                 })
             },
