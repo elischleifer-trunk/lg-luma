@@ -367,6 +367,7 @@ fn effects(
                     platform.send(Request::Refresh);
                 }
             }
+            Effect::ReclaimHome => platform.send(Request::ReclaimHome),
             Effect::Launch(id) if id == model::CAMERAS_APP => {
                 state.show_cameras = true;
             }
@@ -820,6 +821,9 @@ fn run() -> Result<(), String> {
         webos,
         options.preferences.is_none() && options.test_extra_apps == 0,
     );
+    if webos && !options.webos_home && state.preferences.luma_home {
+        platform.send(Request::ReclaimHome);
+    }
     let webhook_service = webhook::Service::new();
     // Pairings sit beside the preferences; a temporary --preferences profile keeps its own.
     let mut camera_service = cameras::Service::default();

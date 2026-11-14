@@ -989,6 +989,21 @@
     "nl": "Minder beweging",
     "sv": "Minskad rörelse"
   },
+  "lumaAsHome": {
+    "zh-tw": "開啟時將 Luma 設為主畫面",
+    "en": "Open Luma as Home",
+    "de": "Luma als Startbildschirm öffnen",
+    "es": "Abrir Luma como inicio",
+    "zh": "打开时将 Luma 设为主屏幕",
+    "pt": "Abrir o Luma como início",
+    "it": "Apri Luma come Home",
+    "ru": "Открывать Luma как главный экран",
+    "pl": "Otwieraj Lumę jako ekran główny",
+    "fr": "Ouvrir Luma comme accueil",
+    "vi": "Mở Luma làm màn hình chính",
+    "nl": "Luma openen als startscherm",
+    "sv": "Öppna Luma som hemskärm"
+  },
   "homeAssistant": {
     "en": "Home Assistant",
     "de": "Home Assistant",

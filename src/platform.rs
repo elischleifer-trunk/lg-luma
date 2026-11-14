@@ -156,22 +156,17 @@ fn home_takeover_active() -> bool {
     marked("/usr/palm/applications/com.webos.app.home/.luma-home") || marked("/var/run/luma-home")
 }
 
-/// Open LG's original Home. While Luma has replaced Home, `home.sh suspend` lifts the takeover
-/// (keeping it enabled, so the boot hook reapplies it at the next cold boot), stops this Home
-/// instance and opens LG's. It runs in its own systemd unit: it ends this process, and Homebrew
-/// Channel's exec would end it when the call returns.
-fn open_lg_home() -> Result<(), String> {
-    if !home_takeover_active() && !runs_as_lg_home() {
-        return call(
-            "luna://com.webos.applicationManager/launch",
-            json!({"id": HOME_ID}),
-        )
-        .map(|_| ());
-    }
+/// Written by `home.sh suspend` while the LG Home tile has lifted the takeover. /var/run is shared
+/// with a tile's jail and cleared at boot, when the boot hook applies the takeover anyway.
+const HOME_SUSPENDED: &str = "/var/run/luma-home-suspended";
+
+/// Run the installed `home.sh` with `command` as root, in its own systemd unit: the command may
+/// end this process, and Homebrew Channel's exec would end it when the call returns.
+fn home_script(command: &str) -> Result<(), String> {
     let script = install_dir()?.join("home.sh");
     let quote = |text: &str| format!("'{}'", text.replace('\'', "'\\''"));
     let command = format!(
-        "systemd-run --unit=luma-lg-home --collect /bin/sh {} suspend",
+        "systemd-run --unit=luma-home-{command} --collect /bin/sh {} {command}",
         quote(&script.to_string_lossy())
     );
     let envelope = call(
@@ -185,12 +180,37 @@ fn open_lg_home() -> Result<(), String> {
         {
             let stderr = envelope.get("stderrString").and_then(Value::as_str);
             return Err(format!(
-                "LG Home could not be opened: {}",
+                "home.sh {command} could not be started: {}",
                 output_excerpt(stderr.unwrap_or(""))
             ));
         }
     }
     Ok(())
+}
+
+/// The normal instance started while the LG Home tile had lifted the takeover: `home.sh resume`
+/// closes it and applies the takeover again, opening Luma as Home.
+fn reclaim_home() -> Result<(), String> {
+    let suspended = std::fs::read_to_string(HOME_SUSPENDED).is_ok_and(|m| m.trim() == APP_ID);
+    if !suspended || home_takeover_active() || runs_as_lg_home() {
+        return Ok(());
+    }
+    home_script("resume")
+}
+
+/// Open LG's original Home. While Luma has replaced Home, `home.sh suspend` lifts the takeover
+/// (keeping it enabled, so the boot hook reapplies it at the next cold boot), stops this Home
+/// instance and opens LG's. It runs in its own systemd unit: it ends this process, and Homebrew
+/// Channel's exec would end it when the call returns.
+fn open_lg_home() -> Result<(), String> {
+    if !home_takeover_active() && !runs_as_lg_home() {
+        return call(
+            "luna://com.webos.applicationManager/launch",
+            json!({"id": HOME_ID}),
+        )
+        .map(|_| ());
+    }
+    home_script("suspend")
 }
 
 pub fn redirect_to_home() -> Result<bool, String> {
@@ -218,6 +238,8 @@ pub enum Request {
     WatchSignal,
     /// Bring Home to the front.
     GoHome,
+    /// Make Luma Home again if the LG Home tile lifted the takeover until the next boot.
+    ReclaimHome,
     Launch(String),
     /// Launch an app with webOS launch `params`, such as a streaming title to open.
     LaunchWith {
@@ -318,6 +340,12 @@ impl Platform {
                                 "luna://com.webos.applicationManager/launch",
                                 json!({"id": home_id()}),
                             );
+                        }
+                        continue;
+                    }
+                    Request::ReclaimHome => {
+                        if webos && let Err(error) = reclaim_home() {
+                            crate::telemetry::log_warn!("home", "{error}");
                         }
                         continue;
                     }

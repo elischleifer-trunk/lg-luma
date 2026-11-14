@@ -11,6 +11,9 @@ const CONFIG: &str = "/var/lib/luma-home/state.json";
 const STAGE: &str = "/var/lib/luma-home/app";
 const HOOK: &str = "/var/lib/webosbrew/init.d/64-luma-home";
 const MARKER: &str = "/var/run/luma-home";
+/// While the LG Home tile has lifted the takeover until the next boot. /var/run is shared with
+/// Luma's tile jail, so a normal Luma start can ask to `resume`; boot clears it.
+const SUSPENDED: &str = "/var/run/luma-home-suspended";
 pub const HOME: &str = "com.webos.app.home";
 pub const FULL_HOME: &str = "com.webos.app.fullhome";
 fn default_home() -> String {
@@ -270,7 +273,7 @@ impl<'a, S: System> Home<'a, S> {
             .as_array()
             .is_some_and(|apps| apps.iter().any(|app| app["id"] == APP)))
     }
-    fn close_normal(&self) -> Result<()> {
+    pub fn close_normal(&self) -> Result<()> {
         if !self.normal_running()? {
             return Ok(());
         }
@@ -616,6 +619,7 @@ pub fn dispatch(
         }
         "apply" | "disable" | "restore" => {
             let mut config = saved.ok_or("Luma Home has not been enabled")?;
+            system::remove(system, SUSPENDED)?;
             if command == "apply" && config.enabled {
                 home.apply(&config, false)?;
             } else {
@@ -635,6 +639,20 @@ pub fn dispatch(
                 .filter(|c| c.enabled)
                 .ok_or("Luma Home is not enabled")?;
             home.restore(&config, true)?;
+            system::write(system, SUSPENDED, format!("{APP}\n").as_bytes(), 0o644)?;
+            Ok(json!({"returnValue":true}))
+        }
+        // Luma's normal instance started after `suspend`: close it and make Luma Home again.
+        "resume" => {
+            let config = saved
+                .filter(|c| c.enabled)
+                .ok_or("Luma Home is not enabled")?;
+            if !system::exists(system, SUSPENDED) {
+                return Ok(json!({"returnValue":true}));
+            }
+            system::remove(system, SUSPENDED)?;
+            home.close_normal()?;
+            home.apply(&config, true)?;
             Ok(json!({"returnValue":true}))
         }
         _ => Err("Unknown Home integration command".into()),

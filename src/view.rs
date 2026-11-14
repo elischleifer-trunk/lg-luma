@@ -3209,6 +3209,13 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets, now: Offset
                     false,
                 ),
                 (
+                    11,
+                    language.t("lumaAsHome"),
+                    "luma-mark",
+                    Some(on_off(state.preferences.luma_home)),
+                    false,
+                ),
+                (
                     8,
                     language.t("homeAssistant"),
                     "tv",

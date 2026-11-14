@@ -264,6 +264,8 @@ pub enum Effect {
     /// Fire-and-forget HTTP request for a custom tile, off the SDL thread.
     FireWebhook(CustomTile),
     Quit,
+    /// Make Luma Home again if the LG Home tile lifted the takeover.
+    ReclaimHome,
     Weather(weather::Command),
     UpdateDownload(String),
 }
@@ -2823,6 +2825,14 @@ impl State {
                         return vec![];
                     }
                     2 => self.preferences.reduced_motion = !self.preferences.reduced_motion,
+                    11 => {
+                        self.preferences.luma_home = !self.preferences.luma_home;
+                        return if self.preferences.luma_home {
+                            vec![Effect::Save, Effect::ReclaimHome]
+                        } else {
+                            vec![Effect::Save]
+                        };
+                    }
                     8 => {
                         self.subpage = Some(Subpage::HomeAssistant);
                         self.focus = Target::HomeAssistantToggle;

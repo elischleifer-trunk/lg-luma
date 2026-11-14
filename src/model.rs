@@ -415,6 +415,8 @@ pub struct Preferences {
     pub wallpaper_gradient: bool,
     /// Accept camera overlays and notifications from paired Home Assistant servers.
     pub home_assistant: bool,
+    /// After the LG Home tile lifted Luma's Home takeover, opening Luma takes Home back.
+    pub luma_home: bool,
     /// Unix seconds of the last automatic or chosen wallpaper change, for the timed modes.
     pub wallpaper_changed: u64,
     /// Settings this build does not know, from a newer Luma. They are written back unchanged so
@@ -472,6 +474,7 @@ impl Default for Preferences {
             wallpaper_cycle: false,
             wallpaper_gradient: true,
             home_assistant: false,
+            luma_home: true,
             wallpaper_changed: 0,
             extra: serde_json::Map::new(),
         }

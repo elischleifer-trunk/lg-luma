@@ -10,8 +10,8 @@ fi
 SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$SCRIPT")" && pwd) || exit 1
 COMMAND=${1:-boot}
 case "$COMMAND" in
-  enable|disable|restore|suspend|status|apply|boot) ;;
-  *) printf '%s\n' 'Usage: home.sh enable [APP_DIR] [HOME_ID] | disable | restore | suspend | status' >&2; exit 1 ;;
+  enable|disable|restore|suspend|resume|status|apply|boot) ;;
+  *) printf '%s\n' 'Usage: home.sh enable [APP_DIR] [HOME_ID] | disable | restore | suspend | resume | status' >&2; exit 1 ;;
 esac
 [ "$(id -u)" = 0 ] || { printf '%s\n' 'Run as root.' >&2; exit 1; }
 # boot only schedules the copied $STATE/home.sh apply, which checks for the helper itself.

@@ -961,6 +961,13 @@ Luma's Home and opens LG's, but leaves the integration enabled and the boot hook
 Home key then opens LG Home until the next cold boot (standby with Quick Start+ is not one), when
 `64-luma-home` applies the takeover again. Run `home.sh apply` to bring Luma back sooner.
 
+`suspend` also writes `/var/run/luma-home-suspended`, which a tile's jail can read and boot
+clears. Settings › System › **Open Luma as Home** (`luma_home`, on by default) makes a normal Luma
+start that finds this marker run `home.sh resume` the same way: it closes the normal instance and
+applies the takeover again, opening Luma as Home. Turning the setting on does the same at once.
+`resume` does nothing without the marker; `apply`, `disable` and `restore` remove it, so a
+disabled integration is never taken back.
+
 Build and script checks cannot establish native Home compatibility. Manually verify Home, Back
 out of the last app, standby wake with the TV's chosen Quick Start+ setting, a full cold boot,
 saved preferences and restoring LG Home. The broader webOS 6+ app compatibility statement does

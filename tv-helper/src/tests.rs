@@ -345,9 +345,38 @@ fn suspend_opens_lg_home_and_keeps_the_takeover_for_the_next_boot() {
     let c = home::load(&f).unwrap().unwrap();
     assert!(c.enabled);
     assert!(home::hook_owned(&f));
+    assert_eq!(
+        f.read("/var/run/luma-home-suspended"),
+        format!("{APP}\n").as_bytes()
+    );
     // The boot hook's apply brings Luma back as Home.
     home::dispatch(&f, "apply", None, None).unwrap();
     assert!(system::same_file(&f, EXE, format!("{DIR}/luma")));
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+}
+#[test]
+fn resume_after_suspend_makes_luma_home_again_and_is_otherwise_a_no_op() {
+    let f = Fixture::new();
+    home::dispatch(&f, "enable", Some(DIR), None).unwrap();
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    *f.front.borrow_mut() = APP.into();
+    home::dispatch(&f, "resume", None, None).unwrap();
+    assert!(system::same_file(&f, EXE, format!("{DIR}/luma")));
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+    assert_eq!(f.front.borrow().as_str(), home::HOME);
+    // Without a suspension, resume changes nothing.
+    let calls = f.calls().len();
+    home::dispatch(&f, "resume", None, None).unwrap();
+    assert_eq!(f.calls().len(), calls);
+    // A disabled integration is never taken back.
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    home::dispatch(&f, "disable", None, None).unwrap();
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+    assert!(
+        home::dispatch(&f, "resume", None, None)
+            .unwrap_err()
+            .contains("not enabled")
+    );
 }
 #[test]
 fn installation_under_a_symlinked_temporary_parent_stays_inside_the_root() {

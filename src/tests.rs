@@ -1179,7 +1179,7 @@ fn system_category_owns_refresh_and_quit_and_restores_sidebar_focus() {
     assert_eq!(state.section, crate::state::SYSTEM_SECTION);
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::TvSettings);
-    for expected in [0, 4, 2, 8, 10, 7, 3] {
+    for expected in [0, 4, 2, 11, 8, 10, 7, 3] {
         state.direction(Direction::Down, &controls(&state));
         assert_eq!(state.focus, Target::Setting(expected));
     }
@@ -3667,6 +3667,21 @@ fn lg_home_tile_is_listed_once_and_launches_through_luma() {
     assert!(!crate::platform::can_uninstall(LG_HOME_APP));
     state.focus = Target::App(LG_HOME_APP.into());
     assert_eq!(state.activate(), vec![Effect::Launch(LG_HOME_APP.into())]);
+}
+
+#[test]
+fn luma_as_home_is_on_by_default_and_turning_it_on_reclaims_home() {
+    let mut state = ready();
+    assert!(state.preferences.luma_home);
+    state.section = crate::state::SYSTEM_SECTION;
+    state.focus = Target::Setting(11);
+    assert_eq!(state.activate(), vec![Effect::Save]);
+    assert!(!state.preferences.luma_home);
+    assert_eq!(state.activate(), vec![Effect::Save, Effect::ReclaimHome]);
+    assert!(state.preferences.luma_home);
+    // Older preference files without the key keep the default.
+    let preferences: Preferences = serde_json::from_value(serde_json::json!({})).unwrap();
+    assert!(preferences.luma_home);
 }
 
 #[test]
