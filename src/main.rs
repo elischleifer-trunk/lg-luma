@@ -1505,6 +1505,9 @@ fn run() -> Result<(), String> {
         if let Some((id, endpoint)) = state.camera_warm(visible, Instant::now()) {
             camera_service.warm(id, endpoint);
         }
+        for (id, endpoint) in state.camera_relays(visible, Instant::now()) {
+            camera_service.warm(id, endpoint);
+        }
         if let Some(video) = state.cameras.play.take() {
             home_assistant.show_video(video);
         }

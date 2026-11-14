@@ -91,6 +91,8 @@ LIVE_VIEW_URL = "/api/luma/live/{entity_id}"
 # A TV waits at most this long for a relay to reach its camera.
 LIVE_START_TIMEOUT = 15.0
 RELAYS = f"{DOMAIN}_relays"
+# Integrations whose cameras repeat ones another integration provides: left out of the gallery.
+SECOND_COPIES = frozenset({"frigate"})
 HISTORY_VIEW_URL = "/api/luma/history/{entity_id}"
 PROTECT = "unifiprotect"
 PROTECT_SNAPSHOT = "/api/unifiprotect/snapshot/{nvr}/{camera}/{timestamp}"
@@ -191,8 +193,13 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
         return []
     # HLS needs Home Assistant's stream integration (part of default_config).
     streams = "stream" in hass.config.components
+    registry = er.async_get(hass)
     cameras = []
     for state in sorted(hass.states.async_all("camera"), key=lambda state: state.name.casefold()):
+        # Frigate's cameras are second copies of cameras another integration already provides.
+        entry = registry.async_get(state.entity_id)
+        if entry is not None and entry.platform in SECOND_COPIES:
+            continue
         token = state.attributes.get("access_token")
         if not token or state.state == "unavailable":
             continue

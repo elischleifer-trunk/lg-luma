@@ -94,7 +94,8 @@ you are watching.
 ## Cameras app
 
 While **Home Assistant** is on, Luma lists a **Cameras** app with your other apps. Favorite it to
-keep it on Home. Opening it shows every camera entity Home Assistant has (unavailable ones are
+keep it on Home. Opening it shows every camera entity Home Assistant has (Frigate's, which repeat cameras another
+integration already provides, and unavailable ones are
 skipped, at most 32) in a grid of snapshots that refresh every couple of seconds. Choose a camera
 and press **OK** to see it full screen as live video; **Back** returns to the grid, and **Back**
 again closes it.

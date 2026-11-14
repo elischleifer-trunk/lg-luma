@@ -462,6 +462,7 @@ button sends a snapshot-only overlay of `custom_components/luma/example.jpg`, se
 `/api/luma/example.jpg`, so owners can preview the card without a camera.
 
 **Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
+(Frigate's cameras, `SECOND_COPIES`, are left out as copies of cameras another integration provides)
 camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds
 after any `camera.*` state change, which includes every access-token rotation, coalescing bursts.
 Every minute it also reads `GET /api/status`, whose `cameras` counts only the asking server's list, and resends when it is 0, since
@@ -557,8 +558,11 @@ listener that stretch flagged as earlier, then every frame as it arrives; a list
 behind skips to the next keyframe. The body is `LUMAVID1`, a length-prefixed JSON header (`codec`
 `h264` or `hevc`, `width`, `height`), then frames of `u32 length, u8 flags, i64 pts` (microseconds)
 and Annex B bytes with parameter sets before each keyframe. `&warm=1` only starts the relay, which
-stops by itself two minutes after its last listener; `State::camera_warm` asks that instead of the
-HLS endpoint when the TV will decode. On a TV, UniFi Protect cameras sent a keyframe every 5 s: a
+stops by itself two minutes after its last listener. While the gallery is open,
+`State::camera_relays` asks it for every camera on screen that UniFi Protect records, at once and
+every 90 s (and when the grid scrolls), so whichever camera is enlarged is already being read;
+other cameras, which may run on a battery, are asked by `State::camera_warm` only once focus
+rests on them, instead of the HLS endpoint. On a TV, UniFi Protect cameras sent a keyframe every 5 s: a
 relay already reading delivered its first frame in 25-49 ms, one that had to connect in 1-2 s.
 
 `src/live.rs` reads that stream on a `camera-live` thread and feeds `NDL_DirectVideoPlay`. The
@@ -571,8 +575,10 @@ makes the scene drop its wallpaper, backdrop and picture and the renderer clear 
 it. Pausing or scrubbing ends the decoder's video and the gallery's own pictures take over; going
 live starts it again. A relay or decoder failure puts the camera in `native_failed`, which plays
 HLS in the overlay app as before. The motion-JPEG worker keeps running underneath, for the frames
-the gallery rewinds through. There is no sound yet. The decoder inside Luma running as Home has
-not been verified on a TV.
+the gallery rewinds through. There is no sound yet. On an OLED G4 (webOS 11.2) with Luma as Home,
+three UniFi Protect cameras played smoothly with the controls drawn over them; the decoder loaded
+in 459 ms the first time and about 75 ms after that, and what remained of the wait was the relay
+connecting to a camera it was not yet reading (1-2 s), which starting relays at opening removes.
 
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the

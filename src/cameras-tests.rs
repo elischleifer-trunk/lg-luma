@@ -1184,3 +1184,74 @@ fn up_on_the_live_video_with_nothing_earlier_stays_live() {
     assert_eq!(state.cameras.playback, Playback::Live);
     assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
 }
+
+#[test]
+fn recorded_cameras_on_screen_have_their_relays_started_when_the_gallery_opens() {
+    let live = |id: &str| format!("http://ha:8123/api/luma/live/camera.{id}?token=t");
+    let mut state = protect(&["a", "b", "c", "d", "e", "f", "g", "h"]);
+    for camera in &mut state.cameras.cameras {
+        let name = camera.name.clone();
+        camera.live = Some(live(&name));
+    }
+    // A camera nothing records may run on a battery: it waits for focus to rest on it.
+    state.cameras.cameras[1].history = None;
+    let start = Instant::now();
+    // No decoder on this TV: nothing to start.
+    assert!(state.camera_relays(true, start).is_empty());
+    state.cameras.decoder = true;
+    let ids = |relays: Vec<(String, String)>| -> Vec<String> {
+        relays
+            .into_iter()
+            .map(|(id, _)| id.replace("0/camera.", ""))
+            .collect()
+    };
+    let first = state.camera_relays(true, start);
+    assert_eq!(first[0].1, format!("{}&warm=1", live("a")));
+    // The six tiles on screen, less the unrecorded one; once, then again after a while.
+    assert_eq!(ids(first), ["a", "c", "d", "e", "f"]);
+    assert!(
+        state
+            .camera_relays(true, start + Duration::from_secs(60))
+            .is_empty()
+    );
+    assert_eq!(
+        ids(state.camera_relays(true, start + Duration::from_secs(91))),
+        ["a", "c", "d", "e", "f"]
+    );
+    // Focus on a recorded camera asks nothing more; on the unrecorded one, its relay.
+    assert_eq!(state.camera_warm(true, start), None);
+    assert_eq!(
+        state.camera_warm(true, start + Duration::from_secs(1)),
+        None
+    );
+    state.direction(Direction::Right, &[]);
+    assert_eq!(
+        state.camera_warm(true, start + Duration::from_secs(2)),
+        None
+    );
+    assert_eq!(
+        state.camera_warm(true, start + Duration::from_secs(3)),
+        Some(("0/camera.b".into(), format!("{}&warm=1", live("b"))))
+    );
+    // Scrolled to the next row: the cameras that came on screen start too.
+    for _ in 0..2 {
+        state.direction(Direction::Down, &[]);
+    }
+    assert_eq!(state.cameras.first_row, 1);
+    assert_eq!(
+        ids(state.camera_relays(true, start + Duration::from_secs(95))),
+        ["d", "e", "f", "g", "h"]
+    );
+    // Not while Luma is hidden or live video is off.
+    assert!(
+        state
+            .camera_relays(false, start + Duration::from_secs(300))
+            .is_empty()
+    );
+    state.cameras.live = false;
+    assert!(
+        state
+            .camera_relays(true, start + Duration::from_secs(600))
+            .is_empty()
+    );
+}

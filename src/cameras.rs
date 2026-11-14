@@ -74,6 +74,9 @@ const HOLD_GAP: Duration = Duration::from_millis(500);
 const WARM_AFTER: Duration = Duration::from_millis(400);
 /// Home Assistant stops a stream nobody loads about a minute after it starts: ask again then.
 const WARM_AGAIN: Duration = Duration::from_secs(70);
+/// Relays of the cameras on screen are asked to start again this often while the gallery is open
+/// (a relay nobody listens to stops after two minutes).
+const RELAYS_AGAIN: Duration = Duration::from_secs(90);
 /// A camera left focused longer than this is no longer kept ready.
 const WARM_FOR: Duration = Duration::from_secs(5 * 60);
 /// Faster playback, forward or (negated) backward.
@@ -1155,6 +1158,10 @@ pub struct Gallery {
     /// The latest scrubbing key: recorded video waits until scrubbing settles.
     scrubbed: Option<Instant>,
     warm: Option<Warm>,
+    /// When the relays of the cameras on screen were last asked to start, and for which row.
+    relays_warmed: Option<(Instant, usize)>,
+    /// The enlarged camera's first live picture has been logged.
+    live_logged: bool,
     /// When the gallery opened, until every picture on screen has loaded (and whether the
     /// first has): how long opening took goes to the log.
     opened: Option<(Instant, bool)>,
@@ -1803,7 +1810,8 @@ impl State {
                 gallery.unavailable.retain(|id| *id != frame.key);
                 if frame.live
                     && gallery.enlarged.as_deref() == Some(frame.key.as_str())
-                    && let Some(at) = gallery.enlarged_at.take()
+                    && !std::mem::replace(&mut gallery.live_logged, true)
+                    && let Some(at) = gallery.enlarged_at
                 {
                     crate::telemetry::log_info!(
                         "cameras",
@@ -1993,6 +2001,45 @@ impl State {
         self.cameras_open() && self.cameras.loaded()
     }
 
+    /// The relays to start now: those of the recorded cameras on screen, as soon as the gallery
+    /// opens and again while it stays open, so whichever camera is enlarged is already being
+    /// read and its video starts at once. Only cameras UniFi Protect records, which stream to
+    /// their recorder all the time anyway: starting a stream would wake a battery camera, so
+    /// other cameras wait for focus to rest on them (`camera_warm`).
+    pub fn camera_relays(&mut self, visible: bool, now: Instant) -> Vec<(String, String)> {
+        let gallery = &mut self.cameras;
+        if !visible
+            || !matches!(self.overlay, Some(Overlay::Cameras { .. }))
+            || !gallery.live
+            || !gallery.decoder
+        {
+            gallery.relays_warmed = None;
+            return vec![];
+        }
+        if gallery.relays_warmed.is_some_and(|(at, row)| {
+            row == gallery.first_row && now.saturating_duration_since(at) < RELAYS_AGAIN
+        }) {
+            return vec![];
+        }
+        gallery.relays_warmed = Some((now, gallery.first_row));
+        let shown = gallery.visible();
+        let layout = Layout::new(shown.len());
+        shown
+            .iter()
+            .skip(gallery.first_row * layout.cols)
+            .take(layout.visible_rows * layout.cols)
+            .filter(|camera| {
+                camera.history.is_some() && !gallery.native_failed.contains(&camera.id)
+            })
+            .filter_map(|camera| {
+                Some((
+                    camera.id.clone(),
+                    format!("{}&warm=1", camera.live.as_ref()?),
+                ))
+            })
+            .collect()
+    }
+
     /// The focused camera's HLS endpoint, once focus has rested on it: the main loop asks Home
     /// Assistant to start its video stream, so it is already running when OK enlarges the
     /// camera. Asked again while focus stays, since Home Assistant stops an unwatched stream.
@@ -2015,14 +2062,20 @@ impl State {
                 return None;
             }
         };
-        // The relay when this TV decodes the camera's own video, else Home Assistant's HLS.
+        // The relay when this TV decodes the camera's own video (unless `camera_relays` already
+        // keeps it running), else Home Assistant's HLS.
         let camera = gallery.camera(focused)?;
         let relayed = camera
             .live
             .as_ref()
-            .filter(|_| gallery.decoder && !gallery.native_failed.contains(focused))
-            .map(|url| format!("{url}&warm=1"));
-        let endpoint = relayed.or_else(|| camera.hls.clone())?;
+            .filter(|_| gallery.decoder && !gallery.native_failed.contains(focused));
+        if relayed.is_some() && camera.history.is_some() {
+            gallery.warm = None;
+            return None;
+        }
+        let endpoint = relayed
+            .map(|url| format!("{url}&warm=1"))
+            .or_else(|| camera.hls.clone())?;
         if gallery.warm.as_ref().is_none_or(|warm| warm.id != *focused) {
             gallery.warm = Some(Warm {
                 id: focused.clone(),
@@ -2213,6 +2266,7 @@ impl State {
             Target::Camera(id) if gallery.sheet.is_none() => {
                 gallery.enlarged = Some(id);
                 gallery.enlarged_at = Some(Instant::now());
+                gallery.live_logged = false;
                 gallery.request_video();
             }
             Target::CameraGear => self.open_camera_settings(),
