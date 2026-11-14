@@ -370,24 +370,137 @@ impl Enrichment {
     }
 }
 
+/// A half-typed word is completed only when the word it would become has at least this share
+/// of the votes of all the titles it could be.
+pub const COMPLETION_SHARE: f64 = 0.8;
+
+/// A letter or digit as it is compared: lowercase input, accents removed. None for anything
+/// that separates words.
+fn fold(c: char) -> Option<char> {
+    Some(match c {
+        'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' => 'a',
+        'ç' => 'c',
+        'è' | 'é' | 'ê' | 'ë' => 'e',
+        'ì' | 'í' | 'î' | 'ï' => 'i',
+        'ñ' => 'n',
+        'ò' | 'ó' | 'ô' | 'õ' | 'ö' => 'o',
+        'ù' | 'ú' | 'û' | 'ü' => 'u',
+        c if c.is_alphanumeric() => c,
+        _ => return None,
+    })
+}
+
+/// Each word of `text` as it is compared (see [`fold`]) and as it is written, in lowercase.
+fn tokens(text: &str) -> Vec<(String, String)> {
+    let mut tokens = Vec::new();
+    let (mut folded, mut written) = (String::new(), String::new());
+    for c in text.to_lowercase().chars() {
+        match fold(c) {
+            Some(plain) => {
+                folded.push(plain);
+                written.push(c);
+            }
+            None if folded.is_empty() => {}
+            None => tokens.push((std::mem::take(&mut folded), std::mem::take(&mut written))),
+        }
+    }
+    if !folded.is_empty() {
+        tokens.push((folded, written));
+    }
+    tokens
+}
+
 /// Lowercase words without punctuation or accents, so "Amélie" matches "amelie".
 fn words(text: &str) -> Vec<String> {
-    let folded: String = text
-        .to_lowercase()
-        .chars()
-        .map(|c| match c {
-            'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' => 'a',
-            'ç' => 'c',
-            'è' | 'é' | 'ê' | 'ë' => 'e',
-            'ì' | 'í' | 'î' | 'ï' => 'i',
-            'ñ' => 'n',
-            'ò' | 'ó' | 'ô' | 'õ' | 'ö' => 'o',
-            'ù' | 'ú' | 'û' | 'ü' => 'u',
-            c if c.is_alphanumeric() => c,
-            _ => ' ',
-        })
-        .collect();
-    folded.split_whitespace().map(str::to_owned).collect()
+    tokens(text).into_iter().map(|(folded, _)| folded).collect()
+}
+
+/// The typed text with its unfinished last word finished: "ghostb" → "ghostbusters",
+/// "star w" → "star wars". Movie of the Night matches whole words, so searching it for half a
+/// word spends a metered call on near misses; TMDB's free search does match a word's start.
+/// The word chosen is the one the most-seen matching titles continue with, and only when they
+/// nearly all do ([`COMPLETION_SHARE`]): "gho" could be *Ghost*, *Ghosts* or *Ghostbusters*,
+/// so it is searched as typed. None too when the text already ends in a whole word of a title
+/// worth listing ("super", "fan"), or when no such title starts a word with it ("sup": TMDB
+/// lists exact words first, and those are obscure).
+///
+/// Every keystroke that completes to the same word is one cached search, so typing the rest
+/// of "ghostbusters" costs nothing and the results do not move.
+pub fn complete(query: &str, results: &[SearchMultiResponseResult]) -> Option<String> {
+    let typed = words(query);
+    let (last, leading) = typed.split_last()?;
+    // Punctuation after the last word means it is finished.
+    query.chars().next_back().and_then(fold)?;
+    // Completed word → (as written in the title, votes of the titles that use it).
+    let mut english: Vec<(String, String, i64)> = Vec::new();
+    let mut foreign: Vec<(String, String, i64)> = Vec::new();
+    let mut foreign_whole = false;
+    for result in results {
+        let kind = match result.media_type.as_deref() {
+            Some("movie") => Kind::Movie,
+            Some("tv") => Kind::Series,
+            _ => continue,
+        };
+        let Some(title) = result.title.as_deref().or(result.name.as_deref()) else {
+            continue;
+        };
+        let signals = Signals::from_search(result);
+        if !signals.keep(kind, true) {
+            continue;
+        }
+        let title = tokens(title);
+        let starts = |window: &[(String, String)]| {
+            window[..leading.len()]
+                .iter()
+                .map(|(folded, _)| folded)
+                .eq(leading)
+                && window[leading.len()].0.starts_with(last.as_str())
+        };
+        let mut matches = title.windows(typed.len()).filter(|window| starts(window));
+        if matches
+            .clone()
+            .any(|window| window[leading.len()].0 == *last)
+        {
+            if signals.foreign() {
+                foreign_whole = true;
+                continue;
+            }
+            return None;
+        }
+        let Some(window) = matches.next() else {
+            continue;
+        };
+        let (folded, written) = &window[leading.len()];
+        let words = if signals.foreign() {
+            &mut foreign
+        } else {
+            &mut english
+        };
+        match words.iter_mut().find(|(word, _, _)| word == folded) {
+            Some((_, _, votes)) => *votes += signals.votes,
+            None => words.push((folded.clone(), written.clone(), signals.votes)),
+        }
+    }
+    let words = match (english.is_empty(), foreign_whole) {
+        (false, _) => english,
+        // The text names a foreign title outright (*Amélie*): search for it as typed.
+        (true, true) => return None,
+        (true, false) => foreign,
+    };
+    // The first of equally seen words: TMDB's own order breaks the tie.
+    let mut best: Option<&(String, String, i64)> = None;
+    for word in &words {
+        if best.is_none_or(|(_, _, votes)| word.2 > *votes) {
+            best = Some(word);
+        }
+    }
+    let (_, written, votes) = best?;
+    let total: i64 = words.iter().map(|(_, _, votes)| votes).sum();
+    if (*votes as f64) < COMPLETION_SHARE * total as f64 {
+        return None;
+    }
+    let rest: String = written.chars().skip(last.chars().count()).collect();
+    Some(format!("{query}{rest}"))
 }
 
 /// How a title matches the query; lower is better.

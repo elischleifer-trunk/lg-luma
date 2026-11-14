@@ -192,14 +192,33 @@ pub trait Source: Send + 'static {
     fn scores(&self, imdb_ids: &[String]) -> Option<Result<HashMap<String, Scores>, Error>>;
 }
 
-/// The live API with the key read from disk for each batch, so a new key applies at once.
+/// The live API with the key read from disk for each batch, so a new key applies at once. The
+/// client, and so its open connection, is kept until the key changes.
 pub struct Live {
-    pub keys: PathBuf,
+    keys: PathBuf,
+    client: std::sync::Mutex<Option<(String, Client)>>,
+}
+
+impl Live {
+    pub fn new(keys: PathBuf) -> Self {
+        Self {
+            keys,
+            client: std::sync::Mutex::new(None),
+        }
+    }
 }
 
 impl Source for Live {
     fn scores(&self, imdb_ids: &[String]) -> Option<Result<HashMap<String, Scores>, Error>> {
-        let client = crate::streaming_keys::load(&self.keys).mdblist()?;
+        let key = crate::streaming_keys::load(&self.keys).mdblist;
+        if key.is_empty() {
+            return None;
+        }
+        let mut client = self.client.lock().ok()?;
+        if client.as_ref().is_none_or(|(used, _)| *used != key) {
+            *client = Some((key.clone(), Client::new(&key)));
+        }
+        let (_, client) = client.as_ref()?;
         Some(client.scores(imdb_ids))
     }
 }

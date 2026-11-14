@@ -2,6 +2,10 @@
 //! (`motn-api.rs`, `tmdb-api.rs`). Blocking ureq/rustls with the same rules as weather: fixed
 //! origins, timeouts, no proxy or redirects and bounded replies. Call it from a worker thread,
 //! never the SDL thread.
+//!
+//! Keep an `Http` alive between calls: it owns the connection pool. A new TLS connection to
+//! Movie of the Night takes several times longer than a request on an open one, and replies
+//! are asked for gzipped (TMDB's are a quarter of the size; Movie of the Night sends plain).
 use serde::de::DeserializeOwned;
 use std::{fmt, io::Read, time::Duration};
 
@@ -33,6 +37,12 @@ impl fmt::Display for Error {
     }
 }
 
+/// Connections one search opens to an API at once; also how many stay open afterwards.
+pub const CONNECTIONS: usize = 6;
+/// How long an unused connection is kept for the next search. Typing a title on a remote takes
+/// a few seconds a letter; a closed connection is replaced, never an error.
+const IDLE: Duration = Duration::from_secs(60);
+
 /// One API origin plus its credentials.
 #[derive(Clone)]
 pub struct Http {
@@ -50,6 +60,8 @@ impl Http {
             .max_redirects(0)
             .proxy(None)
             .http_status_as_error(false)
+            .max_idle_connections_per_host(CONNECTIONS)
+            .max_idle_age(IDLE)
             .build()
             .new_agent();
         Self {
@@ -58,6 +70,27 @@ impl Http {
             headers,
             limit,
         }
+    }
+
+    /// Opens a connection for the requests that follow, so the first search does not wait for
+    /// DNS and TLS. Sent without credentials: the origin refuses it, which costs no quota, and
+    /// the connection stays open. Failure only means the first request connects itself.
+    pub fn warm(&self) {
+        let Ok(mut response) = self
+            .agent
+            .get(format!("{}/", self.base))
+            .header("User-Agent", "LumaNative")
+            .call()
+        else {
+            return;
+        };
+        // A connection is reused only once its reply has been read to the end.
+        let mut sink = Vec::new();
+        let _ = response
+            .body_mut()
+            .as_reader()
+            .take(64 * 1024)
+            .read_to_end(&mut sink);
     }
 
     /// GETs `path` (already percent-encoded) and decodes the JSON reply.

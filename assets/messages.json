@@ -3944,21 +3944,6 @@
     "nl": "Op {app}",
     "sv": "På {app}"
   },
-  "titleAddon": {
-    "en": "Add-on channel on {app}",
-    "de": "Zusatzkanal auf {app}",
-    "es": "Canal adicional en {app}",
-    "zh": "{app} 上的附加频道",
-    "zh-tw": "{app} 上的附加頻道",
-    "pt": "Canal adicional no {app}",
-    "it": "Canale aggiuntivo su {app}",
-    "ru": "Доп. канал в {app}",
-    "pl": "Kanał dodatkowy w {app}",
-    "fr": "Chaîne en option sur {app}",
-    "vi": "Kênh bổ sung trên {app}",
-    "nl": "Extra kanaal op {app}",
-    "sv": "Tilläggskanal på {app}"
-  },
   "titleRent": {
     "en": "Rent on {app}",
     "de": "Leihen auf {app}",

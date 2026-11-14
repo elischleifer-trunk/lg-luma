@@ -41,6 +41,13 @@ const QUERIES = [
   ['no-results', 'zzqxjvw'], // empty result list
 ];
 
+// Half-typed text, captured from TMDB only: its free search says which word the text is
+// completed to before Movie of the Night is asked (relevance::complete). [slug, text].
+const PARTIAL_QUERIES = [
+  ['ghostb', 'ghostb'], // completed to "ghostbusters"
+  ['star-w', 'star w'], // completed to "star wars"
+];
+
 // Movie of the Night requests. Keep names stable: tests refer to them.
 const MOTN_REQUESTS = [
   // Reference data: service IDs, names, logos and catalog types per country.
@@ -198,6 +205,14 @@ async function captureTmdb(tmdb, motnResults) {
     for (const result of titles.slice(0, TMDB_DETAILS_PER_SEARCH)) {
       await details(result.media_type, result.id);
     }
+  }
+  for (const [slug, text] of PARTIAL_QUERIES) {
+    await tmdb.get(`search-multi-${slug}`, '/3/search/multi', {
+      query: text,
+      include_adult: 'false',
+      language: 'en-US',
+      page: '1',
+    });
   }
   for (const id of [...collections].sort((a, b) => a - b)) {
     await tmdb.get(`collection-${id}`, `/3/collection/${id}`, { language: 'en-US' });
