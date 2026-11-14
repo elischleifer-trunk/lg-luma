@@ -23,6 +23,9 @@ pub const MIN_QUERY_CHARS: usize = 3;
 pub const DEBOUNCE: Duration = Duration::from_millis(350);
 /// Distinct queries whose replies are kept for instant redisplay (e.g. after Backspace).
 const CACHE_QUERIES: usize = 32;
+/// How long a remembered reply is shown again without asking: no longer than the disk cache
+/// keeps where a show streams (`search_cache::ttl::STREAMING`), as Luma runs for days.
+pub const CACHE_AGE: Duration = Duration::from_secs(12 * 3600);
 
 /// Movie of the Night service IDs and the curated brand whose TV app plays them.
 const SERVICE_BRANDS: &[(&str, &str)] = &[
@@ -247,7 +250,8 @@ pub struct Incremental<T = Show> {
     query: String,
     changed_at: Option<Instant>,
     generation: u64,
-    cache: VecDeque<(String, Vec<T>)>,
+    /// Query, when its reply arrived, and the reply.
+    cache: VecDeque<(String, Instant, Vec<T>)>,
     pub results: Vec<T>,
     /// The results are a local filter of an earlier, shorter query while the real reply loads.
     pub provisional: bool,
@@ -292,6 +296,8 @@ impl<T: Titled> Incremental<T> {
             self.provisional = false;
             return;
         }
+        self.cache
+            .retain(|(_, at, _)| now.saturating_duration_since(*at) <= CACHE_AGE);
         if let Some(cached) = self.cached(&self.query) {
             self.results = cached.to_vec();
             self.provisional = false;
@@ -303,9 +309,9 @@ impl<T: Titled> Incremental<T> {
         let prefix = self
             .cache
             .iter()
-            .filter(|(q, _)| self.query.starts_with(q.as_str()))
-            .max_by_key(|(q, _)| q.len());
-        if let Some((_, shows)) = prefix {
+            .filter(|(q, _, _)| self.query.starts_with(q.as_str()))
+            .max_by_key(|(q, _, _)| q.len());
+        if let Some((_, _, shows)) = prefix {
             let query = &self.query;
             self.results = shows
                 .iter()
@@ -313,6 +319,21 @@ impl<T: Titled> Incremental<T> {
                 .cloned()
                 .collect();
             self.provisional = true;
+        } else {
+            // Results for other text must not pass for this text's while it loads.
+            self.results.clear();
+            self.provisional = false;
+        }
+    }
+
+    /// Forgets remembered replies, whose picks were made for the TV's apps at the time, and
+    /// searches the current text again. Call when the TV's apps change.
+    pub fn refresh(&mut self, now: Instant) {
+        self.cache.clear();
+        if self.query.chars().count() >= MIN_QUERY_CHARS {
+            self.generation += 1;
+            self.searching = false;
+            self.changed_at = Some(now);
         }
     }
 
@@ -336,15 +357,26 @@ impl<T: Titled> Incremental<T> {
 
     /// Accepts a worker reply. Returns whether the visible results changed.
     pub fn accept(&mut self, request: &Request, reply: Result<Vec<T>, String>) -> bool {
+        self.accept_at(request, reply, Instant::now())
+    }
+
+    /// `accept` with the time the reply arrived, which starts its age in the cache.
+    pub fn accept_at(
+        &mut self,
+        request: &Request,
+        reply: Result<Vec<T>, String>,
+        now: Instant,
+    ) -> bool {
         let current = request.generation == self.generation;
         match reply {
             Ok(shows) => {
                 // Cache even stale replies: the user may come back to that text.
-                self.cache.retain(|(q, _)| *q != request.query);
+                self.cache.retain(|(q, _, _)| *q != request.query);
                 if self.cache.len() == CACHE_QUERIES {
                     self.cache.pop_front();
                 }
-                self.cache.push_back((request.query.clone(), shows.clone()));
+                self.cache
+                    .push_back((request.query.clone(), now, shows.clone()));
                 if !current {
                     return false;
                 }
@@ -366,8 +398,8 @@ impl<T: Titled> Incremental<T> {
     fn cached(&self, query: &str) -> Option<&[T]> {
         self.cache
             .iter()
-            .find(|(q, _)| q == query)
-            .map(|(_, shows)| shows.as_slice())
+            .find(|(q, _, _)| q == query)
+            .map(|(_, _, shows)| shows.as_slice())
     }
 }
 

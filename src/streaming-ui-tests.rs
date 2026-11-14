@@ -401,3 +401,40 @@ fn two_rows_of_posters_fit_under_the_selected_title() {
         "no scrolling to reach it"
     );
 }
+
+#[test]
+fn a_failed_search_says_so_even_with_results_on_screen() {
+    let mut state = typed("dune");
+    answer(&mut state, "dune");
+    // "dune drifter" narrows "dune" locally while its own search runs, then fails.
+    state.title_query = "dune drifter".into();
+    let now = Instant::now();
+    state.sync_titles(now);
+    assert!(!state.titles.results.is_empty(), "narrowed locally");
+    assert!(shows_text(&state, "Searching…"));
+    let request = state.sync_titles(now + DEBOUNCE).unwrap();
+    state.accept_titles(&request, Err("offline".into()));
+    assert!(shows_text(
+        &state,
+        "Movie and show search is unavailable right now."
+    ));
+}
+
+#[test]
+fn installing_or_removing_an_app_searches_the_current_text_again() {
+    let mut state = typed("dune");
+    answer(&mut state, "dune");
+    assert!(state.titles.deadline().is_none());
+    let mut inventory = state.inventory.clone();
+    inventory.apps.pop();
+    state.set_inventory(inventory.clone(), None);
+    assert!(
+        state.titles.deadline().is_some(),
+        "picks were made for the old apps"
+    );
+    // The same apps again change nothing.
+    let request = state.sync_titles(Instant::now() + DEBOUNCE).unwrap();
+    state.accept_titles(&request, Ok(state.titles.results.clone()));
+    state.set_inventory(inventory, None);
+    assert!(state.titles.deadline().is_none());
+}

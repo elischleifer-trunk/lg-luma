@@ -85,13 +85,15 @@ def needs_push(options: dict[str, Any], status: dict[str, Any]) -> bool:
     if not isinstance(held, dict):
         return False
     motn, tmdb, mdblist = keys(options)
+    # An older Luma does not report MDBList and cannot take that key, so it is nothing to push.
+    if "mdblist" not in held:
+        mdblist = ""
     if not (motn or tmdb or mdblist):
         return False
     return (
         (bool(motn) and not held.get("motn"))
         or (bool(tmdb) and not held.get("tmdb"))
-        # An older Luma does not report MDBList; it cannot take that key, so do not push for it.
-        or (bool(mdblist) and "mdblist" in held and not held.get("mdblist"))
+        or (bool(mdblist) and not held.get("mdblist"))
         or not held.get("home_assistant")
     )
 

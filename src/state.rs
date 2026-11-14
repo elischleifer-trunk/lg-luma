@@ -864,7 +864,18 @@ impl State {
 
     /// Returns whether a newly reported console changed the saved preferences.
     pub fn set_inventory(&mut self, next: Inventory, warning: Option<String>) -> bool {
+        let apps_changed = self.inventory.apps.len() != next.apps.len()
+            || self
+                .inventory
+                .apps
+                .iter()
+                .zip(&next.apps)
+                .any(|(old, new)| old.id != new.id);
         self.inventory.apps = next.apps;
+        if apps_changed {
+            // Remembered movie and show results chose among the old apps.
+            self.titles.refresh(Instant::now());
+        }
         self.inventory.search = next.search;
         if self.focus == Target::LgSearch && self.inventory.search.is_none() {
             self.focus = Target::Nav(self.page_index());

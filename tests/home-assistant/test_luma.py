@@ -873,3 +873,17 @@ async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert (len(key_pushes(aioclient_mock)) > before) is pushed
+
+
+def test_an_older_tv_is_not_pushed_an_mdblist_key_it_cannot_take() -> None:
+    from custom_components.luma.streaming_keys import needs_push
+
+    only_mdblist = {"mdblist_api_key": MDBLIST}
+    older = {"streaming_keys": {"motn": False, "tmdb": False, "home_assistant": False}}
+    assert not needs_push(only_mdblist, older)
+    newer = {
+        "streaming_keys": {"motn": False, "tmdb": False, "mdblist": False, "home_assistant": False}
+    }
+    assert needs_push(only_mdblist, newer)
+    # Keys an older TV does take are still pushed.
+    assert needs_push({**only_mdblist, "motn_api_key": MOTN}, older)

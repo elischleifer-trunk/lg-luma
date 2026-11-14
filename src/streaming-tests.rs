@@ -294,3 +294,54 @@ fn captured_fixtures_parse() {
         assert_eq!(parse_search(reply).unwrap().len(), raw, "{name}");
     }
 }
+
+#[test]
+fn new_text_without_a_cached_prefix_does_not_keep_other_text_results() {
+    let mut search = Incremental::<Show>::default();
+    let now = Instant::now();
+    search.set_text("dune", now);
+    let request = search.due(now + DEBOUNCE).unwrap();
+    search.accept_at(&request, Ok(vec![show("1", "Dune", "movie", vec![])]), now);
+    assert_eq!(search.results.len(), 1);
+    // "dun" is not a narrowing of "dune": nothing is shown until its own reply.
+    search.set_text("dun", now);
+    assert!(search.results.is_empty());
+    assert!(!search.provisional);
+    // Back to "dune": remembered.
+    search.set_text("dune", now);
+    assert_eq!(search.results.len(), 1);
+}
+
+#[test]
+fn remembered_replies_expire_and_are_forgotten_when_the_apps_change() {
+    let mut search = Incremental::<Show>::default();
+    let now = Instant::now();
+    search.set_text("dune", now);
+    let request = search.due(now + DEBOUNCE).unwrap();
+    search.accept_at(&request, Ok(vec![show("1", "Dune", "movie", vec![])]), now);
+    search.set_text("ghostbusters", now);
+    // Within the age limit the reply comes back without a request.
+    search.set_text("dune", now + CACHE_AGE / 2);
+    assert!(search.deadline().is_none());
+    // After it, the text is searched again.
+    search.set_text("ghostbusters", now + CACHE_AGE * 2);
+    search.set_text("dune", now + CACHE_AGE * 2);
+    assert!(search.deadline().is_some());
+    assert!(search.results.is_empty());
+
+    // New apps: remembered replies go, and the current text is searched again.
+    let later = now + CACHE_AGE * 3;
+    let request = search.due(later).unwrap();
+    search.accept_at(
+        &request,
+        Ok(vec![show("1", "Dune", "movie", vec![])]),
+        later,
+    );
+    search.refresh(later);
+    let again = search.due(later + DEBOUNCE).expect("searched again");
+    assert_ne!(again.generation, request.generation);
+    assert_eq!(search.results.len(), 1, "shown until the new reply");
+    search.set_text("ghostbusters", later);
+    search.set_text("dune", later);
+    assert!(search.deadline().is_some(), "not remembered");
+}

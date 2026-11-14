@@ -2130,7 +2130,29 @@ fn search_hero(
     let show = &selected.show;
     let x = 88.;
     let right = 1832.;
-    let width = right - x;
+    let mut width = right - x;
+    // While a search is pending, or it failed, say so at the right of the title line: the
+    // results may be a local narrowing of an earlier reply.
+    let titles = &state.titles;
+    let status = if titles.error.is_some() {
+        Some(language.t("titlesError"))
+    } else if titles.searching || titles.deadline().is_some() {
+        Some(language.t("titlesSearching"))
+    } else {
+        None
+    };
+    if let Some(status) = status {
+        let style = text(20.8, 550, -0.01).leading(1.4);
+        let w = assets.width(status, style).min(width / 2.) + 2.;
+        out.text(
+            ellipsize(assets, status, style, w),
+            Rect::new(right - w, 140., w, 29.12),
+            style,
+            c(0xeeeeee, 0.65),
+            false,
+        );
+        width -= w + 32.;
+    }
     let title_style = text(40., 650, -0.035).leading(1.2);
     out.text(
         ellipsize(assets, &show.title, title_style, width),
@@ -2210,6 +2232,7 @@ fn search_hero(
     if let Some(Some(scores)) = state.scores.get(&show.imdb_id) {
         cursor += hero_scores(out, assets, scores, x, y);
     }
+    let width = right - x;
     let where_style = text(20.8, 650, -0.01).leading(1.4);
     let place = ellipsize(
         assets,
