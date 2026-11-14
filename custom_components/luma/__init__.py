@@ -114,6 +114,8 @@ class LumaData:
     compatibility: versions.Compatibility
     # Whether the TV was last asked to report its text fields to this entry's webhook.
     keyboard: bool = False
+    # The text field the TV last reported open, by its key; None when closed.
+    field: str | None = None
 
 
 type LumaConfigEntry = ConfigEntry[LumaData]
@@ -662,6 +664,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         hass.http.register_view(ExampleImageView())
         hass.http.register_view(StreamView(hass))
         hass.http.register_view(HistoryView(hass))
+    await keyboard.async_setup_panel(hass)
 
     async def show_camera(call: ServiceCall) -> None:
         data = dict(call.data)

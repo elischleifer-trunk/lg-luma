@@ -1241,6 +1241,9 @@ async def test_phones_chosen_in_options_are_offered_typing_when_a_tv_field_opens
     assert action["behavior"] == "textInput"
     assert action["textInputPlaceholder"] == "Search"
     assert data["data"]["tag"] == f"luma_keyboard_{config.entry_id}"
+    # A tap opens the typing page for this TV, on iPhone and on Android.
+    assert data["data"]["url"] == f"/luma-keyboard?entry={config.entry_id}"
+    assert data["data"]["clickAction"] == data["data"]["url"]
 
     # The reply is typed on the TV; another entry's or a blank reply is not.
     aioclient_mock.post(f"{TV}/api/keyboard/text", json={"typed": True})
@@ -1284,3 +1287,71 @@ async def test_phones_chosen_in_options_are_offered_typing_when_a_tv_field_opens
     )
     await hass.async_block_till_done()
     assert keyboard_calls(aioclient_mock, "/api/keyboard") == [{}]
+
+
+async def test_tapping_the_notification_opens_a_page_that_types_on_the_tv(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    hass_client_no_auth,
+    hass_ws_client,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from homeassistant.setup import async_setup_component
+
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    # Home Assistant's frontend itself is not installed for tests; panels need only its registry.
+    assert await async_setup_component(hass, "websocket_api", {})
+    hass.config.components.add("frontend")
+    async_mock_service(hass, "notify", "mobile_app_pixel")
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    config = entry(hass)
+    hass.config_entries.async_update_entry(
+        config, options={"keyboard_phones": ["mobile_app_pixel"]}
+    )
+    aioclient_mock.get(f"{TV}/api/status", json={"overlay": None, "overlay_ready": True})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done()
+
+    # The page is a panel outside the sidebar, for every user, with its script served.
+    panel = hass.data["frontend_panels"]["luma-keyboard"]
+    assert panel.sidebar_title is None and not panel.require_admin
+    module = panel.config["_panel_custom"]["module_url"]
+    assert panel.config["_panel_custom"]["name"] == "luma-keyboard-panel"
+    client = await hass_client_no_auth()
+    script = await client.get(module)
+    assert script.status == 200
+    assert "customElements.define('luma-keyboard-panel'" in await script.text()
+
+    ws = await hass_ws_client(hass)
+
+    async def call(**message):
+        await ws.send_json_auto_id(message)
+        return await ws.receive_json()
+
+    tv = {"entry_id": config.entry_id, "title": "Living room TV"}
+    assert (await call(type="luma/keyboard/tvs"))["result"] == {"tvs": [{**tv, "prompt": None}]}
+    await client.post(
+        f"/api/webhook/{config.data['webhook_id']}", json={"open": True, "field": "titles"}
+    )
+    assert (await call(type="luma/keyboard/tvs"))["result"] == {
+        "tvs": [{**tv, "prompt": "Movies & shows"}]
+    }
+
+    aioclient_mock.post(f"{TV}/api/keyboard/text", json={"typed": True})
+    reply = await call(type="luma/keyboard/type", entry_id=config.entry_id, text=" Dune\nTwo ")
+    assert reply["success"]
+    assert keyboard_calls(aioclient_mock, "/api/keyboard/text") == [{"text": "Dune Two"}]
+    reply = await call(type="luma/keyboard/type", entry_id=config.entry_id, text="  ")
+    assert reply["error"]["code"] == "invalid_format"
+    reply = await call(type="luma/keyboard/type", entry_id="other", text="Alien")
+    assert reply["error"]["code"] == "not_found"
+
+    # The field closed on the TV before the text arrived.
+    await client.post(f"/api/webhook/{config.data['webhook_id']}", json={"open": False})
+    assert (await call(type="luma/keyboard/tvs"))["result"] == {"tvs": [{**tv, "prompt": None}]}
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{TV}/api/keyboard/text", status=409, json={"error": "No field"})
+    reply = await call(type="luma/keyboard/type", entry_id=config.entry_id, text="Alien")
+    assert reply["error"]["code"] == "no_field"
