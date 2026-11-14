@@ -337,6 +337,18 @@ impl<'a, S: System> Home<'a, S> {
         }
         Ok(())
     }
+    /// The conditions `apply` refuses on before changing anything.
+    pub fn preflight(&self, config: &Config) -> Result<()> {
+        if !self.exists(Path::new(&config.app_dir).join("luma")) {
+            return Err("Luma is no longer installed".into());
+        }
+        if config.method == "executable" {
+            self.owned_mount()?;
+        } else if self.foreign_mount()? {
+            return Err("Another integration is mounted over LG Home".into());
+        }
+        Ok(())
+    }
     pub fn apply(&self, config: &Config, open: bool) -> Result<()> {
         if !self.exists(Path::new(&config.app_dir).join("luma")) {
             return Err("Luma is no longer installed".into());
@@ -650,11 +662,12 @@ pub fn dispatch(
             if !system::exists(system, SUSPENDED) {
                 return Ok(json!({"returnValue":true}));
             }
-            // Keep the marker until Luma is Home again, so a failed attempt is retried on the
-            // next normal start.
+            // One attempt per suspension: a failure that persists must not close every later
+            // Luma start. Check what apply needs before closing the instance the user opened.
+            system::remove(system, SUSPENDED)?;
+            home.preflight(&config)?;
             home.close_normal()?;
             home.apply(&config, true)?;
-            system::remove(system, SUSPENDED)?;
             Ok(json!({"returnValue":true}))
         }
         _ => Err("Unknown Home integration command".into()),

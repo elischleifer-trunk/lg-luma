@@ -965,7 +965,9 @@ Home key then opens LG Home until the next cold boot (standby with Quick Start+ 
 clears. Settings › System › **Make this the default Home app** (`luma_home`, on by default) makes a normal Luma
 start that finds this marker run `home.sh resume` the same way: it closes the normal instance and
 applies the takeover again, opening Luma as Home. Turning the setting on does the same at once.
-`resume` does nothing without the marker; `apply`, `disable` and `restore` remove it, so a
+`resume` does nothing without the marker and removes it before trying, so it tries once per
+suspension; it checks what `apply` needs (Luma installed, no other mount over LG Home) before
+closing the open instance; `apply`, `disable` and `restore` remove it, so a
 disabled integration is never taken back.
 
 Build and script checks cannot establish native Home compatibility. Manually verify Home, Back

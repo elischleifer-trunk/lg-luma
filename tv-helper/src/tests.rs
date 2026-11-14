@@ -379,6 +379,32 @@ fn resume_after_suspend_makes_luma_home_again_and_is_otherwise_a_no_op() {
     );
 }
 #[test]
+fn resume_that_cannot_apply_keeps_the_open_luma_and_does_not_retry() {
+    let f = Fixture::new();
+    home::dispatch(&f, "enable", Some(DIR), None).unwrap();
+    // A failure that persists closes the normal instance at most once, and never before the
+    // takeover could apply.
+    home::dispatch(&f, "suspend", None, None).unwrap();
+    f.put("/var/lib/other/launcher", b"foreign");
+    f.mount("/var/lib/other/launcher", EXE);
+    *f.front.borrow_mut() = APP.into();
+    f.normal.set(true);
+    let calls = f.calls().len();
+    assert!(
+        home::dispatch(&f, "resume", None, None)
+            .unwrap_err()
+            .contains("Another integration")
+    );
+    assert!(
+        !f.calls()[calls..]
+            .iter()
+            .any(|s| s.contains("closeByAppId"))
+    );
+    assert!(!system::exists(&f, "/var/run/luma-home-suspended"));
+    home::dispatch(&f, "resume", None, None).unwrap();
+    assert!(f.normal.get());
+}
+#[test]
 fn installation_under_a_symlinked_temporary_parent_stays_inside_the_root() {
     let real = std::env::temp_dir().join(format!("luma-native-real-{}", std::process::id()));
     let link = std::env::temp_dir().join(format!("luma-native-link-{}", std::process::id()));
