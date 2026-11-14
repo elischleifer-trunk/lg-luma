@@ -212,11 +212,11 @@ fn studio_and_network_lists_have_no_duplicates() {
 
 #[test]
 fn us_ratings_come_from_appended_release_dates_and_content_ratings() {
-    let dune: MovieDetailsResponse = fixture("tmdb", "rated-movie-438631").unwrap();
+    let dune: MovieDetailsResponse = fixture("tmdb", "movie-438631-rated").unwrap();
     // The festival premiere has no certification; the theatrical release is PG-13.
     assert_eq!(us_certification(&dune).as_deref(), Some("PG-13"));
     assert_eq!(Signals::movie(&dune).rating.as_deref(), Some("PG-13"));
-    let office: TvSeriesDetailsResponse = fixture("tmdb", "rated-tv-2316").unwrap();
+    let office: TvSeriesDetailsResponse = fixture("tmdb", "tv-2316-rated").unwrap();
     assert_eq!(us_tv_rating(&office).as_deref(), Some("TV-14"));
     // Details fetched without ratings, as older cached ones were, have none.
     let unrated: MovieDetailsResponse = fixture("tmdb", "movie-438631").unwrap();
@@ -226,7 +226,7 @@ fn us_ratings_come_from_appended_release_dates_and_content_ratings() {
 #[test]
 fn ranked_results_carry_the_rating_of_their_details() {
     let (shows, mut enrichment) = search("dune");
-    let dune: MovieDetailsResponse = fixture("tmdb", "rated-movie-438631").unwrap();
+    let dune: MovieDetailsResponse = fixture("tmdb", "movie-438631-rated").unwrap();
     enrichment.add_movie(&dune);
     let ranked = rank(
         "dune",
