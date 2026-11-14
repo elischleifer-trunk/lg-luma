@@ -81,6 +81,32 @@ separate workers/cache and generation IDs. Cache Celsius and convert units witho
 Only configured/enabled/visible Home starts forecasts. Shared translations are bundled locally.
 Match the current native design without on-screen weather credits; attribution remains in docs.
 
+## Reaching the development TV
+
+The maintainer's rooted TV is reachable for root SSH through a Cloudflare Access tunnel at
+`tv.elischleifer.com`. Ask the maintainer before connecting; they add your key and approve the
+login. From a cloud session:
+
+1. Install `openssh-client` and `cloudflared` (the official linux-amd64 release binary).
+2. `cloudflared access login https://tv.elischleifer.com`, then give the maintainer the printed
+   URL to approve; leave it running until it prints the token.
+3. Generate a key with comment `claude-cloud-session` and have the maintainer append the public
+   key to `/home/root/.ssh/authorized_keys` on the TV.
+4. `~/.ssh/config`: `Host tv` → `HostName tv.elischleifer.com`, `User root`,
+   `ProxyCommand cloudflared access ssh --hostname %h`.
+
+**Run `luna-send` with `ssh -tt`.** Without a TTY it exits 0, prints nothing and does nothing,
+which looks like a launch the app ignored. Check with
+`ssh -tt tv 'luna-send -n 1 luna://com.webos.applicationManager/getForegroundAppInfo "{}"; exit'`:
+a working call prints a JSON reply.
+
+To learn how the TV itself launches an app with content (deep link formats), capture the Luna bus
+with `ls-monitor` (`/usr/sbin/ls-monitor`) while the maintainer triggers it from LG search or voice,
+and search the capture for `//launch`. Captures include account tokens (Prime Video's OAuth
+refresh token, for one): grep them on the TV, never copy them off, and delete them afterwards.
+An app's `appinfo.json` (`/media/cryptofs/apps/usr/palm/applications/<id>/`) may declare its
+`deeplinkingParams`.
+
 ## Assets
 
 When adding, removing or renaming a UI language, update `Language::ALL`/picker ordering in
