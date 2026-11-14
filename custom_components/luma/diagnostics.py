@@ -9,9 +9,9 @@ from homeassistant.core import HomeAssistant
 
 from . import LumaConfigEntry
 from .api import LumaError
-from .const import CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_TOKEN
+from .const import CONF_MDBLIST_KEY, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_TOKEN
 
-REDACT = {CONF_TOKEN, CONF_MOTN_KEY, CONF_TMDB_TOKEN}
+REDACT = {CONF_TOKEN, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_MDBLIST_KEY}
 
 
 async def async_get_config_entry_diagnostics(

@@ -10,6 +10,8 @@ use serde_json::{Value, json};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Confidence {
+    // No format has been confirmed on a TV yet.
+    #[allow(dead_code)]
     Verified,
     Unverified,
 }

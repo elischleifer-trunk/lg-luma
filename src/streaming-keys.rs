@@ -1,5 +1,5 @@
-//! API keys for streaming search: Movie of the Night (where a title streams) and TMDB (how
-//! prominent it is). The owner enters them on a phone through the QR key editor; they are never
+//! API keys for streaming search: Movie of the Night (where a title streams), TMDB (how
+//! prominent it is) and MDBList (its review scores). The owner enters them on a phone through the QR key editor; they are never
 //! typed on the TV, bundled in the package, logged or shown beyond their last four characters.
 //! Stored in `streaming-keys.json` next to the preferences, readable only by Luma (mode 0600).
 use crate::{motn_api, openapi::Http, tmdb_api};
@@ -22,6 +22,9 @@ pub struct Keys {
     /// TMDB API Read Access Token, sent as a bearer token.
     #[serde(default)]
     pub tmdb: String,
+    /// MDBList API key, for Rotten Tomatoes and IMDb scores.
+    #[serde(default)]
+    pub mdblist: String,
     /// Home Assistant set these last. It is the source of truth and pushes them again after
     /// a reset; keys entered on the QR page clear this until its next push.
     #[serde(default)]
@@ -34,6 +37,7 @@ impl fmt::Debug for Keys {
         f.debug_struct("Keys")
             .field("motn", &mask(&self.motn))
             .field("tmdb", &mask(&self.tmdb))
+            .field("mdblist", &mask(&self.mdblist))
             .field("home_assistant", &self.home_assistant)
             .finish()
     }
@@ -44,10 +48,12 @@ impl fmt::Debug for Keys {
 pub struct Status {
     pub motn: bool,
     pub tmdb: bool,
+    pub mdblist: bool,
     pub home_assistant: bool,
 }
 
 impl Status {
+    #[allow(dead_code)]
     pub fn complete(self) -> bool {
         self.motn && self.tmdb
     }
@@ -58,6 +64,7 @@ impl Keys {
         Status {
             motn: !self.motn.is_empty(),
             tmdb: !self.tmdb.is_empty(),
+            mdblist: !self.mdblist.is_empty(),
             home_assistant: self.home_assistant,
         }
     }
@@ -85,6 +92,10 @@ impl Keys {
             )
         };
         Some(motn_api::Client::new(http))
+    }
+
+    pub fn mdblist(&self) -> Option<crate::mdblist::Client> {
+        (!self.mdblist.is_empty()).then(|| crate::mdblist::Client::new(&self.mdblist))
     }
 
     pub fn tmdb(&self) -> Option<tmdb_api::Client> {
@@ -134,12 +145,14 @@ pub fn merge_from_home_assistant(
     keys: &Keys,
     motn: Option<&str>,
     tmdb: Option<&str>,
+    mdblist: Option<&str>,
 ) -> Result<Keys, String> {
     let mut next = keys.clone();
     let mut changed = false;
     for (name, value, slot) in [
         ("motn", motn, &mut next.motn),
         ("tmdb", tmdb, &mut next.tmdb),
+        ("mdblist", mdblist, &mut next.mdblist),
     ] {
         let value = clean(value.unwrap_or_default()).map_err(|e| format!("{name}: {e}"))?;
         if !value.is_empty() {
@@ -185,12 +198,13 @@ mod tests {
         let keys = Keys {
             motn: "motn-key-secretsecretsecret1234".into(),
             tmdb: "eyJhbGciOiJIUzI1NiJ9.secret.abcd".into(),
+            mdblist: "secretsecretsecretwxyz".into(),
             home_assistant: true,
         };
         let debug = format!("{keys:?}");
         assert!(!debug.contains("secret"), "{debug}");
         assert!(
-            debug.contains("…1234") && debug.contains("…abcd"),
+            debug.contains("…1234") && debug.contains("…abcd") && debug.contains("…wxyz"),
             "{debug}"
         );
     }
@@ -226,6 +240,7 @@ mod tests {
             Status {
                 motn: true,
                 tmdb: false,
+                mdblist: false,
                 home_assistant: false,
             }
         );
@@ -243,17 +258,23 @@ mod tests {
         let stored = Keys {
             motn: "motn-key-0123456789abcdef".into(),
             tmdb: "eyJhbGciOiJIUzI1NiJ9.e30.oldtoken".into(),
+            mdblist: "abcdefghijklmnopqrstuvwxy".into(),
             home_assistant: false,
         };
-        let next = merge_from_home_assistant(&stored, None, Some("  ")).unwrap();
+        let next = merge_from_home_assistant(&stored, None, Some("  "), None).unwrap();
         assert_eq!(next, stored, "empty push changed nothing");
-        let next =
-            merge_from_home_assistant(&stored, Some(""), Some("eyJhbGciOiJIUzI1NiJ9.e30.newtoken"))
-                .unwrap();
+        let next = merge_from_home_assistant(
+            &stored,
+            Some(""),
+            Some("eyJhbGciOiJIUzI1NiJ9.e30.newtoken"),
+            Some("zyxwvutsrqponmlkjihgfedcb"),
+        )
+        .unwrap();
         assert_eq!(next.motn, stored.motn);
         assert_eq!(next.tmdb, "eyJhbGciOiJIUzI1NiJ9.e30.newtoken");
+        assert_eq!(next.mdblist, "zyxwvutsrqponmlkjihgfedcb");
         assert!(next.home_assistant);
-        assert!(merge_from_home_assistant(&stored, Some("bad key"), None).is_err());
+        assert!(merge_from_home_assistant(&stored, Some("bad key"), None, None).is_err());
     }
 
     #[test]

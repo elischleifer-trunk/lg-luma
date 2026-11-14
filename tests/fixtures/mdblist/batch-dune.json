@@ -1,0 +1,3568 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/imdb/any",
+    "body": {
+      "ids": [
+        "tt1160419",
+        "tt15239678",
+        "tt0087182",
+        "tt0142032",
+        "tt12451788",
+        "tt10466872",
+        "tt0309338",
+        "tt1935156",
+        "tt31378509",
+        "tt2251648",
+        "tt14450978",
+        "tt15331462",
+        "tt11835714",
+        "tt0287839",
+        "tt38999951",
+        "tt23780438",
+        "tt11018038",
+        "tt5288532",
+        "tt0068425",
+        "tt0099474"
+      ]
+    }
+  },
+  "capturedAt": "2026-11-14T00:02:12Z",
+  "response": [
+    {
+      "id": 125013,
+      "title": "The Cremators",
+      "year": 1972,
+      "released": "1972-09-06",
+      "description": "An alien life form, resembling glowing rocks, summons forth a huge, rolling ball of fire, whenever threatened, that incinerates people.",
+      "tagline": "From the sun come the Fire-People to incinerate all mankind! Great Balls of Fire: Scorching! Ravaging! Engulfing!",
+      "runtime": 72,
+      "budget": 50000,
+      "revenue": null,
+      "score": 6,
+      "score_average": 29,
+      "ids": {
+        "imdb": "tt0068425",
+        "trakt": 118019,
+        "tmdb": 188628,
+        "tvdb": 185236,
+        "mal": null,
+        "mdblist": "2ogl"
+      },
+      "type": "movie",
+      "updated": "2026-11-07T14:47:45.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 2.6,
+          "score": 26,
+          "votes": 565,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/some-say-the-world-will-end-in-fire"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 32,
+          "score": 32,
+          "votes": 10,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/cremators",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 11,
+          "score": 11,
+          "votes": 50,
+          "url": "/m/cremators"
+        },
+        {
+          "source": "tmdb",
+          "value": 27,
+          "score": 27,
+          "votes": 12,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 5.2,
+          "score": 52,
+          "votes": 258,
+          "url": "/film/the-cremators/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 11,
+          "title": "Horror"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        },
+        {
+          "id": 439,
+          "name": "Shout! Factory TV"
+        },
+        {
+          "id": 600,
+          "name": "Shout! Factory Amazon Channel"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 92277,
+          "name": "Arista Productions Inc."
+        },
+        {
+          "id": 1950,
+          "name": "New World Pictures"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "PG",
+      "commonsense": null,
+      "age_rating": 11,
+      "commonsense_media": {
+        "common_sense": 11,
+        "common_sense_selection": null,
+        "parental_source": null,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "released",
+      "trailer": "https://www.youtube.com/watch?v=WMvpf4Cx9eU",
+      "poster": "https://image.tmdb.org/t/p/original/7lOox9krlgwCcIr8IaCNmYiybHk.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/w0fkX7sLwR8OfiICwbbyj7nSZj3.jpg"
+    },
+    {
+      "id": 520665,
+      "title": "Dune",
+      "year": 1984,
+      "released": "1984-12-14",
+      "description": "In the year 10,191, the most precious substance in the universe is the spice Melange. The spice extends life. The spice expands consciousness. The spice is vital to space travel.  The spice exists on only one planet in the entire universe, the vast desert planet Arrakis, also known as Dune.  Its native inhabitants, the Fremen, have long held a prophecy that a man would come, a messiah who would lead them to true freedom.",
+      "tagline": "A world beyond your experience, beyond your imagination.",
+      "runtime": 136,
+      "budget": 40000000,
+      "revenue": 31502434,
+      "score": 51,
+      "score_average": 51,
+      "ids": {
+        "imdb": "tt0087182",
+        "trakt": 684,
+        "tmdb": 841,
+        "tvdb": 1406,
+        "mal": null,
+        "mdblist": "b5qx"
+      },
+      "type": "movie",
+      "updated": "2026-11-10T09:54:52.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 6.2,
+          "score": 62,
+          "votes": 194989,
+          "url": 655
+        },
+        {
+          "source": "metacritic",
+          "value": 41,
+          "score": 41,
+          "votes": 20,
+          "url": "/dune"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 6.3,
+          "score": 63.0,
+          "votes": 205,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 65,
+          "score": 65,
+          "votes": 7806,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": 36,
+          "score": 36,
+          "votes": 117,
+          "url": "/m/dune_1984",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 65,
+          "score": 65,
+          "votes": 50000,
+          "url": "/m/dune_1984"
+        },
+        {
+          "source": "tmdb",
+          "value": 61,
+          "score": 61,
+          "votes": 3616,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 5.8,
+          "score": 58,
+          "votes": 306868,
+          "url": "/film/dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": 1.0,
+          "score": null,
+          "votes": null,
+          "url": "dune-1984"
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        }
+      ],
+      "streams": [
+        {
+          "id": 7,
+          "name": "HBO"
+        },
+        {
+          "id": 12,
+          "name": "Starz"
+        }
+      ],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 235,
+          "name": "YouTube Free"
+        },
+        {
+          "id": 1825,
+          "name": "HBO Max Amazon Channel"
+        },
+        {
+          "id": 1899,
+          "name": "HBO Max"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 10308,
+          "name": "Dino De Laurentiis Company"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "PG",
+      "commonsense": true,
+      "age_rating": 14,
+      "commonsense_media": {
+        "common_sense": 14,
+        "common_sense_selection": false,
+        "parental_source": 1,
+        "parental_violence": 4,
+        "parental_nudity": 2,
+        "parental_language": 2,
+        "parental_drinking": 3
+      },
+      "awards": "Nominated: Best Sound (Oscars, 1985).",
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=hjRG8kvMFw0",
+      "poster": "https://image.tmdb.org/t/p/original/4kJmUCE7mkVJjXa7A0g2rY4IGTm.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/5wJ2tckpvwcxGCAgZiccodwEJpf.jpg"
+    },
+    {
+      "id": 425176,
+      "title": "Dune Warriors",
+      "year": 1991,
+      "released": "1991-01-18",
+      "description": "After the end of the world, Earth is a thirsty planet ruled by vicious warlords. One woman is brave enough to fight back; she bands together five warriors to save her town and their precious water",
+      "tagline": null,
+      "runtime": 80,
+      "budget": null,
+      "revenue": null,
+      "score": 14,
+      "score_average": 37,
+      "ids": {
+        "imdb": "tt0099474",
+        "trakt": 136597,
+        "tmdb": 222339,
+        "tvdb": 101233,
+        "mal": null,
+        "mdblist": "942g"
+      },
+      "type": "movie",
+      "updated": "2026-10-19T18:10:12.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 4.1,
+          "score": 41,
+          "votes": 668,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/dune-warriors-blut-fur-wasser"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 39,
+          "score": 39,
+          "votes": 25,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/dune_warriors",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 11,
+          "score": 11,
+          "votes": 1,
+          "url": "/m/dune_warriors"
+        },
+        {
+          "source": "tmdb",
+          "value": 40,
+          "score": 40,
+          "votes": 26,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 5.8,
+          "score": 58,
+          "votes": 522,
+          "url": "/film/dune-warriors/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        },
+        {
+          "id": 207,
+          "name": "The Roku Channel"
+        },
+        {
+          "id": 439,
+          "name": "Shout! Factory TV"
+        },
+        {
+          "id": 538,
+          "name": "Plex"
+        },
+        {
+          "id": 600,
+          "name": "Shout! Factory Amazon Channel"
+        },
+        {
+          "id": 1963,
+          "name": "Xumo Play"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 20235,
+          "name": "New Horizons Picture"
+        },
+        {
+          "id": 4688,
+          "name": "Concorde-New Horizons"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "R",
+      "commonsense": null,
+      "age_rating": 17,
+      "commonsense_media": {
+        "common_sense": 17,
+        "common_sense_selection": null,
+        "parental_source": null,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=HSE-7UipMVk",
+      "poster": "https://image.tmdb.org/t/p/original/gIdY8sYd3joPeHqnK5qUxABNieD.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/dJww8jI8Zqx1vL70lDK3EcxiZ04.jpg"
+    },
+    {
+      "id": 393314,
+      "title": "Frank Herbert's Dune",
+      "year": 2000,
+      "released": "2000-12-03",
+      "description": "In the year 10,191, the most precious substance in the universe is the spice Melange. The spice extends life. The spice expands consciousness. The spice is vital to space travel. The spice exists on only one planet in the entire universe, the vast desert planet Arrakis, also known as Dune. Its native inhabitants, the Fremen, have long held a prophecy that a man would come, a messiah who would lead them to true freedom.",
+      "tagline": "One man. One planet. One destiny.",
+      "runtime": 285,
+      "budget": null,
+      "revenue": null,
+      "score": 69,
+      "score_average": 69,
+      "ids": {
+        "imdb": "tt0142032",
+        "trakt": 19475,
+        "tmdb": 19566,
+        "tvdb": 79551,
+        "mal": null,
+        "mdblist": "8fhe"
+      },
+      "type": "show",
+      "updated": "2026-11-07T10:20:14.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 6.9,
+          "score": 69,
+          "votes": 25284,
+          "url": 1578
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/frank-herberts-dune"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 7.2,
+          "score": 72.0,
+          "votes": 30,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 69,
+          "score": 69,
+          "votes": 743,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/tv/dune",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 72,
+          "score": 72,
+          "votes": 100,
+          "url": "/tv/dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 68,
+          "score": 68,
+          "votes": 392,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 6.4,
+          "score": 64,
+          "votes": 8015,
+          "url": "/film/frank-herberts-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 6,
+          "title": "Drama"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [
+        {
+          "id": 30377,
+          "name": "Victor Television Productions Inc."
+        },
+        {
+          "id": 57967,
+          "name": "Milk & Honey Pictures"
+        },
+        {
+          "id": 69940,
+          "name": "Evision"
+        },
+        {
+          "id": 572,
+          "name": "New Amsterdam Entertainment"
+        },
+        {
+          "id": 2493,
+          "name": "Tandem Communications"
+        },
+        {
+          "id": 73949,
+          "name": "KirchMedia"
+        },
+        {
+          "id": 18348,
+          "name": "Victor Television Productions"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "TV-14",
+      "commonsense": false,
+      "age_rating": 14,
+      "commonsense_media": {
+        "common_sense": 14,
+        "common_sense_selection": null,
+        "parental_source": 2,
+        "parental_violence": 3,
+        "parental_nudity": 3,
+        "parental_language": 2,
+        "parental_drinking": 2
+      },
+      "awards": "2 wins & 1 nomination.",
+      "status": "Ended",
+      "trailer": "https://www.youtube.com/watch?v=7B1nfv65xQY",
+      "poster": "https://image.tmdb.org/t/p/original/iIf5XeuuBKPtG6H7MfWLirbJGrQ.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/rAJmWCqmEeRwlV5CxzbeQ3lSN5N.jpg",
+      "tvdbid": 79551,
+      "seasons": [
+        {
+          "tmdbid": 29892,
+          "name": "Specials",
+          "air_date": null,
+          "episode_count": 9,
+          "season_number": 0,
+          "tomatofresh": null,
+          "poster_path": null
+        },
+        {
+          "tmdbid": 29890,
+          "name": "Miniseries",
+          "air_date": "2000-12-03T00:00:00.000Z",
+          "episode_count": 3,
+          "season_number": 1,
+          "tomatofresh": null,
+          "poster_path": "/puFqM4cHzpwinSJfOeWxxMwykgS.jpg"
+        }
+      ]
+    },
+    {
+      "id": 397881,
+      "title": "Frank Herbert's Children of Dune",
+      "year": 2003,
+      "released": "2003-03-16",
+      "description": "Twelve years following the events of Dune, the Atreides family must overcome a conspiracy that threatens to destroy their legacy and undermine their House in the eyes of The Empire. Only Paul's children can prevent this catastrophe from destroying everything and saving House Atreides from this malevolent force.",
+      "tagline": "Born to rule an empire. Destined to tear it apart.",
+      "runtime": 261,
+      "budget": null,
+      "revenue": null,
+      "score": 72,
+      "score_average": 72,
+      "ids": {
+        "imdb": "tt0287839",
+        "trakt": 9109,
+        "tmdb": 9156,
+        "tvdb": 79552,
+        "mal": null,
+        "mdblist": "8j09"
+      },
+      "type": "show",
+      "updated": "2026-10-26T04:37:10.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 7.2,
+          "score": 72,
+          "votes": 16441,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/children-of-dune"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 7.6,
+          "score": 76.0,
+          "votes": 21,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 71,
+          "score": 71,
+          "votes": 576,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": 80,
+          "score": 80,
+          "votes": 15,
+          "url": "/tv/children_of_dune",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 71,
+          "score": 71,
+          "votes": null,
+          "url": "/tv/children_of_dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 69,
+          "score": 69,
+          "votes": 254,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 6.4,
+          "score": 64,
+          "votes": 4380,
+          "url": "/film/frank-herberts-children-of-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 6,
+          "title": "Drama"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        },
+        {
+          "id": 1,
+          "title": "Action"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [
+        {
+          "id": 573,
+          "name": "Blixa Film Productktion"
+        },
+        {
+          "id": 4056,
+          "name": "Hallmark Entertainment"
+        },
+        {
+          "id": 572,
+          "name": "New Amsterdam Entertainment"
+        },
+        {
+          "id": 76576,
+          "name": "ABC Television"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "TV-14",
+      "commonsense": false,
+      "age_rating": 14,
+      "commonsense_media": {
+        "common_sense": 14,
+        "common_sense_selection": null,
+        "parental_source": 2,
+        "parental_violence": 3,
+        "parental_nudity": 2,
+        "parental_language": 2,
+        "parental_drinking": 2
+      },
+      "awards": "Won: Outstanding Special Visual Effects for a Miniseries, Movie or a Special (Emmys, 2003). Plus 3 nominations.",
+      "status": "Ended",
+      "trailer": "https://www.youtube.com/watch?v=8rBXcsk-BeE",
+      "poster": "https://image.tmdb.org/t/p/original/yCP8lKXBMtcG1CU9K3NsWlu1RgF.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/8tko4lM3VE6Rpye7IbilDpdHsWh.jpg",
+      "tvdbid": 79552,
+      "seasons": [
+        {
+          "tmdbid": 19076,
+          "name": "Specials",
+          "air_date": "2003-03-19T00:00:00.000Z",
+          "episode_count": 6,
+          "season_number": 0,
+          "tomatofresh": null,
+          "poster_path": "/4tHtZRNcay88k01ESpHbL5m5Hy1.jpg"
+        },
+        {
+          "tmdbid": 19075,
+          "name": "Miniseries",
+          "air_date": "2003-03-16T00:00:00.000Z",
+          "episode_count": 3,
+          "season_number": 1,
+          "tomatofresh": null,
+          "poster_path": "/kcKmfLYvZseU7Id6v9OItdS28SW.jpg"
+        }
+      ]
+    },
+    {
+      "id": 4839229,
+      "title": "Dune",
+      "year": 1989,
+      "released": "1989-04-19",
+      "description": "A completely prosperous couple on their own brand new Volga got lost in the desert. And when they joyfully rushed towards the truck, counting on help, it turned out that there were two recidivists in the cab who had just escaped from the colony ...",
+      "tagline": null,
+      "runtime": 81,
+      "budget": null,
+      "revenue": null,
+      "score": 0,
+      "score_average": 0,
+      "ids": {
+        "imdb": "tt0309338",
+        "trakt": 468289,
+        "tmdb": 627150,
+        "tvdb": null,
+        "mal": null,
+        "mdblist": "2vpz1"
+      },
+      "type": "movie",
+      "updated": "2026-07-21T03:11:44.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 5.8,
+          "score": 58,
+          "votes": 21,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 65,
+          "score": 65,
+          "votes": 4,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null,
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "tmdb",
+          "value": 66,
+          "score": 66,
+          "votes": 3,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/film/dune-1989/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 6,
+          "title": "Drama"
+        },
+        {
+          "id": 4,
+          "title": "Crime"
+        },
+        {
+          "id": 14,
+          "title": "Mystery"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [],
+      "language": "ru",
+      "spoken_language": "ru",
+      "country": "su",
+      "certification": "NR",
+      "commonsense": null,
+      "age_rating": null,
+      "commonsense_media": {},
+      "awards": null,
+      "status": "released",
+      "trailer": null,
+      "poster": "https://image.tmdb.org/t/p/original/f1G59dEnJ6NNE0kibsKJcJBMeta.jpg",
+      "backdrop": null
+    },
+    {
+      "id": 50330,
+      "title": "Dune: Prophecy",
+      "year": 2024,
+      "released": "2024-11-17",
+      "description": "Ten thousand years before the ascension of Paul Atreides, sisters Valya and Tula Harkonnen establish the fabled sect and female order that would become known as the Bene Gesserit to control the future of humankind.",
+      "tagline": "True power begins with control.",
+      "runtime": 910,
+      "budget": null,
+      "revenue": null,
+      "score": 68,
+      "score_average": 68,
+      "ids": {
+        "imdb": "tt10466872",
+        "trakt": 152957,
+        "tmdb": 90228,
+        "tvdb": 367118,
+        "mal": null,
+        "mdblist": "12u2"
+      },
+      "type": "show",
+      "updated": "2026-11-10T08:31:50.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 7.3,
+          "score": 73,
+          "votes": 71554,
+          "url": 385
+        },
+        {
+          "source": "metacritic",
+          "value": 64,
+          "score": 64,
+          "votes": 34,
+          "url": "/dune-prophecy"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 5.7,
+          "score": 57.0,
+          "votes": 253,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 74,
+          "score": 74,
+          "votes": 5033,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": 64,
+          "score": 64,
+          "votes": 78,
+          "url": "/tv/dune_prophecy",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 63,
+          "score": 63,
+          "votes": 1000,
+          "url": "/tv/dune_prophecy"
+        },
+        {
+          "source": "tmdb",
+          "value": 72,
+          "score": 72,
+          "votes": 684,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        }
+      ],
+      "streams": [
+        {
+          "id": 8,
+          "name": "HBO MAX"
+        }
+      ],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 1825,
+          "name": "HBO Max Amazon Channel"
+        },
+        {
+          "id": 1899,
+          "name": "HBO Max"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 54629,
+          "name": "Legendary Television"
+        },
+        {
+          "id": 3268,
+          "name": "HBO"
+        },
+        {
+          "id": 245085,
+          "name": "Wandering Jew Productions"
+        },
+        {
+          "id": 245086,
+          "name": "Herbert Properties"
+        },
+        {
+          "id": 245087,
+          "name": "Flying Life"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "TV-MA",
+      "commonsense": true,
+      "age_rating": 16,
+      "commonsense_media": {
+        "common_sense": 16,
+        "common_sense_selection": false,
+        "parental_source": 1,
+        "parental_violence": 4,
+        "parental_nudity": 4,
+        "parental_language": 0,
+        "parental_drinking": 3
+      },
+      "awards": "Nominated: Outstanding Fantasy/Sci-Fi Costumes (Emmys, 2025). Plus 3 more nominations.",
+      "status": "Returning Series",
+      "trailer": "https://www.youtube.com/watch?v=CzVHWNosS2o",
+      "poster": "https://image.tmdb.org/t/p/original/oWVohNsxkxA3u92EzRo8fTuXIS0.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/lBoHzOgft2QfpjkVVvZCqeM4ttT.jpg",
+      "tvdbid": 367118,
+      "seasons": [
+        {
+          "tmdbid": 486998,
+          "name": "Specials",
+          "air_date": null,
+          "episode_count": 17,
+          "season_number": 0,
+          "tomatofresh": null,
+          "poster_path": "/eMgjGSc1ibI15ElFmD76JfoFZz9.jpg"
+        },
+        {
+          "tmdbid": 125731,
+          "name": "Season 1",
+          "air_date": "2024-11-17T00:00:00.000Z",
+          "episode_count": 6,
+          "season_number": 1,
+          "tomatofresh": null,
+          "poster_path": "/pgrv9C8qLjLll58CGosCwBa7VoH.jpg"
+        },
+        {
+          "tmdbid": 484478,
+          "name": "Season 2",
+          "air_date": null,
+          "episode_count": 8,
+          "season_number": 2,
+          "tomatofresh": null,
+          "poster_path": "/tEf8XSW9DN4RNxKlL0YOFtiXIZm.jpg"
+        }
+      ]
+    },
+    {
+      "id": 4539979,
+      "title": "Dune Dreams",
+      "year": 2021,
+      "released": "2021-06-02",
+      "description": "In the wake of his wife’s death, Simon tries to make a fresh start by moving with his son Camille to Dubai. In that extraordinary city, Camille manages to forget, let go, and begin a new life. But for Simon, it’s not so easy. He begins to feel an alarming presence in their home - someone quietly, patiently lurking in the shadows. Could it really be his double? Simon slowly succumbs to anxiety and thinks he is going mad. But he’s not the only one to feel threatened this way. It seems to be happening to all people in Dubai who refuse to cut off all ties to their past.",
+      "tagline": null,
+      "runtime": 103,
+      "budget": null,
+      "revenue": null,
+      "score": 0,
+      "score_average": 0,
+      "ids": {
+        "imdb": "tt11018038",
+        "trakt": 652128,
+        "tmdb": 818926,
+        "tvdb": null,
+        "mal": null,
+        "mdblist": "2pb2j"
+      },
+      "type": "movie",
+      "updated": "2026-11-04T00:27:44.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 5.2,
+          "score": 52,
+          "votes": 53,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/dune-dreams"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 51,
+          "score": 51,
+          "votes": 6,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null,
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "tmdb",
+          "value": 49,
+          "score": 49,
+          "votes": 8,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/film/dune-dreams/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 14,
+          "title": "Mystery"
+        },
+        {
+          "id": 21,
+          "title": "Thriller"
+        },
+        {
+          "id": 8,
+          "title": "Fantasy"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [
+        {
+          "id": 36321,
+          "name": "Avenue B Productions"
+        },
+        {
+          "id": 49473,
+          "name": "Frakas Productions"
+        }
+      ],
+      "language": "fr",
+      "spoken_language": "fr",
+      "country": "be",
+      "certification": "NR",
+      "commonsense": null,
+      "age_rating": null,
+      "commonsense_media": {},
+      "awards": null,
+      "status": "released",
+      "trailer": null,
+      "poster": "https://image.tmdb.org/t/p/original/5UI57QaaKArOx7vUrmHQ8symLPj.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/nWiKdO1ZQVJ1N6NhAhjhrF6mVTB.jpg"
+    },
+    {
+      "id": 59437,
+      "title": "Dune",
+      "year": 2021,
+      "released": "2021-09-15",
+      "description": "Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe to ensure the future of his family and his people. As malevolent forces explode into conflict over the planet's exclusive supply of the most precious resource in existence - a commodity capable of unlocking humanity's greatest potential - only those who can conquer their fear will survive.",
+      "tagline": "It begins.",
+      "runtime": 155,
+      "budget": 165000000,
+      "revenue": 410668500,
+      "score": 81,
+      "score_average": 81,
+      "ids": {
+        "imdb": "tt1160419",
+        "trakt": 287071,
+        "tmdb": 438631,
+        "tvdb": 6187,
+        "mal": null,
+        "mdblist": "19v1"
+      },
+      "type": "movie",
+      "updated": "2026-11-12T21:41:09.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 8.0,
+          "score": 80,
+          "votes": 1102067,
+          "url": 71
+        },
+        {
+          "source": "metacritic",
+          "value": 74,
+          "score": 74,
+          "votes": 68,
+          "url": "/dune-part-one"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 7.9,
+          "score": 79.0,
+          "votes": 2265,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 81,
+          "score": 81,
+          "votes": 67048,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": 83,
+          "score": 83,
+          "votes": 512,
+          "url": "/m/dune_2021",
+          "fresh": 1
+        },
+        {
+          "source": "popcorn",
+          "value": 90,
+          "score": 90,
+          "votes": 5000,
+          "url": "/m/dune_2021"
+        },
+        {
+          "source": "tmdb",
+          "value": 77,
+          "score": 77,
+          "votes": 15945,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 7.8,
+          "score": 78,
+          "votes": 4613936,
+          "url": "/film/dune-2021/"
+        },
+        {
+          "source": "rogerebert",
+          "value": 3.5,
+          "score": null,
+          "votes": null,
+          "url": "dune-movie-review-2021"
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 363,
+          "name": "TNT"
+        },
+        {
+          "id": 506,
+          "name": "TBS"
+        },
+        {
+          "id": 507,
+          "name": "tru TV"
+        },
+        {
+          "id": 538,
+          "name": "Plex"
+        },
+        {
+          "id": 1825,
+          "name": "HBO Max Amazon Channel"
+        },
+        {
+          "id": 1899,
+          "name": "HBO Max"
+        },
+        {
+          "id": 2528,
+          "name": "YouTube TV"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 923,
+          "name": "Legendary Entertainment"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "M",
+      "commonsense": true,
+      "age_rating": 13,
+      "commonsense_media": {
+        "common_sense": 13,
+        "common_sense_selection": false,
+        "parental_source": 1,
+        "parental_violence": 3,
+        "parental_nudity": 2,
+        "parental_language": 3,
+        "parental_drinking": 2
+      },
+      "awards": "Won: Best Achievement in Cinematography (Oscars, 2022). Plus 5 more Oscars, 4 Oscar nominations, 6 wins & 8 nominations.",
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=w0HgHet0sxg",
+      "poster": "https://image.tmdb.org/t/p/original/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/qVgZu5BTx6pu4owCvVOm4zjTfOi.jpg"
+    },
+    {
+      "id": 901601,
+      "title": "Dune Drifter",
+      "year": 2020,
+      "released": "2020-10-24",
+      "description": "When the trainee pilot and her mortally wounded gunner are shot down, they crash land on a nearby planet. An enemy craft offers the chance of spare parts to fix her ship, but then she spots another survivor - an enemy alien soldier with no intention of letting her escape.",
+      "tagline": null,
+      "runtime": 98,
+      "budget": 1200000,
+      "revenue": null,
+      "score": 34,
+      "score_average": 50,
+      "ids": {
+        "imdb": "tt11835714",
+        "trakt": 585356,
+        "tmdb": 744738,
+        "tvdb": 147325,
+        "mal": null,
+        "mdblist": "jboh"
+      },
+      "type": "movie",
+      "updated": "2026-11-01T05:05:23.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 3.6,
+          "score": 36,
+          "votes": 1737,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/khodiashchii-po-diunam"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 48,
+          "score": 48,
+          "votes": 206,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/dune_drifter",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 62,
+          "score": 62,
+          "votes": 31,
+          "url": "/m/dune_drifter"
+        },
+        {
+          "source": "tmdb",
+          "value": 46,
+          "score": 46,
+          "votes": 57,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 5.8,
+          "score": 58,
+          "votes": 538,
+          "url": "/film/dune-drifter/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 9,
+          "name": "Amazon Prime Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 212,
+          "name": "Hoopla"
+        },
+        {
+          "id": 538,
+          "name": "Plex"
+        },
+        {
+          "id": 613,
+          "name": "Amazon Prime Video Free with Ads"
+        },
+        {
+          "id": 1898,
+          "name": "Amazon MX Player"
+        },
+        {
+          "id": 2100,
+          "name": "Amazon Prime Video with Ads"
+        },
+        {
+          "id": 2409,
+          "name": "Fawesome"
+        },
+        {
+          "id": 2533,
+          "name": "Mometu"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 111964,
+          "name": "Dead Pixel Productions"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "GB",
+      "certification": "MA 15+",
+      "commonsense": null,
+      "age_rating": 17,
+      "commonsense_media": {
+        "common_sense": 17,
+        "common_sense_selection": null,
+        "parental_source": null,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=_7q1l0ohQQM",
+      "poster": "https://image.tmdb.org/t/p/original/hBLJzYriF9zZAHc2Gjb3KTQGTGT.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/vFU53Ue7s2RflLl7wBjTZmRpivb.jpg"
+    },
+    {
+      "id": 4660073,
+      "title": "Dune",
+      "year": 2020,
+      "released": "2020-06-15",
+      "description": "Sounds as witnesses. They blurr into memories, half-dreams, it is undecided if they are real or not. A fluctuation between imagination and reality.",
+      "tagline": null,
+      "runtime": 4,
+      "budget": null,
+      "revenue": null,
+      "score": 44,
+      "score_average": 73,
+      "ids": {
+        "imdb": "tt12451788",
+        "trakt": 541097,
+        "tmdb": 697620,
+        "tvdb": null,
+        "mal": null,
+        "mdblist": "2rvqh"
+      },
+      "type": "movie",
+      "updated": "2026-10-31T01:46:10.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 6.5,
+          "score": 65,
+          "votes": 88,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/dune-2020"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 86,
+          "score": 86,
+          "votes": 214,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null,
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "tmdb",
+          "value": 74,
+          "score": 74,
+          "votes": 37,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 7.0,
+          "score": 70,
+          "votes": 1372,
+          "url": "/film/dune-2020-1/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 24,
+          "title": "Animation"
+        },
+        {
+          "id": 14,
+          "title": "Mystery"
+        },
+        {
+          "id": 21,
+          "title": "Thriller"
+        },
+        {
+          "id": 17,
+          "title": "Short"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [
+        {
+          "id": 132865,
+          "name": "Kecskemétfilm"
+        }
+      ],
+      "language": "hu",
+      "spoken_language": "xx",
+      "country": "hu",
+      "certification": "NR",
+      "commonsense": null,
+      "age_rating": null,
+      "commonsense_media": {},
+      "awards": null,
+      "status": "released",
+      "trailer": null,
+      "poster": "https://image.tmdb.org/t/p/original/CecUPdnnP22wV1NoRFQaG231zj.jpg",
+      "backdrop": null
+    },
+    {
+      "id": 4644761,
+      "title": "Dune World",
+      "year": 2021,
+      "released": "2021-08-08",
+      "description": "A deep space crew takes a job on a mysterious remote planet. A crash landing strands them on the hostile surface. Soon they find out what creatures live there, and the hidden fate of the crew before them.",
+      "tagline": "We don't belong out here.",
+      "runtime": 70,
+      "budget": null,
+      "revenue": null,
+      "score": 0,
+      "score_average": 41,
+      "ids": {
+        "imdb": "tt14450978",
+        "trakt": 673479,
+        "tmdb": 843281,
+        "tvdb": null,
+        "mal": null,
+        "mdblist": "2rjx5"
+      },
+      "type": "movie",
+      "updated": "2026-10-18T07:33:58.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 1.4,
+          "score": 14,
+          "votes": 526,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/dune-world"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 28,
+          "score": 28,
+          "votes": 35,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/dune_world",
+          "fresh": 1
+        },
+        {
+          "source": "popcorn",
+          "value": 90,
+          "score": 90,
+          "votes": null,
+          "url": "/m/dune_world"
+        },
+        {
+          "source": "tmdb",
+          "value": 26,
+          "score": 26,
+          "votes": 7,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 5.0,
+          "score": 50,
+          "votes": 289,
+          "url": "/film/dune-world/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 8,
+          "title": "Fantasy"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 212,
+          "name": "Hoopla"
+        },
+        {
+          "id": 1963,
+          "name": "Xumo Play"
+        },
+        {
+          "id": 2555,
+          "name": "Bloodstream"
+        },
+        {
+          "id": 2555,
+          "name": "Bloodstream"
+        },
+        {
+          "id": 2555,
+          "name": "Bloodstream"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 64599,
+          "name": "SRS Cinema"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "us",
+      "certification": "NR",
+      "commonsense": null,
+      "age_rating": null,
+      "commonsense_media": {},
+      "awards": null,
+      "status": "released",
+      "trailer": "https://youtube.com/watch?v=dLWRqcVx0Cw",
+      "poster": "https://image.tmdb.org/t/p/original/ztRN5ng5g2FSGjt1WexuFuRESgM.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/T6jRmCIYoHcTj1i0cmkueurkZw.jpg"
+    },
+    {
+      "id": 948505,
+      "title": "Dune: Part Two",
+      "year": 2024,
+      "released": "2024-02-27",
+      "description": "Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, Paul endeavors to prevent a terrible future only he can foresee.",
+      "tagline": "Long live the fighters.",
+      "runtime": 167,
+      "budget": 190000000,
+      "revenue": 714844358,
+      "score": 86,
+      "score_average": 86,
+      "ids": {
+        "imdb": "tt15239678",
+        "trakt": 537449,
+        "tmdb": 693134,
+        "tvdb": 290272,
+        "mal": null,
+        "mdblist": "kbvd"
+      },
+      "type": "movie",
+      "updated": "2026-11-11T14:49:58.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 8.4,
+          "score": 84,
+          "votes": 805923,
+          "url": 119
+        },
+        {
+          "source": "metacritic",
+          "value": 79,
+          "score": 79,
+          "votes": 62,
+          "url": "/dune-part-two"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 8.4,
+          "score": 84.0,
+          "votes": 1763,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 86,
+          "score": 86,
+          "votes": 52570,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": 92,
+          "score": 92,
+          "votes": 466,
+          "url": "/m/dune_part_two",
+          "fresh": 1
+        },
+        {
+          "source": "popcorn",
+          "value": 95,
+          "score": 95,
+          "votes": 5000,
+          "url": "/m/dune_part_two"
+        },
+        {
+          "source": "tmdb",
+          "value": 81,
+          "score": 81,
+          "votes": 8962,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 8.8,
+          "score": 88,
+          "votes": 3781996,
+          "url": "/film/dune-part-two/"
+        },
+        {
+          "source": "rogerebert",
+          "value": 3.5,
+          "score": null,
+          "votes": null,
+          "url": "dune-part-two-movie-review-2024"
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 486,
+          "name": "Spectrum On Demand"
+        },
+        {
+          "id": 538,
+          "name": "Plex"
+        },
+        {
+          "id": 1825,
+          "name": "HBO Max Amazon Channel"
+        },
+        {
+          "id": 1899,
+          "name": "HBO Max"
+        },
+        {
+          "id": 2528,
+          "name": "YouTube TV"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 923,
+          "name": "Legendary Entertainment"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "M",
+      "commonsense": true,
+      "age_rating": 13,
+      "commonsense_media": {
+        "common_sense": 13,
+        "common_sense_selection": false,
+        "parental_source": 1,
+        "parental_violence": 3,
+        "parental_nudity": 2,
+        "parental_language": 3,
+        "parental_drinking": 2
+      },
+      "awards": "Won: Best Achievement in Visual Effects (Oscars, 2025). Plus 1 more Oscar, 3 Oscar nominations, 2 wins & 6 nominations.",
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=U2Qp5pL3ovA",
+      "poster": "https://image.tmdb.org/t/p/original/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/eZ239CUp1d6OryZEBPnO2n87gMG.jpg"
+    },
+    {
+      "id": 4744801,
+      "title": "Planet Dune",
+      "year": 2021,
+      "released": "2021-10-29",
+      "description": "A crew on a mission to rescue a marooned base on a desert planet turns deadly when the crew finds themselves hunted and attacked by the planet’s apex predators: giant sand worms.",
+      "tagline": "Their mission... was doomed to fail.",
+      "runtime": 86,
+      "budget": null,
+      "revenue": null,
+      "score": 27,
+      "score_average": 36,
+      "ids": {
+        "imdb": "tt15331462",
+        "trakt": 705826,
+        "tmdb": 881460,
+        "tvdb": 290061,
+        "mal": null,
+        "mdblist": "2tp41"
+      },
+      "type": "movie",
+      "updated": "2026-11-07T16:40:55.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 2.5,
+          "score": 25,
+          "votes": 1365,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/sha-qiu-xing-qiu"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 39,
+          "score": 39,
+          "votes": 177,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/planet_dune",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": 29,
+          "score": 29,
+          "votes": 50,
+          "url": "/m/planet_dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 50,
+          "score": 50,
+          "votes": 73,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 3.8,
+          "score": 38,
+          "votes": 1155,
+          "url": "/film/planet-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 11,
+          "title": "Horror"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 9,
+          "name": "Amazon Prime Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        },
+        {
+          "id": 83,
+          "name": "The CW"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 207,
+          "name": "The Roku Channel"
+        },
+        {
+          "id": 212,
+          "name": "Hoopla"
+        },
+        {
+          "id": 300,
+          "name": "Pluto TV"
+        },
+        {
+          "id": 332,
+          "name": "Fandango at Home Free"
+        },
+        {
+          "id": 538,
+          "name": "Plex"
+        },
+        {
+          "id": 2100,
+          "name": "Amazon Prime Video with Ads"
+        },
+        {
+          "id": 2409,
+          "name": "Fawesome"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 162087,
+          "name": "Atomic Blonde Entertainment"
+        },
+        {
+          "id": 1311,
+          "name": "The Asylum"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "16",
+      "commonsense": null,
+      "age_rating": 17,
+      "commonsense_media": {
+        "common_sense": 17,
+        "common_sense_selection": null,
+        "parental_source": null,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=ZwVZ-2WuJo4",
+      "poster": "https://image.tmdb.org/t/p/original/cPSPghn6tr6fGY6hTi78SrxBcqY.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/3BBwgGaZmM8KqEdCqovoTwLQHBY.jpg"
+    },
+    {
+      "id": 4280,
+      "title": "Jodorowsky's Dune",
+      "year": 2013,
+      "released": "2013-08-30",
+      "description": "In 1974, Chilean-French director Alejandro Jodorowsky embarked on the quixotic project of adapting Frank Herbert's influential novel Dune (1969) for the big screen. After investing two years, and millions of dollars, the gigantic project ended in failure; but the artists Jodorowsky brought together to carry it out continued to work together, and ended up laying the foundations for modern science fiction cinema.",
+      "tagline": "What is to give light must endure burning",
+      "runtime": 87,
+      "budget": null,
+      "revenue": 662736,
+      "score": 82,
+      "score_average": 82,
+      "ids": {
+        "imdb": "tt1935156",
+        "trakt": 119793,
+        "tmdb": 191720,
+        "tvdb": 11001,
+        "mal": null,
+        "mdblist": "3aw"
+      },
+      "type": "movie",
+      "updated": "2026-10-24T00:46:17.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 8.0,
+          "score": 80,
+          "votes": 29640,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": 79,
+          "score": 79,
+          "votes": 31,
+          "url": "/jodorowskys-dune"
+        },
+        {
+          "source": "metacriticuser",
+          "value": 8.2,
+          "score": 82.0,
+          "votes": 71,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 78,
+          "score": 78,
+          "votes": 1464,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": 97,
+          "score": 97,
+          "votes": 116,
+          "url": "/m/jodorowskys_dune",
+          "fresh": 1
+        },
+        {
+          "source": "popcorn",
+          "value": 89,
+          "score": 89,
+          "votes": 334,
+          "url": "/m/jodorowskys_dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 78,
+          "score": 78,
+          "votes": 789,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": 8.0,
+          "score": 80,
+          "votes": 65919,
+          "url": "/film/jodorowskys-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": 3.0,
+          "score": null,
+          "votes": null,
+          "url": "jodorowskys-dune-2014"
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 5,
+          "title": "Documentary"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 235,
+          "name": "YouTube Free"
+        },
+        {
+          "id": 486,
+          "name": "Spectrum On Demand"
+        },
+        {
+          "id": 1825,
+          "name": "HBO Max Amazon Channel"
+        },
+        {
+          "id": 1899,
+          "name": "HBO Max"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 6454,
+          "name": "Caméra One"
+        },
+        {
+          "id": 14664,
+          "name": "Endless Picnic"
+        },
+        {
+          "id": 7787,
+          "name": "Snowfort Pictures"
+        },
+        {
+          "id": 664,
+          "name": "City Film"
+        }
+      ],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "FR",
+      "certification": "M",
+      "commonsense": false,
+      "age_rating": 13,
+      "commonsense_media": {
+        "common_sense": 13,
+        "common_sense_selection": null,
+        "parental_source": 2,
+        "parental_violence": 2,
+        "parental_nudity": 3,
+        "parental_language": 2,
+        "parental_drinking": 2
+      },
+      "awards": "Nominated: Cannes, 2013.",
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=Q-oBEGF7uwE",
+      "poster": "https://image.tmdb.org/t/p/original/maxjevZcGbfrp55XRk4gcZGeJVd.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/xfC6hsmcsnf2MY1iXDs56gJNfQZ.jpg"
+    },
+    {
+      "id": 104572,
+      "title": "The Dune",
+      "year": 2014,
+      "released": "2014-08-13",
+      "description": "Through the course of several accidents and chance encounters, Hanoch and Ruben will meet and each of them will have to face a page of his personal history, a page that they both need to turn for good.",
+      "tagline": null,
+      "runtime": 86,
+      "budget": null,
+      "revenue": 57993,
+      "score": 13,
+      "score_average": 59,
+      "ids": {
+        "imdb": "tt2251648",
+        "trakt": 169658,
+        "tmdb": 271683,
+        "tvdb": 86332,
+        "mal": null,
+        "mdblist": "28os"
+      },
+      "type": "movie",
+      "updated": "2026-11-04T03:33:59.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 6.8,
+          "score": 68,
+          "votes": 296,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/la-dune"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 56,
+          "score": 56,
+          "votes": 3,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/la_dune",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/la_dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 55,
+          "score": 55,
+          "votes": 21,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/film/the-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 6,
+          "title": "Drama"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        }
+      ],
+      "production_companies": [
+        {
+          "id": 2426,
+          "name": "Les Films du Poisson"
+        },
+        {
+          "id": 15,
+          "name": "Lama Films"
+        },
+        {
+          "id": 30233,
+          "name": "Cinémage"
+        },
+        {
+          "id": 41258,
+          "name": "Région Aquitaine"
+        },
+        {
+          "id": 24477,
+          "name": "Rabinovich Film Fund Cinema Project"
+        },
+        {
+          "id": 65060,
+          "name": "La Banque postale Image"
+        },
+        {
+          "id": 310,
+          "name": "CNC"
+        },
+        {
+          "id": 11246,
+          "name": "Région Ile-de-France"
+        }
+      ],
+      "language": "fr",
+      "spoken_language": "fr",
+      "country": "IL",
+      "certification": "NR",
+      "commonsense": null,
+      "age_rating": null,
+      "commonsense_media": {},
+      "awards": null,
+      "status": "Released",
+      "trailer": "https://www.youtube.com/watch?v=0SIJqwkLuKw",
+      "poster": "https://image.tmdb.org/t/p/original/qNnFzvRyXk0FkHOGuxS4jWqj1vO.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/3HpMbtAvtxn2CWlKHWi5lM8jVGC.jpg"
+    },
+    {
+      "id": 4793027,
+      "title": "Devil In Dune",
+      "year": 2021,
+      "released": "2021-12-03",
+      "description": "In the near future which the earth is irreversibly sandy, as human emissions and rubbish exceed its carrying capacity. As plants and animals mutate to create the Earth's new masters, the \"sand worms\", which are slaughtering the planet and driving humans to the brink of extinction, the survivors are left to their own devices to find the only remaining refuge in the deep desert, the \"Oasis\". An exiled team of wealthy businessmen, scientists, security chiefs, mechanic families and gangsters set out on an adventure to find the Oasis in a special armored vehicle, but the bloodthirsty insects are hot on their heels.",
+      "tagline": null,
+      "runtime": 78,
+      "budget": null,
+      "revenue": null,
+      "score": 12,
+      "score_average": 52,
+      "ids": {
+        "imdb": "tt23780438",
+        "trakt": 730013,
+        "tmdb": 911972,
+        "tvdb": null,
+        "mal": null,
+        "mdblist": "2uqbn"
+      },
+      "type": "movie",
+      "updated": "2026-11-11T07:12:56.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 3.7,
+          "score": 37,
+          "votes": 68,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 53,
+          "score": 53,
+          "votes": 8,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/devil_in_dune",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/devil_in_dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 67,
+          "score": 67,
+          "votes": 18,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/film/devil-in-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 1,
+          "title": "Action"
+        },
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 67,
+          "title": "Sci-Fi"
+        },
+        {
+          "id": 21,
+          "title": "Thriller"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 503,
+          "name": "Hi-YAH"
+        },
+        {
+          "id": 2403,
+          "name": "Hi-YAH Amazon Channel"
+        }
+      ],
+      "production_companies": [],
+      "language": "zh",
+      "spoken_language": "zh",
+      "country": "CN",
+      "certification": "16",
+      "commonsense": null,
+      "age_rating": 17,
+      "commonsense_media": {
+        "common_sense": 17,
+        "common_sense_selection": null,
+        "parental_source": null,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "released",
+      "trailer": null,
+      "poster": "https://image.tmdb.org/t/p/original/nQLdzYYB71sUugtSR7e7YdjF6Vx.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/pyw45YPB9Mk01zQiAnvfIdUFYQo.jpg"
+    },
+    {
+      "id": 5312337,
+      "title": "Dune: Part Three",
+      "year": 2026,
+      "released": "2026-12-15",
+      "description": "Nearly two decades after he seized control of the Imperium, Paul Atreides is now a ruthless Emperor, and must face the consequences of his reign as old allies return, terrifying new threats emerge, and betrayal lurks in every shadow. Haunted by visions of Imperial collapse and the reappearance of his long-lost love, Paul is drawn into a sweeping conspiracy, with Chani at the heart of its unfolding mystery. As enemies close in, Paul must confront the true cost of power and the fate of those he loves the most.",
+      "tagline": "The epic conclusion.",
+      "runtime": 150,
+      "budget": 200000000,
+      "revenue": null,
+      "score": 0,
+      "score_average": 0,
+      "ids": {
+        "imdb": "tt31378509",
+        "trakt": 943606,
+        "tmdb": 1170608,
+        "tvdb": 356047,
+        "mal": null,
+        "mdblist": "35v0x"
+      },
+      "type": "movie",
+      "updated": "2026-11-11T16:13:52.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": 73
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 78,
+          "score": 78,
+          "votes": 137,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/dune_part_three",
+          "fresh": 1
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/dune_part_three"
+        },
+        {
+          "source": "tmdb",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/film/dune-part-three/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 16,
+          "title": "Science Fiction"
+        },
+        {
+          "id": 25,
+          "title": "Adventure"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [
+        {
+          "id": 923,
+          "name": "Legendary Entertainment"
+        },
+        {
+          "id": 6736,
+          "name": "Imagenation Abu Dhabi FZ"
+        }
+      ],
+      "language": "en",
+      "spoken_language": null,
+      "country": "US",
+      "certification": "M",
+      "commonsense": null,
+      "age_rating": 15,
+      "commonsense_media": {
+        "common_sense": 15,
+        "common_sense_selection": null,
+        "parental_source": null,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "Post Production",
+      "trailer": "https://www.youtube.com/watch?v=uJqaGLmZpGo",
+      "poster": "https://image.tmdb.org/t/p/original/glt0v4I89rMWstDNCaFXc5SNyO1.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/i5E9H7Ik0u61ylDDTbmUpTL3Yw.jpg"
+    },
+    {
+      "id": 6891396,
+      "title": "Be Dune Teen",
+      "year": 2025,
+      "released": "2025-12-05",
+      "description": "Abhay and Neha, an ordinary married couple, find their lives overturned when a routine checkup reveals they are expecting triplets.",
+      "tagline": null,
+      "runtime": 88,
+      "budget": null,
+      "revenue": null,
+      "score": 0,
+      "score_average": 0,
+      "ids": {
+        "imdb": "tt38999951",
+        "trakt": 310163,
+        "tmdb": 307531,
+        "tvdb": null,
+        "mal": null,
+        "mdblist": "43pfo"
+      },
+      "type": "show",
+      "updated": "2026-11-10T17:54:22.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 7.6,
+          "score": 76,
+          "votes": 27,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null,
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "tmdb",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 3,
+          "title": "Comedy"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        },
+        {
+          "id": 7,
+          "title": "Family"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [],
+      "production_companies": [],
+      "language": "mr",
+      "spoken_language": "mr",
+      "country": "in",
+      "certification": "NR",
+      "commonsense": false,
+      "age_rating": null,
+      "commonsense_media": {
+        "common_sense": null,
+        "common_sense_selection": null,
+        "parental_source": 4,
+        "parental_violence": null,
+        "parental_nudity": null,
+        "parental_language": null,
+        "parental_drinking": null
+      },
+      "awards": null,
+      "status": "Returning Series",
+      "trailer": null,
+      "poster": "https://image.tmdb.org/t/p/original/eP3sReaCV2BUkc4bEEslaCb0Kww.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/4t9gRAssk8Ol6sbdTWIcvT76Ebn.jpg",
+      "tvdbid": null,
+      "seasons": [
+        {
+          "tmdbid": 488050,
+          "name": "Season 1",
+          "air_date": "2025-12-05T00:00:00.000Z",
+          "episode_count": 5,
+          "season_number": 1,
+          "tomatofresh": null,
+          "poster_path": "/8G9jFq8uI4buni7SYOZU3c2Etc1.jpg"
+        }
+      ]
+    },
+    {
+      "id": 1630012,
+      "title": "The Sand Dune",
+      "year": 2018,
+      "released": "2018-11-01",
+      "description": "It only takes one look, one touch, one kiss to know you've met the one person who will change your life forever. Such is the case for young Jake and Aylin as they venture into The Sand Dune that one fateful evening.",
+      "tagline": null,
+      "runtime": 86,
+      "budget": null,
+      "revenue": null,
+      "score": 0,
+      "score_average": 50,
+      "ids": {
+        "imdb": "tt5288532",
+        "trakt": 503321,
+        "tmdb": 613359,
+        "tvdb": 318924,
+        "mal": null,
+        "mdblist": "yxq4"
+      },
+      "type": "movie",
+      "updated": "2026-10-07T15:16:19.000Z",
+      "ratings": [
+        {
+          "source": "imdb",
+          "value": 4.4,
+          "score": 44,
+          "votes": 202,
+          "url": 5000
+        },
+        {
+          "source": "metacritic",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/gezeiten-der-liebe"
+        },
+        {
+          "source": "metacriticuser",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "trakt",
+          "value": 56,
+          "score": 56,
+          "votes": 6,
+          "url": null
+        },
+        {
+          "source": "tomatoes",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/the_sand_dune",
+          "fresh": 0
+        },
+        {
+          "source": "popcorn",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/m/the_sand_dune"
+        },
+        {
+          "source": "tmdb",
+          "value": 49,
+          "score": 49,
+          "votes": 5,
+          "url": null
+        },
+        {
+          "source": "letterboxd",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": "/film/the-sand-dune/"
+        },
+        {
+          "source": "rogerebert",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        },
+        {
+          "source": "myanimelist",
+          "value": null,
+          "score": null,
+          "votes": null,
+          "url": null
+        }
+      ],
+      "genres": [
+        {
+          "id": 26,
+          "title": "Romance"
+        },
+        {
+          "id": 6,
+          "title": "Drama"
+        }
+      ],
+      "streams": [],
+      "watch_providers": [
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 2,
+          "name": "Apple TV Store"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 3,
+          "name": "Google Play Movies"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 7,
+          "name": "Fandango At Home"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 10,
+          "name": "Amazon Video"
+        },
+        {
+          "id": 73,
+          "name": "Tubi TV"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 192,
+          "name": "YouTube"
+        },
+        {
+          "id": 207,
+          "name": "The Roku Channel"
+        },
+        {
+          "id": 212,
+          "name": "Hoopla"
+        },
+        {
+          "id": 332,
+          "name": "Fandango at Home Free"
+        }
+      ],
+      "production_companies": [],
+      "language": "en",
+      "spoken_language": "en",
+      "country": "US",
+      "certification": "NR",
+      "commonsense": null,
+      "age_rating": null,
+      "commonsense_media": {},
+      "awards": null,
+      "status": "released",
+      "trailer": null,
+      "poster": "https://image.tmdb.org/t/p/original/sPDbOE2PMEer7JkFTP6df9Goabw.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/mgVzJWzEDYU8WmQyw6brLYqzmL0.jpg"
+    }
+  ]
+}

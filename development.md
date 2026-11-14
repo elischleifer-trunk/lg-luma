@@ -97,7 +97,7 @@ It does not execute the test suites. A desktop display is required; on headless 
 Backspace deletes while editing. Native Back uses SDL's webOS-specific keycode. Back dismisses
 the keyboard first; Weather Location then returns to its parent Location row, HDMI choices to
 that HDMI row, and the Background gallery to Background in the sidebar. Back from the sidebar
-focuses the Settings tab, then returns Home. The header holds Home, Apps and Settings, and at
+focuses the Settings tab, then returns Home. The header holds Search, Home, Apps and Settings, and at
 the right margin a search button (`Target::LgSearch`) that launches LG's own search app. It is
 shown only when `listApps` reports one: `platform::lg_search_app` takes the first known ID
 (`com.webos.app.search`, `…searchapp`, `…lgsearch`, `…searchviewer`), else any LG system app
@@ -1101,6 +1101,28 @@ Fresh Celsius readings are reused for 15 minutes; valid saved data lasts up to s
 failure retries after five minutes. Unit changes convert unrounded cached Celsius immediately.
 Removing a city clears its cache. The `.weather.json` sidecar uses Unix-seconds timestamps.
 Mock servers accept only literal loopback HTTP origins and are refused in TV builds.
+
+The Search tab (tab index 3, `state::SEARCH_TAB`, drawn left of Home so the other tabs keep their
+indices) turns into the search field and opens the keyboard (`TextField::Titles`). Its search
+follows `title_query` once a Movie of the Night key is stored. The selected result is shown at
+the top in four short lines, so two rows of posters fit below, with its US rating from TMDB
+details fetched with `release_dates` or `content_ratings` appended (MDBList's certifications are
+not reliably American).
+`streaming::Incremental` waits for three characters and a 350 ms pause, answers repeats from
+memory and drops replies for text that has since changed. `streaming_search::Service` runs each
+search on its own worker thread, reading `streaming-keys.json` per search so new keys apply at
+once, and caches every API reply under `streaming-cache/` beside the preferences. OK launches the
+picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Posters come
+from the signed `cdn.movieofthenight.com` links in each result (no other host is fetched): three
+`posters` workers fetch them with the weather rules (timeout, no redirects or proxy, 1 MiB limit),
+keep the JPEG under `streaming-posters/` (48 MiB cap) keyed by the link without its signature,
+and decode it to card size. The renderer uploads each like a camera frame; State keeps decoded
+posters only for the current results. With an MDBList key, `mdblist` fetches review scores for
+a whole search in one `POST /imdb/any` batch by IMDb ID (one request of the free 1,000 a day),
+caches each title's scores for a week in `streaming-cache/`, and scrubs the key (a query
+parameter) from any error text. Captured replies are in `tests/fixtures/mdblist`. Scripted
+captures can wait with `await-titles`. Pre-filling `streaming-cache/` from
+`tests/fixtures/streaming` with a placeholder key renders results without network access.
 
 `assets/messages.json` supplies Dutch, English, French, German, Italian, Polish, Portuguese (Brazil),
 Russian, Simplified Chinese, Spanish, Swedish, Traditional Chinese and Vietnamese, including locale formatting

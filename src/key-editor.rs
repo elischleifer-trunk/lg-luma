@@ -93,6 +93,7 @@ impl Drop for Service {
 struct Change {
     motn: Option<String>,
     tmdb: Option<String>,
+    mdblist: Option<String>,
 }
 
 /// Applies a change without checking keys against their APIs.
@@ -104,6 +105,9 @@ fn apply(keys: &Keys, change: &Change) -> Result<Keys, String> {
     }
     if let Some(tmdb) = &change.tmdb {
         next.tmdb = clean(tmdb).map_err(|e| format!("TMDB: {e}"))?;
+    }
+    if let Some(mdblist) = &change.mdblist {
+        next.mdblist = clean(mdblist).map_err(|e| format!("MDBList: {e}"))?;
     }
     Ok(next)
 }
@@ -158,12 +162,20 @@ fn check_tmdb(keys: &Keys) -> Check {
     )
 }
 
+fn check_mdblist(keys: &Keys) -> Check {
+    let Some(client) = keys.mdblist() else {
+        return Check::Accepted;
+    };
+    classify(client.check())
+}
+
 /// Checks each changed key, then reports what the page should say. `Err` means nothing is saved.
 fn verify(
     current: &Keys,
     next: &Keys,
     motn: impl FnOnce(&Keys) -> Check,
     tmdb: impl FnOnce(&Keys) -> Check,
+    mdblist: impl FnOnce(&Keys) -> Check,
 ) -> Result<Vec<String>, String> {
     let mut warnings = Vec::new();
     let mut rejected = Vec::new();
@@ -177,6 +189,11 @@ fn verify(
             "TMDB",
             next.tmdb != current.tmdb && !next.tmdb.is_empty(),
             Box::new(tmdb),
+        ),
+        (
+            "MDBList",
+            next.mdblist != current.mdblist && !next.mdblist.is_empty(),
+            Box::new(mdblist),
         ),
     ] {
         if !changed {
@@ -205,6 +222,7 @@ fn listing(keys: &Keys) -> serde_json::Value {
     serde_json::json!({
         "motn": {"set": status.motn, "hint": mask(&keys.motn)},
         "tmdb": {"set": status.tmdb, "hint": mask(&keys.tmdb)},
+        "mdblist": {"set": status.mdblist, "hint": mask(&keys.mdblist)},
     })
 }
 
@@ -391,7 +409,7 @@ fn serve(
         Ok(next) => next,
         Err(error) => return error_response(stream, "422 Unprocessable Content", &error),
     };
-    let warnings = match verify(&current, &next, check_motn, check_tmdb) {
+    let warnings = match verify(&current, &next, check_motn, check_tmdb, check_mdblist) {
         Ok(warnings) => warnings,
         Err(error) => return error_response(stream, "422 Unprocessable Content", &error),
     };
@@ -428,6 +446,7 @@ mod tests {
         Keys {
             motn: motn.into(),
             tmdb: tmdb.into(),
+            mdblist: String::new(),
             home_assistant: false,
         }
     }
@@ -456,6 +475,7 @@ mod tests {
             &next,
             |_| panic!("unchanged Movie of the Night key was checked"),
             |_| Check::Accepted,
+            |_| panic!("unchanged MDBList key was checked"),
         )
         .unwrap();
         assert!(warnings.is_empty());
@@ -464,6 +484,7 @@ mod tests {
             &current,
             &keys("", TMDB),
             |_| panic!("checked a removed key"),
+            |_| panic!("checked an unchanged key"),
             |_| panic!("checked an unchanged key"),
         )
         .unwrap();
@@ -478,6 +499,7 @@ mod tests {
             &next,
             |_| Check::Rejected("You are not subscribed to this API.".into()),
             |_| Check::Accepted,
+            |_| Check::Accepted,
         )
         .unwrap_err();
         assert!(error.contains("Movie of the Night refused"), "{error}");
@@ -487,10 +509,24 @@ mod tests {
             &next,
             |_| Check::Accepted,
             |_| Check::Unchecked("Network error: timeout".into()),
+            |_| Check::Accepted,
         )
         .unwrap();
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].starts_with("Saved, but TMDB"), "{warnings:?}");
+        let next = Keys {
+            mdblist: "abcdefghijklmnopqrstuvwxy".into(),
+            ..Keys::default()
+        };
+        let error = verify(
+            &current,
+            &next,
+            |_| panic!("no Movie of the Night key"),
+            |_| panic!("no TMDB key"),
+            |_| Check::Rejected("Invalid API key".into()),
+        )
+        .unwrap_err();
+        assert!(error.contains("MDBList refused"), "{error}");
     }
 
     #[test]
@@ -519,7 +555,13 @@ mod tests {
 
     #[test]
     fn the_page_never_receives_a_key() {
-        let body = listing(&keys(MOTN, TMDB)).to_string();
+        let body = listing(&Keys {
+            mdblist: "abcdefghijklmnopqrstuvwxy".into(),
+            ..keys(MOTN, TMDB)
+        })
+        .to_string();
+        assert!(!body.contains("abcdefghijk"), "{body}");
+        assert!(body.contains("…vwxy"), "{body}");
         assert!(!body.contains("0123456789"), "{body}");
         assert!(!body.contains("signature"), "{body}");
         assert!(body.contains("…cdef") && body.contains("…ture"), "{body}");
