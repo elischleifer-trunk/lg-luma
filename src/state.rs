@@ -21,6 +21,16 @@ pub const INVENTORY_RETRY_DELAY: Duration = Duration::from_secs(2);
 pub const HOME_COLUMNS: usize = 6;
 pub const HOME_TILE_WIDTH: f32 = 256.;
 pub const HOME_TILE_PITCH: f32 = 281.6;
+/// Movie and show posters on the Search page, eight to a row under the selected title; two
+/// rows fit on screen.
+pub const TITLE_COLUMNS: usize = 8;
+/// The Search tab's index: drawn first, left of Home, but numbered after the original three
+/// tabs so Home, Apps and Settings keep their indices.
+pub const SEARCH_TAB: usize = 3;
+/// Tab indices in the order the header draws them, left to right.
+pub const TAB_ORDER: [usize; 4] = [SEARCH_TAB, 0, 1, 2];
+/// Where the Search page's poster grid starts, under the selected title.
+pub const SEARCH_GRID_TOP: f32 = 352.;
 pub const BACKGROUND_FADE: f32 = 0.4;
 pub const CYCLE_FADE: f32 = 1.6;
 
@@ -36,6 +46,8 @@ pub enum Page {
     Home,
     Apps,
     Settings,
+    /// Movies and shows: the search field in the header, the selected title, then posters.
+    Search,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -55,6 +67,8 @@ pub enum Target {
     ClearFilter,
     Search,
     ClearSearch,
+    /// A movie or show result on the Search page, by index into the streaming results.
+    Title(usize),
     Sidebar(usize),
     Setting(usize),
     Widget(usize),
@@ -198,6 +212,8 @@ pub enum Subpage {
 #[derive(Clone, Copy, Debug, PartialEq, Serialize)]
 pub enum TextField {
     Apps,
+    /// The Search tab's field: movies and shows.
+    Titles,
     Location,
     Name,
     InputName,
@@ -213,6 +229,7 @@ impl TextField {
             Self::Name => "greeting_name",
             Self::InputName => "input_name",
             Self::CameraName => "camera_name",
+            Self::Titles => "titles",
         }
     }
 }
@@ -233,6 +250,11 @@ pub enum Effect {
     /// Refresh apps: read the inventory and every app icon again.
     Reload,
     Launch(String),
+    /// Open a movie or show: its app, with launch parameters for the title when known.
+    LaunchTitle {
+        app: String,
+        params: Option<serde_json::Value>,
+    },
     Uninstall(String),
     DeleteWallpaper(String),
     Recent {
@@ -295,6 +317,15 @@ pub struct State {
     pub key_editor: Option<Result<crate::companion::Session, String>>,
     /// Which streaming search keys are stored (never the keys themselves).
     pub streaming_keys: crate::streaming_keys::Status,
+    /// What is typed in the Search tab's field.
+    pub title_query: String,
+    /// Movies and shows matching `title_query`, once a Movie of the Night key is stored.
+    pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
+    /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
+    pub posters: std::collections::HashMap<String, Option<std::sync::Arc<crate::cameras::Frame>>>,
+    /// Review scores for the shows in `titles`, by IMDb ID: None while loading. Only fetched
+    /// once an MDBList key is stored.
+    pub scores: std::collections::HashMap<String, Option<crate::mdblist::Scores>>,
     /// The HACS install link's QR code, made when its dialog opens.
     pub home_assistant_qr: Option<Result<crate::companion::Session, String>>,
     /// Where Home Assistant reaches this TV, once the listener is up.
@@ -358,6 +389,10 @@ impl State {
             tile_editor: None,
             key_editor: None,
             streaming_keys: Default::default(),
+            title_query: String::new(),
+            titles: Default::default(),
+            posters: Default::default(),
+            scores: Default::default(),
             home_assistant_qr: None,
             home_assistant_address: None,
             home_assistant_code: None,
@@ -552,6 +587,7 @@ impl State {
             Page::Home => 0,
             Page::Apps => 1,
             Page::Settings => 2,
+            Page::Search => SEARCH_TAB,
         }
     }
 
@@ -589,6 +625,7 @@ impl State {
         self.page = match index {
             1 => Page::Apps,
             2 => Page::Settings,
+            SEARCH_TAB => Page::Search,
             _ => Page::Home,
         };
         self.focus = Target::Nav(self.page_index());
@@ -600,6 +637,11 @@ impl State {
         self.subpage = None;
         self.panel_started = None;
         self.dirty = true;
+        if self.page == Page::Search {
+            // The field starts empty, as the TV keyboard does, and the keyboard comes up.
+            self.title_query.clear();
+            self.open_keyboard(TextField::Titles);
+        }
     }
 
     pub fn apps(&self) -> Vec<&App> {
@@ -736,6 +778,16 @@ impl State {
         Rect::new(content.x, 244.8, content.w, content.y + content.h - 244.8)
     }
 
+    /// The Search page's poster grid, which scrolls under the selected title.
+    pub fn search_viewport(&self) -> Rect {
+        Rect::new(
+            64.,
+            SEARCH_GRID_TOP - 16.,
+            1792.,
+            1080. - SEARCH_GRID_TOP + 16.,
+        )
+    }
+
     pub fn backgrounds_viewport(&self) -> Rect {
         let content = self.content_viewport();
         Rect::new(620., 244.8, 1160., content.y + content.h - 244.8)
@@ -750,6 +802,8 @@ impl State {
                     self.backgrounds_viewport()
                 } else if self.page == Page::Apps {
                     self.apps_viewport()
+                } else if self.page == Page::Search {
+                    self.search_viewport()
                 } else {
                     self.content_viewport()
                 };
@@ -827,7 +881,18 @@ impl State {
 
     /// Returns whether a newly reported console changed the saved preferences.
     pub fn set_inventory(&mut self, next: Inventory, warning: Option<String>) -> bool {
+        let apps_changed = self.inventory.apps.len() != next.apps.len()
+            || self
+                .inventory
+                .apps
+                .iter()
+                .zip(&next.apps)
+                .any(|(old, new)| old.id != new.id);
         self.inventory.apps = next.apps;
+        if apps_changed {
+            // Remembered movie and show results chose among the old apps.
+            self.titles.refresh(Instant::now());
+        }
         self.inventory.search = next.search;
         if self.focus == Target::LgSearch && self.inventory.search.is_none() {
             self.focus = Target::Nav(self.page_index());
@@ -951,6 +1016,13 @@ impl State {
                 .map(|app| Target::App(app.id.clone()))
                 .unwrap_or(Target::Filter(1)),
             Page::Settings => Target::Sidebar(0),
+            Page::Search => {
+                if self.titles.results.is_empty() {
+                    Target::Nav(SEARCH_TAB)
+                } else {
+                    Target::Title(0)
+                }
+            }
         }
     }
 
@@ -989,6 +1061,8 @@ impl State {
                     self.backgrounds_viewport().y + 8.
                 } else if self.page == Page::Apps {
                     self.apps_viewport().y + 8.
+                } else if self.page == Page::Search {
+                    self.search_viewport().y + 8.
                 } else {
                     120.8
                 };
@@ -1620,9 +1694,13 @@ impl State {
                 return vec![];
             }
             if let Target::Nav(index) = self.focus {
+                // Tabs in drawn order: Search, Home, Apps, Settings.
+                let position = TAB_ORDER.iter().position(|&tab| tab == index).unwrap_or(0);
                 let next = match direction {
-                    Direction::Left if index > 0 => Some(index - 1),
-                    Direction::Right if index < 2 => Some(index + 1),
+                    Direction::Left if position > 0 => Some(TAB_ORDER[position - 1]),
+                    Direction::Right if position + 1 < TAB_ORDER.len() => {
+                        Some(TAB_ORDER[position + 1])
+                    }
                     _ => None,
                 };
                 if let Some(next) = next {
@@ -1656,6 +1734,24 @@ impl State {
                     }
                     return vec![];
                 }
+            }
+            if self.page == Page::Search
+                && let Target::Title(index) = self.focus
+                && matches!(direction, Direction::Up | Direction::Down)
+            {
+                let count = self.titles.results.len();
+                let next = match direction {
+                    Direction::Up if index < TITLE_COLUMNS => Some(Target::Nav(SEARCH_TAB)),
+                    Direction::Up => Some(Target::Title(index - TITLE_COLUMNS)),
+                    Direction::Down if (index / TITLE_COLUMNS + 1) * TITLE_COLUMNS < count => {
+                        Some(Target::Title((index + TITLE_COLUMNS).min(count - 1)))
+                    }
+                    _ => None,
+                };
+                if let Some(next) = next {
+                    self.focus(next, controls);
+                }
+                return vec![];
             }
             if let Target::Background(index) = self.focus {
                 match direction {
@@ -2015,6 +2111,17 @@ impl State {
                 self.dirty = true;
                 return;
             }
+            if self.keyboard_field == TextField::Titles {
+                let length = self.title_query.chars().count();
+                self.title_query.extend(
+                    text.chars()
+                        .filter(|c| !c.is_control())
+                        .take(120usize.saturating_sub(length)),
+                );
+                self.scroll = 0.;
+                self.dirty = true;
+                return;
+            }
             self.query.extend(
                 text.chars()
                     .filter(|c| !c.is_control())
@@ -2037,6 +2144,8 @@ impl State {
                 self.input_name.pop();
             } else if self.keyboard_field == TextField::CameraName {
                 self.cameras.name_draft.pop();
+            } else if self.keyboard_field == TextField::Titles {
+                self.title_query.pop();
             } else {
                 self.query.pop();
             }
@@ -2179,6 +2288,9 @@ impl State {
             self.input_name = query;
         } else if self.keyboard_field == TextField::CameraName {
             self.cameras.name_draft = query;
+        } else if self.keyboard_field == TextField::Titles {
+            self.title_query = query;
+            self.scroll = 0.;
         } else {
             self.query = query;
             self.scroll = 0.;
@@ -2198,6 +2310,7 @@ impl State {
             TextField::InputName => self.input_name.clear(),
             TextField::CameraName => self.cameras.name_draft.clear(),
             TextField::Apps => self.query.clear(),
+            TextField::Titles => self.title_query.clear(),
         }
         self.text(text);
     }
@@ -2209,6 +2322,7 @@ impl State {
             TextField::InputName => &self.input_name,
             TextField::CameraName => &self.cameras.name_draft,
             TextField::Apps => &self.query,
+            TextField::Titles => &self.title_query,
         }
     }
     pub fn open_keyboard(&mut self, field: TextField) {
@@ -2236,6 +2350,7 @@ impl State {
                 TextField::InputName => Target::InputRename,
                 TextField::CameraName => Target::CameraRename,
                 TextField::Apps => Target::Search,
+                TextField::Titles => Target::Nav(SEARCH_TAB),
             };
             self.panel_started = None;
             self.dirty = true;
@@ -2269,7 +2384,152 @@ impl State {
                 .as_ref()
                 .map_or(Target::CameraGear, |(id, _)| Target::Camera(id.clone())),
             TextField::Apps => Target::Search,
+            TextField::Titles => Target::Nav(SEARCH_TAB),
         }
+    }
+
+    /// The TV's apps as streaming search ranks them: installed, recently used, favorites.
+    pub fn streaming_services(&self) -> crate::streaming::Services {
+        let installed: Vec<String> = self.inventory.apps.iter().map(|a| a.id.clone()).collect();
+        let recent: Vec<String> = self
+            .recents
+            .entries
+            .iter()
+            .map(|entry| entry.app.id.clone())
+            .collect();
+        let favorites = self.preferences.favorites(&self.inventory.apps);
+        crate::streaming::Services::new(&installed, &recent, &favorites)
+    }
+
+    /// Follows the Apps search text. Returns a search for the worker once typing pauses.
+    pub fn sync_titles(&mut self, now: Instant) -> Option<crate::streaming::Request> {
+        let text = if self.streaming_keys.motn {
+            self.title_query.as_str()
+        } else {
+            ""
+        };
+        if crate::streaming::normalize(text) != self.titles.query() {
+            self.titles.set_text(text, now);
+            self.reconcile_title_focus();
+            self.dirty = true;
+        }
+        let request = self.titles.due(now)?;
+        self.dirty = true;
+        Some(request)
+    }
+
+    /// A reply from the search worker.
+    pub fn accept_titles(
+        &mut self,
+        request: &crate::streaming::Request,
+        reply: Result<Vec<crate::streaming::Ranked>, String>,
+    ) {
+        if self.titles.accept(request, reply) {
+            self.reconcile_title_focus();
+            self.dirty = true;
+        }
+    }
+
+    /// Posters to fetch for the current results, or None when nothing changed. Posters of shows
+    /// no longer listed are dropped, so only the visible results hold decoded images.
+    pub fn poster_requests(&mut self) -> Option<Vec<crate::posters::Request>> {
+        let before = self.posters.len();
+        let titles = &self.titles.results;
+        self.posters
+            .retain(|id, _| titles.iter().any(|result| &result.show.id == id));
+        let mut requests = Vec::new();
+        for result in titles {
+            let show = &result.show;
+            if self.posters.contains_key(&show.id) {
+                continue;
+            }
+            self.posters.insert(show.id.clone(), None);
+            if let Some(url) = crate::posters::url(show) {
+                requests.push(crate::posters::Request {
+                    show_id: show.id.clone(),
+                    url: url.to_owned(),
+                });
+            }
+        }
+        (self.posters.len() != before || !requests.is_empty()).then_some(requests)
+    }
+
+    /// IMDb IDs whose scores to fetch for the current results, in one batch, or None when
+    /// there are none. Scores of shows no longer listed are dropped.
+    pub fn score_requests(&mut self) -> Option<Vec<String>> {
+        let titles = &self.titles.results;
+        self.scores
+            .retain(|id, _| titles.iter().any(|result| &result.show.imdb_id == id));
+        if !self.streaming_keys.mdblist {
+            return None;
+        }
+        let mut wanted = Vec::new();
+        for result in titles {
+            let id = &result.show.imdb_id;
+            if crate::mdblist::valid_imdb_id(id) && !self.scores.contains_key(id) {
+                self.scores.insert(id.clone(), None);
+                wanted.push(id.clone());
+            }
+        }
+        (!wanted.is_empty()).then_some(wanted)
+    }
+
+    pub fn accept_scores(&mut self, reply: crate::mdblist::Reply) {
+        for (id, scores) in reply {
+            if let Some(slot) = self.scores.get_mut(&id) {
+                *slot = Some(scores);
+                self.dirty = true;
+            }
+        }
+    }
+
+    pub fn accept_poster(
+        &mut self,
+        show_id: &str,
+        poster: Option<std::sync::Arc<crate::cameras::Frame>>,
+    ) {
+        if let Some(slot) = self.posters.get_mut(show_id) {
+            *slot = poster;
+            self.dirty = true;
+        }
+    }
+
+    /// The result shown at the top of the Search page: the focused one, else the first.
+    pub fn selected_title(&self) -> Option<&crate::streaming::Ranked> {
+        let index = match self.focus {
+            Target::Title(index) => index,
+            _ => 0,
+        };
+        self.titles.results.get(index)
+    }
+
+    /// Keeps focus on a result that still exists after the results change.
+    fn reconcile_title_focus(&mut self) {
+        if let Target::Title(index) = self.focus {
+            let count = self.titles.results.len();
+            if index >= count {
+                self.focus = if count > 0 {
+                    Target::Title(count - 1)
+                } else {
+                    self.first_content()
+                };
+            }
+        }
+    }
+
+    fn launch_title(&mut self, index: usize) -> Vec<Effect> {
+        let Some(result) = self.titles.results.get(index) else {
+            return vec![];
+        };
+        let Some(pick) = &result.pick else {
+            self.notify(self.preferences.language.t("titleNotOnApps"));
+            return vec![];
+        };
+        let params = crate::deeplink::launch(&pick.service_id, &pick.link).map(|l| l.params);
+        vec![Effect::LaunchTitle {
+            app: pick.app_id.clone(),
+            params,
+        }]
     }
 
     pub fn activate(&mut self) -> Vec<Effect> {
@@ -2298,6 +2558,10 @@ impl State {
             return self.send_tile(tile);
         }
         match self.focus.clone() {
+            // On the Search page, OK on its own tab (the field) brings the keyboard back.
+            Target::Nav(SEARCH_TAB) if self.page == Page::Search => {
+                self.open_keyboard(TextField::Titles)
+            }
             Target::Nav(index) => self.open(index),
             Target::Browse => self.open(1),
             Target::Retry => return vec![Effect::Reload],
@@ -2321,6 +2585,7 @@ impl State {
                     return vec![Effect::Launch(id)];
                 }
             }
+            Target::Title(index) if !self.launching => return self.launch_title(index),
             Target::App(_) if self.page == Page::Apps && !self.launching => self.options(),
             Target::App(id) if !self.launching => {
                 return vec![Effect::Launch(id)];
@@ -2841,6 +3106,7 @@ impl State {
                     TextField::InputName => self.input_name.clear(),
                     TextField::CameraName => self.cameras.name_draft.clear(),
                     TextField::Apps => self.query.clear(),
+                    TextField::Titles => self.title_query.clear(),
                 },
                 "Done" => {
                     self.overlay = None;
@@ -2952,6 +3218,11 @@ impl State {
         if self.page == Page::Apps && matches!(self.focus, Target::Search | Target::ClearSearch) {
             self.query.clear();
             self.focus = Target::Nav(1);
+            self.scroll = 0.;
+            return vec![];
+        }
+        if self.page == Page::Search && matches!(self.focus, Target::Title(_)) {
+            self.focus = Target::Nav(SEARCH_TAB);
             self.scroll = 0.;
             return vec![];
         }

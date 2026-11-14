@@ -54,20 +54,23 @@
       },
       "streaming_keys": {
         "title": "Streaming search keys",
-        "description": "Luma's search uses Movie of the Night to find where a show streams and TMDB to rank results. Keys are checked when you submit, then kept in sync with the TV.\n\nLeave a field empty to keep the key already on the TV.",
+        "description": "Luma's search uses Movie of the Night to find where a show streams, TMDB to rank results and, optionally, MDBList for Rotten Tomatoes and IMDb scores. Keys are checked when you submit, then kept in sync with the TV.\n\nLeave a field empty to keep the key already on the TV.",
         "data": {
           "motn_api_key": "Movie of the Night key",
-          "tmdb_read_access_token": "TMDB read access token"
+          "tmdb_read_access_token": "TMDB read access token",
+          "mdblist_api_key": "MDBList key (optional)"
         },
         "data_description": {
           "motn_api_key": "Get one at [Movie of the Night]({motn_url}). It starts with `motn-key-`. A RapidAPI Streaming Availability key also works.",
-          "tmdb_read_access_token": "The long **API Read Access Token** in your [TMDB API settings]({tmdb_url}), not the short API key."
+          "tmdb_read_access_token": "The long **API Read Access Token** in your [TMDB API settings]({tmdb_url}), not the short API key.",
+          "mdblist_api_key": "For review scores on each poster. Find it in [MDBList's preferences]({mdblist_url}) under API access."
         }
       }
     },
     "error": {
       "motn_refused": "Movie of the Night refused this key. Check it is complete and the subscription is active.",
-      "tmdb_refused": "TMDB refused this token. Use the API Read Access Token, not the API key."
+      "tmdb_refused": "TMDB refused this token. Use the API Read Access Token, not the API key.",
+      "mdblist_refused": "MDBList refused this key. Copy the whole key from mdblist.com → Preferences."
     }
   },
   "entity": {

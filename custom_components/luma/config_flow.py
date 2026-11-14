@@ -32,6 +32,7 @@ from .api import LumaApiError, LumaClient, LumaConnectionError, LumaError
 from .const import (
     CONF_DEVICE_ID,
     CONF_KEYBOARD_PHONES,
+    CONF_MDBLIST_KEY,
     CONF_MOTN_KEY,
     CONF_TMDB_TOKEN,
     CONF_TOKEN,
@@ -260,17 +261,23 @@ class LumaOptionsFlow(OptionsFlow):
         errors: dict[str, str] = {}
         current = self.config_entry.options
         if user_input is not None:
-            motn, tmdb = streaming_keys.keys(user_input)
-            old_motn, old_tmdb = streaming_keys.keys(current)
+            motn, tmdb, mdblist = streaming_keys.keys(user_input)
+            old_motn, old_tmdb, old_mdblist = streaming_keys.keys(current)
             # Only keys that changed are checked, so saving again costs no API calls.
             errors = await streaming_keys.check(
                 self.hass,
                 motn if motn != old_motn else "",
                 tmdb if tmdb != old_tmdb else "",
+                mdblist if mdblist != old_mdblist else "",
             )
             if not errors:
                 return self.async_create_entry(
-                    data={**current, CONF_MOTN_KEY: motn, CONF_TMDB_TOKEN: tmdb}
+                    data={
+                        **current,
+                        CONF_MOTN_KEY: motn,
+                        CONF_TMDB_TOKEN: tmdb,
+                        CONF_MDBLIST_KEY: mdblist,
+                    }
                 )
         values = user_input or current
         return self.async_show_form(
@@ -285,6 +292,10 @@ class LumaOptionsFlow(OptionsFlow):
                         CONF_TMDB_TOKEN,
                         description={"suggested_value": values.get(CONF_TMDB_TOKEN, "")},
                     ): SECRET,
+                    vol.Optional(
+                        CONF_MDBLIST_KEY,
+                        description={"suggested_value": values.get(CONF_MDBLIST_KEY, "")},
+                    ): SECRET,
                 }
             ),
             errors=errors,
@@ -292,5 +303,6 @@ class LumaOptionsFlow(OptionsFlow):
             description_placeholders={
                 "motn_url": "https://www.movieofthenight.com/about/api",
                 "tmdb_url": "https://www.themoviedb.org/settings/api",
+                "mdblist_url": "https://mdblist.com/preferences/",
             },
         )

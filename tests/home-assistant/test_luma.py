@@ -736,6 +736,8 @@ MOTN = "motn-key-0123456789abcdef"
 TMDB_KEY = "eyJhbGciOiJIUzI1NiJ9.e30.signature"
 MOTN_CHECK = "https://api.movieofthenight.com/v4/genres"
 TMDB_CHECK = "https://api.themoviedb.org/3/find/tt0087332?external_source=imdb_id"
+MDBLIST = "abcdefghij0123456789wxyz"
+MDBLIST_CHECK = "https://api.mdblist.com/user"
 
 
 def key_pushes(aioclient_mock: AiohttpClientMocker) -> list:
@@ -775,17 +777,41 @@ async def test_options_check_streaming_keys_then_send_them_to_the_tv(
     assert result["errors"] == {"motn_api_key": "motn_refused"}
     assert key_pushes(aioclient_mock) == []
 
+    # MDBList checks its key on the account endpoint, with the key as a query parameter.
     aioclient_mock.clear_requests()
-    aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
     aioclient_mock.get(MOTN_CHECK, json=[{"id": "action", "name": "Action"}])
     aioclient_mock.get(TMDB_CHECK, json={"movie_results": []})
+    aioclient_mock.get(MDBLIST_CHECK, status=401, json={"error": "Invalid API key"})
     result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
+        result["flow_id"],
+        {"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY, "mdblist_api_key": "wrong"},
+    )
+    assert result["errors"] == {"mdblist_api_key": "mdblist_refused"}
+    assert key_pushes(aioclient_mock) == []
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.put(
+        f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True, "mdblist": True}
+    )
+    aioclient_mock.get(MOTN_CHECK, json=[{"id": "action", "name": "Action"}])
+    aioclient_mock.get(TMDB_CHECK, json={"movie_results": []})
+    aioclient_mock.get(MDBLIST_CHECK, json={"api_requests": 1000})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY, "mdblist_api_key": MDBLIST},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
-    assert config.options == {"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
-    assert key_pushes(aioclient_mock) == [{"motn": MOTN, "tmdb": TMDB_KEY}]
+    assert config.options == {
+        "motn_api_key": MOTN,
+        "tmdb_read_access_token": TMDB_KEY,
+        "mdblist_api_key": MDBLIST,
+    }
+    assert key_pushes(aioclient_mock) == [{"motn": MOTN, "tmdb": TMDB_KEY, "mdblist": MDBLIST}]
+    mdblist_checks = [
+        call for call in aioclient_mock.mock_calls if call[1].host == "api.mdblist.com"
+    ]
+    assert [call[1].query.get("apikey") for call in mdblist_checks] == [MDBLIST]
     # The TMDB token travels as a bearer token, the Movie of the Night key in its header.
     headers = {call[1].host: call[3] for call in aioclient_mock.mock_calls if call[0] == "GET"}
     assert headers["api.themoviedb.org"]["Authorization"] == f"Bearer {TMDB_KEY}"
@@ -825,6 +851,9 @@ async def test_a_cleared_key_is_not_sent_and_unchanged_keys_are_not_checked_agai
     ("held", "pushed"),
     [
         ({"motn": True, "tmdb": True, "home_assistant": True}, False),
+        ({"motn": True, "tmdb": True, "mdblist": True, "home_assistant": True}, False),
+        # Lost its MDBList key.
+        ({"motn": True, "tmdb": True, "mdblist": False, "home_assistant": True}, True),
         ({"motn": True, "tmdb": False, "home_assistant": True}, True),
         # Changed on the TV's own QR page: Home Assistant is the source of truth.
         ({"motn": True, "tmdb": True, "home_assistant": False}, True),
@@ -842,7 +871,12 @@ async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
     monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
     config = entry(hass)
     hass.config_entries.async_update_entry(
-        config, options={"motn_api_key": MOTN, "tmdb_read_access_token": TMDB_KEY}
+        config,
+        options={
+            "motn_api_key": MOTN,
+            "tmdb_read_access_token": TMDB_KEY,
+            "mdblist_api_key": MDBLIST,
+        },
     )
     status = {"overlay": None, "overlay_ready": True, "cameras": 0}
     if held is not None:
@@ -856,6 +890,20 @@ async def test_the_tv_gets_the_keys_again_when_it_lost_or_replaced_them(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert (len(key_pushes(aioclient_mock)) > before) is pushed
+
+
+def test_an_older_tv_is_not_pushed_an_mdblist_key_it_cannot_take() -> None:
+    from custom_components.luma.streaming_keys import needs_push
+
+    only_mdblist = {"mdblist_api_key": MDBLIST}
+    older = {"streaming_keys": {"motn": False, "tmdb": False, "home_assistant": False}}
+    assert not needs_push(only_mdblist, older)
+    newer = {
+        "streaming_keys": {"motn": False, "tmdb": False, "mdblist": False, "home_assistant": False}
+    }
+    assert needs_push(only_mdblist, newer)
+    # Keys an older TV does take are still pushed.
+    assert needs_push({**only_mdblist, "motn_api_key": MOTN}, older)
 
 
 def issues(hass: HomeAssistant) -> set[str]:

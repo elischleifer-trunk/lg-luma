@@ -16,6 +16,9 @@ mod wallpaper_tests;
 #[path = "input-refresh-tests.rs"]
 mod input_refresh_tests;
 
+#[path = "streaming-ui-tests.rs"]
+mod streaming_ui_tests;
+
 fn ready() -> State {
     let mut state = State::new(Preferences::default());
     state.set_inventory(demo_inventory(), None);
@@ -164,7 +167,11 @@ fn scene(state: &State) -> view::Scene {
         metrics: BTreeMap::new(),
         artwork: crate::app_artwork::Service::new(false),
     };
-    let navigation = view::navigation(&assets, state.preferences.language);
+    let navigation = view::navigation(
+        &assets,
+        state.preferences.language,
+        state.page == crate::state::Page::Search,
+    );
     view::scene_with_pill(
         state,
         &assets,
@@ -3780,6 +3787,7 @@ fn streaming_keys_row_opens_a_phone_dialog_and_shows_only_whether_keys_are_set()
     state.streaming_keys = crate::streaming_keys::Status {
         motn: true,
         tmdb: false,
+        mdblist: false,
         home_assistant: false,
     };
     assert!(value(&state, "Incomplete"));
@@ -3831,6 +3839,11 @@ fn text_typed_on_a_phone_replaces_the_open_field_and_commits_it() {
     assert_eq!(state.query, "Dune");
     state.set_editing_text(&"x".repeat(200));
     assert_eq!(state.query.chars().count(), 120);
+
+    state.open_keyboard(crate::state::TextField::Titles);
+    state.text("al");
+    state.set_editing_text("Alien");
+    assert_eq!(state.title_query, "Alien");
 
     state.open(2);
     state.subpage = Some(crate::state::Subpage::Input("HDMI_1".into()));

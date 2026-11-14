@@ -3,6 +3,7 @@
 //! preferences, named by a SHA-256 of its key. Each read states how old a reply may be, so one
 //! cache serves short-lived data (where a show streams) and long-lived data (a film's studio).
 //! The directory is capped; the oldest replies go first. Any unreadable entry is a miss.
+//! Posters use their own capped directory of raw image files (`get_bytes`/`put_bytes`).
 use ring::digest;
 use serde::{Serialize, de::DeserializeOwned};
 use std::{
@@ -25,6 +26,9 @@ pub mod ttl {
 
 /// Plenty for hundreds of searches; a title search reply is a few hundred KB.
 pub const DEFAULT_LIMIT: u64 = 64 * 1024 * 1024;
+/// Posters are about 30 KB each, so this keeps well over a thousand.
+pub const POSTER_LIMIT: u64 = 48 * 1024 * 1024;
+const IMAGE: &str = "img";
 
 #[derive(Clone, Debug)]
 pub struct DiskCache {
@@ -60,14 +64,26 @@ impl DiskCache {
         Self::new(preferences.with_file_name("streaming-cache"), DEFAULT_LIMIT)
     }
 
+    /// The poster directory beside the preferences.
+    pub fn posters_beside(preferences: &Path) -> Self {
+        Self::new(
+            preferences.with_file_name("streaming-posters"),
+            POSTER_LIMIT,
+        )
+    }
+
     fn file(&self, key: &str) -> PathBuf {
+        self.named(key, "json")
+    }
+
+    fn named(&self, key: &str, extension: &str) -> PathBuf {
         let hash = digest::digest(&digest::SHA256, key.as_bytes());
         let name: String = hash
             .as_ref()
             .iter()
             .map(|byte| format!("{byte:02x}"))
             .collect();
-        self.dir.join(format!("{name}.json"))
+        self.dir.join(format!("{name}.{extension}"))
     }
 
     /// The value stored under `key`, if it is younger than `max_age`.
@@ -101,6 +117,19 @@ impl DiskCache {
         }
     }
 
+    /// A stored image, however old: a poster at a given link does not change.
+    pub fn get_bytes(&self, key: &str) -> Option<Vec<u8>> {
+        fs::read(self.named(key, IMAGE)).ok()
+    }
+
+    /// Stores an image; like `put`, failures are logged and ignored.
+    pub fn put_bytes(&self, key: &str, bytes: &[u8]) {
+        match crate::storage::write_atomic(&self.named(key, IMAGE), bytes) {
+            Ok(()) => self.evict(),
+            Err(error) => eprintln!("Luma streaming cache: {error}"),
+        }
+    }
+
     /// Removes the oldest entries until the directory fits its limit.
     fn evict(&self) {
         let Ok(entries) = fs::read_dir(&self.dir) else {
@@ -108,7 +137,12 @@ impl DiskCache {
         };
         let mut files: Vec<(SystemTime, u64, PathBuf)> = entries
             .flatten()
-            .filter(|entry| entry.path().extension().is_some_and(|ext| ext == "json"))
+            .filter(|entry| {
+                entry
+                    .path()
+                    .extension()
+                    .is_some_and(|ext| ext == "json" || ext == IMAGE)
+            })
             .filter_map(|entry| {
                 let metadata = entry.metadata().ok()?;
                 Some((metadata.modified().ok()?, metadata.len(), entry.path()))
@@ -173,6 +207,20 @@ mod tests {
         let day = Duration::from_secs(86_400);
         assert_eq!(cache.get::<String>("a", day, now), None);
         assert_eq!(cache.get::<String>("c", day, now), Some(big));
+        fs::remove_dir_all(&cache.dir).unwrap();
+    }
+
+    #[test]
+    fn images_round_trip_and_count_toward_the_limit() {
+        let cache = cache("images", 1500);
+        cache.put_bytes("poster:a", &[1; 600]);
+        std::thread::sleep(Duration::from_millis(20));
+        cache.put_bytes("poster:b", &[2; 600]);
+        std::thread::sleep(Duration::from_millis(20));
+        cache.put("reply", &"x".repeat(600), SystemTime::now());
+        assert_eq!(cache.get_bytes("poster:a"), None);
+        assert_eq!(cache.get_bytes("poster:b"), Some(vec![2; 600]));
+        assert_eq!(cache.get_bytes("poster:c"), None);
         fs::remove_dir_all(&cache.dir).unwrap();
     }
 

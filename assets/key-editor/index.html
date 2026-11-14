@@ -17,8 +17,9 @@
       <form id="keys">
         <h1>Streaming search keys</h1>
         <p class="intro">
-          Search on your TV finds where shows stream with Movie of the Night and ranks them with
-          TMDB. Keys are checked, then stored only on your TV.
+          Search on your TV finds where shows stream with Movie of the Night, ranks them with TMDB
+          and shows their Rotten Tomatoes and IMDb scores with MDBList. Keys are checked, then
+          stored only on your TV.
         </p>
         <label class="field"
           ><span>Movie of the Night API key</span
@@ -60,6 +61,26 @@
           <span id="tmdb-state"></span>
         </p>
         <button id="tmdb-remove" type="button" class="danger wide" hidden>Remove TMDB token</button>
+        <label class="field"
+          ><span>MDBList API key (optional)</span
+          ><input
+            id="mdblist"
+            type="text"
+            maxlength="1024"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+        /></label>
+        <p class="hint">
+          For review scores on each poster. Under
+          <a href="https://mdblist.com/preferences/" target="_blank" rel="noreferrer"
+            >MDBList → Preferences</a
+          >, API access.
+          <span id="mdblist-state"></span>
+        </p>
+        <button id="mdblist-remove" type="button" class="danger wide" hidden>
+          Remove MDBList key
+        </button>
         <div class="actions">
           <button id="save" type="submit" disabled>Check and save to TV</button>
         </div>

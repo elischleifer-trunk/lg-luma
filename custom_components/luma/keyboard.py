@@ -31,6 +31,7 @@ ACTION_EVENT = "mobile_app_notification_action"
 # What the notification asks for, by the TV's field key.
 PROMPTS = {
     "search": "Search",
+    "titles": "Movies & shows",
     "weather_location": "Weather location",
     "greeting_name": "Your name",
     "input_name": "Input name",
