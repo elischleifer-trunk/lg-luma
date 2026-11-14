@@ -791,7 +791,9 @@ async def test_options_check_streaming_keys_then_send_them_to_the_tv(
         "mdblist_api_key": MDBLIST,
     }
     assert key_pushes(aioclient_mock) == [{"motn": MOTN, "tmdb": TMDB_KEY, "mdblist": MDBLIST}]
-    mdblist_checks = [call for call in aioclient_mock.mock_calls if call[1].host == "api.mdblist.com"]
+    mdblist_checks = [
+        call for call in aioclient_mock.mock_calls if call[1].host == "api.mdblist.com"
+    ]
     assert [call[1].query.get("apikey") for call in mdblist_checks] == [MDBLIST]
     # The TMDB token travels as a bearer token, the Movie of the Night key in its header.
     headers = {call[1].host: call[3] for call in aioclient_mock.mock_calls if call[0] == "GET"}

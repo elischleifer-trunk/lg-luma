@@ -1,9 +1,10 @@
 """Streaming search keys: checking them with their services and keeping each TV in step.
 
 Luma's search on the TV finds where shows stream with Movie of the Night, ranks them with TMDB
-and shows review scores from MDBList. The owner enters the keys in this integration's options; Home Assistant checks them,
-then pushes them to every paired TV, and again whenever a TV lost them (a reset) or had them
-changed on its own QR page. A key left empty here is never sent, so it never erases one.
+and shows review scores from MDBList. The owner enters the keys in this integration's options;
+Home Assistant checks them, then pushes them to every paired TV, and again whenever a TV lost
+them (a reset) or had them changed on its own QR page. A key left empty here is never sent,
+so it never erases one.
 """
 
 from __future__ import annotations

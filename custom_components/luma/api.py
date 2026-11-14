@@ -131,8 +131,6 @@ class LumaClient:
         """Set the TV's streaming search keys. Empty keys are left out, so a field cleared in
         Home Assistant never erases the TV's key. Returns which keys the TV now holds."""
         payload = {
-            name: key
-            for name, key in (("motn", motn), ("tmdb", tmdb), ("mdblist", mdblist))
-            if key
+            name: key for name, key in (("motn", motn), ("tmdb", tmdb), ("mdblist", mdblist)) if key
         }
         return await self._request("PUT", "/api/streaming-keys", payload)
