@@ -1,0 +1,203 @@
+{
+  "request": {
+    "path": "/3/tv/79481",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:36.318Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/cTCn2EO69SERNfhaezJMoqBom4G.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      25
+    ],
+    "first_air_date": "2017-01-07",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      }
+    ],
+    "homepage": "https://v.qq.com/x/cover/xvlhj7cglyfwx8x/m0022eyxv9v.html",
+    "id": 79481,
+    "in_production": true,
+    "languages": [
+      "zh"
+    ],
+    "last_air_date": "2026-11-07",
+    "last_episode_to_air": {
+      "id": 7501503,
+      "name": "Episode 218",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-11-07",
+      "episode_number": 218,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 23,
+      "season_number": 5,
+      "show_id": 79481,
+      "still_path": "/l52XOEw8eh63pN7AQ2qi9iBPKuO.jpg"
+    },
+    "name": "Fights Break Sphere",
+    "next_episode_to_air": {
+      "id": 7501508,
+      "name": "Episode 219",
+      "overview": "",
+      "vote_average": 10,
+      "vote_count": 1,
+      "air_date": "2026-11-14",
+      "episode_number": 219,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 24,
+      "season_number": 5,
+      "show_id": 79481,
+      "still_path": null
+    },
+    "networks": [
+      {
+        "id": 2007,
+        "logo_path": "/6Lfll43wYG2eyereOBjpYFRSGs4.png",
+        "name": "Tencent Video",
+        "origin_country": "CN"
+      }
+    ],
+    "number_of_episodes": 279,
+    "number_of_seasons": 5,
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "zh",
+    "original_name": "斗破苍穹",
+    "overview": "In a land where no magic is present. A land where the strong make the rules and weak have to obey. A land filled with alluring treasures and beauty, yet also filled with unforeseen danger. Three years ago, Xiao Yan, who had shown talents none had seen in decades, suddenly lost everything. His powers, his reputation, and his promise to his mother. What sorcery has caused him to lose all of his powers? And why has his fiancee suddenly shown up?",
+    "popularity": 50.8,
+    "poster_path": "/oyoahIcdamTXwjIaL3CqZ1v5CLl.jpg",
+    "production_companies": [
+      {
+        "id": 162911,
+        "logo_path": "/bpulbAIOw3U3MJu2RWM3agLEaxM.png",
+        "name": "Motion Magic",
+        "origin_country": "CN"
+      },
+      {
+        "id": 120351,
+        "logo_path": "/kKOogwEg5lJFPLqy9gkVN0qwB3R.png",
+        "name": "Shanghai Foch Film Culture Investment",
+        "origin_country": "CN"
+      },
+      {
+        "id": 238655,
+        "logo_path": "/jqTvY0QXwCaFOYazJNNCjYwz8DU.png",
+        "name": "For U Music",
+        "origin_country": "CN"
+      },
+      {
+        "id": 115127,
+        "logo_path": "/lEA4MJ3zsi4RojFvNl4aw6t5okF.png",
+        "name": "China Literature",
+        "origin_country": "CN"
+      },
+      {
+        "id": 84946,
+        "logo_path": "/8wrAXwrNZ5zHImKb0SyVLQbXkaM.png",
+        "name": "Tencent Penguin Pictures",
+        "origin_country": "CN"
+      },
+      {
+        "id": 109474,
+        "logo_path": "/16ydjNJFFhTh8QyHnaIc9TrTvdF.png",
+        "name": "Tencent Animation & Comics",
+        "origin_country": "CN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2017-09-30",
+        "episode_count": 24,
+        "id": 112067,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/bdBpPtd78zTLEpTlGL9RFEfp7Pz.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2017-01-07",
+        "episode_count": 12,
+        "id": 103724,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/16CXeIZ7dlyAukrbrUcvDOTmnMN.jpg",
+        "season_number": 1,
+        "vote_average": 10
+      },
+      {
+        "air_date": "2018-03-03",
+        "episode_count": 12,
+        "id": 110421,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/nu88hbTo8KcHrn3ILs0B7x45tB8.jpg",
+        "season_number": 2,
+        "vote_average": 8.5
+      },
+      {
+        "air_date": "2019-07-21",
+        "episode_count": 12,
+        "id": 134212,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/pDJbATQucJ2NipF2NvWs7lwq33s.jpg",
+        "season_number": 3,
+        "vote_average": 7
+      },
+      {
+        "air_date": "2021-03-28",
+        "episode_count": 24,
+        "id": 182643,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/laV1CTHKyxUKCavZOaIKOQkSozY.jpg",
+        "season_number": 4,
+        "vote_average": 8
+      },
+      {
+        "air_date": "2022-07-31",
+        "episode_count": 219,
+        "id": 299748,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": "/4w7z5Y8chYWTU1X6renGTxtjpwl.jpg",
+        "season_number": 5,
+        "vote_average": 6.5
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 8.1,
+    "vote_count": 63
+  }
+}

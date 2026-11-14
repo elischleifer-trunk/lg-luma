@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/433763/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:22.792Z",
+  "response": {
+    "id": 433763,
+    "titles": [
+      {
+        "iso_3166_1": "AU",
+        "title": "Mountain Miracle - An Unexpected Friendship",
+        "type": "Melbourne International Film Festival"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Amélie a horský zázrak",
+        "type": "festival title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Amélie court",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "生命的奇迹",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/1222479/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.638Z",
+  "response": {
+    "id": 1222479,
+    "titles": [
+      {
+        "iso_3166_1": "JP",
+        "title": "未来",
+        "type": "Japanese"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "未來",
+        "type": "Japanese"
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Mirayi",
+        "type": "English alternative title"
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "మిరై",
+        "type": "Telugu Alternative title"
+      }
+    ]
+  }
+}

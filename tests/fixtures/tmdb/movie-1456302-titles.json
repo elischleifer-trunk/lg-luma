@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1456302/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:15.189Z",
+  "response": {
+    "id": 1456302,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "LEGO Ghostbusters",
+        "type": ""
+      }
+    ]
+  }
+}

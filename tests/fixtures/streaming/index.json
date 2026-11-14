@@ -94,6 +94,36 @@
     }
   },
   {
+    "name": "search-title-fan",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "fan",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-sup",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "sup",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-super",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "super",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
     "name": "search-title-no-results",
     "path": "/shows/search/title",
     "query": {

@@ -1,0 +1,84 @@
+{
+  "request": {
+    "path": "/3/movie/1216195",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:24.987Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7MjgRNq3RqQ8reT5DNprkYOd3LV.jpg",
+    "belongs_to_collection": {
+      "id": 552742,
+      "name": "Oh My Ghost Collection",
+      "poster_path": "/3sJqpj3itrnPR1jJh4te7M2Wa15.jpg",
+      "backdrop_path": "/oRF0vSJzpqDw8E3DLTRrYOKLwcz.jpg"
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "",
+    "id": 1216195,
+    "imdb_id": "tt35021460",
+    "origin_country": [
+      "TH"
+    ],
+    "original_language": "th",
+    "original_title": "หอแต๋วแตก แหกสัปะหยด",
+    "overview": "Strange things begin happening to Kouy, the beloved son of Taew, prompting her to seek help from Panda, the calm twin of the mischievous ghost Pancake.",
+    "popularity": 1.5175,
+    "poster_path": "/h59dS8S28ANNfWj5nuga2PveHPP.jpg",
+    "production_companies": [
+      {
+        "id": 5562,
+        "logo_path": null,
+        "name": "Mono Film",
+        "origin_country": "TH"
+      },
+      {
+        "id": 134975,
+        "logo_path": null,
+        "name": "Film Guru",
+        "origin_country": "TH"
+      },
+      {
+        "id": 142990,
+        "logo_path": null,
+        "name": "Mono Originals",
+        "origin_country": "TH"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TH",
+        "name": "Thailand"
+      }
+    ],
+    "release_date": "2024-03-14",
+    "revenue": 3984000,
+    "runtime": 108,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Thai",
+        "iso_639_1": "th",
+        "name": "ภาษาไทย"
+      }
+    ],
+    "status": "Released",
+    "tagline": "The true mission, big mama's turn.",
+    "title": "Oh My Ghost : The Finale",
+    "video": false,
+    "vote_average": 5.9,
+    "vote_count": 35
+  }
+}

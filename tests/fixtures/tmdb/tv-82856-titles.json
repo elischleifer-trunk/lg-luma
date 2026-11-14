@@ -1,0 +1,197 @@
+{
+  "request": {
+    "path": "/3/tv/82856/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.514Z",
+  "response": {
+    "id": 82856,
+    "results": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Мандалорецът",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Мандалорианецът",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "The Mandalorian: Uma História de Guerra nas Estrelas",
+        "type": "TV aberta (Globo)"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Mandaloriano",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BY",
+        "title": "Мандалорац",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Le Mandalorien",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：曼达洛人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "曼达洛人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "曼達洛人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - The Mandalorian",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: The Mandalorian",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "The Mandalorian",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Ο Μανταλοριανός",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰：曼達洛人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "曼達洛人與古古",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: המנדולוריאן",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "המנדולוריאני",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "המנדלוריאני",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס: מנדלוריאן",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "مندلوری",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ザ・マンダロリアン",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "만달로리안",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "더 만달로리안",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Žvaigždžių karai: Mandalorietis",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LV",
+        "title": "Mandalorietis",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Mandalorianin",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Star Wars: O Mandaloriano",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Мандалорац",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Мандалорец",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "الماندالوري",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Mandalorián",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Mandaloryalı",
+        "type": "translate"
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "曼達洛人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Мандалорець",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Мандалорець",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Mandalorian",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UZ",
+        "title": "Mandalorlik",
+        "type": ""
+      }
+    ]
+  }
+}

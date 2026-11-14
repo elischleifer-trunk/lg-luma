@@ -1,0 +1,72 @@
+{
+  "request": {
+    "path": "/3/movie/353821",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:25.945Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/iEBnG5ttY4tY5XNdAbdWkZ8r0gW.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 353821,
+    "imdb_id": "tt4925042",
+    "origin_country": [
+      "CN",
+      "HK"
+    ],
+    "original_language": "zh",
+    "original_title": "七十二家房客",
+    "overview": "Based on a stage play. it revolves around a police officer named '369' who keeps thinking up ways to rip off the 72 tenants.",
+    "popularity": 0.5702,
+    "poster_path": "/s4LL7KMRy9GbDyao2zAMAILAK4Z.jpg",
+    "production_companies": [
+      {
+        "id": 60498,
+        "logo_path": "/yomuA2IpkP5gjjK04jqS0glZdMQ.png",
+        "name": "珠江电影制片",
+        "origin_country": "CN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      },
+      {
+        "iso_3166_1": "HK",
+        "name": "Hong Kong"
+      }
+    ],
+    "release_date": "1963-12-03",
+    "revenue": 0,
+    "runtime": 81,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The House of 72 Tenants",
+    "video": false,
+    "vote_average": 6,
+    "vote_count": 2
+  }
+}

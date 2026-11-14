@@ -1,0 +1,11 @@
+{
+  "request": {
+    "path": "/3/movie/571906/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:15.521Z",
+  "response": {
+    "id": 571906,
+    "titles": []
+  }
+}

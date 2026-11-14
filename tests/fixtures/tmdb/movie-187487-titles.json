@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/187487/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:33.036Z",
+  "response": {
+    "id": 187487,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "Xianggang qi shi san",
+        "type": "Mandarin title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Heung gong chat sup sam",
+        "type": "transliteration"
+      }
+    ]
+  }
+}

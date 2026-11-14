@@ -1,0 +1,132 @@
+{
+  "request": {
+    "path": "/3/movie/194/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:22.477Z",
+  "response": {
+    "id": 194,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Fabulous Destiny of Amelie Poulain",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "天使艾米莉",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Neymovirna dolya Ameli Pulen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CL",
+        "title": "El fabuloso destino de Amelie Poulain",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Ameri",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Čudesna sudbina Amelije Pulen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Amélie Poulain",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "سرنوشت شگفت‌انگیز املی پولن",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Neveroyatnata sŭdba na Ameli Pulen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Amelí",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Амели",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Амелі",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Fabuloso Destino de Amélie Poulain",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "艾蜜莉的異想世界",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Amélie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Den fabelaktige Amélie fra Montmartre",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "アメリ：2001",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Amelie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "アメリ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Amélie from Montmartre",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Amelie from Montmartre",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Ամելի",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Die fabelhafte Welt der Amélie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Невероятната съдба на Амели Пулен",
+        "type": "Bulgarian"
+      }
+    ]
+  }
+}

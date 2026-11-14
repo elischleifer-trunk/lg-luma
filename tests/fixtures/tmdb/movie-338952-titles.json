@@ -1,0 +1,147 @@
+{
+  "request": {
+    "path": "/3/movie/338952/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.188Z",
+  "response": {
+    "id": 338952,
+    "titles": [
+      {
+        "iso_3166_1": "VN",
+        "title": "Sinh Vật Huyền Bí 2: Tội Ác của Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts 2",
+        "type": "short informal title"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "Fantastic Beasts: The Crimes og Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Animais Fantásticos 2 - Os Crimes de Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts 2: The Crimes of Grindelwald",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "신비한 동물사전 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les Animaux fantastiques - Les Crimes de Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts: The Crimes of Grindelwald 3D",
+        "type": "3D version"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts։ The Crimes of Grindelwald 3D",
+        "type": "3D version"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Animais Fantásticos Os Crimes de Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Animale fantastice: Crimele lui Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "怪獸與葛林戴華德之罪",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇动物：格林德沃之罪",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇动物2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Fantastic Beasts 2 - The Crimes of Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇动物2：格林德沃之罪",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les Animaux Fantastiques Les Crimes de Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les Animaux Fantastiques, Les Crimes de Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "جانوران شگفت‌انگیز ۲: جنایات گریندل‌والد",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "جانوران شگفت‌انگیز ۲",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "怪獸與葛林戴華德之罪",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts II: The Crimes of Grindelwald",
+        "type": "Playlist title"
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "Phantastische Tierwesen 2 - Grindelwalds Verbrechen",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "جانوران شگفت‌ انگیز: جنایات گریندل‌ والد",
+        "type": "فارسی"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts The Crimes of Grindelwald",
+        "type": "special characters causing issues"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Animales fantásticos: Los crímenes de Grindelwald",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Los crímenes de Grindelwald",
+        "type": ""
+      }
+    ]
+  }
+}

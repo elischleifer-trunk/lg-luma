@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/tv/289219/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.615Z",
+  "response": {
+    "id": 289219,
+    "results": [
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Maul - Shadow Lord",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Maul - Mistrz cienia",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "SE",
+        "title": "Star Wars Maul Shadow Lord",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Maul - Shadow Lord",
+        "type": "short title"
+      }
+    ]
+  }
+}

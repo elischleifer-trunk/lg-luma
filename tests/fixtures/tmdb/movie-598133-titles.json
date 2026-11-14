@@ -1,0 +1,37 @@
+{
+  "request": {
+    "path": "/3/movie/598133/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.711Z",
+  "response": {
+    "id": 598133,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Fuck-It List",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "The F**k-It List",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Die LMAA Liste",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "La lista dei fanculo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "퍼킷 리스트",
+        "type": ""
+      }
+    ]
+  }
+}

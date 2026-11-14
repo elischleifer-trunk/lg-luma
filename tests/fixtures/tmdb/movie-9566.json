@@ -1,0 +1,89 @@
+{
+  "request": {
+    "path": "/3/movie/9566",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:34.459Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/dISWllRkiQ1l5Nbn5JMZbz6RHoh.jpg",
+    "belongs_to_collection": null,
+    "budget": 55000000,
+    "genres": [
+      {
+        "id": 53,
+        "name": "Thriller"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 9566,
+    "imdb_id": "tt0116277",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Fan",
+    "overview": "When the San Francisco Giants pay center-fielder, Bobby Rayburn $40 million to lead their team to the World Series, no one is happier or more supportive than #1 fan, Gil Renard.  When Rayburn becomes mired in the worst slump of his career, the obsessed Renard decides to stop at nothing to help his idol regain his former glory—not even murder.",
+    "popularity": 2.9694,
+    "poster_path": "/lu7CjP8YES5dJMCFg5O9o9jCkjl.jpg",
+    "production_companies": [
+      {
+        "id": 559,
+        "logo_path": "/eC0bWHVjnjUducyA6YFoEFqnPMC.png",
+        "name": "TriStar Pictures",
+        "origin_country": "US"
+      },
+      {
+        "id": 1236,
+        "logo_path": "/xkxmDvj3JKohTqHB7QZZIhAqSS2.png",
+        "name": "Mandalay Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 1645,
+        "logo_path": "/6Ry6uNBaa0IbbSs1XYIgX5DkA9r.png",
+        "name": "Scott Free Productions",
+        "origin_country": "GB"
+      },
+      {
+        "id": 412,
+        "logo_path": null,
+        "name": "Wendy Finerman Productions",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      },
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "1996-08-15",
+    "revenue": 18626419,
+    "runtime": 116,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "All fans have a favorite player.  This one has a favorite target.",
+    "title": "The Fan",
+    "video": false,
+    "vote_average": 5.986,
+    "vote_count": 927
+  }
+}

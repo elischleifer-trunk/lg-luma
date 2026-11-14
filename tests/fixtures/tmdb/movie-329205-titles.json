@@ -1,0 +1,47 @@
+{
+  "request": {
+    "path": "/3/movie/329205/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:13.661Z",
+  "response": {
+    "id": 329205,
+    "titles": [
+      {
+        "iso_3166_1": "KR",
+        "title": "구울",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Juegos Demoniacos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Juegos Demoniacos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Juegos Demoniacos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "A Ukrainian Cannibal",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "食尸鬼",
+        "type": "惊悚 / 恐怖"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "食尸鬼2015",
+        "type": ""
+      }
+    ]
+  }
+}

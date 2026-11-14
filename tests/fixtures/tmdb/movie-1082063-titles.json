@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/1082063/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:24.132Z",
+  "response": {
+    "id": 1082063,
+    "titles": [
+      {
+        "iso_3166_1": "MX",
+        "title": "Herencia Siniestra",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "A Semente do Mal",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "فرزندان آمیلیا",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Дети Амелии",
+        "type": ""
+      }
+    ]
+  }
+}

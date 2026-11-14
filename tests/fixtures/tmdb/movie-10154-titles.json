@@ -1,0 +1,57 @@
+{
+  "request": {
+    "path": "/3/movie/10154/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:25.872Z",
+  "response": {
+    "id": 10154,
+    "titles": [
+      {
+        "iso_3166_1": "IT",
+        "title": "Mickey occhi blu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Mickey ojos azules",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Mickovy Modre Oci",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Mickey Blue Eyes - Mafioso wider Willen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Modrooký Mickey",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "蓝眼睛米奇",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "求婚脑震荡",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "黑帮女婿",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "蓝眼米基",
+        "type": ""
+      }
+    ]
+  }
+}

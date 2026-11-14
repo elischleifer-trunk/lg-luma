@@ -1,0 +1,27 @@
+{
+  "request": {
+    "path": "/3/movie/9566/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:29.014Z",
+  "response": {
+    "id": 9566,
+    "titles": [
+      {
+        "iso_3166_1": "CN",
+        "title": "狂迷",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "追星的人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "烈火终结令",
+        "type": ""
+      }
+    ]
+  }
+}

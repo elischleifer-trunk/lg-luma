@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/386830/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:19.896Z",
+  "response": {
+    "id": 386830,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Сезонники",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Office Temps",
+        "type": "Streaming Title"
+      }
+    ]
+  }
+}

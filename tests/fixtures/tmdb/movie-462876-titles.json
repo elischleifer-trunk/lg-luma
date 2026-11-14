@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/462876/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:33.243Z",
+  "response": {
+    "id": 462876,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Windmill Palm Grove",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "Jongryeonamu sup",
+        "type": "romanization"
+      }
+    ]
+  }
+}

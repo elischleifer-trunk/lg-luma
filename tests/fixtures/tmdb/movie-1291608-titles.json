@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/movie/1291608/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:28.313Z",
+  "response": {
+    "id": 1291608,
+    "titles": [
+      {
+        "iso_3166_1": "CN",
+        "title": "征服者",
+        "type": "剧情"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "征服者",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "黑境行者",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "Patriotismo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dhurandhar (FF26)",
+        "type": "Re-release title"
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Dhurandhar (Raw & Undekha)",
+        "type": "uncut title"
+      }
+    ]
+  }
+}

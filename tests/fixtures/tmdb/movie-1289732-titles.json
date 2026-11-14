@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1289732/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:14.757Z",
+  "response": {
+    "id": 1289732,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Возвращение охотников за привидениями",
+        "type": ""
+      }
+    ]
+  }
+}

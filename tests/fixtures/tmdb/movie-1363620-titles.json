@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/1363620/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.366Z",
+  "response": {
+    "id": 1363620,
+    "titles": [
+      {
+        "iso_3166_1": "TH",
+        "title": "สัปเหร่อ 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Sup Pa Rer 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Sup Pa Ror 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Undertaker 2",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "request": {
+    "path": "/3/tv/215521",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:25.303Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/vPpR3wxariTR1fAtJwLzF04uBnz.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      90
+    ],
+    "first_air_date": "2022-12-01",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "",
+    "id": 215521,
+    "in_production": false,
+    "languages": [
+      "th"
+    ],
+    "last_air_date": "2022-12-22",
+    "last_episode_to_air": {
+      "id": 4082976,
+      "name": "Episode 16",
+      "overview": "When Non takes something from Gut that can never be replaced, karma is swift to retaliate. Then, Va and Gut start a new chapter of their lives together.",
+      "vote_average": 5,
+      "vote_count": 1,
+      "air_date": "2022-12-22",
+      "episode_number": 16,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 91,
+      "season_number": 1,
+      "show_id": 215521,
+      "still_path": "/g8zdujdfPnlwIESR65TJftNQAR2.jpg"
+    },
+    "name": "You Are My Makeup Artist",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 344,
+        "logo_path": "/jjndRHOq412g8D6Hjm63rZMxAnO.png",
+        "name": "Channel 3",
+        "origin_country": "TH"
+      }
+    ],
+    "number_of_episodes": 16,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "TH"
+    ],
+    "original_language": "th",
+    "original_name": "มัดหัวใจยัยซุปตาร์",
+    "overview": "After a celebrity discovers her wealthy fiancé has been unfaithful, she has a drunken one-night stand with her makeup artist and risks her reputation.",
+    "popularity": 2.7061,
+    "poster_path": "/kPzIrQpcpa9YK6LSq4adma0jwW5.jpg",
+    "production_companies": [
+      {
+        "id": 26830,
+        "logo_path": "/eEOuPvqONusvlzWO8woxtKGp4Q9.png",
+        "name": "Channel 3",
+        "origin_country": "TH"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TH",
+        "name": "Thailand"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2022-12-01",
+        "episode_count": 16,
+        "id": 318303,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/kPzIrQpcpa9YK6LSq4adma0jwW5.jpg",
+        "season_number": 1,
+        "vote_average": 7.4
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Thai",
+        "iso_639_1": "th",
+        "name": "ภาษาไทย"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 8.5,
+    "vote_count": 17
+  }
+}

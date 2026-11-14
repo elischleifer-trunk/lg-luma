@@ -1,0 +1,121 @@
+{
+  "request": {
+    "path": "/3/tv/210252",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.389Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/lBW6kxJ29ULf14JrRUGpx3u5bbJ.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2000-12-25",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "https://tviplayer.iol.pt/programa/super-pai/53c6b37a3004dc006243cb07",
+    "id": 210252,
+    "in_production": false,
+    "languages": [
+      "pt"
+    ],
+    "last_air_date": "2003-12-31",
+    "last_episode_to_air": {
+      "id": 7591948,
+      "name": "Episode 100",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2003-12-31",
+      "episode_number": 100,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 45,
+      "season_number": 2,
+      "show_id": 210252,
+      "still_path": null
+    },
+    "name": "Super Pai",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 93,
+        "logo_path": "/bCngEbZ5SoIwkgmSMsLUABqanZn.png",
+        "name": "TVI",
+        "origin_country": "PT"
+      }
+    ],
+    "number_of_episodes": 174,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "PT"
+    ],
+    "original_language": "pt",
+    "original_name": "Super Pai",
+    "overview": "",
+    "popularity": 8.7451,
+    "poster_path": "/eHMcT9TaZGhTHsHVJq4KXpkQgvk.jpg",
+    "production_companies": [
+      {
+        "id": 8863,
+        "logo_path": "/11x9eeGVBxcAraFfgwt5Hb1Z3Ms.png",
+        "name": "Plural Entertainment",
+        "origin_country": "PT"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "PT",
+        "name": "Portugal"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2000-12-25",
+        "episode_count": 74,
+        "id": 308679,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": null,
+        "episode_count": 100,
+        "id": 532444,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Portuguese",
+        "iso_639_1": "pt",
+        "name": "Português"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7,
+    "vote_count": 2
+  }
+}

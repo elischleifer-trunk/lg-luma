@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/188628/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:22.263Z",
+  "response": {
+    "id": 188628,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Dune Rollers",
+        "type": "alternative title"
+      }
+    ]
+  }
+}

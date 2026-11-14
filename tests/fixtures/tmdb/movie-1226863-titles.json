@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/movie/1226863/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.536Z",
+  "response": {
+    "id": 1226863,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Super Mario Bros. Movie 2",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Super Mario Dünyası",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Super Mario World",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "האחים סופר מריו: גלקסי",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Super Mario Galaxy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UZ",
+        "title": "Super Mario Galaktika",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BA",
+        "title": "Super Mario Galatički Film",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "เดอะ ซูเปอร์มาริโอ กาแล็กซี่ มูฟวี่",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ザ・スーパーマリオギャラクシー・ムービー",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "슈퍼마리오 갤럭시",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Супербратья Марио 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Супербратья Марио в кино 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Süper Mario Galaksi Filmi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超级玛利欧银河大电影",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Super Mario 200",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Super Mario galaktika film",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Super Mario Galaxy La película",
+        "type": ""
+      }
+    ]
+  }
+}

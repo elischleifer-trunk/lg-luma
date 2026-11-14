@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/movie/1152358/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.127Z",
+  "response": {
+    "id": 1152358,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Yu Yu Hakusho: Ghost Files - Two Shots / All or Nothing",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Yu Yu Hakusho OVA: \"Two Shots\" and \"All or Nothing\"",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Yuu☆Yuu☆Hakusho: Two Shots/Noru ka Soru ka",
+        "type": "Romaji"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Yuu Yuu Hakusho: Two Shots/Noru ka Soru ka",
+        "type": "Romaji"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Yu Yu Hakusho Special: Two Shots and All or Nothing",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Hành Trình U Linh Giới - Two Shots / All or Nothing",
+        "type": ""
+      }
+    ]
+  }
+}

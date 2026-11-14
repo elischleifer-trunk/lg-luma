@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/75188/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.912Z",
+  "response": {
+    "id": 75188,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "Sing kung chok tse sup yut tam",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "request": {
+    "path": "/3/tv/4194/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.644Z",
+  "response": {
+    "id": 4194,
+    "results": [
+      {
+        "iso_3166_1": "AU",
+        "title": "Star Wars: The Clone Wars—The Animated Series",
+        "type": "DVD"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：克隆人战争",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, La Guerre des Clones",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Ο πόλεμος των άστρων: Ο πόλεμος των κλώνων",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大战：复制战纪",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "HR",
+        "title": "Ratovi Zvijezda: Ratovi Klonova",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: מלחמת המשובטים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IS",
+        "title": "Stjörnustríð: Klónastríðin",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ クローン・ウォーズ",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny: Wojny Klonów",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Star Wars: A Guerra dos Clones",
+        "type": "Animação"
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Звездани ратови: Ратови клонова",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Ратови звезда: Ратови клонова",
+        "type": "Alternate"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Войны клонов",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Star Wars: Klonové Vojny",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Clone Wars—The Lost Missions",
+        "type": "Season 6"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Clone Wars—The Final Season",
+        "type": "Season 7"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Clone Wars—Secrets Revealed",
+        "type": "Season 3"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Clone Wars—Battle Lines",
+        "type": "Season 4"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Clone Wars—Rise of the Bounty Hunters",
+        "type": "Season 2"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Clone Wars",
+        "type": "Main"
+      },
+      {
+        "iso_3166_1": "VE",
+        "title": "La Guerra de las Galaxias: La Guerra de los Clones",
+        "type": "Main"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/tv/70633/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:18.625Z",
+  "response": {
+    "id": 70633,
+    "results": [
+      {
+        "iso_3166_1": "FI",
+        "title": "The Office",
+        "type": ""
+      }
+    ]
+  }
+}

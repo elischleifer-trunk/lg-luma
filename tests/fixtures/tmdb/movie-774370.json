@@ -1,0 +1,79 @@
+{
+  "request": {
+    "path": "/3/movie/774370",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:28.154Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/iXU87IdtNsYt7n6OigPJBDdbFf1.jpg",
+    "belongs_to_collection": null,
+    "budget": 40000000,
+    "genres": [
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      }
+    ],
+    "homepage": "https://www.dreamworksdogman.com",
+    "id": 774370,
+    "imdb_id": "tt10954718",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Dog Man",
+    "overview": "When a faithful police dog and his human police officer owner are injured together on the job, a harebrained but life-saving surgery fuses the two of them together and Dog Man is born. Dog Man is sworn to protect and serve—and fetch, sit and roll over. As Dog Man embraces his new identity and strives to impress his Chief, he must stop the pretty evil plots of feline supervillain Petey the Cat.",
+    "popularity": 6.4395,
+    "poster_path": "/89wNiexZdvLQ41OQWIsQy4O6jAQ.jpg",
+    "production_companies": [
+      {
+        "id": 521,
+        "logo_path": "/3BPX5VGBov8SDqTV7wC1L1xShAS.png",
+        "name": "DreamWorks Animation",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2025-01-24",
+    "revenue": 145603415,
+    "runtime": 89,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Part dog. Part man. All hero.",
+    "title": "Dog Man",
+    "video": false,
+    "vote_average": 7.346,
+    "vote_count": 406
+  }
+}

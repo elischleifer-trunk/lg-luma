@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/108/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:26.303Z",
+  "response": {
+    "id": 108,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Blue",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Tre farver: Blå",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Three Colours: Blue",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SE",
+        "title": "Den blå filmen",
+        "type": "re-release title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "세가지 색: 블루",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Üç Rəng: Mavi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Kolme väriä: Sininen",
+        "type": "video box title"
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Tre färger - blått",
+        "type": "Swedish title"
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Tre färger: Den blå",
+        "type": "Swedish TV title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Bleu",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Torikorôru: Ao no Ai",
+        "type": "transliterated title"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Azul",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Tres colores. Azul",
+        "type": "TV title"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Tres colors: Blau",
+        "type": "Catalan title"
+      }
+    ]
+  }
+}

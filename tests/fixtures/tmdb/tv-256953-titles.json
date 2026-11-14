@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/tv/256953/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:25.149Z",
+  "response": {
+    "id": 256953,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "布鲁伊迷你剧",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Blue krátké díly",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Bluey Mini",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Pequeñas historias de Bluey",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Bluey-kortfilmer",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Blue krátke časti",
+        "type": ""
+      }
+    ]
+  }
+}

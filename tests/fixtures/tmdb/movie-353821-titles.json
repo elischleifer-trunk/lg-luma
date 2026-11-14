@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/353821/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:32.779Z",
+  "response": {
+    "id": 353821,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "Chat sup yee ga fong hak",
+        "type": "romanization"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Qi shi er jia fang ke",
+        "type": "romanization"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "七十二家房客 (1963)",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "七十二家房客",
+        "type": ""
+      }
+    ]
+  }
+}

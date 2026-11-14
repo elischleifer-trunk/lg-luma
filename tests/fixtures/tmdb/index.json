@@ -7,11 +7,21 @@
     }
   },
   {
+    "name": "tv-30669-titles",
+    "path": "/3/tv/30669/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-114564",
     "path": "/3/movie/114564",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-114564-titles",
+    "path": "/3/movie/114564/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1222309",
@@ -21,11 +31,21 @@
     }
   },
   {
+    "name": "movie-1222309-titles",
+    "path": "/3/movie/1222309/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1152358",
     "path": "/3/movie/1152358",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1152358-titles",
+    "path": "/3/movie/1152358/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-692821",
@@ -35,11 +55,21 @@
     }
   },
   {
+    "name": "movie-692821-titles",
+    "path": "/3/movie/692821/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1040194",
     "path": "/3/movie/1040194",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1040194-titles",
+    "path": "/3/movie/1040194/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-80707",
@@ -49,11 +79,21 @@
     }
   },
   {
+    "name": "tv-80707-titles",
+    "path": "/3/tv/80707/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-126027",
     "path": "/3/tv/126027",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-126027-titles",
+    "path": "/3/tv/126027/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-17174",
@@ -63,11 +103,21 @@
     }
   },
   {
+    "name": "tv-17174-titles",
+    "path": "/3/tv/17174/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-251",
     "path": "/3/movie/251",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-251-titles",
+    "path": "/3/movie/251/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1380291",
@@ -77,11 +127,21 @@
     }
   },
   {
+    "name": "movie-1380291-titles",
+    "path": "/3/movie/1380291/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-620",
     "path": "/3/movie/620",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-620-titles",
+    "path": "/3/movie/620/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-967847",
@@ -91,11 +151,21 @@
     }
   },
   {
+    "name": "movie-967847-titles",
+    "path": "/3/movie/967847/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-868759",
     "path": "/3/movie/868759",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-868759-titles",
+    "path": "/3/movie/868759/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-852096",
@@ -105,11 +175,21 @@
     }
   },
   {
+    "name": "movie-852096-titles",
+    "path": "/3/movie/852096/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-332512",
     "path": "/3/movie/332512",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-332512-titles",
+    "path": "/3/movie/332512/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-411279",
@@ -119,11 +199,21 @@
     }
   },
   {
+    "name": "movie-411279-titles",
+    "path": "/3/movie/411279/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-329205",
     "path": "/3/movie/329205",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-329205-titles",
+    "path": "/3/movie/329205/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-640402",
@@ -133,11 +223,21 @@
     }
   },
   {
+    "name": "movie-640402-titles",
+    "path": "/3/movie/640402/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-37793",
     "path": "/3/movie/37793",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-37793-titles",
+    "path": "/3/movie/37793/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-43074",
@@ -147,11 +247,21 @@
     }
   },
   {
+    "name": "movie-43074-titles",
+    "path": "/3/movie/43074/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-425909",
     "path": "/3/movie/425909",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-425909-titles",
+    "path": "/3/movie/425909/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-282345",
@@ -161,11 +271,21 @@
     }
   },
   {
+    "name": "tv-282345-titles",
+    "path": "/3/tv/282345/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-18131",
     "path": "/3/tv/18131",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-18131-titles",
+    "path": "/3/tv/18131/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-2978",
@@ -175,11 +295,21 @@
     }
   },
   {
+    "name": "movie-2978-titles",
+    "path": "/3/movie/2978/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-4793",
     "path": "/3/tv/4793",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-4793-titles",
+    "path": "/3/tv/4793/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-2286",
@@ -189,11 +319,21 @@
     }
   },
   {
+    "name": "tv-2286-titles",
+    "path": "/3/tv/2286/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1289732",
     "path": "/3/movie/1289732",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1289732-titles",
+    "path": "/3/movie/1289732/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-236426",
@@ -203,11 +343,21 @@
     }
   },
   {
+    "name": "movie-236426-titles",
+    "path": "/3/movie/236426/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-731502",
     "path": "/3/movie/731502",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-731502-titles",
+    "path": "/3/movie/731502/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-21871",
@@ -217,11 +367,21 @@
     }
   },
   {
+    "name": "tv-21871-titles",
+    "path": "/3/tv/21871/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1456302",
     "path": "/3/movie/1456302",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1456302-titles",
+    "path": "/3/movie/1456302/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1211769",
@@ -231,11 +391,21 @@
     }
   },
   {
+    "name": "movie-1211769-titles",
+    "path": "/3/movie/1211769/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-571905",
     "path": "/3/movie/571905",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-571905-titles",
+    "path": "/3/movie/571905/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-571906",
@@ -245,11 +415,21 @@
     }
   },
   {
+    "name": "movie-571906-titles",
+    "path": "/3/movie/571906/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-772032",
     "path": "/3/movie/772032",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-772032-titles",
+    "path": "/3/movie/772032/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-567641",
@@ -259,11 +439,21 @@
     }
   },
   {
+    "name": "movie-567641-titles",
+    "path": "/3/movie/567641/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-123356",
     "path": "/3/movie/123356",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-123356-titles",
+    "path": "/3/movie/123356/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-11",
@@ -273,11 +463,21 @@
     }
   },
   {
+    "name": "movie-11-titles",
+    "path": "/3/movie/11/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1892",
     "path": "/3/movie/1892",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1892-titles",
+    "path": "/3/movie/1892/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1228710",
@@ -287,11 +487,21 @@
     }
   },
   {
+    "name": "movie-1228710-titles",
+    "path": "/3/movie/1228710/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-83867",
     "path": "/3/tv/83867",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-83867-titles",
+    "path": "/3/tv/83867/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1894",
@@ -301,11 +511,21 @@
     }
   },
   {
+    "name": "movie-1894-titles",
+    "path": "/3/movie/1894/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-82856",
     "path": "/3/tv/82856",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-82856-titles",
+    "path": "/3/tv/82856/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-289219",
@@ -315,11 +535,21 @@
     }
   },
   {
+    "name": "tv-289219-titles",
+    "path": "/3/tv/289219/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-288055",
     "path": "/3/tv/288055",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-288055-titles",
+    "path": "/3/tv/288055/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-202879",
@@ -329,11 +559,21 @@
     }
   },
   {
+    "name": "tv-202879-titles",
+    "path": "/3/tv/202879/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-114479",
     "path": "/3/tv/114479",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-114479-titles",
+    "path": "/3/tv/114479/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-114461",
@@ -343,11 +583,21 @@
     }
   },
   {
+    "name": "tv-114461-titles",
+    "path": "/3/tv/114461/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-114478",
     "path": "/3/tv/114478",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-114478-titles",
+    "path": "/3/tv/114478/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-203085",
@@ -357,11 +607,21 @@
     }
   },
   {
+    "name": "tv-203085-titles",
+    "path": "/3/tv/203085/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-105971",
     "path": "/3/tv/105971",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-105971-titles",
+    "path": "/3/tv/105971/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-348350",
@@ -371,11 +631,21 @@
     }
   },
   {
+    "name": "movie-348350-titles",
+    "path": "/3/movie/348350/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-181812",
     "path": "/3/movie/181812",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-181812-titles",
+    "path": "/3/movie/181812/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-4194",
@@ -385,11 +655,21 @@
     }
   },
   {
+    "name": "tv-4194-titles",
+    "path": "/3/tv/4194/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-181808",
     "path": "/3/movie/181808",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-181808-titles",
+    "path": "/3/movie/181808/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-330459",
@@ -399,11 +679,21 @@
     }
   },
   {
+    "name": "movie-330459-titles",
+    "path": "/3/movie/330459/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-115036",
     "path": "/3/tv/115036",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-115036-titles",
+    "path": "/3/tv/115036/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-2316",
@@ -413,11 +703,21 @@
     }
   },
   {
+    "name": "tv-2316-titles",
+    "path": "/3/tv/2316/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-256480",
     "path": "/3/tv/256480",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-256480-titles",
+    "path": "/3/tv/256480/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-2996",
@@ -427,11 +727,21 @@
     }
   },
   {
+    "name": "tv-2996-titles",
+    "path": "/3/tv/2996/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-90762",
     "path": "/3/tv/90762",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-90762-titles",
+    "path": "/3/tv/90762/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-49097",
@@ -441,11 +751,21 @@
     }
   },
   {
+    "name": "movie-49097-titles",
+    "path": "/3/movie/49097/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-70633",
     "path": "/3/tv/70633",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-70633-titles",
+    "path": "/3/tv/70633/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1396000",
@@ -455,11 +775,21 @@
     }
   },
   {
+    "name": "movie-1396000-titles",
+    "path": "/3/movie/1396000/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-613653",
     "path": "/3/movie/613653",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-613653-titles",
+    "path": "/3/movie/613653/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-445021",
@@ -469,11 +799,21 @@
     }
   },
   {
+    "name": "movie-445021-titles",
+    "path": "/3/movie/445021/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-920933",
     "path": "/3/movie/920933",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-920933-titles",
+    "path": "/3/movie/920933/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-24876",
@@ -483,11 +823,21 @@
     }
   },
   {
+    "name": "tv-24876-titles",
+    "path": "/3/tv/24876/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-37054",
     "path": "/3/tv/37054",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-37054-titles",
+    "path": "/3/tv/37054/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-154825",
@@ -497,11 +847,21 @@
     }
   },
   {
+    "name": "tv-154825-titles",
+    "path": "/3/tv/154825/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-128822",
     "path": "/3/tv/128822",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-128822-titles",
+    "path": "/3/tv/128822/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-272429",
@@ -511,11 +871,21 @@
     }
   },
   {
+    "name": "tv-272429-titles",
+    "path": "/3/tv/272429/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1225332",
     "path": "/3/movie/1225332",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1225332-titles",
+    "path": "/3/movie/1225332/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-213307",
@@ -525,11 +895,21 @@
     }
   },
   {
+    "name": "tv-213307-titles",
+    "path": "/3/tv/213307/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-386830",
     "path": "/3/movie/386830",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-386830-titles",
+    "path": "/3/movie/386830/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-474331",
@@ -539,11 +919,21 @@
     }
   },
   {
+    "name": "movie-474331-titles",
+    "path": "/3/movie/474331/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-6202",
     "path": "/3/tv/6202",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-6202-titles",
+    "path": "/3/tv/6202/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-438631",
@@ -553,11 +943,21 @@
     }
   },
   {
+    "name": "movie-438631-titles",
+    "path": "/3/movie/438631/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-693134",
     "path": "/3/movie/693134",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-693134-titles",
+    "path": "/3/movie/693134/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-841",
@@ -567,11 +967,21 @@
     }
   },
   {
+    "name": "movie-841-titles",
+    "path": "/3/movie/841/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-19566",
     "path": "/3/tv/19566",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-19566-titles",
+    "path": "/3/tv/19566/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-697620",
@@ -581,11 +991,21 @@
     }
   },
   {
+    "name": "movie-697620-titles",
+    "path": "/3/movie/697620/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-90228",
     "path": "/3/tv/90228",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-90228-titles",
+    "path": "/3/tv/90228/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-627150",
@@ -595,11 +1015,21 @@
     }
   },
   {
+    "name": "movie-627150-titles",
+    "path": "/3/movie/627150/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-191720",
     "path": "/3/movie/191720",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-191720-titles",
+    "path": "/3/movie/191720/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1170608",
@@ -609,11 +1039,21 @@
     }
   },
   {
+    "name": "movie-1170608-titles",
+    "path": "/3/movie/1170608/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-271683",
     "path": "/3/movie/271683",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-271683-titles",
+    "path": "/3/movie/271683/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-843281",
@@ -623,11 +1063,21 @@
     }
   },
   {
+    "name": "movie-843281-titles",
+    "path": "/3/movie/843281/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-881460",
     "path": "/3/movie/881460",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-881460-titles",
+    "path": "/3/movie/881460/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-744738",
@@ -637,11 +1087,21 @@
     }
   },
   {
+    "name": "movie-744738-titles",
+    "path": "/3/movie/744738/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-9156",
     "path": "/3/tv/9156",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-9156-titles",
+    "path": "/3/tv/9156/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-307531",
@@ -651,11 +1111,21 @@
     }
   },
   {
+    "name": "tv-307531-titles",
+    "path": "/3/tv/307531/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-911972",
     "path": "/3/movie/911972",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-911972-titles",
+    "path": "/3/movie/911972/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-818926",
@@ -665,11 +1135,21 @@
     }
   },
   {
+    "name": "movie-818926-titles",
+    "path": "/3/movie/818926/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-613359",
     "path": "/3/movie/613359",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-613359-titles",
+    "path": "/3/movie/613359/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-188628",
@@ -679,11 +1159,21 @@
     }
   },
   {
+    "name": "movie-188628-titles",
+    "path": "/3/movie/188628/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-222339",
     "path": "/3/movie/222339",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-222339-titles",
+    "path": "/3/movie/222339/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-194",
@@ -693,11 +1183,21 @@
     }
   },
   {
+    "name": "movie-194-titles",
+    "path": "/3/movie/194/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-682012",
     "path": "/3/movie/682012",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-682012-titles",
+    "path": "/3/movie/682012/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1076411",
@@ -707,11 +1207,21 @@
     }
   },
   {
+    "name": "movie-1076411-titles",
+    "path": "/3/movie/1076411/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-433763",
     "path": "/3/movie/433763",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-433763-titles",
+    "path": "/3/movie/433763/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-239212",
@@ -721,11 +1231,21 @@
     }
   },
   {
+    "name": "tv-239212-titles",
+    "path": "/3/tv/239212/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-131302",
     "path": "/3/tv/131302",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-131302-titles",
+    "path": "/3/tv/131302/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-540446",
@@ -735,11 +1255,21 @@
     }
   },
   {
+    "name": "movie-540446-titles",
+    "path": "/3/movie/540446/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-263560",
     "path": "/3/movie/263560",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-263560-titles",
+    "path": "/3/movie/263560/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-913302",
@@ -749,11 +1279,21 @@
     }
   },
   {
+    "name": "movie-913302-titles",
+    "path": "/3/movie/913302/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-398258",
     "path": "/3/movie/398258",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-398258-titles",
+    "path": "/3/movie/398258/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-751223",
@@ -763,11 +1303,21 @@
     }
   },
   {
+    "name": "movie-751223-titles",
+    "path": "/3/movie/751223/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-269107",
     "path": "/3/movie/269107",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-269107-titles",
+    "path": "/3/movie/269107/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-491392",
@@ -777,11 +1327,21 @@
     }
   },
   {
+    "name": "movie-491392-titles",
+    "path": "/3/movie/491392/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-140383",
     "path": "/3/movie/140383",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-140383-titles",
+    "path": "/3/movie/140383/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-8915",
@@ -791,11 +1351,21 @@
     }
   },
   {
+    "name": "movie-8915-titles",
+    "path": "/3/movie/8915/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1082063",
     "path": "/3/movie/1082063",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1082063-titles",
+    "path": "/3/movie/1082063/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-258436",
@@ -805,11 +1375,21 @@
     }
   },
   {
+    "name": "movie-258436-titles",
+    "path": "/3/movie/258436/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-93097",
     "path": "/3/tv/93097",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-93097-titles",
+    "path": "/3/tv/93097/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1067159",
@@ -819,11 +1399,21 @@
     }
   },
   {
+    "name": "movie-1067159-titles",
+    "path": "/3/movie/1067159/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-373909",
     "path": "/3/movie/373909",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-373909-titles",
+    "path": "/3/movie/373909/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-82728",
@@ -833,11 +1423,21 @@
     }
   },
   {
+    "name": "tv-82728-titles",
+    "path": "/3/tv/82728/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-413230",
     "path": "/3/movie/413230",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-413230-titles",
+    "path": "/3/movie/413230/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-13869",
@@ -847,11 +1447,21 @@
     }
   },
   {
+    "name": "tv-13869-titles",
+    "path": "/3/tv/13869/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1453792",
     "path": "/3/movie/1453792",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1453792-titles",
+    "path": "/3/movie/1453792/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-256953",
@@ -861,11 +1471,21 @@
     }
   },
   {
+    "name": "tv-256953-titles",
+    "path": "/3/tv/256953/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1633859",
     "path": "/3/movie/1633859",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1633859-titles",
+    "path": "/3/movie/1633859/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-314883",
@@ -875,11 +1495,21 @@
     }
   },
   {
+    "name": "tv-314883-titles",
+    "path": "/3/tv/314883/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-257018",
     "path": "/3/tv/257018",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-257018-titles",
+    "path": "/3/tv/257018/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1403836",
@@ -889,11 +1519,21 @@
     }
   },
   {
+    "name": "movie-1403836-titles",
+    "path": "/3/movie/1403836/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-304633",
     "path": "/3/tv/304633",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-304633-titles",
+    "path": "/3/tv/304633/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-615667",
@@ -903,11 +1543,21 @@
     }
   },
   {
+    "name": "movie-615667-titles",
+    "path": "/3/movie/615667/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-10154",
     "path": "/3/movie/10154",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-10154-titles",
+    "path": "/3/movie/10154/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-316461",
@@ -917,11 +1567,21 @@
     }
   },
   {
+    "name": "tv-316461-titles",
+    "path": "/3/tv/316461/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1413356",
     "path": "/3/movie/1413356",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1413356-titles",
+    "path": "/3/movie/1413356/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-68417",
@@ -931,11 +1591,21 @@
     }
   },
   {
+    "name": "movie-68417-titles",
+    "path": "/3/movie/68417/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-108",
     "path": "/3/movie/108",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-108-titles",
+    "path": "/3/movie/108/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1432207",
@@ -945,11 +1615,21 @@
     }
   },
   {
+    "name": "movie-1432207-titles",
+    "path": "/3/movie/1432207/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-617126",
     "path": "/3/movie/617126",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-617126-titles",
+    "path": "/3/movie/617126/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-451735",
@@ -959,11 +1639,21 @@
     }
   },
   {
+    "name": "movie-451735-titles",
+    "path": "/3/movie/451735/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-24595",
     "path": "/3/movie/24595",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-24595-titles",
+    "path": "/3/movie/24595/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-120462",
@@ -973,11 +1663,21 @@
     }
   },
   {
+    "name": "tv-120462-titles",
+    "path": "/3/tv/120462/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-76479",
     "path": "/3/tv/76479",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-76479-titles",
+    "path": "/3/tv/76479/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-299939",
@@ -987,11 +1687,21 @@
     }
   },
   {
+    "name": "tv-299939-titles",
+    "path": "/3/tv/299939/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-224372",
     "path": "/3/tv/224372",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-224372-titles",
+    "path": "/3/tv/224372/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1275779",
@@ -1001,11 +1711,21 @@
     }
   },
   {
+    "name": "movie-1275779-titles",
+    "path": "/3/movie/1275779/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1368337",
     "path": "/3/movie/1368337",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1368337-titles",
+    "path": "/3/movie/1368337/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1314481",
@@ -1015,11 +1735,21 @@
     }
   },
   {
+    "name": "movie-1314481-titles",
+    "path": "/3/movie/1314481/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1306368",
     "path": "/3/movie/1306368",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1306368-titles",
+    "path": "/3/movie/1306368/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1301421",
@@ -1029,11 +1759,21 @@
     }
   },
   {
+    "name": "movie-1301421-titles",
+    "path": "/3/movie/1301421/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1272837",
     "path": "/3/movie/1272837",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1272837-titles",
+    "path": "/3/movie/1272837/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-454639",
@@ -1043,11 +1783,21 @@
     }
   },
   {
+    "name": "movie-454639-titles",
+    "path": "/3/movie/454639/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1325734",
     "path": "/3/movie/1325734",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1325734-titles",
+    "path": "/3/movie/1325734/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1083381",
@@ -1057,11 +1807,21 @@
     }
   },
   {
+    "name": "movie-1083381-titles",
+    "path": "/3/movie/1083381/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-200875",
     "path": "/3/tv/200875",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-200875-titles",
+    "path": "/3/tv/200875/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1291608",
@@ -1071,11 +1831,21 @@
     }
   },
   {
+    "name": "movie-1291608-titles",
+    "path": "/3/movie/1291608/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-604079",
     "path": "/3/movie/604079",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-604079-titles",
+    "path": "/3/movie/604079/alternative_titles",
+    "query": {}
   },
   {
     "name": "tv-247718",
@@ -1085,11 +1855,21 @@
     }
   },
   {
+    "name": "tv-247718-titles",
+    "path": "/3/tv/247718/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "tv-250307",
     "path": "/3/tv/250307",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "tv-250307-titles",
+    "path": "/3/tv/250307/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-950387",
@@ -1099,11 +1879,741 @@
     }
   },
   {
+    "name": "movie-950387-titles",
+    "path": "/3/movie/950387/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-377985",
+    "path": "/3/movie/377985",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-377985-titles",
+    "path": "/3/movie/377985/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-9566",
+    "path": "/3/movie/9566",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-9566-titles",
+    "path": "/3/movie/9566/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-715292",
+    "path": "/3/movie/715292",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-715292-titles",
+    "path": "/3/movie/715292/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "tv-37854",
+    "path": "/3/tv/37854",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-37854-titles",
+    "path": "/3/tv/37854/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-230240",
+    "path": "/3/movie/230240",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-230240-titles",
+    "path": "/3/movie/230240/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-365313",
+    "path": "/3/movie/365313",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-365313-titles",
+    "path": "/3/movie/365313/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-441919",
+    "path": "/3/movie/441919",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-441919-titles",
+    "path": "/3/movie/441919/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-270919",
+    "path": "/3/movie/270919",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-270919-titles",
+    "path": "/3/movie/270919/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-74899",
+    "path": "/3/movie/74899",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-74899-titles",
+    "path": "/3/movie/74899/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-10358",
+    "path": "/3/movie/10358",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-10358-titles",
+    "path": "/3/movie/10358/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-334533",
+    "path": "/3/movie/334533",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-334533-titles",
+    "path": "/3/movie/334533/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-338952",
+    "path": "/3/movie/338952",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-338952-titles",
+    "path": "/3/movie/338952/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-259316",
+    "path": "/3/movie/259316",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-259316-titles",
+    "path": "/3/movie/259316/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "tv-308834",
+    "path": "/3/tv/308834",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-308834-titles",
+    "path": "/3/tv/308834/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-634429",
+    "path": "/3/movie/634429",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-634429-titles",
+    "path": "/3/movie/634429/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-420541",
+    "path": "/3/movie/420541",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-420541-titles",
+    "path": "/3/movie/420541/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-598133",
+    "path": "/3/movie/598133",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-598133-titles",
+    "path": "/3/movie/598133/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-575428",
+    "path": "/3/movie/575428",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-575428-titles",
+    "path": "/3/movie/575428/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "tv-79481",
+    "path": "/3/tv/79481",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-79481-titles",
+    "path": "/3/tv/79481/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-33542",
+    "path": "/3/movie/33542",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-33542-titles",
+    "path": "/3/movie/33542/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-732946",
+    "path": "/3/movie/732946",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-732946-titles",
+    "path": "/3/movie/732946/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "tv-309104",
+    "path": "/3/tv/309104",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-309104-titles",
+    "path": "/3/tv/309104/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1363620",
+    "path": "/3/movie/1363620",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1363620-titles",
+    "path": "/3/movie/1363620/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1113119",
+    "path": "/3/movie/1113119",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1113119-titles",
+    "path": "/3/movie/1113119/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-21781",
+    "path": "/3/movie/21781",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-21781-titles",
+    "path": "/3/movie/21781/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1216195",
+    "path": "/3/movie/1216195",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1216195-titles",
+    "path": "/3/movie/1216195/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-66842",
+    "path": "/3/movie/66842",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-66842-titles",
+    "path": "/3/movie/66842/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-75188",
+    "path": "/3/movie/75188",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-75188-titles",
+    "path": "/3/movie/75188/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "tv-215521",
+    "path": "/3/tv/215521",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-215521-titles",
+    "path": "/3/tv/215521/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1492897",
+    "path": "/3/movie/1492897",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1492897-titles",
+    "path": "/3/movie/1492897/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-841354",
+    "path": "/3/movie/841354",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-841354-titles",
+    "path": "/3/movie/841354/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-437090",
+    "path": "/3/movie/437090",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-437090-titles",
+    "path": "/3/movie/437090/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-525420",
+    "path": "/3/movie/525420",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-525420-titles",
+    "path": "/3/movie/525420/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-320554",
+    "path": "/3/movie/320554",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-320554-titles",
+    "path": "/3/movie/320554/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-353821",
+    "path": "/3/movie/353821",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-353821-titles",
+    "path": "/3/movie/353821/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-121451",
+    "path": "/3/movie/121451",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-121451-titles",
+    "path": "/3/movie/121451/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-187487",
+    "path": "/3/movie/187487",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-187487-titles",
+    "path": "/3/movie/187487/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-279042",
+    "path": "/3/movie/279042",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-279042-titles",
+    "path": "/3/movie/279042/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-462876",
+    "path": "/3/movie/462876",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-462876-titles",
+    "path": "/3/movie/462876/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-82952",
+    "path": "/3/movie/82952",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-82952-titles",
+    "path": "/3/movie/82952/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-45132",
+    "path": "/3/movie/45132",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-45132-titles",
+    "path": "/3/movie/45132/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1061474",
+    "path": "/3/movie/1061474",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1061474-titles",
+    "path": "/3/movie/1061474/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-123196",
+    "path": "/3/movie/123196",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-123196-titles",
+    "path": "/3/movie/123196/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-53287",
+    "path": "/3/movie/53287",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-53287-titles",
+    "path": "/3/movie/53287/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-37686",
+    "path": "/3/movie/37686",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-37686-titles",
+    "path": "/3/movie/37686/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1154389",
+    "path": "/3/movie/1154389",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1154389-titles",
+    "path": "/3/movie/1154389/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-502356",
+    "path": "/3/movie/502356",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-502356-titles",
+    "path": "/3/movie/502356/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-148839",
+    "path": "/3/movie/148839",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-148839-titles",
+    "path": "/3/movie/148839/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-8224",
+    "path": "/3/movie/8224",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-8224-titles",
+    "path": "/3/movie/8224/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-8363",
+    "path": "/3/movie/8363",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-8363-titles",
+    "path": "/3/movie/8363/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1226863",
+    "path": "/3/movie/1226863",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1226863-titles",
+    "path": "/3/movie/1226863/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1222479",
+    "path": "/3/movie/1222479",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1222479-titles",
+    "path": "/3/movie/1222479/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-406960",
+    "path": "/3/movie/406960",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-406960-titles",
+    "path": "/3/movie/406960/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1190511",
+    "path": "/3/movie/1190511",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1190511-titles",
+    "path": "/3/movie/1190511/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-774370",
+    "path": "/3/movie/774370",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-774370-titles",
+    "path": "/3/movie/774370/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-1175942",
+    "path": "/3/movie/1175942",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1175942-titles",
+    "path": "/3/movie/1175942/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "tv-235884",
+    "path": "/3/tv/235884",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-235884-titles",
+    "path": "/3/tv/235884/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-939243",
+    "path": "/3/movie/939243",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-939243-titles",
+    "path": "/3/movie/939243/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-848538",
+    "path": "/3/movie/848538",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-848538-titles",
+    "path": "/3/movie/848538/alternative_titles",
+    "query": {}
+  },
+  {
+    "name": "movie-426004",
+    "path": "/3/movie/426004",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-426004-titles",
+    "path": "/3/movie/426004/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1895",
     "path": "/3/movie/1895",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1895-titles",
+    "path": "/3/movie/1895/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1893",
@@ -1113,11 +2623,21 @@
     }
   },
   {
+    "name": "movie-1893-titles",
+    "path": "/3/movie/1893/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-140607",
     "path": "/3/movie/140607",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-140607-titles",
+    "path": "/3/movie/140607/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-1891",
@@ -1127,11 +2647,21 @@
     }
   },
   {
+    "name": "movie-1891-titles",
+    "path": "/3/movie/1891/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-732670",
     "path": "/3/movie/732670",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-732670-titles",
+    "path": "/3/movie/732670/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-12180",
@@ -1141,11 +2671,21 @@
     }
   },
   {
+    "name": "movie-12180-titles",
+    "path": "/3/movie/12180/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-1731694",
     "path": "/3/movie/1731694",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-1731694-titles",
+    "path": "/3/movie/1731694/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-765673",
@@ -1155,11 +2695,21 @@
     }
   },
   {
+    "name": "movie-765673-titles",
+    "path": "/3/movie/765673/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-782054",
     "path": "/3/movie/782054",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-782054-titles",
+    "path": "/3/movie/782054/alternative_titles",
+    "query": {}
   },
   {
     "name": "movie-667574",
@@ -1169,6 +2719,11 @@
     }
   },
   {
+    "name": "movie-667574-titles",
+    "path": "/3/movie/667574/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-825647",
     "path": "/3/movie/825647",
     "query": {
@@ -1176,11 +2731,21 @@
     }
   },
   {
+    "name": "movie-825647-titles",
+    "path": "/3/movie/825647/alternative_titles",
+    "query": {}
+  },
+  {
     "name": "movie-980804",
     "path": "/3/movie/980804",
     "query": {
       "language": "en-US"
     }
+  },
+  {
+    "name": "movie-980804-titles",
+    "path": "/3/movie/980804/alternative_titles",
+    "query": {}
   },
   {
     "name": "search-multi-gho",
@@ -1522,6 +3087,218 @@
     }
   },
   {
+    "name": "search-multi-fan",
+    "path": "/3/search/multi",
+    "query": {
+      "query": "fan",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  {
+    "name": "tv-110898",
+    "path": "/3/tv/110898",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-69193",
+    "path": "/3/tv/69193",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-90049",
+    "path": "/3/tv/90049",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-69746",
+    "path": "/3/tv/69746",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-34327",
+    "path": "/3/tv/34327",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-106843",
+    "path": "/3/tv/106843",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-88140",
+    "path": "/3/tv/88140",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-303870",
+    "path": "/3/tv/303870",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-83271",
+    "path": "/3/tv/83271",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-916213",
+    "path": "/3/movie/916213",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "search-multi-sup",
+    "path": "/3/search/multi",
+    "query": {
+      "query": "sup",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  {
+    "name": "movie-1391432",
+    "path": "/3/movie/1391432",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1741494",
+    "path": "/3/movie/1741494",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1780495",
+    "path": "/3/movie/1780495",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1640818",
+    "path": "/3/movie/1640818",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "movie-1305142",
+    "path": "/3/movie/1305142",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-271094",
+    "path": "/3/tv/271094",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "search-multi-super",
+    "path": "/3/search/multi",
+    "query": {
+      "query": "super",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  {
+    "name": "tv-71026",
+    "path": "/3/tv/71026",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-936",
+    "path": "/3/tv/936",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-312359",
+    "path": "/3/tv/312359",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-85278",
+    "path": "/3/tv/85278",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-94572",
+    "path": "/3/tv/94572",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-62715",
+    "path": "/3/tv/62715",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-210252",
+    "path": "/3/tv/210252",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-17964",
+    "path": "/3/tv/17964",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-155660",
+    "path": "/3/tv/155660",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "tv-1771",
+    "path": "/3/tv/1771",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
     "name": "search-multi-no-results",
     "path": "/3/search/multi",
     "query": {
@@ -1581,6 +3358,27 @@
     }
   },
   {
+    "name": "collection-387618",
+    "path": "/3/collection/387618",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "collection-435259",
+    "path": "/3/collection/435259",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "collection-552742",
+    "path": "/3/collection/552742",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
     "name": "collection-564857",
     "path": "/3/collection/564857",
     "query": {
@@ -1588,8 +3386,22 @@
     }
   },
   {
+    "name": "collection-591956",
+    "path": "/3/collection/591956",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
     "name": "collection-669105",
     "path": "/3/collection/669105",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "collection-720879",
+    "path": "/3/collection/720879",
     "query": {
       "language": "en-US"
     }
@@ -1609,6 +3421,13 @@
     }
   },
   {
+    "name": "collection-1231053",
+    "path": "/3/collection/1231053",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
     "name": "collection-1314623",
     "path": "/3/collection/1314623",
     "query": {
@@ -1616,8 +3435,22 @@
     }
   },
   {
+    "name": "collection-1434561",
+    "path": "/3/collection/1434561",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
     "name": "collection-1461530",
     "path": "/3/collection/1461530",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "collection-1540907",
+    "path": "/3/collection/1540907",
     "query": {
       "language": "en-US"
     }

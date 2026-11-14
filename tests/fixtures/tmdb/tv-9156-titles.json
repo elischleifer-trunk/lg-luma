@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/tv/9156/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:21.716Z",
+  "response": {
+    "id": 9156,
+    "results": [
+      {
+        "iso_3166_1": "BE",
+        "title": "Les Enfants de Dune",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "伏虎记",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Děti Duny",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Dune - Der Messias",
+        "type": "first part title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Dune - Bedrohung des Imperiums",
+        "type": "second part title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Dune - Die Kinder des Wüstenplaneten",
+        "type": "third part title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Dune - Krieg um den Wüstenplaneten",
+        "type": "cut version"
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Children of Dune",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Hijos de Dune 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les enfants de Dune",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Πλανήτης Dune: Η Δεύτερη Γενιά",
+        "type": "DVD title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "デューン/砂の惑星II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "デューン / 砂の惑星 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Children of Dune",
+        "type": "Proper title"
+      }
+    ]
+  }
+}

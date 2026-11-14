@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/movie/1368337/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.354Z",
+  "response": {
+    "id": 1368337,
+    "titles": [
+      {
+        "iso_3166_1": "IL",
+        "title": "האודיסיאה",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Odysseen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "奧德賽",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Οδύσσεια",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PK",
+        "title": "دی اوڈیسی",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "ادیسه",
+        "type": "فارسی"
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "দ্য অডিচি",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BD",
+        "title": "দ্য ওডিসি",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BY",
+        "title": "Адысея",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Odisseya",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Odisėja",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Odyssey",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "L'Odyssée",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La Odisea",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NP",
+        "title": "ओडिसी",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "奥德赛",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "The.Odyssey.La.Odisea.2026",
+        "type": ""
+      }
+    ]
+  }
+}

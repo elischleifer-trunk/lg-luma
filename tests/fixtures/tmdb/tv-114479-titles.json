@@ -1,0 +1,112 @@
+{
+  "request": {
+    "path": "/3/tv/114479/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.930Z",
+  "response": {
+    "id": 114479,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "A Acólita",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：侍者",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "侍者",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "信徒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：信徒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "门徒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：门徒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - The Acolyte",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EC",
+        "title": "Star Wars: The Acolyte",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: The Acolyte",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : The Acolyte",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Star Wars: Az akolitus",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "アコライト／スター・ウォーズ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Star Wars: アコライト",
+        "type": "logo"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "アコライト",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny: Akolita",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Послушник",
+        "type": "wrong literal translation"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Аколит",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Аколіт",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Acolyte",
+        "type": "working title"
+      }
+    ]
+  }
+}

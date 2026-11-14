@@ -1,0 +1,167 @@
+{
+  "request": {
+    "path": "/3/movie/502356/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.104Z",
+  "response": {
+    "id": 502356,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Super Mario Movie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Super Mario Bros.",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Супербратья Марио",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "سوپر ماریو: قارچ خور!",
+        "type": "Abanda Studio dub title"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "برادران قارچ خور",
+        "type": "AlphaMedia Studio dub title"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "برادران سوپر ماریو",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "فیلم سینمایی برادران سوپر ماریو",
+        "type": "Seda Pishe dub title"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "قارچ خور: برادران سوپر ماریو",
+        "type": "Soren Studio dub title"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "سوپر ماریو",
+        "type": "Studio Best Voice dub title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Супербратья Марио в кино",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "เดอะ ซูเปอร์มาริโอบราเธอร์ส มูฟวี่",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AD",
+        "title": "Super Mario Bros.: La pel·lícula",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EG",
+        "title": "فيلم سوبر ماريو بروس",
+        "type": "theatrical title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "სუპერ მარიო ძმკბის ფილმი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "האחים סופר מריו - הסרט",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Super Mario braća film",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Super Mario Qardaşları",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Супер Марио Браќа Филм",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MN",
+        "title": "Супер Марио ах Дүүс",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KH",
+        "title": "ស៊ូប៉ាម៉ារីអូប្រូថអឺស: ភាពយន្",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LA",
+        "title": "ຊູເປີມາຣິໂອ ໂບຣສ ເດິມູວີ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "فيلم الأخوان ماريو الخارقان",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "الأخوان ماريو الخارقان - فيلم",
+        "type": "literal translation"
+      },
+      {
+        "iso_3166_1": "EG",
+        "title": "سوبر ماريو بروس، الفيلم",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "超级玛利欧兄弟大电影",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超级马利欧兄弟大电影",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Super Mario Bros. le film",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超级马里奥兄弟",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "超级玛利欧兄弟电影版",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スーパーマリオ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超级玛利欧兄弟大电影",
+        "type": ""
+      }
+    ]
+  }
+}

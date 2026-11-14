@@ -133,6 +133,21 @@ pub struct Signals {
     pub date: String,
     /// The US rating (PG-13, TV-14), from details fetched with `append_to_response`.
     pub rating: Option<String>,
+    /// Other titles used in the US and UK ("Star Wars: Andor"), from details fetched with
+    /// `append_to_response=alternative_titles`.
+    pub titles: Vec<String>,
+}
+
+/// Countries whose alternative titles count as English names for the title.
+const ENGLISH_TITLE_COUNTRIES: &[&str] = &["US", "GB"];
+
+fn english_titles<'a>(
+    titles: impl Iterator<Item = (Option<&'a str>, Option<&'a str>)>,
+) -> Vec<String> {
+    titles
+        .filter(|(country, _)| country.is_some_and(|c| ENGLISH_TITLE_COUNTRIES.contains(&c)))
+        .filter_map(|(_, title)| title.map(str::to_owned))
+        .collect()
 }
 
 /// The US certification of a film: the theatrical one when set, else any US release's.
@@ -213,6 +228,13 @@ impl Signals {
             collection: details.belongs_to_collection.as_ref().and_then(|c| c.id),
             date: details.release_date.clone().unwrap_or_default(),
             rating: us_certification(details),
+            titles: english_titles(
+                details
+                    .alternative_titles
+                    .iter()
+                    .flat_map(|a| a.titles.iter().flatten())
+                    .map(|t| (t.iso_3166_1.as_deref(), t.title.as_deref())),
+            ),
         }
     }
 
@@ -247,6 +269,13 @@ impl Signals {
             collection: None,
             date: details.first_air_date.clone().unwrap_or_default(),
             rating: us_tv_rating(details),
+            titles: english_titles(
+                details
+                    .alternative_titles
+                    .iter()
+                    .flat_map(|a| a.results.iter().flatten())
+                    .map(|t| (t.iso_3166_1.as_deref(), t.title.as_deref())),
+            ),
         }
     }
 
@@ -381,10 +410,22 @@ pub fn match_tier(query: &str, title: &str) -> u8 {
     if title.windows(query.len()).any(|window| window == query) {
         return 2;
     }
-    if title.join(" ").contains(&query.join(" ")) {
+    // Punctuation counts as nothing as well as a space: "oceans" finds "Ocean's Eleven",
+    // "spiderman" finds "Spider-Man".
+    if title.join(" ").contains(&query.join(" ")) || title.concat().contains(&query.concat()) {
         return 3;
     }
     4
+}
+
+/// How the best of a show's English names matches the query: its title, or an alternative
+/// title used in the US or UK. *Andor* is "Star Wars: Andor" there.
+fn best_tier(query: &str, show: &Show, signals: &Signals) -> u8 {
+    signals
+        .titles
+        .iter()
+        .map(|title| match_tier(query, title))
+        .fold(match_tier(query, &show.title), u8::min)
 }
 
 /// "Ghostbusters: Afterlife" and "Ghostbusters II" share the base title "ghostbusters".
@@ -412,6 +453,8 @@ struct Candidate {
     base: String,
     american: bool,
     date: String,
+    /// The original title matches the query (*Amélie*).
+    original: bool,
 }
 
 /// Same franchise: same kind and match group, and the same TMDB collection, or the same base
@@ -444,7 +487,7 @@ pub fn rank(
                 ShowType::Series => Kind::Series,
                 _ => Kind::Movie,
             };
-            let tier = match_tier(query, &show.title);
+            let tier = best_tier(query, show, signals);
             if !signals.keep(kind, tier == 0) {
                 return None;
             }
@@ -469,6 +512,7 @@ pub fn rank(
                 } else {
                     signals.date.clone()
                 },
+                original: match_tier(query, &show.original_title) < 4,
             })
         })
         .collect();
@@ -485,6 +529,15 @@ pub fn rank(
         if let Some(tier) = candidate.collection.and_then(|c| collection_tiers.get(&c)) {
             candidate.tier = *tier;
         }
+    }
+
+    // Movie of the Night matches titles in every language and fills its 20 results with near
+    // misses: "super" brings back *8MM* and *The Bad Guys 2*. Drop titles none of whose names
+    // contain the query and that share no collection with one that does. When none match,
+    // keep them all: a near miss beats an empty screen (a misspelt title).
+    let on_topic = |c: &Candidate| c.tier < 4 || c.original;
+    if candidates.iter().any(on_topic) {
+        candidates.retain(on_topic);
     }
 
     candidates.sort_by(|a, b| {
@@ -540,4 +593,4 @@ pub fn rank(
 
 #[cfg(test)]
 #[path = "relevance-tests.rs"]
-mod tests;
+pub(crate) mod tests;

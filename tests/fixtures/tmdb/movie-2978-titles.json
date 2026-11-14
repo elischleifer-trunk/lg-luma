@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/movie/2978/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:14.410Z",
+  "response": {
+    "id": 2978,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters II: River of Slime",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Last of the Ghostbusters",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "捉鬼敢死队2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "SOS Fantômes 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "cazafantasmas II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트 버스터즈 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "捉鬼敢死隊續集",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "cazafantasmas 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Ghostbusters II - Acchiappafantasmi II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Pogromcy Duchów II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Pogromcy Duchów 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트버스터즈 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ゴーストバスターズ２",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "捉鬼敢死隊續集",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Krotitelé duchů 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Seed",
+        "type": "working title"
+      }
+    ]
+  }
+}

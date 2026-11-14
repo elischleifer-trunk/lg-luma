@@ -29,7 +29,26 @@ const SERVICES = {
       ];
     },
   },
-  prime: { apps: ['amazon'], candidates: webLink },
+  // Verified on a TV: the title's GTI, decoded from the compact ID in the link (see
+  // gti_from_compact in src/deeplink.rs). Web links and the compact ID open the home screen.
+  prime: {
+    apps: ['amazon'],
+    candidates: (link) => {
+      // Titles included with Prime: app.primevideo.com/detail?gti=<GTI>.
+      const direct = link.match(/[?&]gti=(amzn1\.dv\.gti\.[0-9a-f-]{36})(?:[&#]|$)/)?.[1];
+      if (direct) return [{ contentTarget: direct }, ...webLink(link)];
+      const compact = link.match(/\/(?:detail|dp)\/([0-9A-Z]{26})(?:[/?#]|$)/)?.[1];
+      if (!compact) return webLink(link);
+      const hex = (
+        [...compact].reduce((n, c) => n * 36n + BigInt(parseInt(c, 36)), 0n) -
+        (1n << 128n)
+      )
+        .toString(16)
+        .padStart(32, '0');
+      const gti = `amzn1.dv.gti.${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+      return [{ contentTarget: gti }, ...webLink(link)];
+    },
+  },
   disney: { apps: ['com.disney.disneyplus-prod'], candidates: webLink },
   hbo: { apps: ['com.wbd.stream', 'com.hbo.hbomax', 'hbo-go-2'], candidates: webLink },
   hulu: { apps: ['hulu'], candidates: webLink },

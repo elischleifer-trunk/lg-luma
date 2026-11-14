@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/74899/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:29.833Z",
+  "response": {
+    "id": 74899,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Trance",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "El Admirador",
+        "type": ""
+      }
+    ]
+  }
+}

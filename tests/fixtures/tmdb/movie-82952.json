@@ -1,0 +1,64 @@
+{
+  "request": {
+    "path": "/3/movie/82952",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:26.560Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/vH51b8bxpsaIzIt1pqMhsuO9fnV.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 10749,
+        "name": "Romance"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 82952,
+    "imdb_id": "tt0105174",
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "cn",
+    "original_title": "廟街十二少",
+    "overview": "Andy Lau stars in The Prince of Temple Street, a classic triad story of honor and righteousness. Andy Lau is \"The Twelfth Young Master\", so called because he was raised by twelve foster parents from the triad underworld. A lifelong resident of Temple Street, the Young Master is intimately familiar with the triad life, having been around triads his whole life. But things change when he meets a beautiful missionary named Teresa (Joey Wang). She desires to bring hope and faith to Temple Street, and the Young Master is drawn towards her.",
+    "popularity": 0.8465,
+    "poster_path": "/bBEpKzIPr787UehSt5ssyf6m2WL.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "HK",
+        "name": "Hong Kong"
+      }
+    ],
+    "release_date": "1992-08-20",
+    "revenue": 0,
+    "runtime": 95,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Cantonese",
+        "iso_639_1": "cn",
+        "name": "广州话 / 廣州話"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "The Prince of Temple Street",
+    "video": false,
+    "vote_average": 6.1,
+    "vote_count": 7
+  }
+}

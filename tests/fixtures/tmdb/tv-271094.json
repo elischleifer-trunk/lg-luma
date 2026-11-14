@@ -1,0 +1,71 @@
+{
+  "request": {
+    "path": "/3/tv/271094",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.529Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/lsrQcN33faIbPjWUET1Q7gPaCUD.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2024-09-10",
+    "genres": [],
+    "homepage": "",
+    "id": 271094,
+    "in_production": true,
+    "languages": [],
+    "last_air_date": "2024-09-10",
+    "last_episode_to_air": {
+      "id": 5590488,
+      "name": "Episode 1",
+      "overview": "Musician, surfer and comedian Chris Hau talks with various celebrities. The catch? They are on Stand Up Paddleboards! Interviews, competitions, shows, concerts and more, this show is full of fun and laughs for the whole family.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2024-09-10",
+      "episode_number": 1,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 1,
+      "show_id": 271094,
+      "still_path": null
+    },
+    "name": "What Sup",
+    "next_episode_to_air": null,
+    "networks": [],
+    "number_of_episodes": 1,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Nautical Ch: What Sup",
+    "overview": "Musician, surfer and comedian Chris Hau talks with various celebrities. The catch? They are on Stand Up Paddleboards! Interviews, competitions, shows, concerts and more, this show is full of fun and laughs for the whole family.",
+    "popularity": 0.0565,
+    "poster_path": null,
+    "production_companies": [],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "2024-09-10",
+        "episode_count": 1,
+        "id": 417917,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

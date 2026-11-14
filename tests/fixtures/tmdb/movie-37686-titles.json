@@ -1,0 +1,37 @@
+{
+  "request": {
+    "path": "/3/movie/37686/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:33.893Z",
+  "response": {
+    "id": 37686,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "1Super8",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "SUPER8／スーパーエイト",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Супер 8",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "슈퍼 에이트",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超级八",
+        "type": ""
+      }
+    ]
+  }
+}

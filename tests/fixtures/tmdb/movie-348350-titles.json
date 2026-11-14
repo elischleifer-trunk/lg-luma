@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/348350/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.444Z",
+  "response": {
+    "id": 348350,
+    "titles": [
+      {
+        "iso_3166_1": "IL",
+        "title": "האן סולו: סיפור מלחמת הכוכבים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Solo: Hvězdné války",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EG",
+        "title": "سولو: قصة من حرب النجوم",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные Войны Истории. Хан Соло",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars - Han Solo: Una historia de Star Wars",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AL",
+        "title": "Solo: Një rrëfenjë nga Lufta e Yjeve",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "한솔로",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Solo: Chiến Tranh Giữa Các Vì Sao Ngoại Truyện",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Han Solo: Bir Star Wars Hikayesi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战外传游侠索罗",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "韓索羅：星球大戰外傳",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Solo - A Star Wars Story",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Solo: Ulduz müharibələri. Hekayələr",
+        "type": ""
+      }
+    ]
+  }
+}

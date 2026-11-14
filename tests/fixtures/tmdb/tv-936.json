@@ -1,0 +1,205 @@
+{
+  "request": {
+    "path": "/3/tv/936",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.826Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/ebbeTgwFRvKEdFSAoHsBPvZsAFf.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      60
+    ],
+    "first_air_date": "1973-09-08",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "https://play.hbomax.com/page/urn:hbo:page:GYKaOxA4KeJ7DwwEAAAAR:type:series",
+    "id": 936,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1985-10-26",
+    "last_episode_to_air": {
+      "id": 2458048,
+      "name": "Escape from Space City",
+      "overview": "The evil Darkseid's latest project involves the capture and takeover of Star City, a gigantic orbiting earth colony. To this end, he replaces the satellite's kidnapped inventor Mr. Moko with a robot lookalike that even fools Moko's daughter, Kiri. Meanwhile, Batman, Firestorm and Samurai must steer clear of Darkseid's minions Kalibak and DeSaad and their robot army, long enough to allow Superman, Wonder Woman and Aquaman to seek out and destroy the control equipment hidden in Darkseid's headquarters!",
+      "vote_average": 7,
+      "vote_count": 2,
+      "air_date": "1985-10-26",
+      "episode_number": 8,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 60,
+      "season_number": 9,
+      "show_id": 936,
+      "still_path": "/5fF9dBxvMc4liI0g1nZBX1AhBa7.jpg"
+    },
+    "name": "Super Friends",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2,
+        "logo_path": "/2uy2ZWcplrSObIyt4x0Y9rkG6qO.png",
+        "name": "ABC",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 109,
+    "number_of_seasons": 9,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Super Friends",
+    "overview": "The most powerful heroes ever--Superman, Wonder Woman, Aquaman, Batman and Robin--join forces with teenagers Wendy and Marvin and their dog, Marvel the Wonderdog, to defend justice and guard the innocent.",
+    "popularity": 24.2915,
+    "poster_path": "/3AvUm2Lf7YnEb7yHIJmC87mh0kK.jpg",
+    "production_companies": [
+      {
+        "id": 115373,
+        "logo_path": null,
+        "name": "Eric Porter Studios",
+        "origin_country": ""
+      },
+      {
+        "id": 1353,
+        "logo_path": "/yXhCcOFK5Fy3ZBQwhBYx8Zu9ZIw.png",
+        "name": "Hanna-Barbera Cartoons",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": null,
+        "episode_count": 2,
+        "id": 2713,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/rsSDrN3M1J145o83mV9JCOTujPp.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1973-09-08",
+        "episode_count": 16,
+        "id": 2712,
+        "name": "Season 1",
+        "overview": "Super Friends premiered on September 8, 1973. Seasons were generally released annually with some breaks in between. Aside from Season 1, each season had its own name, title card, title sequence, and slightly varying theme song along with differing characters. However, each season kept the 3 core super friends, Superman, Batman, and Wonder Woman as well as the same narrator throughout.",
+        "poster_path": "/lWXduWuJT9Ffo7Pu9CHCOMC5Ceh.jpg",
+        "season_number": 1,
+        "vote_average": 7.4
+      },
+      {
+        "air_date": "1977-09-10",
+        "episode_count": 15,
+        "id": 165135,
+        "name": "The All-New Super Friends Hour",
+        "overview": "",
+        "poster_path": "/looFpzovTpeEnhlwUzYmuF9ZhmH.jpg",
+        "season_number": 2,
+        "vote_average": 6.7
+      },
+      {
+        "air_date": "1978-09-09",
+        "episode_count": 32,
+        "id": 165136,
+        "name": "Challenge of the Super Friends",
+        "overview": "",
+        "poster_path": "/b9GUurdQhhTPLNeaRrueb1emIwt.jpg",
+        "season_number": 3,
+        "vote_average": 7.2
+      },
+      {
+        "air_date": "1979-09-22",
+        "episode_count": 8,
+        "id": 165137,
+        "name": "The World's Greatest Super Friends",
+        "overview": "",
+        "poster_path": "/hEakdNnXl9B0wRE22ejqTMoc97Z.jpg",
+        "season_number": 4,
+        "vote_average": 6.8
+      },
+      {
+        "air_date": "1980-09-13",
+        "episode_count": 8,
+        "id": 165138,
+        "name": "Super Friends - A Dangerous Fate",
+        "overview": "These new adventures featured appearances by the core group of the five classic Super Friends (Aquaman, Batman, Robin, Superman and Wonder Woman) along with Zan, Jayna & Gleek.",
+        "poster_path": "/jIV5qTxHYXUhxp3eBtM92RRqBoI.jpg",
+        "season_number": 5,
+        "vote_average": 7
+      },
+      {
+        "air_date": "1981-09-26",
+        "episode_count": 6,
+        "id": 165139,
+        "name": "Super Friends! Legacy Of Super Powers",
+        "overview": "",
+        "poster_path": "/gsxe898kzakcxUTMPhUkO3jeRKb.jpg",
+        "season_number": 6,
+        "vote_average": 6.8
+      },
+      {
+        "air_date": "1983-09-10",
+        "episode_count": 8,
+        "id": 165140,
+        "name": "Super Friends - The Lost Episodes",
+        "overview": "",
+        "poster_path": "/jH1gBavzMRwAgzleb8vRtDhcF1D.jpg",
+        "season_number": 7,
+        "vote_average": 6.8
+      },
+      {
+        "air_date": "1984-09-08",
+        "episode_count": 8,
+        "id": 165141,
+        "name": "Super Friends: The Legendary Super Powers Show",
+        "overview": "",
+        "poster_path": "/AeI1X9eGRTyvMHgbrDUwjvniVDb.jpg",
+        "season_number": 8,
+        "vote_average": 6.6
+      },
+      {
+        "air_date": "1985-09-07",
+        "episode_count": 8,
+        "id": 165142,
+        "name": "The Super Powers Team: Galactic Guardians",
+        "overview": "",
+        "poster_path": "/6pC7YGlx2EDBTQ1XRxoU8yha6c6.jpg",
+        "season_number": 9,
+        "vote_average": 6.7
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.8,
+    "vote_count": 167
+  }
+}

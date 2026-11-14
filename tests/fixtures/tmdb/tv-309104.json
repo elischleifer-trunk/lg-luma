@@ -1,0 +1,103 @@
+{
+  "request": {
+    "path": "/3/tv/309104",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:24.584Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7b3NxyUsiQYyi2mdx2jcGzbMEce.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2026-02-06",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://www.one31.net/shows/detail/605",
+    "id": 309104,
+    "in_production": false,
+    "languages": [
+      "th"
+    ],
+    "last_air_date": "2026-03-27",
+    "last_episode_to_air": {
+      "id": 6817447,
+      "name": "Episodes 8",
+      "overview": "",
+      "vote_average": 10,
+      "vote_count": 1,
+      "air_date": "2026-03-27",
+      "episode_number": 8,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 69,
+      "season_number": 1,
+      "show_id": 309104,
+      "still_path": "/bLp7oMOHJrHHMe0QjI94qVX9PAv.jpg"
+    },
+    "name": "I Wanna Be Sup'Tar",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1784,
+        "logo_path": "/cxBpog9yHJTIclmGsojZC7tqwlH.png",
+        "name": "ONE 31",
+        "origin_country": "TH"
+      }
+    ],
+    "number_of_episodes": 8,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "TH"
+    ],
+    "original_language": "th",
+    "original_name": "วันหนึ่งจะเป็นซุปตาร์",
+    "overview": "A disgraced superstar with nothing left ends up living under the same roof as an ordinary supporting actress. As house rules pile up and egos collide, their dysfunctional cohabitation spirals into sharp humor, constant friction, and consequences neither can avoid.",
+    "popularity": 2.0283,
+    "poster_path": "/pszdGaYDWZLidOTXEglzNMe3C0n.jpg",
+    "production_companies": [
+      {
+        "id": 105655,
+        "logo_path": "/ooE9GW8yiGGmIbENN1m9EElwd6F.png",
+        "name": "Change 2561",
+        "origin_country": "TH"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TH",
+        "name": "Thailand"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-02-06",
+        "episode_count": 8,
+        "id": 491017,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/rmWuPRhkLVS4ZPvKGJZ9fphwv8H.jpg",
+        "season_number": 1,
+        "vote_average": 9.3
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Thai",
+        "iso_639_1": "th",
+        "name": "ภาษาไทย"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Miniseries",
+    "vote_average": 6.6,
+    "vote_count": 8
+  }
+}

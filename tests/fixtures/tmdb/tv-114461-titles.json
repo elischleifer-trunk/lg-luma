@@ -1,0 +1,47 @@
+{
+  "request": {
+    "path": "/3/tv/114461/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.038Z",
+  "response": {
+    "id": 114461,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "阿索卡",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：阿索卡",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : Ahsoka",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: אסוקה",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "アソーカ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Star Wars：アソーカ",
+        "type": "logo"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Ahsoka",
+        "type": ""
+      }
+    ]
+  }
+}

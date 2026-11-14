@@ -261,6 +261,7 @@ pub struct MovieDetailsResponse {
     pub vote_average: Option<f64>,
     pub vote_count: Option<i64>,
     pub release_dates: Option<MovieDetailsResponseReleaseDates>,
+    pub alternative_titles: Option<MovieDetailsResponseAlternativeTitles>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -313,6 +314,17 @@ pub struct MovieDetailsResponseReleaseDatesResult {
 pub struct MovieDetailsResponseReleaseDatesResultReleaseDate {
     pub certification: Option<String>,
     pub r#type: Option<i64>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct MovieDetailsResponseAlternativeTitles {
+    pub titles: Option<Vec<MovieDetailsResponseAlternativeTitlesTitle>>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct MovieDetailsResponseAlternativeTitlesTitle {
+    pub iso_3166_1: Option<String>,
+    pub title: Option<String>,
 }
 
 /// Parameters of [`Client::search_multi`].
@@ -397,6 +409,7 @@ pub struct TvSeriesDetailsResponse {
     pub vote_average: Option<f64>,
     pub vote_count: Option<i64>,
     pub content_ratings: Option<TvSeriesDetailsResponseContentRatings>,
+    pub alternative_titles: Option<TvSeriesDetailsResponseAlternativeTitles>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -480,4 +493,15 @@ pub struct TvSeriesDetailsResponseContentRatings {
 pub struct TvSeriesDetailsResponseContentRatingsResult {
     pub iso_3166_1: Option<String>,
     pub rating: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct TvSeriesDetailsResponseAlternativeTitles {
+    pub results: Option<Vec<TvSeriesDetailsResponseAlternativeTitlesResult>>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct TvSeriesDetailsResponseAlternativeTitlesResult {
+    pub iso_3166_1: Option<String>,
+    pub title: Option<String>,
 }

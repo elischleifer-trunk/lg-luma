@@ -26,7 +26,12 @@ impl Fixtures {
             .join(format!("{name}.json"));
         let bytes = std::fs::read(path).map_err(|_| missing())?;
         let record: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
-        Ok(serde_json::from_value(record["response"].clone()).unwrap())
+        Ok(serde_json::from_value(crate::relevance::tests::with_titles(
+            dir,
+            name,
+            record["response"].clone(),
+        ))
+        .unwrap())
     }
 
     fn calls(&self, prefix: &str) -> Vec<String> {
@@ -212,4 +217,125 @@ fn generated_types_survive_the_cache_round_trip() {
         serde_json::from_slice(&serde_json::to_vec(&movie).unwrap()).unwrap();
     assert_eq!(shows_again, shows);
     assert_eq!(movie_again, movie);
+}
+
+fn titles(results: &[Ranked]) -> Vec<&str> {
+    results.iter().map(|r| r.show.title.as_str()).collect()
+}
+
+#[test]
+fn fan_lists_only_titles_with_fan_in_them() {
+    let source = Fixtures::default();
+    let results = search(&source, "fan", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    // Movie of the Night pads its 20 results with titles that match in other languages.
+    for gone in [
+        "One Piece",
+        "Shin Ultraman",
+        "Rumble in the Bronx",
+        "Zack and Miri Make a Porno",
+    ] {
+        assert!(!titles.contains(&gone), "{gone}: {titles:#?}");
+    }
+    assert!(!titles.is_empty());
+    for title in &titles {
+        assert!(title.to_lowercase().contains("fan"), "{titles:#?}");
+    }
+}
+
+#[test]
+fn super_drops_titles_that_do_not_say_super() {
+    let source = Fixtures::default();
+    let results = search(&source, "super", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    for gone in [
+        "8MM",
+        "The Bad Guys 2",
+        "Dog Man",
+        "Argylle",
+        "Sonic the Hedgehog 3",
+    ] {
+        assert!(!titles.contains(&gone), "{gone}: {titles:#?}");
+    }
+    for kept in ["Superman", "Super 8", "Superbad"] {
+        assert!(titles.contains(&kept), "{kept}: {titles:#?}");
+    }
+}
+
+#[test]
+fn star_wars_keeps_the_franchise_titles_that_do_not_say_star_wars() {
+    let source = Fixtures::default();
+    let results = search(&source, "star wars", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    // Their US titles say "Star Wars: Andor", "Star Wars: The Mandalorian"…; Return of the Jedi
+    // is in the Star Wars collection.
+    for kept in [
+        "Andor",
+        "The Mandalorian",
+        "The Acolyte",
+        "Ahsoka",
+        "The Book of Boba Fett",
+        "Return of the Jedi",
+    ] {
+        assert!(titles.contains(&kept), "{kept}: {titles:#?}");
+    }
+    // Return of the Jedi came with the title search, so expanding the franchise does not
+    // fetch it again: the four lookups go to the films the search missed, The Force Awakens
+    // among them.
+    assert_eq!(
+        source.calls("streaming/show-"),
+        [
+            "streaming/show-movie-140607",
+            "streaming/show-movie-1891",
+            "streaming/show-movie-1893",
+            "streaming/show-movie-1895",
+        ]
+    );
+}
+
+#[test]
+fn when_nothing_matches_the_near_misses_stay() {
+    // Only the "sup" results that do not contain "sup" in any of their names.
+    let source = Fixtures::default();
+    let all = search(&source, "sup", "us", &Services::default()).unwrap();
+    let near_misses: Vec<Show> = Fixtures::default()
+        .search("sup", "us")
+        .unwrap()
+        .into_iter()
+        .filter(|show| !all.iter().any(|r| r.show.tmdb_id == show.tmdb_id))
+        .collect();
+    assert!(!near_misses.is_empty());
+    let mut enrichment = relevance::Enrichment::default();
+    for show in &near_misses {
+        match relevance::tmdb_id(show) {
+            Some((Kind::Movie, id)) => {
+                if let Ok(details) = source.movie(id) {
+                    enrichment.add_movie(&details);
+                }
+            }
+            Some((Kind::Series, id)) => {
+                if let Ok(details) = source.series(id) {
+                    enrichment.add_series(&details);
+                }
+            }
+            None => {}
+        }
+    }
+    let ranked = relevance::rank(
+        "sup",
+        &near_misses,
+        "us",
+        &Services::default(),
+        Some(&enrichment),
+    );
+    let kept = near_misses
+        .iter()
+        .filter(|show| {
+            enrichment
+                .signals
+                .get(&relevance::tmdb_id(show).unwrap())
+                .is_some_and(|s| s.keep(relevance::tmdb_id(show).unwrap().0, false))
+        })
+        .count();
+    assert_eq!(ranked.len(), kept, "nothing dropped for not matching");
 }

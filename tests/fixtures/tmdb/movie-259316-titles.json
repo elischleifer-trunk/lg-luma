@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/259316/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.289Z",
+  "response": {
+    "id": 259316,
+    "titles": [
+      {
+        "iso_3166_1": "RS",
+        "title": "Fantastične zveri i gde ih naći",
+        "type": "romanization"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "Ka'yot ha'pele ve'hey'khan limtzo otan",
+        "type": "romanization"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Animais Fantásticos - E Onde Habitam",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Sinh Vật Huyền Bí và Nơi Tìm Ra Chúng",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "신비한 동물 사전",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "幻の動物とその生息地",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Фантастические звери и места их обитания",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Beasts and Where to Find Them 3D",
+        "type": "3D version"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "怪獸與牠們的產地",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇动物1：神奇动物在哪里",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "怪獸與牠們的產地",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "جانوران شگفت‌انگیز و زیستگاه آنها",
+        "type": "فارسی"
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "Phantastische Tierwesen 1 und wo sie zu finden sind",
+        "type": "short title"
+      }
+    ]
+  }
+}

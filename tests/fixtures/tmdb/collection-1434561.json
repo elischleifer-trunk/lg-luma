@@ -1,0 +1,68 @@
+{
+  "request": {
+    "path": "/3/collection/1434561",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:31.395Z",
+  "response": {
+    "id": 1434561,
+    "name": "The Super Mario Collection",
+    "original_language": "en",
+    "original_name": "The Super Mario Collection",
+    "overview": "A series of films following Brooklyn plumber Mario and his brother Luigi in their adventures in a fantastical land called the Mushroom Kingdom.",
+    "poster_path": "/jvntZuQBsvODH1YcEiIzOz4ZKFy.jpg",
+    "backdrop_path": "/mCF47RnRN8alhxCmFJzJRoEEPIe.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/9n2tJBplPbgR2ca05hS5CKXwP2c.jpg",
+        "genre_ids": [
+          10751,
+          35,
+          12,
+          14,
+          16
+        ],
+        "id": 502356,
+        "title": "The Super Mario Bros. Movie",
+        "original_language": "en",
+        "original_title": "The Super Mario Bros. Movie",
+        "overview": "While working underground to fix a water main, Brooklyn plumbers—and brothers—Mario and Luigi are transported down a mysterious pipe and wander into a magical new world. But when the brothers are separated, Mario embarks on an epic quest to find Luigi.",
+        "popularity": 20.655,
+        "poster_path": "/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
+        "release_date": "2023-04-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.584,
+        "vote_count": 11324,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/kxQiIJ4gVcD3K6o14MJ72p5yRcE.jpg",
+        "genre_ids": [
+          10751,
+          35,
+          12,
+          14,
+          16
+        ],
+        "id": 1226863,
+        "title": "The Super Mario Galaxy Movie",
+        "original_language": "en",
+        "original_title": "The Super Mario Galaxy Movie",
+        "overview": "Having thwarted Bowser's previous plot to marry Princess Peach, Mario and Luigi now face a fresh threat in Bowser Jr., who is determined to liberate his father from captivity and restore the family legacy. Alongside companions new and old, the brothers travel across the stars to stop the young heir's crusade.",
+        "popularity": 33.3663,
+        "poster_path": "/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg",
+        "release_date": "2026-04-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.18,
+        "vote_count": 3980,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

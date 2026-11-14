@@ -1,0 +1,125 @@
+{
+  "request": {
+    "path": "/3/tv/1771",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.712Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/dk8nGTq6qYa10rYh0l7kLna1tWt.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      30
+    ],
+    "first_air_date": "1990-10-05",
+    "genres": [
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "",
+    "id": 1771,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1992-05-26",
+    "last_episode_to_air": {
+      "id": 107425,
+      "name": "A Hundred Years a Second",
+      "overview": "When a bad reaction to a virtual reality device damages his memory, Zach's friends must prevent him from slipping into a death-like coma from which he will never awaken.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1992-05-26",
+      "episode_number": 22,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 21,
+      "season_number": 2,
+      "show_id": 1771,
+      "still_path": null
+    },
+    "name": "Super Force",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 184,
+        "logo_path": null,
+        "name": "Syndication",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 48,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Super Force",
+    "overview": "Super Force is an action-adventure TV series about a former astronaut who uses an advanced combat suit and motorcycle to fight crime in the city of Metroplex during the year 2020. Among the features of the suit were enhanced strength and armament, whereas the motorcycle had an array of James Bond-type gadgets and weapons.",
+    "popularity": 7.2038,
+    "poster_path": "/2n539x75lXDvNVXJpHvUe6bfrdh.jpg",
+    "production_companies": [
+      {
+        "id": 12077,
+        "logo_path": "/s6p5INYKlo6gD6RFXlm9ACA2VVj.png",
+        "name": "Viacom Productions",
+        "origin_country": "US"
+      },
+      {
+        "id": 105188,
+        "logo_path": null,
+        "name": "Premiere Limited Productions",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1990-10-05",
+        "episode_count": 26,
+        "id": 4979,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/8OssNRJOg17vE07n2taqqGWpOMu.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1991-10-06",
+        "episode_count": 22,
+        "id": 4980,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/5JRq16tTFq1ZfvVRA4G5vFGW2Kx.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.1,
+    "vote_count": 8
+  }
+}

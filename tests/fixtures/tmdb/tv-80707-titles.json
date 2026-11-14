@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/tv/80707/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.456Z",
+  "response": {
+    "id": 80707,
+    "results": [
+      {
+        "iso_3166_1": "ES",
+        "title": "Gul",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Ghul",
+        "type": ""
+      }
+    ]
+  }
+}

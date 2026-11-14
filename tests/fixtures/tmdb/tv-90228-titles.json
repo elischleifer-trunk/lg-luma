@@ -1,0 +1,57 @@
+{
+  "request": {
+    "path": "/3/tv/90228/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:20.773Z",
+  "response": {
+    "id": 90228,
+    "results": [
+      {
+        "iso_3166_1": "BA",
+        "title": "Dune Prophecy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Duna: A Profecia",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Dune : Prophecy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Dune - La prophétie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Dune : La Prophétie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "დიუნი: წინასწარმეტყველება",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "სილახვავი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune: The Sisterhood",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune - Prophecy",
+        "type": ""
+      }
+    ]
+  }
+}

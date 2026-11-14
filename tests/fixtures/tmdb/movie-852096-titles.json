@@ -1,0 +1,112 @@
+{
+  "request": {
+    "path": "/3/movie/852096/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:13.322Z",
+  "response": {
+    "id": 852096,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Ernest",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "บ้านนี้มีผีป่วน",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Mamy tu ducha",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Fantasma e CIA",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EC",
+        "title": "Tenemos un fantasma",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HR",
+        "title": "Imamo duha",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Szellem van a házunkban",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Avem o fantomă",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Un fantasma in casa",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "屋根裏のアーネスト",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "У нас привидение!",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Имамо духа",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "У нас є привид",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Un fantasma anda suelto por casa",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Meşhur Hayalet Ernest",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Nhà Ta Có Một Con Ma",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "في بيتنا شبح",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Meillä asuu aave",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "我们家有鬼",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "我家有鬼",
+        "type": ""
+      }
+    ]
+  }
+}

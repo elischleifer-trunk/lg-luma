@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/843281/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:21.358Z",
+  "response": {
+    "id": 843281,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Sand World",
+        "type": ""
+      }
+    ]
+  }
+}

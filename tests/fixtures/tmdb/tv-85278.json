@@ -1,0 +1,145 @@
+{
+  "request": {
+    "path": "/3/tv/85278",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.078Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/l0Z5iYacxqgLvDcrf5FEWkwCTgn.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      80
+    ],
+    "first_air_date": "2016-09-10",
+    "genres": [
+      {
+        "id": 10764,
+        "name": "Reality"
+      }
+    ],
+    "homepage": "https://www.sonyliv.com/shows/super-dancer-1700000035",
+    "id": 85278,
+    "in_production": true,
+    "languages": [
+      "hi"
+    ],
+    "last_air_date": "2025-10-12",
+    "last_episode_to_air": {
+      "id": 6558212,
+      "name": "Maha Finale - Part 2",
+      "overview": "As the season comes to a close, the Super Dancers are nearing the end of their journey. Who will emerge as the winner and claim the coveted title of Super Dancer for this season?",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2025-10-12",
+      "episode_number": 26,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 73,
+      "season_number": 5,
+      "show_id": 85278,
+      "still_path": "/aHqXEDzZn1UeKP1GHYLIZRzXMe7.jpg"
+    },
+    "name": "Super Dancer",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 676,
+        "logo_path": "/vamK8zdyD953QvkMIGf4J93MPKz.png",
+        "name": "Sony Entertainment Television",
+        "origin_country": "IN"
+      }
+    ],
+    "number_of_episodes": 215,
+    "number_of_seasons": 5,
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_name": "Super Dancer",
+    "overview": "A group of children, aged between four and 13, compete to find out who is the future of dance. They are tested on their desire to dance, their determination and their discipline.",
+    "popularity": 10.0543,
+    "poster_path": "/y6NHZ3TxXpqShmtCUu30AcMlfzE.jpg",
+    "production_companies": [
+      {
+        "id": 128743,
+        "logo_path": "/lolfhhOSyUBEg0C7nxAdu481lQ.png",
+        "name": "Frames Production Company",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2016-09-10",
+        "episode_count": 29,
+        "id": 193411,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2017-09-30",
+        "episode_count": 51,
+        "id": 193412,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2018-12-29",
+        "episode_count": 52,
+        "id": 115001,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/s2XZdCB3T8Rxoika3xb31upW9G8.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-03-27",
+        "episode_count": 57,
+        "id": 188348,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/a81jYObB9aUyk8ohOzJ7Yjbl9LN.jpg",
+        "season_number": 4,
+        "vote_average": 10
+      },
+      {
+        "air_date": "2025-07-19",
+        "episode_count": 26,
+        "id": 466259,
+        "name": "Season 5",
+        "overview": "Super Dancer Chapter 5 returns with a bang, ready to discover the next 'Dance Ka Kal'! Skipping the stage auditions, this season dives straight into the heartfelt journeys of 12 incredible young dancers, aged 4 to 13, as they team up with their Super Gurus to mesmerize the nation. With fresh talent, fierce moves, and emotional stories, the stage is set - are you ready?",
+        "poster_path": null,
+        "season_number": 5,
+        "vote_average": 10
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Reality",
+    "vote_average": 4.8,
+    "vote_count": 5
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "request": {
+    "path": "/3/tv/303870",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:37.473Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/5XnCFHGrBCDsZCH4Aihr4PsNXBe.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      24
+    ],
+    "first_air_date": "2026-04-03",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://kirio-fc.com/",
+    "id": 303870,
+    "in_production": false,
+    "languages": [
+      "ja"
+    ],
+    "last_air_date": "2026-06-19",
+    "last_episode_to_air": {
+      "id": 7104409,
+      "name": "Kirio Fan Club",
+      "overview": "Kirio reaches his breaking point. Now it's up to Aimi, Nami, and his friends to bring him back from the brink.",
+      "vote_average": 7.3,
+      "vote_count": 3,
+      "air_date": "2026-06-19",
+      "episode_number": 12,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 24,
+      "season_number": 1,
+      "show_id": 303870,
+      "still_path": "/3WUCIVf6t1LRRCn4dLdP8lwkym9.jpg"
+    },
+    "name": "Kirio Fan Club",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 94,
+        "logo_path": "/7RNXnyiMbjgqtPAjja13wchcrGI.png",
+        "name": "MBS",
+        "origin_country": "JP"
+      },
+      {
+        "id": 160,
+        "logo_path": "/lUACMATs6jcscXIrzNCQzbvNVN5.png",
+        "name": "TBS",
+        "origin_country": "JP"
+      }
+    ],
+    "number_of_episodes": 12,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_name": "霧尾ファンクラブ",
+    "overview": "What would you do if your crush had ear-splitting farts? For Aimi and Nami, the answer is to cry tears of joy for being able to pinpoint at a distance the object of their affections, Kirio, from a single toot. These are the kinds of deep, philosophical questions the two friends/rivals in romance pose to each other to prove their love for this boy who hardly seems to know they exist. That won't stop them from conducting nightly rituals to entice him into their dreams, though, or listing out what exactly they like about him, down to the very last organ. But when push comes to shove, will they choose their hilarious friendship over a shot at love?",
+    "popularity": 4.251,
+    "poster_path": "/jVTHFZnK5ApZqrLLabWjKnI6Jza.jpg",
+    "production_companies": [
+      {
+        "id": 30293,
+        "logo_path": "/uXK0FJB6rlX6kegyZl8uGOeiwHd.png",
+        "name": "SATELIGHT",
+        "origin_country": "JP"
+      },
+      {
+        "id": 9148,
+        "logo_path": "/rtW3NadfF4kR5mTW00ahiFxw6k7.png",
+        "name": "Pony Canyon",
+        "origin_country": "JP"
+      },
+      {
+        "id": 3363,
+        "logo_path": "/sj3vD7n63bTCih7bcf6GnWvRf1Q.png",
+        "name": "MBS",
+        "origin_country": "JP"
+      },
+      {
+        "id": 12150,
+        "logo_path": "/WdjrchcdBhMcdQU5wWrL60lPd7.png",
+        "name": "PARCO",
+        "origin_country": "JP"
+      },
+      {
+        "id": 294106,
+        "logo_path": "/mN8s7Q8hyVqlAQrwnDEOnyRQMHV.png",
+        "name": "viviON",
+        "origin_country": "JP"
+      },
+      {
+        "id": 201112,
+        "logo_path": "/51PBGXXhTUz9YEKmK9hHasZWtja.png",
+        "name": "MIXER",
+        "origin_country": "JP"
+      },
+      {
+        "id": 248960,
+        "logo_path": "/hOg7H9GvvKTMuf6Dhj1LRAdfTVX.png",
+        "name": "Jitsugyo no Nihon Sha",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-04-03",
+        "episode_count": 12,
+        "id": 481630,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/jVTHFZnK5ApZqrLLabWjKnI6Jza.jpg",
+        "season_number": 1,
+        "vote_average": 7.8
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6,
+    "vote_count": 7
+  }
+}

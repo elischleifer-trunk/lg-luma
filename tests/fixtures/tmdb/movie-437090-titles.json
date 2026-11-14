@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/437090/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:32.453Z",
+  "response": {
+    "id": 437090,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "13 is Not Much",
+        "type": "English Title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Thirteen is Not Much",
+        "type": "English Title (alt spelling)"
+      }
+    ]
+  }
+}

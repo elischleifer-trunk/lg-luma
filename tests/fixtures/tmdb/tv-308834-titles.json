@@ -1,0 +1,47 @@
+{
+  "request": {
+    "path": "/3/tv/308834/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.390Z",
+  "response": {
+    "id": 308834,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "绘梦婚礼",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Wedding Dream",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Dreaming of a Wedding Day",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Wat Fan Wan Wiwa",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "In love forever the series",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "In.Love.Forever.",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "In.Love.Forever",
+        "type": ""
+      }
+    ]
+  }
+}

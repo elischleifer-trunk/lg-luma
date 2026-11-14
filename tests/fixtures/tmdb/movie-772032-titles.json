@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/772032/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:15.635Z",
+  "response": {
+    "id": 772032,
+    "titles": [
+      {
+        "iso_3166_1": "MX",
+        "title": "Cazafantasmas a la mexicana",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Kill Me Because I Am Dying",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -282,8 +282,8 @@ request covers a whole search, and its free 1,000 requests a day are plenty.
 
 Press **Down** from the field to reach the results and **OK** to open the selected title in its
 app; **OK** on the field brings the keyboard back, and **Back** returns to the field, then Home.
-Links straight to a title are not yet confirmed on a TV, so an app may open on its home screen
-instead. Replies and posters are cached beside the preferences, so repeating a search
+Apple TV and Prime Video open straight to the title; other apps may open on their home screen
+instead until their links are confirmed on a TV. Replies and posters are cached beside the preferences, so repeating a search
 makes no API calls and downloads nothing. The **Apps** page's search box still finds apps.
 
 ### Recent app switching

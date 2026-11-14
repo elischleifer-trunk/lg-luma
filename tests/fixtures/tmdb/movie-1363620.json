@@ -1,0 +1,76 @@
+{
+  "request": {
+    "path": "/3/movie/1363620",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:24.685Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/f7KI2Jt1NA0KGaaH8z1wWFJ6RXG.jpg",
+    "belongs_to_collection": {
+      "id": 591956,
+      "name": "Thi Baan The Series",
+      "poster_path": "/ly0NveA4qlKnvu46jaltzm0nlS8.jpg",
+      "backdrop_path": null
+    },
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 27,
+        "name": "Horror"
+      }
+    ],
+    "homepage": "",
+    "id": 1363620,
+    "imdb_id": "tt39762779",
+    "origin_country": [
+      "TH"
+    ],
+    "original_language": "th",
+    "original_title": "สัปเหร่อ 2 โลกหลังความตาย",
+    "overview": "Following the passing of Baikaow and Sak, life in the village slowly returns to normal. This calm is disrupted when Grandma Joy is suddenly struck by lightning and miraculously revives.",
+    "popularity": 1.3339,
+    "poster_path": "/oiOxy2JtR23URJJEp6ryrMd8VH6.jpg",
+    "production_companies": [
+      {
+        "id": 171542,
+        "logo_path": "/btra6uhQW5PYoa60IPCEGQDCfcO.png",
+        "name": "TAIBAAN STUDIO",
+        "origin_country": "TH"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TH",
+        "name": "Thailand"
+      }
+    ],
+    "release_date": "2026-02-12",
+    "revenue": 0,
+    "runtime": 127,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Thai",
+        "iso_639_1": "th",
+        "name": "ภาษาไทย"
+      }
+    ],
+    "status": "Released",
+    "tagline": "When the living haven't found closure, the dead cannot move on.",
+    "title": "The Undertaker 2: Afterlife",
+    "video": false,
+    "vote_average": 7.4,
+    "vote_count": 7
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "request": {
+    "path": "/3/movie/334533",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:35.433Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/d84M69u6Q202dm6EvhVxbiqrK9f.jpg",
+    "belongs_to_collection": null,
+    "budget": 5000000,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "http://www.bleeckerstreetmedia.com/captainfantastic",
+    "id": 334533,
+    "imdb_id": "tt3553976",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Captain Fantastic",
+    "overview": "Deep in the forests of the Pacific Northwest, a father devoted to raising his six kids with a rigorous physical and intellectual education is forced to leave his paradise and enter the world, beginning a journey that challenges his idea of what it means to be a parent.",
+    "popularity": 5.0239,
+    "poster_path": "/2sFME73GaD8UsUxPUKe60cPdLif.jpg",
+    "production_companies": [
+      {
+        "id": 8600,
+        "logo_path": null,
+        "name": "Electric City Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 33603,
+        "logo_path": "/K1SdQd49Kx3QRx0djfHbzeotCz.png",
+        "name": "Shivhans Pictures",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2016-07-08",
+    "revenue": 23123592,
+    "runtime": 119,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Esperanto",
+        "iso_639_1": "eo",
+        "name": "Esperanto"
+      },
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "He prepared them for everything except the outside world.",
+    "title": "Captain Fantastic",
+    "video": false,
+    "vote_average": 7.886,
+    "vote_count": 7049
+  }
+}

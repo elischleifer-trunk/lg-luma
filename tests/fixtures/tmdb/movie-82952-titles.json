@@ -1,0 +1,27 @@
+{
+  "request": {
+    "path": "/3/movie/82952/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:33.359Z",
+  "response": {
+    "id": 82952,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "Miu Kai Sup Yi Siu",
+        "type": "Cantonese"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Prince of Temple Street",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "庙街十二少",
+        "type": ""
+      }
+    ]
+  }
+}

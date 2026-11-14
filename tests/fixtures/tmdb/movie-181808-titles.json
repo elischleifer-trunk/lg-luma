@@ -1,0 +1,317 @@
+{
+  "request": {
+    "path": "/3/movie/181808/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.748Z",
+  "response": {
+    "id": 181808,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны: Эпизод 8",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Star Wars: Επεισόδιο 8",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Ο πόλεμος των άστρων: Επεισόδιο 8",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Gli ultimi Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни:  Епізод 8 - Останній Джедай",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: Episódio VIII - Os Últimos Jedi",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Razboiul Stelelor: Ultimul Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод 8 - Последние Джедаи",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars: Episodio VIII - Gli ultimi Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne wojny: Ostatni Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Star Wars: Ultimii Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Ratovi Zvezde: Epizoda 8 - Poslednji Džedaj",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Tähtien sota: Episodi VIII",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Star Wars: Episódio VIII - Os Últimos Jedi",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Last Jedi",
+        "type": "informal short title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈: 라스트 제다이",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars - Episodio VIII - Los últimos Jedi",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Žvaigždžių karai: Epizodas VII – paskutiniai džedajai",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny: Część VIII - Ostatni Jedi",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode VIII - Les Derniers Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈 에피소드 8 라스트 제다이",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈-라스트 제다이",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars - The Last Jedi - 3D",
+        "type": "3D version"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda VIII - Poslední z Jediů",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode VIII - Die letzten Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드 8, 라스트 제다이",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode 8 - Les Derniers Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les derniers Jedi",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод VIII - Последние Джедаи",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Останні Джедаї",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AL",
+        "title": "Lufta e yjeve: Xhedai i fundit",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: Episodio VIII - Los últimos Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Star Wars Episode 8 - The Last Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars։ The Last Jedi (Episode VIII)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny VIII - Ostatni Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio VIII. Gli ultimi Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, Episode VIII - Les Derniers Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars - Episodio 8 - Los últimos Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战8：最后的绝地武士",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：最后的绝地武士",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Star Wars: Οι Τελευταίοι Τζεντάι",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: El últims Jedi",
+        "type": "Alternative Catalan Title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, épisode VIII - Les Derniers Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Csillagok Háborúja VIII. - Az Utolsó Jedik",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი 8",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები 8",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: უკანასკნელი ჯედაი (ეპიზოდი VIII)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი VIII",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი VIII – უკანასკნელი ჯედაი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები VIII",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס פרק VIII: אחרוני הג'דיי",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chiến Tranh Giữa Các Vì Sao 8: Jedi Cuối Cùng",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Последние джедаи",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio VIII - Gli ultimi Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰：最後絕地武士",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰八部曲：最後的絕地武士",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars Episode VIII - Die letzten Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "TLJ",
+        "type": "abbreviation"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Space Bear",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Episode 8 - Die letzten Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Ulduz müharibələri: VIII Epizod – Sonuncu ceday",
+        "type": ""
+      }
+    ]
+  }
+}

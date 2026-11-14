@@ -1,0 +1,58 @@
+{
+  "request": {
+    "path": "/3/movie/1741494",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.043Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/tk9oJhaFKVS6dIc6SE4b206yUv2.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 99,
+        "name": "Documentary"
+      }
+    ],
+    "homepage": "",
+    "id": 1741494,
+    "imdb_id": null,
+    "origin_country": [
+      "ES"
+    ],
+    "original_language": "es",
+    "original_title": "American SUP",
+    "overview": "",
+    "popularity": 0.1601,
+    "poster_path": "/a7nHuAK1K3AtvZ7JPvHK6pgCY7c.jpg",
+    "production_companies": [
+      {
+        "id": 289534,
+        "logo_path": null,
+        "name": "Basement Tapes",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [],
+    "release_date": "2026-08-01",
+    "revenue": 0,
+    "runtime": 127,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "American SUP",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

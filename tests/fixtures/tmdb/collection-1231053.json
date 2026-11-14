@@ -1,0 +1,70 @@
+{
+  "request": {
+    "path": "/3/collection/1231053",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:31.243Z",
+  "response": {
+    "id": 1231053,
+    "name": "The Bad Guys Collection",
+    "original_language": "en",
+    "original_name": "The Bad Guys Collection",
+    "overview": "The adventures of \"The Bad Guys\". Are they really bad? Can they really be \"Good Guys\"?",
+    "poster_path": "/MvnERW28KnZ5fmxS73a27m3qhN.jpg",
+    "backdrop_path": "/m4WprwbsvC1HsORjSiZmiARy9yl.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/a8w3luV9uCjveB8v7grHfvXVOFJ.jpg",
+        "genre_ids": [
+          28,
+          12,
+          16,
+          35,
+          80,
+          10751
+        ],
+        "id": 629542,
+        "title": "The Bad Guys",
+        "original_language": "en",
+        "original_title": "The Bad Guys",
+        "overview": "When the Bad Guys, a crew of criminal animals, are finally caught after years of heists and being the world’s most-wanted villains, Mr. Wolf brokers a deal to save them all from prison.",
+        "popularity": 9.7938,
+        "poster_path": "/7qop80YfuO0BwJa1uXk1DXUUEwv.jpg",
+        "release_date": "2022-03-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.5,
+        "vote_count": 2747,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jvpkBenB6hv19WWYVlaiow8zklq.jpg",
+        "genre_ids": [
+          10751,
+          35,
+          80,
+          12,
+          16,
+          28
+        ],
+        "id": 1175942,
+        "title": "The Bad Guys 2",
+        "original_language": "en",
+        "original_title": "The Bad Guys 2",
+        "overview": "The now-reformed Bad Guys are trying (very, very hard) to be good, but instead find themselves hijacked into a high-stakes, globe-trotting heist, masterminded by a new team of criminals they never saw coming: The Bad Girls.",
+        "popularity": 10.0924,
+        "poster_path": "/26oSPnq0ct59l07QOXZKyzsiRtN.jpg",
+        "release_date": "2025-07-24",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.606,
+        "vote_count": 950,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

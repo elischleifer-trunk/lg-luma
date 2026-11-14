@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/tv/213307/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:19.788Z",
+  "response": {
+    "id": 213307,
+    "results": [
+      {
+        "iso_3166_1": "AU",
+        "title": "The Office (Saudi Arabia)",
+        "type": ""
+      }
+    ]
+  }
+}

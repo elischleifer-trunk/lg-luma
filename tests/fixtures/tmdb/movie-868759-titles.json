@@ -1,0 +1,52 @@
+{
+  "request": {
+    "path": "/3/movie/868759/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:13.211Z",
+  "response": {
+    "id": 868759,
+    "titles": [
+      {
+        "iso_3166_1": "IN",
+        "title": "घोस्टेड",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Примарні",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神出鬼没",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "真爱玩失踪",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "真愛搞失蹤",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "真愛玩失蹤",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "בין הצללים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스팅",
+        "type": ""
+      }
+    ]
+  }
+}

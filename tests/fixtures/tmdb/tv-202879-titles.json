@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/tv/202879/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.824Z",
+  "response": {
+    "id": 202879,
+    "results": [
+      {
+        "iso_3166_1": "BA",
+        "title": "Star Wars: Skeleton Crew",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Escouade squelette",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：骨干小队",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Tripulación perdida",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스켈레톤 크루",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Skeleton Crew: Viaje a lo desconocido",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Star Wars: Skeleton Crew - Viaje a lo desconocido",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные Войны: Минимальный экипаж",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "حرب النجوم: طاقم الهيكل العظمي",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰：骨幹小隊",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Skeleton Crew",
+        "type": "working title"
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/441919",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:35.010Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      }
+    ],
+    "homepage": "",
+    "id": 441919,
+    "imdb_id": "tt1555803",
+    "origin_country": [
+      "SU"
+    ],
+    "original_language": "ru",
+    "original_title": "Фанат",
+    "overview": "Malysh (Kid), a karate fan in late Soviets, tries hard to beat his way to the top.",
+    "popularity": 0.5736,
+    "poster_path": "/cgjN9L4tWmaUFgkrQ9Hkt0LfdSz.jpg",
+    "production_companies": [
+      {
+        "id": 3161,
+        "logo_path": "/p22GDJaOniIWidl1vPqzBv4qxFN.png",
+        "name": "Odessa Film Studio",
+        "origin_country": "SU"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "SU",
+        "name": "Soviet Union"
+      }
+    ],
+    "release_date": "1989-01-01",
+    "revenue": 0,
+    "runtime": 81,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Russian",
+        "iso_639_1": "ru",
+        "name": "Pусский"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Fan",
+    "video": false,
+    "vote_average": 6.8,
+    "vote_count": 10
+  }
+}

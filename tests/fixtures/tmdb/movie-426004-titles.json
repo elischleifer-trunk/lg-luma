@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/426004/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.489Z",
+  "response": {
+    "id": 426004,
+    "titles": [
+      {
+        "iso_3166_1": "NZ",
+        "title": "Super",
+        "type": "original title"
+      }
+    ]
+  }
+}

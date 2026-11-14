@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/320554/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:32.668Z",
+  "response": {
+    "id": 320554,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "BB Sam Sup",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "BB30",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "request": {
+    "path": "/3/movie/774370/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.954Z",
+  "response": {
+    "id": 774370,
+    "titles": [
+      {
+        "iso_3166_1": "MX",
+        "title": "Las aventuras de Dog Man",
+        "type": "and all latam"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神探狗狗",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "超狗神探",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "مرد سگی",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dreamworks Dog Man",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "Las aventuras de Dog Man",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Las aventuras de Dog Man",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EC",
+        "title": "Las aventuras de Dog Man",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MN",
+        "title": "Нохой хүн",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Homem-Cão",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Homem-Cão",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Super Chien",
+        "type": "Titre VFQ"
+      }
+    ]
+  }
+}

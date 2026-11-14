@@ -1,0 +1,269 @@
+{
+  "request": {
+    "path": "/3/tv/155660",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:30.606Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7J7h3wvRJd92ELg9uaWbf7W1t8L.jpg",
+    "created_by": [
+      {
+        "id": 3383910,
+        "credit_id": "61e2eca7a0b6b50041a88c50",
+        "name": "Peijie Wang",
+        "original_name": "Peijie Wang",
+        "gender": 0,
+        "profile_path": null
+      },
+      {
+        "id": 3383912,
+        "credit_id": "61e2ed4941465c0066264a16",
+        "name": "Yunqing Wang",
+        "original_name": "Yunqing Wang",
+        "gender": 0,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      90
+    ],
+    "first_air_date": "2014-01-03",
+    "genres": [
+      {
+        "id": 10764,
+        "name": "Reality"
+      }
+    ],
+    "homepage": "",
+    "id": 155660,
+    "in_production": true,
+    "languages": [
+      "zh"
+    ],
+    "last_air_date": "2026-04-03",
+    "last_episode_to_air": {
+      "id": 7091844,
+      "name": "Episode 12",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-04-03",
+      "episode_number": 12,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 98,
+      "season_number": 13,
+      "show_id": 155660,
+      "still_path": "/rLRi6FVbdhTFwfTLpYt4vdKJ9KT.jpg"
+    },
+    "name": "Super Brain",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1055,
+        "logo_path": "/7CFi6rsVElIVRgYKKO8zol0jxhB.png",
+        "name": "Jiangsu Television",
+        "origin_country": "CN"
+      },
+      {
+        "id": 1330,
+        "logo_path": "/fNxBFqWr7eWEgNeBDvvCxsSItXx.png",
+        "name": "iQiyi",
+        "origin_country": "CN"
+      },
+      {
+        "id": 1419,
+        "logo_path": "/w2TeR3fvPZ9a617tNIF1oOfyPtk.png",
+        "name": "Youku",
+        "origin_country": "CN"
+      },
+      {
+        "id": 1605,
+        "logo_path": "/cdRh1NZIUaqDUhwjgqWbp6zhWHK.png",
+        "name": "bilibili",
+        "origin_country": "CN"
+      },
+      {
+        "id": 2007,
+        "logo_path": "/6Lfll43wYG2eyereOBjpYFRSGs4.png",
+        "name": "Tencent Video",
+        "origin_country": "CN"
+      }
+    ],
+    "number_of_episodes": 207,
+    "number_of_seasons": 13,
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "zh",
+    "original_name": "最强大脑",
+    "overview": "",
+    "popularity": 14.2525,
+    "poster_path": "/fIgpIsnH3xu7IACEKi9ZcsKtVRh.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2014-01-31",
+        "episode_count": 16,
+        "id": 337994,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2014-01-03",
+        "episode_count": 13,
+        "id": 240118,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/8ZRRsMMfumYxe1UtCYX54sfyt9t.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2015-01-02",
+        "episode_count": 12,
+        "id": 240119,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/3cgBMlxuJRrdWNVY73qNx1K4xzy.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2016-01-08",
+        "episode_count": 12,
+        "id": 240120,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/w12GGoyBijBVxoyP80qlI1wD1EJ.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2017-01-06",
+        "episode_count": 13,
+        "id": 240121,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/lyrXmW6jJvKRhr0UVCrN1k8VIoC.jpg",
+        "season_number": 4,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2018-01-05",
+        "episode_count": 13,
+        "id": 240123,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": "/gi2buctsmkP606b5DUvrJ9t1vIP.jpg",
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-02-15",
+        "episode_count": 12,
+        "id": 240126,
+        "name": "Season 6",
+        "overview": "",
+        "poster_path": "/hAdRJpL3hvV22JkGc9iVvONF9bD.jpg",
+        "season_number": 6,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2020-05-15",
+        "episode_count": 24,
+        "id": 240127,
+        "name": "Season 7",
+        "overview": "",
+        "poster_path": "/7SeCan4fGf6RSDGe0iznbu8cmVO.jpg",
+        "season_number": 7,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-01-08",
+        "episode_count": 12,
+        "id": 240128,
+        "name": "Season 8",
+        "overview": "",
+        "poster_path": "/rkq8w2d7JnxC5gvOAD27vPqNIHG.jpg",
+        "season_number": 8,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2022-01-14",
+        "episode_count": 24,
+        "id": 240069,
+        "name": "Season 9",
+        "overview": "",
+        "poster_path": "/araESxu2mKf6P7vyMQtPMXbHkpP.jpg",
+        "season_number": 9,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2023-01-06",
+        "episode_count": 24,
+        "id": 323127,
+        "name": "Season 10",
+        "overview": "",
+        "poster_path": "/e2h56aAtzZw3ocCvN6z2PN8uwmA.jpg",
+        "season_number": 10,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2024-01-05",
+        "episode_count": 24,
+        "id": 371796,
+        "name": "Season 11",
+        "overview": "",
+        "poster_path": "/MPLM5Tldj7IMSijwplibxiJEDP.jpg",
+        "season_number": 11,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2025-01-10",
+        "episode_count": 12,
+        "id": 435977,
+        "name": "Season 12",
+        "overview": "",
+        "poster_path": "/1BgGDufFIRGMujPwtvenRP7lDPW.jpg",
+        "season_number": 12,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2026-01-16",
+        "episode_count": 12,
+        "id": 494016,
+        "name": "Season 13",
+        "overview": "",
+        "poster_path": "/78N5FqaUr323ahnu9mGJnDSioPw.jpg",
+        "season_number": 13,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Reality",
+    "vote_average": 8,
+    "vote_count": 1
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "request": {
+    "path": "/3/movie/1061474/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:33.574Z",
+  "response": {
+    "id": 1061474,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Superman: Legacy",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סופרמן: מורשת",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "超人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "سوبرمان",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MM",
+        "title": "စူပါမန်း",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "ซูเปอร์แมน",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Genesis",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "超人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "슈퍼맨",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סופרמן",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Superman!",
+        "type": "WGA Directory title"
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "Superman 6",
+        "type": ""
+      }
+    ]
+  }
+}

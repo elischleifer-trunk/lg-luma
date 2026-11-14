@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/1067159/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:24.458Z",
+  "response": {
+    "id": 1067159,
+    "titles": [
+      {
+        "iso_3166_1": "DE",
+        "title": "Sechs auf einen Streich - Die Salzprinzessin",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les Contes de Grimm ː Princesse de sel",
+        "type": ""
+      }
+    ]
+  }
+}

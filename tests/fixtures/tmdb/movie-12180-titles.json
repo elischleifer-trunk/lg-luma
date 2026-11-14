@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/12180/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:36.113Z",
+  "response": {
+    "id": 12180,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны. Эпизод 2: Атака клонов",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Stars Wars: Clone Wars",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - La Guerra Dei Cloni",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars - The Clone Wars",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Star Wars: La Guerra de los Clones",
+        "type": "Alternativo"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : La Guerre des Clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "حرب النجوم - حرب المستنسخين",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Clone Wars Movie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars - The Clone Wars - The Movie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈: 클론전쟁",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：克隆战争",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "The Clone Wars",
+        "type": "Short Title"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים - פרק 2: מתקפת המשובטים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：克隆人战争",
+        "type": ""
+      }
+    ]
+  }
+}

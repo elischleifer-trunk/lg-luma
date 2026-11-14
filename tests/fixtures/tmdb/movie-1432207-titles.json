@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1432207/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:26.412Z",
+  "response": {
+    "id": 1432207,
+    "titles": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Блу",
+        "type": ""
+      }
+    ]
+  }
+}

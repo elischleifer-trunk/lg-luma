@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/1380291/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.868Z",
+  "response": {
+    "id": 1380291,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Jack Ryan: Ghost War",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Jack Ryan: Guerra Fantasma",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Tom Clancy's Jack Ryan - Ghost War",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "Jack Ryan - Ghost War",
+        "type": "Blueray"
+      }
+    ]
+  }
+}

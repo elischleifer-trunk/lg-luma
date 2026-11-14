@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/420541/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.605Z",
+  "response": {
+    "id": 420541,
+    "titles": [
+      {
+        "iso_3166_1": "TH",
+        "title": "Fan Day",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Fanday…Fan Kun Khae Wan Diaw",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Fanday",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "One Day",
+        "type": ""
+      }
+    ]
+  }
+}

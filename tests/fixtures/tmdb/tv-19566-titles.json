@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/tv/19566/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:20.570Z",
+  "response": {
+    "id": 19566,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "沙丘魔堡2000",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "沙丘2000",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Dune la série",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Dune",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "デューン 砂の惑星",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune",
+        "type": "Short"
+      }
+    ]
+  }
+}

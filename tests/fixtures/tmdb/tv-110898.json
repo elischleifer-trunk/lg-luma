@@ -1,0 +1,336 @@
+{
+  "request": {
+    "path": "/3/tv/110898",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:36.677Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/x5p9DZBQikf4YKBk8JJYHzjRljZ.jpg",
+    "created_by": [
+      {
+        "id": 1438156,
+        "credit_id": "6717bc838e05a8c9a84d3b65",
+        "name": "Jacques Martin",
+        "original_name": "Jacques Martin",
+        "gender": 2,
+        "profile_path": "/thY3Onak5Adf5SjuYH6bV5CjJ5n.jpg"
+      }
+    ],
+    "episode_run_time": [
+      150
+    ],
+    "first_air_date": "1977-01-30",
+    "genres": [
+      {
+        "id": 10767,
+        "name": "Talk"
+      },
+      {
+        "id": 10762,
+        "name": "Kids"
+      }
+    ],
+    "homepage": "",
+    "id": 110898,
+    "in_production": false,
+    "languages": [
+      "fr"
+    ],
+    "last_air_date": "1998-06-21",
+    "last_episode_to_air": {
+      "id": 4193281,
+      "name": "Episode 23",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1998-06-21",
+      "episode_number": 23,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 21,
+      "show_id": 110898,
+      "still_path": null
+    },
+    "name": "Fan School",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 361,
+        "logo_path": "/b1cFa5FcHHnpejKiPybXSPcqKjT.png",
+        "name": "France 2",
+        "origin_country": "FR"
+      },
+      {
+        "id": 1130,
+        "logo_path": "/1JnQqStddzcIoa6XYB7LqJbLx01.png",
+        "name": "Antenne 2",
+        "origin_country": "FR"
+      }
+    ],
+    "number_of_episodes": 761,
+    "number_of_seasons": 21,
+    "origin_country": [
+      "FR"
+    ],
+    "original_language": "fr",
+    "original_name": "L'École des fans",
+    "overview": "Host Jacques Martin invites different talented children from various backgrounds to showcase their beautiful voices. The participants entertain and wow the audience with their lovely performances.",
+    "popularity": 36.2973,
+    "poster_path": "/lavhdK5loEnuCSJIRYHi2yAXlXV.jpg",
+    "production_companies": [
+      {
+        "id": 1117,
+        "logo_path": "/2X2uFeObxawiAajNDOf3Mhri5Wg.png",
+        "name": "Antenne 2",
+        "origin_country": "FR"
+      },
+      {
+        "id": 11359,
+        "logo_path": "/aqWJRi66t2oMPMmC60CdK9I3WQd.png",
+        "name": "France 2",
+        "origin_country": "FR"
+      },
+      {
+        "id": 127699,
+        "logo_path": "/y5uOq0KzTduQfn8B4LFZuo2fpnm.png",
+        "name": "Gulli",
+        "origin_country": "FR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "FR",
+        "name": "France"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1977-01-30",
+        "episode_count": 35,
+        "id": 164502,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1978-01-08",
+        "episode_count": 25,
+        "id": 164503,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1980-12-21",
+        "episode_count": 2,
+        "id": 164504,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1981-01-04",
+        "episode_count": 41,
+        "id": 164505,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 4,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1982-01-03",
+        "episode_count": 40,
+        "id": 164506,
+        "name": "Season 5",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 5,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1983-01-02",
+        "episode_count": 39,
+        "id": 164507,
+        "name": "Season 6",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 6,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1984-01-01",
+        "episode_count": 40,
+        "id": 164508,
+        "name": "Season 7",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 7,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1985-01-06",
+        "episode_count": 41,
+        "id": 164509,
+        "name": "Season 8",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 8,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1986-01-05",
+        "episode_count": 40,
+        "id": 164510,
+        "name": "Season 9",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 9,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1987-01-04",
+        "episode_count": 39,
+        "id": 164511,
+        "name": "Season 10",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 10,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1988-01-03",
+        "episode_count": 38,
+        "id": 164512,
+        "name": "Season 11",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 11,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1989-01-01",
+        "episode_count": 42,
+        "id": 164513,
+        "name": "Season 12",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 12,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1990-01-07",
+        "episode_count": 32,
+        "id": 164514,
+        "name": "Season 13",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 13,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1991-01-06",
+        "episode_count": 40,
+        "id": 164515,
+        "name": "Season 14",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 14,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1992-01-05",
+        "episode_count": 39,
+        "id": 164516,
+        "name": "Season 15",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 15,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1993-01-03",
+        "episode_count": 41,
+        "id": 164517,
+        "name": "Season 16",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 16,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1994-01-02",
+        "episode_count": 41,
+        "id": 164518,
+        "name": "Season 17",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 17,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1995-01-01",
+        "episode_count": 43,
+        "id": 326011,
+        "name": "Season 18",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 18,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1996-01-07",
+        "episode_count": 40,
+        "id": 326012,
+        "name": "Season 19",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 19,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1997-01-05",
+        "episode_count": 40,
+        "id": 326013,
+        "name": "Season 20",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 20,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1998-01-04",
+        "episode_count": 23,
+        "id": 326014,
+        "name": "Season 21",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 21,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Canceled",
+    "tagline": "",
+    "type": "Talk Show",
+    "vote_average": 7.2,
+    "vote_count": 2
+  }
+}

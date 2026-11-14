@@ -1,0 +1,37 @@
+{
+  "request": {
+    "path": "/3/tv/288055/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.719Z",
+  "response": {
+    "id": 288055,
+    "results": [
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: Historias del inframundo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: סיפורי הצללים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Star Wars: Historias del inframundo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars Tales of the Underworld",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Tales of the Underworld",
+        "type": ""
+      }
+    ]
+  }
+}

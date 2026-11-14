@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/tv/203085/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.240Z",
+  "response": {
+    "id": 203085,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：绝地传奇",
+        "type": "official Simplified Chinese title on Disney+"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: מעשיות הג׳די",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סיפורי הג'דיי",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ テイルズ・オブ・ジェダイ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ：テイルズ・オブ・ジェダイ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Сказания о джедаях",
+        "type": ""
+      }
+    ]
+  }
+}

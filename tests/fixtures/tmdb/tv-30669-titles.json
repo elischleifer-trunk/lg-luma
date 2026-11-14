@@ -1,0 +1,132 @@
+{
+  "request": {
+    "path": "/3/tv/30669/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:11.788Z",
+  "response": {
+    "id": 30669,
+    "results": [
+      {
+        "iso_3166_1": "BE",
+        "title": "Yū Yū Hakusho",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BE",
+        "title": "Yuu Yuu Hakusho",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Yu Yu Hakusho",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "幽游白书",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "幽遊白书",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Yu Yu Hakusho",
+        "type": "alternate french title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Yuu Yuu Hakusho",
+        "type": "alternate french title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Yu Yu Hakusho - Les aventuriers de l'au-delà",
+        "type": "alternate french title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "幽遊白書",
+        "type": "香港繁體標題"
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Yu-Yu Hakusho: A Szellemfiú",
+        "type": "TV promotion"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Yu degli Spettri",
+        "type": "Manga Italian title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "幽遊白書",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Yuyu Hakusho",
+        "type": "alternate romanization"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Yuu☆Yuu☆Hakusho: Two Shots/Noru ka Soru ka",
+        "type": "2018 OVA title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "幽☆遊☆白書 完全新作アニメーション",
+        "type": "2018 OVA title"
+      },
+      {
+        "iso_3166_1": "MO",
+        "title": "幽游白書",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PH",
+        "title": "Ghost Fighter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "คนเก่งทะลุโลก",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "幽遊白書",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghost Files",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Yu Yu Hakusho - Two Shots and All or Nothing",
+        "type": "2018 OVA title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Yu Yu Hakusho: Ghost Files",
+        "type": "Netflix title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Yu-Yu Hakusho",
+        "type": "Adult Swim title"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Hành trình U Linh Giới",
+        "type": ""
+      }
+    ]
+  }
+}

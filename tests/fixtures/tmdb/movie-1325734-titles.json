@@ -1,0 +1,57 @@
+{
+  "request": {
+    "path": "/3/movie/1325734/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.995Z",
+  "response": {
+    "id": 1325734,
+    "titles": [
+      {
+        "iso_3166_1": "MX",
+        "title": "El Drama",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "戏剧故事",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Вот это драма!",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "L'aveu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "แต่งก็บ้า..ดราม่าเบอร์นี้",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "抓马恋人",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "爱情抓马",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "戏剧性婚礼",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Das Drama",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/tv/2996/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:18.307Z",
+  "response": {
+    "id": 2996,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "办公室笑云",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "The Office (UK)",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "د آفیس",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "오피스",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/movie/1228710/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.183Z",
+  "response": {
+    "id": 1228710,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные Войны: Мандалорец и Грогу",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Mandalorian & Grogu",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: O Mandaloriano e Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: המנדלוריאן וגרוגו",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Star Wars: Le Mandalorian et Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ／マンダロリアン・アンド・グローグー",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "แมนดาลอเรี่ยนและโกรกู",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Mandalorian i Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PA",
+        "title": "Mandalorian y Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "STAR WARS: MANDALORIAN VÀ GROGU",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Mandaloriano e Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Mandalorian and Grogu",
+        "type": "official title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - The Mandalorian and Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Mandalorian ve Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Mandalorian & Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars - The Mandalorian and Grogu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈: 만달로리안과 그로구",
+        "type": ""
+      }
+    ]
+  }
+}

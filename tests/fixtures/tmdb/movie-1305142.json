@@ -1,0 +1,51 @@
+{
+  "request": {
+    "path": "/3/movie/1305142",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:29.370Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/k5ehljOjaf9kpgk1uFJvKNB86Fj.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1305142,
+    "imdb_id": null,
+    "origin_country": [
+      "SG"
+    ],
+    "original_language": "ms",
+    "original_title": "Sup Lidah Kambing",
+    "overview": "A story of a son who tries to redeem himself after causing his parents to divorce.",
+    "popularity": 0.1093,
+    "poster_path": null,
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2023-06-13",
+    "revenue": 0,
+    "runtime": 6,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Malay",
+        "iso_639_1": "ms",
+        "name": "Bahasa melayu"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Sup Lidah Kambing",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

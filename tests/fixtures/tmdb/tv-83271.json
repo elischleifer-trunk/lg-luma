@@ -1,0 +1,103 @@
+{
+  "request": {
+    "path": "/3/tv/83271",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:40:37.574Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "created_by": [],
+    "episode_run_time": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "first_air_date": "2018-08-15",
+    "genres": [],
+    "homepage": "https://noovo.ca/emissions/fan-fini",
+    "id": 83271,
+    "in_production": false,
+    "languages": [
+      "fr"
+    ],
+    "last_air_date": "2018-08-15",
+    "last_episode_to_air": {
+      "id": 1598929,
+      "name": "Episode 20",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2018-08-15",
+      "episode_number": 20,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 1,
+      "show_id": 83271,
+      "still_path": "/6YDd26Jve7HvqHoeQugdyCs7l8S.jpg"
+    },
+    "name": "Fan fini",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 2408,
+        "logo_path": "/t1ETxTmqkcGHtz3cRemxR3zdxgK.png",
+        "name": "noovo.ca",
+        "origin_country": "CA"
+      }
+    ],
+    "number_of_episodes": 20,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "fr",
+    "original_name": "Fan fini",
+    "overview": "",
+    "popularity": 1.3402,
+    "poster_path": null,
+    "production_companies": [
+      {
+        "id": 46682,
+        "logo_path": "/ybNfe9vMywnjygOODnm7QYw9rvQ.png",
+        "name": "Attraction",
+        "origin_country": "CA"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2018-08-15",
+        "episode_count": 20,
+        "id": 111165,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "French",
+        "iso_639_1": "fr",
+        "name": "Français"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

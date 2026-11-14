@@ -1,0 +1,112 @@
+{
+  "request": {
+    "path": "/3/movie/330459/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.859Z",
+  "response": {
+    "id": 330459,
+    "titles": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Rogue One: Uma História de Guerra nas Estrelas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "로그원: 스타워즈 스토리",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈-로그원",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Rogue One: Hvězdné války",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars - Rogue One: Una historia de Star Wars",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Rogue One: A Star Wars Story",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Zsivány Egyes: Egy Star Wars-történet",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Haydut: Bir Yıldız Savaşları Hikayesi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Rogue One: Chiến Tranh Giữa Các Vì Sao Ngoại Truyện",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Rogue One: Tähesõdade lugu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Rogue One",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "俠盜一號：星球大戰外傳",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Rogue One - A Star Wars Story",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Rogue One - A Star Wars Story",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Łotr 1",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Los Alamos",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Rebellion",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dark Times",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Shadow of the Death Star",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "로그 원: 스타 워즈 스토리",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "request": {
+    "path": "/3/movie/950387/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:28.786Z",
+  "response": {
+    "id": 950387,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Minecraft",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Bir Minecraft Filmi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Մայնքրաֆթ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SE",
+        "title": "En Minecraftfilm",
+        "type": "streaming title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "마인크래프트 무비",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Minecraft: Фільм",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Minecraft, Le Film",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "A Minecraft Movie: Block Party Edition!",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "A Minecraft Movie: The Block Party Edition",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "A Minecraft Movie: Block Party Edition",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Minecraft: Филм",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Minecraft филм",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "A Minecraft Movie: Minecraft Block Party",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "A Minecraft Movie - ASL Version",
+        "type": "ASL version"
+      },
+      {
+        "iso_3166_1": "BY",
+        "title": "Майнкрафт. Кіно",
+        "type": ""
+      }
+    ]
+  }
+}

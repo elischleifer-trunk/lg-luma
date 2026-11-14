@@ -1,0 +1,122 @@
+{
+  "request": {
+    "path": "/3/tv/76479/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:26.937Z",
+  "response": {
+    "id": 76479,
+    "results": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Момчетата",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "英雄克星",
+        "type": "Prime Video zh-CN title"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Kluci",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EG",
+        "title": "الرفاق",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "The Boys - A fiúk",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "د بویز",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "پسران",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ザ・ボーイズ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "더 보이즈",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Chłopcy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Băieții",
+        "type": "season 1 & 2"
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Дечаци",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Парни",
+        "type": "Amazon"
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Chlapci",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "ก๊วนหนุ่มซ่าล่าซูเปอร์ฮีโร่",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "黑袍糾察隊",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Хлопці",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Хлопчаки",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Пацани",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Типи",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UZ",
+        "title": "Yigitlar",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Siêu Anh Hùng Phá Hoại",
+        "type": ""
+      }
+    ]
+  }
+}

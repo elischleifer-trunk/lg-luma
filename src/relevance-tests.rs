@@ -9,7 +9,25 @@ fn fixture<T: DeserializeOwned>(dir: &str, name: &str) -> Option<T> {
         .join(dir)
         .join(format!("{name}.json"));
     let record: serde_json::Value = serde_json::from_slice(&std::fs::read(path).ok()?).unwrap();
-    Some(serde_json::from_value(record["response"].clone()).unwrap())
+    Some(serde_json::from_value(with_titles(dir, name, record["response"].clone())).unwrap())
+}
+
+/// Details as the app fetches them, with `alternative_titles` appended: captured separately
+/// as `<name>-titles.json` (see tools/streaming-fixtures.mjs).
+pub(crate) fn with_titles(
+    dir: &str,
+    name: &str,
+    mut details: serde_json::Value,
+) -> serde_json::Value {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures")
+        .join(dir)
+        .join(format!("{name}-titles.json"));
+    if let Ok(bytes) = std::fs::read(path) {
+        let record: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        details["alternative_titles"] = record["response"].clone();
+    }
+    details
 }
 
 /// One captured search, enriched the way the search screen does it: a TMDB `search/multi`
@@ -189,6 +207,10 @@ fn titles_match_by_leading_words_then_prefix_then_word_then_anywhere() {
     assert_eq!(match_tier("busters", "Ghostbusters"), 3);
     assert_eq!(match_tier("amelie", "Amélie"), 0);
     assert_eq!(match_tier("dune", "Ghosted"), 4);
+    // Punctuation counts as nothing as well as a space.
+    assert_eq!(match_tier("oceans", "Ocean's Eleven"), 3);
+    assert_eq!(match_tier("spiderman", "Spider-Man: No Way Home"), 3);
+    assert_eq!(match_tier("super man", "Superman"), 3);
 }
 
 #[test]
@@ -240,4 +262,26 @@ fn ranked_results_carry_the_rating_of_their_details() {
         .find(|r| r.show.tmdb_id == "movie/438631")
         .unwrap();
     assert_eq!(first.rating.as_deref(), Some("PG-13"));
+}
+
+#[test]
+fn english_alternative_titles_count_as_names() {
+    let andor: TvSeriesDetailsResponse = fixture("tmdb", "tv-83867").unwrap();
+    let signals = Signals::series(&andor);
+    assert!(
+        signals.titles.contains(&"Star Wars: Andor".to_owned()),
+        "{:?}",
+        signals.titles
+    );
+    // Only US and UK titles: Bad Guys 2's Danish "De er super barske" is not a match.
+    let bad_guys: MovieDetailsResponse = fixture("tmdb", "movie-1175942").unwrap();
+    let signals = Signals::movie(&bad_guys);
+    assert!(
+        signals
+            .titles
+            .iter()
+            .all(|t| !t.to_lowercase().contains("super")),
+        "{:?}",
+        signals.titles
+    );
 }

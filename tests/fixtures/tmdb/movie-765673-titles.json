@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/765673/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:36.315Z",
+  "response": {
+    "id": 765673,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "A Disturbance in the Force",
+        "type": ""
+      }
+    ]
+  }
+}

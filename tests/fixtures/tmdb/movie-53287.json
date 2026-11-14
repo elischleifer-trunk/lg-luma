@@ -1,0 +1,84 @@
+{
+  "request": {
+    "path": "/3/movie/53287",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:27.010Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/byGDzYJou70f3kFFXIqucOA8L6e.jpg",
+    "belongs_to_collection": null,
+    "budget": 22000000,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 53287,
+    "imdb_id": "tt0103007",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "The Super",
+    "overview": "Louie Kritski is a heartless landlord who has been so negligent in keeping up his ghetto apartment that he is threatened with jail time. The judge gives him another option -- he must live in his rat-infested hell hole until he brings it up to liveable standards.",
+    "popularity": 0.9703,
+    "poster_path": "/grkfopMr14odyBGTZQFiBXZ6K5Z.jpg",
+    "production_companies": [
+      {
+        "id": 1644,
+        "logo_path": "/l5JFudbLN3vr1sSkjRoqF7To8Ky.png",
+        "name": "Largo Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 182,
+        "logo_path": "/1BPbXmwi1DZS1Qp0koK7AuponY6.png",
+        "name": "JVC",
+        "origin_country": "JP"
+      },
+      {
+        "id": 25,
+        "logo_path": "/nM2MfoMqzJQRiSynsDabOtFKetD.png",
+        "name": "20th Century Fox",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      },
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "release_date": "1991-10-04",
+    "revenue": 11000863,
+    "runtime": 86,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "The judge sentenced slumlord Louie Kritski to six months in his own building. He would have been better off in jail.",
+    "title": "The Super",
+    "video": false,
+    "vote_average": 5.9,
+    "vote_count": 130
+  }
+}

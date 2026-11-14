@@ -1,0 +1,52 @@
+{
+  "request": {
+    "path": "/3/movie/8224/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.324Z",
+  "response": {
+    "id": 8224,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "8 Millimeter",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Eight Millimeter",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Huit millimètres",
+        "type": "French title"
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Осем милиметра",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "8mm: Oito Milímetros",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "8mm - kahdeksan millimetriä",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "8 milimetara",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "8mm",
+        "type": ""
+      }
+    ]
+  }
+}

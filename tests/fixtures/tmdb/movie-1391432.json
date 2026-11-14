@@ -1,0 +1,51 @@
+{
+  "request": {
+    "path": "/3/movie/1391432",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:28.890Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "",
+    "id": 1391432,
+    "imdb_id": null,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Sup",
+    "overview": "A woman goes out on a paddleboard. Hijinks ensue.",
+    "popularity": 0.3718,
+    "poster_path": "/iI1RfLx0P55vSzqE9fdpAyNvvmc.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2024-11-08",
+    "revenue": 0,
+    "runtime": 9,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Sup",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

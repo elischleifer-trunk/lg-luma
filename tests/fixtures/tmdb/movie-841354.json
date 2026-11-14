@@ -1,0 +1,46 @@
+{
+  "request": {
+    "path": "/3/movie/841354",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-14T16:43:25.523Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [],
+    "homepage": "",
+    "id": 841354,
+    "imdb_id": "tt0401349",
+    "origin_country": [
+      "ES"
+    ],
+    "original_language": "es",
+    "original_title": "Corrido de sup... madre",
+    "overview": "",
+    "popularity": 0.0604,
+    "poster_path": "/rx91zYsLA6xrQmcYbrR77I1D43t.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2001-12-31",
+    "revenue": 0,
+    "runtime": 0,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Corrido de sup... madre",
+    "video": false,
+    "vote_average": 7.5,
+    "vote_count": 2
+  }
+}

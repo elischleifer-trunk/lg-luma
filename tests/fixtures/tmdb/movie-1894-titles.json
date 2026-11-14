@@ -1,0 +1,307 @@
+{
+  "request": {
+    "path": "/3/movie/1894/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.386Z",
+  "response": {
+    "id": 1894,
+    "titles": [
+      {
+        "iso_3166_1": "NO",
+        "title": "Klonene angriper",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "L'attaque des clones",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Episode II - Attack of the Clones 3D",
+        "type": "3-D version"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Attack of the Clones: The IMAX Experience",
+        "type": "IMAX promotional title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars II: Attack of the Clones",
+        "type": "video box title"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Ataque dos Clones",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Атака клонов",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Η επίθεση των κλώνων",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Attack of the Clones",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "BE",
+        "title": "Star Wars - Episode II - Attack of the Clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Attack of the Clones",
+        "type": "new title"
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰二部曲：複製人全面進攻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드2 클론의 습격",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Star Wars: Episode II - Klonene Angriper",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드 2-클론의 습격",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode II - L'Attaque des Clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Star Wars : Épisode II - L'attaque des clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Hvězdné války: Epizoda II - Klony útočí",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode 2 - L'Attaque des Clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈 에피소드 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star wars: Episodio II El ataque de los clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : L'attaque des clônes",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод II - Атака клонов",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Атака клонов",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Атака клонів",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars: Episodio II - L'attacco dei cloni",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio II - L'attacco dei cloni",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны: Эпизод 2 - Атака клонов",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars Episode 2 - Angriff der Klonkrieger",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Attack of the Clones (Episode II)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars 2 - L'Attaque des clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny II - Atak Klonów",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, Episode II - L'Attaque des clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战2：克隆人的进攻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战前传2：克隆人的进攻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战前传：克隆人的进攻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：克隆人的进攻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, épisode II : L'Attaque des clones",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Csillagok Háborúja II. - A Klónok Támadása",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: კლოენების თავდასხმა (ეპიზოდი II)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები 2",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი II – კლონების თავდასხმა",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס פרק II: מתקפת המשובטים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ エピソード２／クローンの攻撃：2002",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chiến Tranh Giữa Các Vì Sao 2: Cuộc Tấn Công Của Người Vô Tính",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰前傳：複製人侵略",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Episode 2 - Angriff der Klonkrieger",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים 2: מתקפת המשובטים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战前传2：复制人侵略",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UZ",
+        "title": "Yulduzlar jangi-2: Klonlar hujumi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars Episode II - Angriff der Klonkrieger",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Guerra nas Estrelas: Episódio 2 - O Ataque dos Clones",
+        "type": "TV Title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "AOTC",
+        "type": "abbreviation"
+      },
+      {
+        "iso_3166_1": "LV",
+        "title": "Zvaigžņu kari: klonu kari",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны: Эпизод 2",
+        "type": ""
+      }
+    ]
+  }
+}
