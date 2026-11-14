@@ -16,7 +16,11 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import instance_id
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
-from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    async_fire_time_changed,
+    async_mock_service,
+)
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 try:
@@ -744,6 +748,18 @@ def key_pushes(aioclient_mock: AiohttpClientMocker) -> list:
     ]
 
 
+async def keys_form(hass: HomeAssistant, config: MockConfigEntry):
+    """Configure opens a menu; streaming search keys are one of its pages."""
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    assert result["type"] is FlowResultType.MENU
+    assert result["menu_options"] == ["phone_keyboard", "streaming_keys"]
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"next_step_id": "streaming_keys"}
+    )
+    assert result["step_id"] == "streaming_keys"
+    return result
+
+
 async def test_options_check_streaming_keys_then_send_them_to_the_tv(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
@@ -752,8 +768,7 @@ async def test_options_check_streaming_keys_then_send_them_to_the_tv(
     aioclient_mock.get(MOTN_CHECK, status=403, json={"message": "Not subscribed"})
     aioclient_mock.get(TMDB_CHECK, json={"movie_results": []})
 
-    result = await hass.config_entries.options.async_init(config.entry_id)
-    assert result["step_id"] == "init"
+    result = await keys_form(hass, config)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {"motn_api_key": f" {MOTN} ", "tmdb_read_access_token": TMDB_KEY}
     )
@@ -821,7 +836,7 @@ async def test_a_cleared_key_is_not_sent_and_unchanged_keys_are_not_checked_agai
 
     aioclient_mock.clear_requests()
     aioclient_mock.put(f"{TV}/api/streaming-keys", json={"motn": True, "tmdb": True})
-    result = await hass.config_entries.options.async_init(config.entry_id)
+    result = await keys_form(hass, config)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {"motn_api_key": MOTN, "tmdb_read_access_token": ""}
     )
@@ -983,3 +998,106 @@ async def test_a_tv_without_an_endpoint_asks_for_a_luma_update_until_luma_change
     assert issues(hass) == {"tv_outdated"}
     await hass.config_entries.async_remove(config.entry_id)
     assert issues(hass) == set()
+
+
+def keyboard_calls(aioclient_mock: AiohttpClientMocker, path: str) -> list:
+    return [call[2] for call in aioclient_mock.mock_calls if call[1].path == path]
+
+
+async def test_phones_chosen_in_options_are_offered_typing_when_a_tv_field_opens(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    hass_client_no_auth,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    pixel = async_mock_service(hass, "notify", "mobile_app_pixel")
+    async_mock_service(hass, "notify", "mobile_app_ipad")
+    async_mock_service(hass, "notify", "persistent_notification")
+    MockConfigEntry(domain="mobile_app", title="Pixel", data={"device_name": "Pixel"}).add_to_hass(
+        hass
+    )
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    config = await setup(hass, aioclient_mock)
+    webhook_id = config.data["webhook_id"]
+    # Off until a phone is chosen: the TV is not asked to report anything.
+    assert keyboard_calls(aioclient_mock, "/api/keyboard") == []
+
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"next_step_id": "phone_keyboard"}
+    )
+    assert result["step_id"] == "phone_keyboard"
+    selector = next(iter(result["data_schema"].schema.values()))
+    assert selector.config["options"] == [
+        {"value": "mobile_app_ipad", "label": "ipad"},
+        {"value": "mobile_app_pixel", "label": "Pixel"},
+    ]
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"keyboard_phones": ["mobile_app_pixel"]}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert keyboard_calls(aioclient_mock, "/api/keyboard") == [
+        {"webhook": f"http://192.168.1.10:8123/api/webhook/{webhook_id}"}
+    ]
+
+    # The TV opens its search field: the chosen phone gets a notification with a reply box.
+    client = await hass_client_no_auth()
+    response = await client.post(
+        f"/api/webhook/{webhook_id}", json={"open": True, "field": "search"}
+    )
+    assert response.status == 200
+    await hass.async_block_till_done()
+    assert len(pixel) == 1
+    data = pixel[0].data
+    assert data["title"] == "Living room TV"
+    action = data["data"]["actions"][0]
+    assert action["behavior"] == "textInput"
+    assert action["textInputPlaceholder"] == "Search"
+    assert data["data"]["tag"] == f"luma_keyboard_{config.entry_id}"
+
+    # The reply is typed on the TV; another entry's or a blank reply is not.
+    aioclient_mock.post(f"{TV}/api/keyboard/text", json={"typed": True})
+    for reply in [
+        {"action": "LUMA_KEYBOARD_other", "reply_text": "Alien"},
+        {"action": action["action"], "reply_text": "  "},
+        {"action": action["action"], "reply_text": " Dune\nPart\tTwo "},
+    ]:
+        hass.bus.async_fire("mobile_app_notification_action", reply)
+    await hass.async_block_till_done()
+    # Line breaks (Enter on Android) become spaces: the TV's fields are one line.
+    assert keyboard_calls(aioclient_mock, "/api/keyboard/text") == [{"text": "Dune Part Two"}]
+
+    # The field closes: the notification is cleared.
+    await client.post(f"/api/webhook/{webhook_id}", json={"open": False})
+    await hass.async_block_till_done()
+    assert pixel[-1].data == {
+        "message": "clear_notification",
+        "data": {"tag": f"luma_keyboard_{config.entry_id}"},
+    }
+
+    # A TV that restarted lost the webhook and gets it again.
+    aioclient_mock.clear_requests()
+    aioclient_mock.get(
+        f"{TV}/api/status", json={"overlay": None, "cameras": 0, "keyboard_hook": False}
+    )
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert len(keyboard_calls(aioclient_mock, "/api/keyboard")) == 1
+
+    # Choosing no phones tells the TV to stop calling.
+    aioclient_mock.clear_requests()
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"next_step_id": "phone_keyboard"}
+    )
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"keyboard_phones": []}
+    )
+    await hass.async_block_till_done()
+    assert keyboard_calls(aioclient_mock, "/api/keyboard") == [{}]

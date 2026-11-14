@@ -1404,6 +1404,24 @@ fn run() -> Result<(), String> {
                     state.camera_video_closed(closed);
                     continue;
                 }
+                // Typed on a phone through Home Assistant's notification.
+                home_assistant::Event::Typed { text, submit } => {
+                    state.set_editing_text(&text);
+                    if submit {
+                        let pending = state.finish_text_input();
+                        running &= effects(
+                            pending,
+                            &mut state,
+                            &platform,
+                            &preferences_path,
+                            &weather_service,
+                            &wallpaper_service,
+                            &webhook_service,
+                            &updates,
+                        );
+                    }
+                    continue;
+                }
                 // Settings keeps naming them; a notice only for a server newly found outdated.
                 home_assistant::Event::IntegrationOutdated(names) => {
                     let new: Vec<&str> = names
@@ -2028,6 +2046,8 @@ fn run() -> Result<(), String> {
             }
             text_active = keyboard;
         }
+        // Home Assistant offers to type the open field on a phone; it ignores repeats.
+        home_assistant.keyboard(keyboard.then(|| state.keyboard_field.key()));
         let dt = clock::since(last_frame).as_secs_f32().min(0.1);
         last_frame = clock::now();
         let navigation = view::navigation(

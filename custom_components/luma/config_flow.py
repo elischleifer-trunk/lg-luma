@@ -13,6 +13,10 @@ from homeassistant.core import callback
 from homeassistant.helpers import instance_id
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
@@ -23,10 +27,11 @@ try:  # Home Assistant 2025.1+
 except ImportError:  # pragma: no cover - older releases
     from homeassistant.components.ssdp import SsdpServiceInfo
 
-from . import streaming_keys
+from . import keyboard, streaming_keys
 from .api import LumaApiError, LumaClient, LumaConnectionError, LumaError
 from .const import (
     CONF_DEVICE_ID,
+    CONF_KEYBOARD_PHONES,
     CONF_MDBLIST_KEY,
     CONF_MOTN_KEY,
     CONF_TMDB_TOKEN,
@@ -209,9 +214,50 @@ SECRET = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 
 
 class LumaOptionsFlow(OptionsFlow):
-    """Streaming search keys. Saving pushes them to the TV (see __init__.py)."""
+    """Streaming search keys and phone typing. Saving sends them to the TV (see __init__.py)."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        return self.async_show_menu(
+            step_id="init", menu_options=["phone_keyboard", "streaming_keys"]
+        )
+
+    async def async_step_phone_keyboard(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        current = self.config_entry.options
+        if user_input is not None:
+            return self.async_create_entry(
+                data={**current, CONF_KEYBOARD_PHONES: user_input.get(CONF_KEYBOARD_PHONES, [])}
+            )
+        available = keyboard.available_phones(self.hass)
+        chosen = list(current.get(CONF_KEYBOARD_PHONES) or [])
+        # A chosen phone that was removed stays listed, so saving does not drop it silently.
+        options = [
+            SelectOptionDict(value=service, label=name) for service, name in available.items()
+        ]
+        options += [
+            SelectOptionDict(value=service, label=service)
+            for service in chosen
+            if service not in available
+        ]
+        return self.async_show_form(
+            step_id="phone_keyboard",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_KEYBOARD_PHONES, description={"suggested_value": chosen}
+                    ): SelectSelector(
+                        SelectSelectorConfig(
+                            options=options, multiple=True, mode=SelectSelectorMode.LIST
+                        )
+                    ),
+                }
+            ),
+        )
+
+    async def async_step_streaming_keys(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         current = self.config_entry.options
         if user_input is not None:
@@ -235,7 +281,7 @@ class LumaOptionsFlow(OptionsFlow):
                 )
         values = user_input or current
         return self.async_show_form(
-            step_id="init",
+            step_id="streaming_keys",
             data_schema=vol.Schema(
                 {
                     vol.Optional(
@@ -253,4 +299,10 @@ class LumaOptionsFlow(OptionsFlow):
                 }
             ),
             errors=errors,
+            # URLs live here, not in the translation strings (hassfest rejects them there).
+            description_placeholders={
+                "motn_url": "https://www.movieofthenight.com/about/api",
+                "tmdb_url": "https://www.themoviedb.org/settings/api",
+                "mdblist_url": "https://mdblist.com/preferences/",
+            },
         )

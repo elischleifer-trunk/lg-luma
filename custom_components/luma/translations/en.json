@@ -38,17 +38,32 @@
   "options": {
     "step": {
       "init": {
+        "title": "Luma",
+        "menu_options": {
+          "phone_keyboard": "Type on your phone",
+          "streaming_keys": "Streaming search keys"
+        }
+      },
+      "phone_keyboard": {
+        "title": "Type on your phone",
+        "description": "When a text field opens on the TV, such as search, these phones get a notification. Reply to it to type into the TV instead of using the remote. Phones need the Home Assistant app.",
+        "data": { "keyboard_phones": "Phones" },
+        "data_description": {
+          "keyboard_phones": "None chosen turns this off. Phones only appear here once the Home Assistant app is signed in on them."
+        }
+      },
+      "streaming_keys": {
         "title": "Streaming search keys",
-        "description": "Luma's search finds where shows stream with Movie of the Night, ranks them with TMDB and shows Rotten Tomatoes and IMDb scores from MDBList (optional). Keys are checked when saved, then sent to the TV, and again if the TV loses them or they are changed on the TV. Clearing a field here does not remove the TV's key.",
+        "description": "Luma's search uses Movie of the Night to find where a show streams, TMDB to rank results and, optionally, MDBList for Rotten Tomatoes and IMDb scores. Keys are checked when you submit, then kept in sync with the TV.\n\nLeave a field empty to keep the key already on the TV.",
         "data": {
-          "motn_api_key": "Movie of the Night API key",
-          "tmdb_read_access_token": "TMDB API Read Access Token",
-          "mdblist_api_key": "MDBList API key"
+          "motn_api_key": "Movie of the Night key",
+          "tmdb_read_access_token": "TMDB read access token",
+          "mdblist_api_key": "MDBList key (optional)"
         },
         "data_description": {
-          "motn_api_key": "From movieofthenight.com/about/api (starts with motn-key-), or a RapidAPI key for Streaming Availability.",
-          "tmdb_read_access_token": "The long token under themoviedb.org → Settings → API, not the shorter API key.",
-          "mdblist_api_key": "Optional, for review scores on each poster: mdblist.com → Preferences → API access."
+          "motn_api_key": "Get one at [Movie of the Night]({motn_url}). It starts with `motn-key-`. A RapidAPI Streaming Availability key also works.",
+          "tmdb_read_access_token": "The long **API Read Access Token** in your [TMDB API settings]({tmdb_url}), not the short API key.",
+          "mdblist_api_key": "For review scores on each poster. Find it in [MDBList's preferences]({mdblist_url}) under API access."
         }
       }
     },
