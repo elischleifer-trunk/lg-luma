@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1396000/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:18.729Z",
+  "response": {
+    "id": 1396000,
+    "titles": [
+      {
+        "iso_3166_1": "IN",
+        "title": "Aapish",
+        "type": ""
+      }
+    ]
+  }
+}

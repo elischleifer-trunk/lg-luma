@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/tv/309104/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.257Z",
+  "response": {
+    "id": 309104,
+    "results": [
+      {
+        "iso_3166_1": "KR",
+        "title": "슈퍼스타가 되고싶어",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Wannueng Will Be a Superstar",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "One Day, I'll Be a Superstar",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Wannueng Ja Pen Sup'tar",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Wan Nueng Ja Pen Sup'tar",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Wan Nueng Cha Pen Supta",
+        "type": ""
+      }
+    ]
+  }
+}

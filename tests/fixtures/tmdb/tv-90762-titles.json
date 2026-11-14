@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/tv/90762/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:18.410Z",
+  "response": {
+    "id": 90762,
+    "results": [
+      {
+        "iso_3166_1": "IR",
+        "title": "د آفیس",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Office (IN)",
+        "type": ""
+      }
+    ]
+  }
+}

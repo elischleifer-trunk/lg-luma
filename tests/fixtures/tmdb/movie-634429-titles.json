@@ -1,0 +1,52 @@
+{
+  "request": {
+    "path": "/3/movie/634429/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.494Z",
+  "response": {
+    "id": 634429,
+    "titles": [
+      {
+        "iso_3166_1": "JP",
+        "title": "シン・ウルトラマン 空想特撮映画",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "신 울트라맨",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Shin Urutoraman: kūsō tokusatsu eiga",
+        "type": "Japanese title (romaji)"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Shin Ultraman: Fantasy Special Effects Film",
+        "type": "Literal English title"
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "新·超人力霸王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Shin Ultraman: Filme de Efeitos Especiais de Fantasia",
+        "type": "Título Literal em Português"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Shin.Ultraman",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Shin Ultraman",
+        "type": ""
+      }
+    ]
+  }
+}

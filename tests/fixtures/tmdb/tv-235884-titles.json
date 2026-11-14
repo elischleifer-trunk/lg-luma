@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/tv/235884/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.164Z",
+  "response": {
+    "id": 235884,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Pesadelo na Cozinha com Gordon Ramsey",
+        "type": "Continuação (2023) da série anterior (2007)."
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Kitchen Nightmares 2023",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Kitchen Nightmares Reboot",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Kitchen Nightmares: Road to Super Bowl LIX",
+        "type": "season 2"
+      }
+    ]
+  }
+}

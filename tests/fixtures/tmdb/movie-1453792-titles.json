@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1453792/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:25.040Z",
+  "response": {
+    "id": 1453792,
+    "titles": [
+      {
+        "iso_3166_1": "AU",
+        "title": "Bluey's Big Play - The Stage Show",
+        "type": ""
+      }
+    ]
+  }
+}

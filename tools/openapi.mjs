@@ -146,6 +146,63 @@ const APIS = [
           },
         },
       },
+      {
+        // `append_to_response=alternative_titles`: a film's other titles by country. Movie of
+        // the Night matches these ("Star Wars: Return of the Jedi").
+        add: true,
+        path: [
+          'paths',
+          '/3/movie/{movie_id}',
+          'get',
+          'responses',
+          '200',
+          'content',
+          'application/json',
+          'schema',
+          'properties',
+          'alternative_titles',
+        ],
+        value: {
+          type: 'object',
+          properties: {
+            titles: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: { iso_3166_1: { type: 'string' }, title: { type: 'string' } },
+              },
+            },
+          },
+        },
+      },
+      {
+        // `append_to_response=alternative_titles`: a series' other titles ("Star Wars: Andor").
+        add: true,
+        path: [
+          'paths',
+          '/3/tv/{series_id}',
+          'get',
+          'responses',
+          '200',
+          'content',
+          'application/json',
+          'schema',
+          'properties',
+          'alternative_titles',
+        ],
+        value: {
+          type: 'object',
+          properties: {
+            results: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: { iso_3166_1: { type: 'string' }, title: { type: 'string' } },
+              },
+            },
+          },
+        },
+      },
     ],
   },
 ];

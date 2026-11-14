@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/620/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.986Z",
+  "response": {
+    "id": 620,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Ghost Busters",
+        "type": "On-screen title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "SOS Fantômes",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Ghostbusters - Haamujengi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "gosutobasutazu",
+        "type": "romanization"
+      },
+      {
+        "iso_3166_1": "SE",
+        "title": "Ghostbusters - Spökligan",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트 버스터즈",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Ghostbusters - Acchiappafantasmi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Os Caça-Fantasmas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Pogromcy Duchów",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트 버스터즈 1",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트버스터즈",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Γκόστμπαστερς",
+        "type": "Amazon Prime Video title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "捉鬼敢死隊",
+        "type": ""
+      }
+    ]
+  }
+}

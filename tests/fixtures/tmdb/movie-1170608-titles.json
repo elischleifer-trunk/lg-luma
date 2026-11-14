@@ -1,0 +1,87 @@
+{
+  "request": {
+    "path": "/3/movie/1170608/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:21.146Z",
+  "response": {
+    "id": 1170608,
+    "titles": [
+      {
+        "iso_3166_1": "KR",
+        "title": "듄 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune: Part 3",
+        "type": "alternative spelling"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "חולית 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Duna 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Duna: Parte 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ID",
+        "title": "Dune: Bagian Tiga",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Dyun 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Dyun: 3-cü Hissə",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Dune : Troisième partie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Dune 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Dune : Partie 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Duna: Parte Tres",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Дюна: Частина Третя",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NP",
+        "title": "ड्युन: भाग तीन",
+        "type": ""
+      }
+    ]
+  }
+}

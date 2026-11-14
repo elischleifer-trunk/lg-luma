@@ -1,0 +1,27 @@
+{
+  "request": {
+    "path": "/3/movie/21781/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.584Z",
+  "response": {
+    "id": 21781,
+    "titles": [
+      {
+        "iso_3166_1": "KR",
+        "title": "Geomi sup",
+        "type": "revised romanization"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "거미숲",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スパイダー・フォレスト／懺悔",
+        "type": ""
+      }
+    ]
+  }
+}

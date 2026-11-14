@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/movie/848538/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.383Z",
+  "response": {
+    "id": 848538,
+    "titles": [
+      {
+        "iso_3166_1": "KR",
+        "title": "'아가일' - Argylle",
+        "type": "Apple TV+ title"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Argylle: Agente Secreto",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Argylle - Espião Secreto",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Argylle - O Superespião",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Аргайл: Супершпионин",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Άργκαϊλ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Argylle - La super spia",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Argylle: A szuperkém",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Արգայլ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Argylle: Gizli Casus",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "ארגייל",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "機密特務：阿蓋爾",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ARGYLLE/アーガイル",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Argylle: Siêu điệp viên",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "Argylle - อาร์ไกล์ ยอดสายลับ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Arqayl: Supercəsus",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "阿盖尔：神秘特工",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "request": {
+    "path": "/3/movie/980804/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:36.780Z",
+  "response": {
+    "id": 980804,
+    "titles": [
+      {
+        "iso_3166_1": "NO",
+        "title": "LEGO Star Wars: Sommerferie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "乐高星球大战：夏日假期",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "レゴ(R)スター・ウォーズ／サマーバケーション",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "LEGO スター ウォーズ サマー バケーション",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "LEGO Star Wars - Sommerurlaub",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "乐高星球大战 节日特送",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "ЛЕГО Звёздные Войны: Летние Каникулы",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Лего Звездные войны",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Летние каникулы",
+        "type": ""
+      }
+    ]
+  }
+}

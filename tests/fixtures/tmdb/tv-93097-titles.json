@@ -1,0 +1,37 @@
+{
+  "request": {
+    "path": "/3/tv/93097/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:24.356Z",
+  "response": {
+    "id": 93097,
+    "results": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Когато цъфне камелията",
+        "type": "български"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "Dongbaekkkot Pil Muryeop",
+        "type": "Romanization"
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "ربيع الكاميليا",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "山茶花開時",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "When Camellia Blooms",
+        "type": ""
+      }
+    ]
+  }
+}

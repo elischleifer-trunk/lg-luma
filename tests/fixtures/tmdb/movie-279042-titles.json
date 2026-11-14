@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/279042/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:33.140Z",
+  "response": {
+    "id": 279042,
+    "titles": [
+      {
+        "iso_3166_1": "FR",
+        "title": "Sup De Fric",
+        "type": ""
+      }
+    ]
+  }
+}

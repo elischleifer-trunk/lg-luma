@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/782054/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:36.457Z",
+  "response": {
+    "id": 782054,
+    "titles": [
+      {
+        "iso_3166_1": "JP",
+        "title": "Eiga Doraemon: Nobita no Little Star Wars 2021",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Doraemon Movie 41: Nobita no Little Star Wars",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Doraemon The Movie 2021: Nobita no Uchuu Shou Sensou",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Doraemon The Movie 2021: Nobita's Space War (Little Star Wars)",
+        "type": "alternative title"
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "โดราเอมอน ตอน สงครามอวกาศจิ๋วของโนบิตะ 2021",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Doraemon Movie 41: Nobita Và Cuộc Chiến Vũ Trụ Tí Hon",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "電影多啦A夢： 大雄之宇宙小戰爭 2021",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "電影哆啦A夢： 大雄的宇宙小戰爭  2021",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Doraemon Filmi: Nobita'nın Küçük Yıldız Savaşları 2021",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EC",
+        "title": "Eiga Doraemon: Nobita no Little Star Wars",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "哆啦A梦 大雄的宇宙小战争 2021",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Doraemon: The Movie Nobita's Little Star Wars 2021",
+        "type": "alternative title"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "دورایمون: جنگ های ستاره کوچک نوبیتا",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "映画ドラえもん のび太の宇宙小戦争2021",
+        "type": ""
+      }
+    ]
+  }
+}

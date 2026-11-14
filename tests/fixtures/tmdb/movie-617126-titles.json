@@ -1,0 +1,247 @@
+{
+  "request": {
+    "path": "/3/movie/617126/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:26.510Z",
+  "response": {
+    "id": 617126,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Marvel Studios' The Fantastic Four",
+        "type": "former promotional title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "판타스틱 포",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AL",
+        "title": "Katër fantastike",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Фантастична четворка",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Fantastiline nelik",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Fantastiskas Ketvertas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Fantastická štvorka",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UZ",
+        "title": "Fantastik to'rtlik",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Bộ 4 Siêu Đẳng",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇四侠",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Quarteto Fantástico 4: Primeiros Passos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fantastic Four",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Los cuatro Fantásticos de Marvel Studios",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "The Fantastic Four de Marvel Studios",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Fantastik Dörtlü: İlk Adımlar",
+        "type": "Turkish title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Fantastic Four: First Steps",
+        "type": "alternative spelling (official title)"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Fantastic Four",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Marvel Studios' The Fantastic Four: First Steps",
+        "type": "promotional title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "판타스틱 4: 퍼스트 스텝스",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Фантастическая Четверка",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "驚奇4超人：第一步",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Ֆանտաստիկ Քառյակը",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Les Quatre Fantastiques",
+        "type": "French working title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ファンタスティック・フォー",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Fantastyczna Czwórka: Pierwsze Kroki",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Los 4 Fantásticos: Primeros pasos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Les Quatre Fantastiques : Premiers Pas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Фантастична четвірка: Перші кроки",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "I Fantastici 4  - Gli inizi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "ארבעת המופלאים: צעדים ראשונים",
+        "type": "literal translation"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "神俠4俠：英雄第一步",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "چهار شگفت انگیز: گام‌های نخست",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "۴ شگفت انگیز: گام‌های نخست",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Blue Moon",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les Quatre Fantastiques : Premiers pas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ID",
+        "title": "The Fantastic Four: Langkah Pertama",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KZ",
+        "title": "Фантастическая четвёрка: Первые шаги",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Фантастична 4: Први кораци",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "The Fantastic Four - First Steps",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Cei patru fantastici: Primii pași",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les 4 Fantastiques - Premiers pas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les 4 Fantastiques, Premiers pas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Les 4 Fantastiques Premiers pas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇四侠：初露锋芒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Quarteto Fantástico 4",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "I Fantastici Quattro: Gli inizi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "神奇4侠：初露锋芒",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "request": {
+    "path": "/3/movie/732670/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:36.006Z",
+  "response": {
+    "id": 732670,
+    "titles": [
+      {
+        "iso_3166_1": "BR",
+        "title": "LEGO Star Wars: Especial de Natal",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "ЛЕГО Звёздные Войны: Праздничный Спецвыпуск",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "더 레고 스타 워즈 홀리데이 스페셜",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "LEGO スター ウォーズ ホリデー スペシャル",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "乐高星球大战：圣诞特别篇",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The LEGO Star Wars Holiday Special",
+        "type": "on-screen title"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "乐高星球大战：节日特送",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Праздничный спецвыпуск",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "ЛЕГО Звездные войны",
+        "type": ""
+      }
+    ]
+  }
+}

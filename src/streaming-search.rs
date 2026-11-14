@@ -4,7 +4,6 @@
 //!
 //! API calls for a new query, cheapest first:
 //! 1. Movie of the Night title search and TMDB `search/multi`, in parallel (one call each).
-//!    Results whose titles do not contain the query are dropped ([`relevance::on_topic`]).
 //! 2. TMDB details for results the search summary did not already rule out (foreign or
 //!    little-seen titles are skipped), in parallel. TMDB has no batch endpoint; details are
 //!    cached for a month, so each title costs one call.
@@ -57,8 +56,7 @@ pub fn search(
         let shows = source.search(query, country);
         (shows, tmdb.join().unwrap_or(None))
     });
-    // Before any TMDB details are fetched, so off-topic results cost no calls.
-    let mut shows = relevance::on_topic(query, shows?);
+    let mut shows = shows?;
     let results = match tmdb {
         Some(Ok(results)) => results,
         Some(Err(error)) => {
@@ -275,14 +273,14 @@ impl Source for Live {
         let tmdb = self.tmdb.as_ref().ok_or(Error::NotConfigured("TMDB"))?;
         cached(
             &self.cache,
-            // With its US rating appended; details cached before ratings were asked for
-            // are not reused.
-            &format!("tmdb:movie:{id}:rated"),
+            // With its US rating and alternative titles appended; details cached before
+            // those were asked for are not reused.
+            &format!("tmdb:movie:{id}:titled"),
             ttl::TMDB_DETAILS,
             || {
                 tmdb.movie_details(&MovieDetailsParams {
                     movie_id: id,
-                    append_to_response: Some("release_dates".into()),
+                    append_to_response: Some("release_dates,alternative_titles".into()),
                     language: Some(LANGUAGE.into()),
                 })
             },
@@ -293,14 +291,14 @@ impl Source for Live {
         let tmdb = self.tmdb.as_ref().ok_or(Error::NotConfigured("TMDB"))?;
         cached(
             &self.cache,
-            // With its US rating appended; details cached before ratings were asked for
-            // are not reused.
-            &format!("tmdb:tv:{id}:rated"),
+            // With its US rating and alternative titles appended; details cached before
+            // those were asked for are not reused.
+            &format!("tmdb:tv:{id}:titled"),
             ttl::TMDB_DETAILS,
             || {
                 tmdb.tv_series_details(&TvSeriesDetailsParams {
                     series_id: id,
-                    append_to_response: Some("content_ratings".into()),
+                    append_to_response: Some("content_ratings,alternative_titles".into()),
                     language: Some(LANGUAGE.into()),
                 })
             },

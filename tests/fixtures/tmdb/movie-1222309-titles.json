@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1222309/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.014Z",
+  "response": {
+    "id": 1222309,
+    "titles": [
+      {
+        "iso_3166_1": "IN",
+        "title": "This Is the Husband I Want!",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/697620/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:20.669Z",
+  "response": {
+    "id": 697620,
+    "titles": [
+      {
+        "iso_3166_1": "GE",
+        "title": "სილახვავი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "დიუნი",
+        "type": ""
+      }
+    ]
+  }
+}

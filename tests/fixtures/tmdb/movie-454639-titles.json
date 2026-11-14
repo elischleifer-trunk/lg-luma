@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/movie/454639/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.893Z",
+  "response": {
+    "id": 454639,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "MOTU",
+        "type": "Abbreviation"
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "นักรบเจ้าจักรวาล",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "AMOS DEL UNIVERSO",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "마스터즈 오브 더 유니버스",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AU",
+        "title": "He-Man and the masters of the universe",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "He-Man y los amos del universo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SV",
+        "title": "Amos del Universo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EG",
+        "title": "أسياد الكون",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Mestres do Universo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "He-Man y Los Maestros del Universo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CL",
+        "title": "He-Man y Los Maestros del Universo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ID",
+        "title": "Penguasa Alam Semesta",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Masters of the Universe",
+        "type": "Original"
+      }
+    ]
+  }
+}

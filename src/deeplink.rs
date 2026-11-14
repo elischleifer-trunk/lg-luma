@@ -31,6 +31,7 @@ const HOSTS: &[(&str, &[&str])] = &[
             "amazon.com",
             "www.primevideo.com",
             "primevideo.com",
+            "app.primevideo.com",
         ],
     ),
     ("disney", &["www.disneyplus.com", "disneyplus.com"]),
@@ -71,10 +72,15 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
         // search fills it with the title's GTI (`amzn1.dv.gti.<uuid>`), captured with
         // ls-monitor on a TV (2026-11). A GTI converted from a Movie of the Night link opened
         // the title on a TV; web links and the compact ID open its home screen.
+        // Titles included with Prime link to app.primevideo.com/detail?gti=<GTI>; rentals and
+        // purchases to amazon.com/gp/video/detail/<compact GTI>.
         "prime" => {
-            let compact = segment_after(path, &["detail", "dp"])?;
+            let gti = match query_value(path, "gti") {
+                Some(gti) => valid_gti(gti)?,
+                None => gti_from_compact(segment_after(path, &["detail", "dp"])?)?,
+            };
             Some(Launch {
-                params: json!({ "contentTarget": gti_from_compact(compact)? }),
+                params: json!({ "contentTarget": gti }),
                 confidence: Confidence::Verified,
             })
         }
@@ -92,6 +98,25 @@ fn validated_path<'a>(service: &str, link: &'a str) -> Option<&'a str> {
     let (host, path) = rest.split_at(rest.find(['/', '?', '#']).unwrap_or(rest.len()));
     let hosts = HOSTS.iter().find(|(s, _)| *s == service)?.1;
     hosts.contains(&host).then_some(path)
+}
+
+/// The value of `key` in a path's query string: `/detail?gti=x&ref=y` → `x`.
+fn query_value<'a>(path: &'a str, key: &str) -> Option<&'a str> {
+    let query = path.split('#').next()?.split_once('?')?.1;
+    query
+        .split('&')
+        .find_map(|pair| pair.strip_prefix(key)?.strip_prefix('='))
+}
+
+/// A GTI exactly as Prime Video writes it: `amzn1.dv.gti.` and a lowercase UUID.
+fn valid_gti(gti: &str) -> Option<String> {
+    let uuid = gti.strip_prefix("amzn1.dv.gti.")?;
+    let shape = uuid.len() == 36
+        && uuid.char_indices().all(|(i, c)| match i {
+            8 | 13 | 18 | 23 => c == '-',
+            _ => c.is_ascii_digit() || ('a'..='f').contains(&c),
+        });
+    shape.then(|| gti.to_owned())
 }
 
 /// The path segment following one of `markers`: `/gp/video/detail/0O2P…/` → `0O2P…`.
@@ -201,6 +226,23 @@ mod tests {
                 confidence: Confidence::Verified,
             }
         );
+        // Titles included with Prime carry the GTI itself.
+        assert_eq!(
+            launch(
+                "prime",
+                "https://app.primevideo.com/detail?gti=amzn1.dv.gti.72e041dc-573e-4d1d-87a0-c79ddb7004bd"
+            )
+            .unwrap()
+            .params,
+            json!({"contentTarget": "amzn1.dv.gti.72e041dc-573e-4d1d-87a0-c79ddb7004bd"})
+        );
+        for link in [
+            "https://app.primevideo.com/detail?gti=amzn1.dv.gti.72E041DC-573e-4d1d-87a0-c79ddb7004bd",
+            "https://app.primevideo.com/detail?gti=amzn1.dv.gti.72e041dc",
+            "https://app.primevideo.com/detail?gti=amzn1.dv.gti.72e041dc-573e-4d1d-87a0-c79ddb7004bd%22",
+        ] {
+            assert!(launch("prime", link).is_none(), "{link}");
+        }
         // More pairs from amazon.com, including GTIs with leading zero bytes.
         for (compact, gti) in [
             (

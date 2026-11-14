@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/tv/250307/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:28.687Z",
+  "response": {
+    "id": 250307,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "匹兹堡医护前线",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "匹兹堡",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "הפיט",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MA",
+        "title": "ذا بيت",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Питт",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "匹茲堡醫魂",
+        "type": ""
+      }
+    ]
+  }
+}

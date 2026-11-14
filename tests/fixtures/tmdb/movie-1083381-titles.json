@@ -1,0 +1,187 @@
+{
+  "request": {
+    "path": "/3/movie/1083381/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:28.096Z",
+  "response": {
+    "id": 1083381,
+    "titles": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Задните стаи",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Бекрумс",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Бекрумсите",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Tagaruumid",
+        "type": "alternative title"
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Backrooms: Bez izlaza.",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Backrooms: Za stenou",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "นรกห้องลับ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SI",
+        "title": "Backrooms: Brez izhoda",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MA",
+        "title": "الباكرومز",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Backrooms: Thực Thể Quỷ Quyệt",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "الغرف الخلفية",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "באקרומס",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Backrooms: Um Não-Lugar",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Backrooms: O Labirinto",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Закулисье",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Бэкрумс",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Бекрумс",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "แบ็กรูมส์",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Backrooms - Za tebou",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Закулисье реальности",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "嚇房：Everything Must Go",
+        "type": "extended cut title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Backrooms",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Backrooms:Liquidación total",
+        "type": "extended cut title"
+      },
+      {
+        "iso_3166_1": "BY",
+        "title": "Бакоўкі",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "Backrooms",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "بک رومز",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "اتاق های پشتی",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Arka Odalar",
+        "type": "Sinema"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Backrooms: Um Não-Lugar (versão estendida)",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Effigy",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "חדרים אחוריים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "백룸: 익스텐디드 컷",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Backrooms: Everything Must Go",
+        "type": "extended cut title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Backrooms: Everything Must Go Edition",
+        "type": "extended cut title"
+      },
+      {
+        "iso_3166_1": "LV",
+        "title": "Aizistabas",
+        "type": ""
+      }
+    ]
+  }
+}

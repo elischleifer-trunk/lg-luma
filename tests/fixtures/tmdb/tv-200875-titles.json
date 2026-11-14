@@ -1,0 +1,102 @@
+{
+  "request": {
+    "path": "/3/tv/200875/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:28.205Z",
+  "response": {
+    "id": 200875,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "IT: Bem-Vindos a Derry",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "ES: Welcome to Derry",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "ES - Welcome to Derry",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "小丑回魂：歡迎來到德利鎮",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ID",
+        "title": "IT: Selamat datang di Derry",
+        "type": "Film"
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "ایت ولکام تو دری",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "آن به دری خوش آمدید",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "IT／Welcome to Derry \"Sore\" ga mietara, owari.",
+        "type": "romaji"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "IT／Welcome to Derry If you see \"It\", it's the end.",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "อิท: ยินดีต้อนรับสู่เดอร์รี่",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "O: Derry'e Hoş Geldiniz",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Welcome to Derry: From the World of IT",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Welcome to Derry",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Gã Hề Ma Quái: Chào Mừng Tới Derry",
+        "type": "Other name"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chúa Hề Ma Quái: Chào Mừng Đến Derry",
+        "type": "Other name"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chúa Hề Ma Quái: Chào Mừng Tới Derry",
+        "type": "Other name"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "IT: Chào Mừng Tới Derry",
+        "type": "Other name"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "IT: Chào Mừng Đến Derry",
+        "type": "Other name"
+      }
+    ]
+  }
+}

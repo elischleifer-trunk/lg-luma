@@ -1,0 +1,107 @@
+{
+  "request": {
+    "path": "/3/movie/1275779/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.245Z",
+  "response": {
+    "id": 1275779,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Non-View",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Disclosure",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Dish",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Dia D",
+        "type": "Main title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "День раскрытия",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "День разоблачения",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "La Révélation",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Den odhalení",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "วันเปิดโปง ไขปริศนาลวงโลก",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Բացահայտման օր",
+        "type": "Armenian"
+      },
+      {
+        "iso_3166_1": "LA",
+        "title": "ວັນເປີດໂປງ",
+        "type": "Lao"
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Денот на разоткривање",
+        "type": "Macedonian"
+      },
+      {
+        "iso_3166_1": "MM",
+        "title": "ထုတ်ဖော်ပြောကြားသည့်နေ့",
+        "type": "Burmese"
+      },
+      {
+        "iso_3166_1": "PK",
+        "title": "ڈسکلوژر ڈے",
+        "type": "Urdu"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Avaidusen päiv",
+        "type": "Veps"
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "İfşa Günü",
+        "type": "Sinema"
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "O Dia da Revelação",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ID",
+        "title": "Hari Pengungkapan",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Disclosure Day",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -34,6 +34,9 @@ const SERVICES = {
   prime: {
     apps: ['amazon'],
     candidates: (link) => {
+      // Titles included with Prime: app.primevideo.com/detail?gti=<GTI>.
+      const direct = link.match(/[?&]gti=(amzn1\.dv\.gti\.[0-9a-f-]{36})(?:[&#]|$)/)?.[1];
+      if (direct) return [{ contentTarget: direct }, ...webLink(link)];
       const compact = link.match(/\/(?:detail|dp)\/([0-9A-Z]{26})(?:[/?#]|$)/)?.[1];
       if (!compact) return webLink(link);
       const hex = (

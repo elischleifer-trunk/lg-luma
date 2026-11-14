@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/tv/17174/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.663Z",
+  "response": {
+    "id": 17174,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "古宅老友记",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "同一屋檐吓",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "רוחות רפאים: בריטניה",
+        "type": "yes"
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "古宅老友記",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghosts U.K.",
+        "type": "CBS title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghosts UK",
+        "type": "CBS title"
+      }
+    ]
+  }
+}

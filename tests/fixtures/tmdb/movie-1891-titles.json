@@ -1,0 +1,392 @@
+{
+  "request": {
+    "path": "/3/movie/1891/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.903Z",
+  "response": {
+    "id": 1891,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars V: The Empire Strikes Back",
+        "type": "video box title"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Guerre stellari - L'Impero colpisce ancora",
+        "type": "poster title"
+      },
+      {
+        "iso_3166_1": "AD",
+        "title": "L'Imperi Contraataca",
+        "type": "Catalan original title"
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Imperiet slår igen",
+        "type": "original title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Империя наносит ответный удар",
+        "type": "original title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Empire Strikes Back: Star Wars II",
+        "type": "promotional title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Empire Strikes Back",
+        "type": "new title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Episode V - The Empire Strikes Back",
+        "type": "former title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈 에피소드 5: 제국의 역습",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰五部曲：帝國大反擊",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Episode V - The Empire Strikes Back - Despecialized Edition",
+        "type": "special edit"
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Star Wars: Episodi V - Imperiumin vastaisku",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: O Império Contra-Ataca",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: Episódio V - O Império Contra-Ataca",
+        "type": "reissue title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode V - L'Empire Contre-Attaque",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Empire Strikes Back (Despecialized Edition)",
+        "type": "special edit"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Episode V - The Empire Strikes Back Special Edition",
+        "type": "special edition"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드5 제국의 역습",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Star Wars: Episode V - Imperiet slår igen",
+        "type": "reissue title"
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları: Bölüm V - İmparator'un Dönüşü",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları 5",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "L'Impero colpisce ancora (Episodio V)",
+        "type": "modern title"
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Star Wars : Épisode V - L'Empire contre-attaque",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "L'empire contre-attaque",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "звездные войны 4",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Star Wars V. rész - A Birodalom visszavág",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode V - Das Imperium schlägt zurück",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "L'Impero colpisce ancora",
+        "type": "1977 title"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Hvězdné války: Epizoda V – Impérium vrací úder",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars 4K80",
+        "type": "Project 4K"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - L'Impero colpisce ancora",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars: Episodio V - L'Impero colpisce ancora",
+        "type": "new title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode 5 - L'Empire Contre-Attaque",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias. Episodio 5, El imperio contraataca",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars V Despecialized",
+        "type": "special edition"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод 5 – Империя наносит ответный удар",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Империя наносит ответный удар",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны 5 – Империя наносит ответный удар",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : L'Empire contre-attaque",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio V - L'impero colpisce ancora",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод V - Империя наносит ответный удар",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Імперія завдає удару у відповідь",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: Episodio V - El Imperio contraataca",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны: Эпизод 5 - Империя наносит ответный удар",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars Episode 5 - Das Imperium schlägt zurück",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Das Imperium schlägt zurück",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드 5 제국의 역습",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Empire Strikes Back (Episode V)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny V - Imperium Kontratakuje",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战5：帝国反击战",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：帝国反击战",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰：帝國反擊戰",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, épisode V - L'Empire contre-attaque",
+        "type": "depuis 2000"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Star Wars: Episodio V: El Imperio contraataca",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Csillagok Háborúja V. - A Birodalom Visszavág",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları: İmparatorluğun Saldırısı",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი V – იმპერიის საპასუხო დარტყმა",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: იმპერიის საპასუხო დარტყმა (ეპიზოდი V)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი 5",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები 5",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი V",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები V",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias. Episodio V. El imperio contraataca",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס פרק V: האמפריה מכה שנית",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chiến Tranh Giữa Các Vì Sao 5: Đế Chế Phản Công",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ エピソード５／帝国の逆襲：1980",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda V – Impérium vrací úder",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "球大戰：帝國反擊戰",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Episode 5 - Das Imperium schlägt zurück",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים 5: האימפריה מכה שנית",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars Episode 5: The Empire Strikes Back",
+        "type": "Lucasfilm.com"
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Star Wars: The Empire Strikes Back",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Star Wars Episode V: The Empire Strikes Back",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "TESB",
+        "type": "abbreviation"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda 5 - Impérium vrací úder",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CL",
+        "title": "Star Wars: Episodio V - El imperio contraataca",
+        "type": ""
+      }
+    ]
+  }
+}

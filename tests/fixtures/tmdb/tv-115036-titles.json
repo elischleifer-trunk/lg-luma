@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/tv/115036/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.970Z",
+  "response": {
+    "id": 115036,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: O Livro de Boba Fett",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "波巴·费特之书",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：波巴·费特之书",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Das Buch von Boba Fett",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Das Buch von Boba Fett",
+        "type": "Serie"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars ; El libro de Boba Fett",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Le Livre de Boba Fett",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Το Βιβλίο του Μπόμπα Φετ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: הספר של בובה פט",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס: ספרו של בובא פאט",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "O Livro de Boba Fett",
+        "type": "Ficção Científica"
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Книга Боби Фетта",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Book of Boba Fett",
+        "type": ""
+      }
+    ]
+  }
+}

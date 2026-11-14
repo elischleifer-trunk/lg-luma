@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/movie/575428/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.814Z",
+  "response": {
+    "id": 575428,
+    "titles": [
+      {
+        "iso_3166_1": "CN",
+        "title": "Nan Fang Che Zhan De Ju Hui",
+        "type": "Romanized Mandarin pronunciation"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Перестрелка на гусином озере",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "남방차참적취회",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Le lac aux oies sauvages",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Der See der wilden Gaense",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Wild Goose Lake",
+        "type": ""
+      }
+    ]
+  }
+}

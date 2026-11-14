@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/121451/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:32.932Z",
+  "response": {
+    "id": 121451,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "A Side, B Side, Sea Side",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "17 Sui de xia tian",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Sup chuk sui dik ha tin",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "17 歲的夏天",
+        "type": ""
+      }
+    ]
+  }
+}

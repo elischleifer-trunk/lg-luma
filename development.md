@@ -1102,6 +1102,8 @@ failure retries after five minutes. Unit changes convert unrounded cached Celsiu
 Removing a city clears its cache. The `.weather.json` sidecar uses Unix-seconds timestamps.
 Mock servers accept only literal loopback HTTP origins and are refused in TV builds.
 
+Search goals, example queries and known gaps are in [search.md](search.md).
+
 The Search tab (tab index 3, `state::SEARCH_TAB`, drawn left of Home so the other tabs keep their
 indices) turns into the search field and opens the keyboard (`TextField::Titles`). Its search
 follows `title_query` once a Movie of the Night key is stored. The selected result is shown at

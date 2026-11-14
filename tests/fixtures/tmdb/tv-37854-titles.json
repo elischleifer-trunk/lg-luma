@@ -1,0 +1,157 @@
+{
+  "request": {
+    "path": "/3/tv/37854/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:29.281Z",
+  "response": {
+    "id": 37854,
+    "results": [
+      {
+        "iso_3166_1": "AE",
+        "title": "ون بيس",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Едно Парче",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "One Piece",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "海贼王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "海賊王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Ek Tukda",
+        "type": "Hindi title"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Tutti All'arrembaggio",
+        "type": "episodes 54-195"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "All'arrembaggio!",
+        "type": "episodes 1-53"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "One Piece: Tutti All'arrembaggio!",
+        "type": "episodes 196-309"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Wan Pisu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ONE PIECE FAN LETTER",
+        "type": "special"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ONE PIECE",
+        "type": "stylized title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "SPECIAL EDITED VERSION『ONE PIECE』魚人島編",
+        "type": "re-edited story arc"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ワンピース ドレスローザ編",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MY",
+        "title": "Budak Getah",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MY",
+        "title": "Rubber Boy",
+        "type": "translated title"
+      },
+      {
+        "iso_3166_1": "PK",
+        "title": "وَن پِیس",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Большой Куш",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Jackpot",
+        "type": "translated title"
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "วันพีช",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "One Piece",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "海贼王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Єдиний Скарб",
+        "type": "Netflix Ukrainian dub title"
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "ВЕЛИКИЙ КУШ",
+        "type": "unofficial title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "One Piece Log: Fish-Man Island Saga",
+        "type": "re-edited story arc"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "One Piece: Pirate King",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "One Piece",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "One Piece: Pirate Island",
+        "type": "translated title"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "One Piece",
+        "type": ""
+      }
+    ]
+  }
+}

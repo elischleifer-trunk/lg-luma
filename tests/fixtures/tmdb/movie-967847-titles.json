@@ -1,0 +1,62 @@
+{
+  "request": {
+    "path": "/3/movie/967847/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:13.099Z",
+  "response": {
+    "id": 967847,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters 4",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters: Firehouse",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "捉鬼敢死队：冰封之城",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "SOS Fantômes : La Menace de glace",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AE",
+        "title": "غوستباسترز: المملكة المجمدة",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "GHOSTBUSTERS：冰天凍地",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "捉鬼敢死隊: 冰封魅來",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Ghostbusters: Soyuq Dəhşət",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghost Busters: Frozen Empire",
+        "type": "on-screen title"
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "SOS Fantômes : L'empire de glace",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1225332/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:19.686Z",
+  "response": {
+    "id": 1225332,
+    "titles": [
+      {
+        "iso_3166_1": "GB",
+        "title": "The Real Story of Mr Bates vs the Post Office",
+        "type": "Documentaire"
+      }
+    ]
+  }
+}

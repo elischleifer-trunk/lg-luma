@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/140383/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:23.915Z",
+  "response": {
+    "id": 140383,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Keep an Eye on Amélie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Oh, Amelia",
+        "type": ""
+      }
+    ]
+  }
+}

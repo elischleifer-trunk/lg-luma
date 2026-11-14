@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/movie/1301421/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.674Z",
+  "response": {
+    "id": 1301421,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Three Bags Full: A Sheep Detective Movie",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Бараны-детективы",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BE",
+        "title": "Bêêêêtective Privé",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "แก๊งแกะรอย ยอดนักสืบ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BE",
+        "title": "Bèèèèh: Het Mysterie van de Wei",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Bêêêêtective Privé",
+        "type": ""
+      }
+    ]
+  }
+}

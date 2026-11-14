@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/movie/411279/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:13.548Z",
+  "response": {
+    "id": 411279,
+    "titles": [
+      {
+        "iso_3166_1": "IN",
+        "title": "Ghost",
+        "type": "English Translation"
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Raj Mahal Returns",
+        "type": "Hindi Dubbed"
+      }
+    ]
+  }
+}

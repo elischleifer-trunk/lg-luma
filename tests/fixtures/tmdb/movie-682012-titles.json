@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/682012/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:22.580Z",
+  "response": {
+    "id": 682012,
+    "titles": [
+      {
+        "iso_3166_1": "FR",
+        "title": "The Character of Rain",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "La Métaphysique des tubes",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Little Amélie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Lille Amelie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Amélie y los Secretos de la Lluvia",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Little Amélie",
+        "type": "poster title"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Malá Amélie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Mažoji Amelija",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Pieni Amélie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Väike Amelie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "愛美麗的奇幻漫遊",
+        "type": ""
+      }
+    ]
+  }
+}

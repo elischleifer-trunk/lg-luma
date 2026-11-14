@@ -1,0 +1,112 @@
+{
+  "request": {
+    "path": "/3/tv/154825/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:19.375Z",
+  "response": {
+    "id": 154825,
+    "results": [
+      {
+        "iso_3166_1": "AE",
+        "title": "عرض مادّي",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "Propuesta laboral",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Pretendente Surpresa",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "社内相亲",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "社內相親",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Üzleti ajánlat",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Business Proposal",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "しゃないおみあい",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "社内お見合い",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "사내 맞선",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Офисное свидание вслепую",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SG",
+        "title": "社内相亲",
+        "type": "Netflix"
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "İş Teklifi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "社內相親",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "In-House Match",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Confrontation in the Company",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Office Blind Date",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "In-House Confrontation",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Meet the Man",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Hẹn Hò Chốn Công Sở",
+        "type": ""
+      }
+    ]
+  }
+}

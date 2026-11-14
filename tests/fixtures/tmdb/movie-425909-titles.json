@@ -1,0 +1,202 @@
+{
+  "request": {
+    "path": "/3/movie/425909/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:14.083Z",
+  "response": {
+    "id": 425909,
+    "titles": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Os Caça-Fantasmas: Mais Além",
+        "type": "alternative title"
+      },
+      {
+        "iso_3166_1": "AE",
+        "title": "صائدو الأشباح: الآخرة",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Ghostbusters: Legacy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "โกสต์บัสเตอร์: ปลุกพลังล่าท้าผี",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "魔鬼克星 未来世",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "მოჩვენებებზე მონადირენი : სიცოცხლის შემდეგ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "شکارچیان روح: پس از مرگ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Ghostbusters - Legacy",
+        "type": "alternative titel"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超能敢死队：来世",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "捉鬼敢死队：来世",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "新捉鬼敢死队",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超能敢死队",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters 3: Afterlife",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "S.O.S. fantômes : L'au-delà",
+        "type": "Regional French title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "捉鬼敢死隊：魅來世界",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Caça-Fantasmas: O Legado",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Vânătorii de Fantome: Moștenirea",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Isterivači duhova: Nasleđe",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SI",
+        "title": "Izganjalci duhov: Zapuščina",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GT",
+        "title": "Ghostbusters: El Legado",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Krotitelia duchov: Dedičstvo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Мисливці на привидів: З того світу",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Biệt đội săn ma: Chuyển kiếp",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Pogromcy duchów: Dziedzictwo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Vaiduoklių Medžiotojai: Iš Anapus",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트버스터즈 라이즈",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KH",
+        "title": "ក្រុមកម្ចាត់ខ្មោច៖ ក្រោកឡើង",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ゴーストバスターズ: アフターライフ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Szellemirtók: Az Örökség",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HR",
+        "title": "Istjerivači Duhova: Naslijeđe",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "S.O.S Fantômes: L'Héritage",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Cazafantasmas: Más Allá",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Tondipüüdjad: Pärand",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Krotitelé duchů: Odkaz",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "捉鬼敢死队3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "捉鬼敢死队：来生",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "SOS Fantômes 3 - L'Héritage",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters 3",
+        "type": ""
+      }
+    ]
+  }
+}

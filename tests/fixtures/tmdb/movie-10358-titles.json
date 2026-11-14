@@ -1,0 +1,27 @@
+{
+  "request": {
+    "path": "/3/movie/10358/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:29.930Z",
+  "response": {
+    "id": 10358,
+    "titles": [
+      {
+        "iso_3166_1": "HU",
+        "title": "Zack és Miri pornózik",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Zack und Miri drehen einen Porno",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "四仔棒棒堂",
+        "type": ""
+      }
+    ]
+  }
+}

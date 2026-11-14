@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/148839/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.215Z",
+  "response": {
+    "id": 148839,
+    "titles": [
+      {
+        "iso_3166_1": "IN",
+        "title": "Robbery",
+        "type": "Hindi Dubbed"
+      }
+    ]
+  }
+}

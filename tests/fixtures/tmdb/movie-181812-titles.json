@@ -1,0 +1,287 @@
+{
+  "request": {
+    "path": "/3/movie/181812/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.542Z",
+  "response": {
+    "id": 181812,
+    "titles": [
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode IX - Der Aufstieg Skywalkers",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈-라이즈 오브 스카이워커",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드 9 라이즈 오브 스카이워커",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode 9 - L'Ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Star Wars: Episode IX - The Rise of Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias. Episodio IX: El ascenso de Skywalker",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias. Episodio 9, El ascenso de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: Episódio IX - A Ascensão Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BE",
+        "title": "Star Wars - Episode IX - L'Ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La Guerra de las Galaxias.  Episodio IX.  El Ascenso De Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Star Wars: L'ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი IX – სქაიუოკერის აღზევება",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda IX - Vzestup Skywalkera",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode IX - L'Ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "L'ascension de Skywalker",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод IX - Скайуокер. Восход",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод 9 - Скайуокер. Восход",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "El ascenso de Skywalker",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні Війни: Скайвокер. Сходження",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Rise of Skywalker 3D",
+        "type": "3D version"
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Star Wars IX. rész – Skywalker kora",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈 에피소드 9 라이즈 오브 스카이워커",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars - Episodio IX -  El ascenso de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Скайуокер. Восход",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰九部曲：天行者的崛起",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Rise of Skywalker (Episode IX)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars 9 - L'Ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Star Wars - Episode 9 - The Rise of Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny IX - Skywalker. Odrodzenie",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, Episode IX - L'Ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战9：天行者崛起",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：天行者崛起",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: L'ascens de Skywalker",
+        "type": "Alternative Catalan Title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, épisode IX - L'Ascension de Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Csillagok Háborúja IX. - Skywalker Kora",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი IX",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: სქაიუოკერის აღზევება (ეპიზოდი IX)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები 9",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი 9",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები IX",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars 9: Der Aufstieg Skywalkers",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode 9 - Der Aufstieg Skywalkers",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס פרק IX: עלייתו של סקייווקר",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ エピソード９／スカイウォーカーの夜明け：2019",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chiến Tranh Giữa Các Vì Sao 9: Skywalker Trỗi Dậy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio IX - L'ascesa di Skywalker",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰：天行者崛起",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Episode 9 - Der Aufstieg Skywalkers",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: פרק 9 - עלייתו של סקייווקר",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "STAR WARS：天行者的崛起",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars Episode IX - Der Aufstieg Skywalkers",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "TROS",
+        "type": "abbreviation"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Black Diamond",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "TrIXie",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Ulduz müharibələri: IX Epizod – Skayvolkerin yüksəlişi",
+        "type": ""
+      }
+    ]
+  }
+}

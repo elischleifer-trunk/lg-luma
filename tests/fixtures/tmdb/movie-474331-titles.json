@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/474331/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:19.996Z",
+  "response": {
+    "id": 474331,
+    "titles": [
+      {
+        "iso_3166_1": "NL",
+        "title": "At the Office!",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Die Wache",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Աչքերդ բաց պահիր",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Допрос",
+        "type": ""
+      }
+    ]
+  }
+}

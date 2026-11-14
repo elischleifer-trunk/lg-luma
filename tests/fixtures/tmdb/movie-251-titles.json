@@ -1,0 +1,207 @@
+{
+  "request": {
+    "path": "/3/movie/251/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:12.764Z",
+  "response": {
+    "id": 251,
+    "titles": [
+      {
+        "iso_3166_1": "LV",
+        "title": "Spoks",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Mon fantôme d'amour",
+        "type": "Québec title"
+      },
+      {
+        "iso_3166_1": "BY",
+        "title": "Прывід",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Призрак",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Дух",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Привидение",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Привид",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Αόρατος Εραστής",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Ruh",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Kabus",
+        "type": "alternative title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Ghost – Nachricht von Sam",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Ghost, más allá del amor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PY",
+        "title": "Ghost, el fantasma del amor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Ghost, la sombra del amor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HR",
+        "title": "Duh",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Ghost - Fantasma",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Geist",
+        "type": "Low German title"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Uwierz w ducha",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Ghost: Do Outro Lado da Vida",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Ghost: O Espírito do Amor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Fantoma mea iubită",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Duch",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Ghost – näkymätön rakkaus",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Hayalet",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Ուրվական",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "شبح",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "روح",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EG",
+        "title": "الشبح",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "רוח רפאים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ゴースト/ニューヨークの幻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "사랑과 영혼",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Hồn Ma",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "วิญญาณ ความรัก ความรู้สึก",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "人鬼情未了",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "第六感生死戀",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "მოჩვენება",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "घोस्ट",
+        "type": "Hindi title"
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Vaiduoklis",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "रूह",
+        "type": "Hindi dubbed version also known as"
+      }
+    ]
+  }
+}

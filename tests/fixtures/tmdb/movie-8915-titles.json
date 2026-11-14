@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/8915/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:24.024Z",
+  "response": {
+    "id": 8915,
+    "titles": [
+      {
+        "iso_3166_1": "KR",
+        "title": "아멜리에 : 하늘을 사랑한 여인",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,437 @@
+{
+  "request": {
+    "path": "/3/movie/1892/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.070Z",
+  "response": {
+    "id": 1892,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Return of the Jedi",
+        "type": "new title"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars: Episodio VI - Il ritorno dello Jedi",
+        "type": "new title"
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "O Regresso de Jedi",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars VI - Il ritorno dello Jedi",
+        "type": "video box title"
+      },
+      {
+        "iso_3166_1": "AD",
+        "title": "El Retorn del Jedi",
+        "type": "Catalan original title"
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Повернення Джедая",
+        "type": "original title"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Star wars: Episodio VI - El retorno del Jedi",
+        "type": "reissue title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Episode VI - Return of the Jedi",
+        "type": "former title"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: Episódio VI - O Retorno de Jedi",
+        "type": "reissue title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈 에피소드 6: 제다이의 귀환",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AT",
+        "title": "Star Wars: Episode VI - Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Star Wars: Episodi VI - Jedin paluu",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: O Retorno de Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰六部曲：絕地大反攻",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ／ジェダイの復讐",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Star Wars: Episode VI - Jedi-ridderen vender tilbage",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드6 제다이의 귀환",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Revenge of the Jedi",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları: Bölüm VI - Jedi'nin Dönüşü",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları 6",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Retorno de Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Star Wars: VI. rész - A Jedi visszatér",
+        "type": "new title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode VI - Le Retour du Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны 6",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode VI - Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Krieg der Sterne: Episode VI - Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Star Wars : Épisode VI - Le retour du Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Hvězdné války: Epizoda VI – Návrat Jediho",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Revenge of the Jedi",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Blue Harvest",
+        "type": "ruse title"
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "Star Wars: Episode VI -  Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode 6 - Le Retour du Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias. Episodio VI. El retorno del Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars VI Despecialized",
+        "type": "despecialized edition"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Le retour du Jedi",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : Le retour du Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio VI - Il ritorno Dello Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Возвращение Джедая",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Повернення Джедая",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Эпизод VI - Возвращение Джедая",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны: Эпизод 6 - Возвращение Джедая",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars Episode 6 - Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars : Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Return of the Jedi (Episode VI)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈 에피소드 6 제다이의 귀환",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny VI - Powrót Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战6：绝地归来",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：绝地归来",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode 06 - Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "El retorn del Jedi",
+        "type": "Alternative Catalan Title"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de les galàxies: El retorn del Jedi",
+        "type": "Alternative Catalan Title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, épisode VI - Le Retour du Jedi",
+        "type": "depuis 2000"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "La guerra de las galaxias: El regreso del Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias: El retorno del Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Csillagok Háborúja VI. - A Jedi Visszatér",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი VI – ჯედაის დაბრუნება",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ჯედაის დაბრუნება (ეპიზოდი VI)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი 6",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები 6",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი VI",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები VI",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars VI",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Star Wars: Episodo VI - El regreso del jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס פרק VI: שובו של הג'דיי",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: O Retorno de Jedi (Episódio VI)",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chiến Tranh Giữa Các Vì Sao 6: Sự Trở Lại Của Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Return of the Jedi - Despecialized Edition",
+        "type": "professional rescan"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda VI – Návrat Jediho",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars : Le Retour du Jedi (Épisode VI)",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Star Wars: A Jedi visszatér (VI. rész)",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars: Il Ritorno dello Jedi (Episodio VI)",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ／ジェダイの帰還（エピソード６）",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Star Wars: Η Επιστροφή των Jedi (Επεισόδιο VI)",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈: 제다이의 귀환 (에피소드 6)",
+        "type": "Disney+ title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰：武士復仇",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars 4K83",
+        "type": "Project 4K"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "武士复仇",
+        "type": "VHS title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Episode 6 - Die Rückkehr der Jedi-Ritter",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: פרק 6 - שובו של הג'דיי",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים 6: שובו של הג'דיי",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战6：武士复仇",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Star Wars: Return of the Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Star Wars Episode VI: Return of the Jedi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "ROTJ",
+        "type": "abbreviation"
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda 6 - Návrat Jediho",
+        "type": ""
+      }
+    ]
+  }
+}

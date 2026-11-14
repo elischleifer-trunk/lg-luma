@@ -176,9 +176,14 @@ async function captureTmdb(tmdb, motnResults) {
     if (body.belongs_to_collection?.id) collections.add(body.belongs_to_collection.id);
   };
   // Every Movie of the Night search result, as the search screen enriches them by TMDB ID.
+  // The app appends `alternative_titles` to its details call; captured separately here so
+  // older details fixtures stay as they are. Tests merge the two.
   for (const tmdbId of motnResults) {
     const [kind, id] = tmdbId.split('/');
-    if ((kind === 'movie' || kind === 'tv') && /^\d+$/.test(id)) await details(kind, id);
+    if ((kind === 'movie' || kind === 'tv') && /^\d+$/.test(id)) {
+      await details(kind, id);
+      await tmdb.get(`${kind}-${id}-titles`, `/3/${kind}/${id}/alternative_titles`, {});
+    }
   }
   // One search for movies and series together: TMDB has no batch endpoints, so this is
   // the cheapest way to get every result's popularity, votes and original language.

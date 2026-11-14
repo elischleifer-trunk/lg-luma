@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/604079/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:28.423Z",
+  "response": {
+    "id": 604079,
+    "titles": [
+      {
+        "iso_3166_1": "MX",
+        "title": "Camina o muere",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La larga marcha",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La gran caminada",
+        "type": "Nom emprat en el llibre."
+      },
+      {
+        "iso_3166_1": "ID",
+        "title": "Perjalanan Panjang",
+        "type": ""
+      }
+    ]
+  }
+}

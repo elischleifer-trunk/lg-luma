@@ -1,0 +1,47 @@
+{
+  "request": {
+    "path": "/3/tv/299939/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.045Z",
+  "response": {
+    "id": 299939,
+    "results": [
+      {
+        "iso_3166_1": "FR",
+        "title": "Monstre - L'Histoire de Lizzie Borden",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Monstre, L'Histoire de Lizzie Borden",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "മോൺസ്റ്റർ: ദി ലിസി ബോർഡൻ സ്റ്റോറി",
+        "type": "മലയാളം"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Monster: La storia di Lizzie Borden",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Canavar: Lizzie Borden'ın Hikayesi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "怪物：麗茲波頓的故事",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Чудовисько: Історія Ліззі Борден",
+        "type": "Серіал"
+      }
+    ]
+  }
+}

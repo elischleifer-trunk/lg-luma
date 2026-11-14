@@ -1,0 +1,142 @@
+{
+  "request": {
+    "path": "/3/tv/105971/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:17.344Z",
+  "response": {
+    "id": 105971,
+    "results": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Междузвездни войни: Лошата партида",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: Os Mal Feitos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Le Bad Batch",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：异等小队",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：残次品",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：瑕疵小队",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "De hårde hunde",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La remesa mala",
+        "type": "former title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: წუნიანი პარტია",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Η κακή παρτίδα",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大战特种兵团",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "A Rossz Osztag",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס: הקבוצה הרעה",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "היחידה הפגומה",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Star Wars：バッド・バッチ",
+        "type": "logo"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈: 더 배드 배치",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈: 배드 배치",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Star Wars: El Lote Malo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "The Bad Batch",
+        "type": "former title"
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Star Wars: Den gærne gjengen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "O Lote Estragado",
+        "type": "former title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Отряд клонов 99",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Бракованная Партия",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні Війни: Погана партія",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Bad Batch",
+        "type": "former title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars The Bad Batch",
+        "type": ""
+      }
+    ]
+  }
+}

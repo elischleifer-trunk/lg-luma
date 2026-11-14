@@ -102,6 +102,74 @@
             }
           }
         }
+      },
+      {
+        "add": true,
+        "path": [
+          "paths",
+          "/3/movie/{movie_id}",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+          "properties",
+          "alternative_titles"
+        ],
+        "value": {
+          "type": "object",
+          "properties": {
+            "titles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "iso_3166_1": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "add": true,
+        "path": [
+          "paths",
+          "/3/tv/{series_id}",
+          "get",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+          "properties",
+          "alternative_titles"
+        ],
+        "value": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "iso_3166_1": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     ]
   },
@@ -769,6 +837,25 @@
                                     }
                                   }
                                 }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "alternative_titles": {
+                      "type": "object",
+                      "properties": {
+                        "titles": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "iso_3166_1": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
                               }
                             }
                           }
@@ -1793,6 +1880,25 @@
                                 "type": "string"
                               },
                               "rating": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "alternative_titles": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "iso_3166_1": {
+                                "type": "string"
+                              },
+                              "title": {
                                 "type": "string"
                               }
                             }

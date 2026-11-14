@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/tv/24876/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:19.156Z",
+  "response": {
+    "id": 24876,
+    "results": [
+      {
+        "iso_3166_1": "IR",
+        "title": "د آفیس",
+        "type": ""
+      }
+    ]
+  }
+}

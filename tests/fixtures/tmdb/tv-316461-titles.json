@@ -1,0 +1,22 @@
+{
+  "request": {
+    "path": "/3/tv/316461/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:25.985Z",
+  "response": {
+    "id": 316461,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "雾蓝色的雨后晴天",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Smoke Blue no Ame Nochi Hare",
+        "type": ""
+      }
+    ]
+  }
+}

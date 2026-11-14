@@ -1,0 +1,92 @@
+{
+  "request": {
+    "path": "/3/movie/43074/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:13.982Z",
+  "response": {
+    "id": 43074,
+    "titles": [
+      {
+        "iso_3166_1": "FR",
+        "title": "SOS Fantômes 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Caça-Fantasmas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מכסחי השדים 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SE",
+        "title": "Ghostbusters 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Ghostbusters 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "S.O.S. Fantômes 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters: Answer the Call",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "魔鬼剋星：麻辣異攻隊",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "捉鬼敢死队3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트 버스터즈",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "고스트버스터즈",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ゴーストバスターズ2016年版",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Cazafantasmas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Krotitelé duchů 3: Přijmout hovor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Krotitelé duchů 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Ghostbusters - Answer the Call",
+        "type": ""
+      }
+    ]
+  }
+}

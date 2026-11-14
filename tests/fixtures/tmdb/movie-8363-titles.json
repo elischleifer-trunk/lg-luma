@@ -1,0 +1,112 @@
+{
+  "request": {
+    "path": "/3/movie/8363/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:34.429Z",
+  "response": {
+    "id": 8363,
+    "titles": [
+      {
+        "iso_3166_1": "FR",
+        "title": "SuperGrave",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Superbad",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Superbad: Unrated Extended Special Edition",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Superbad - É Hoje",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超级坏",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Superbad - avagy miért ciki a szex?",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "男孩我最壞",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "SuperПерцы",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Super grave",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Suxbad: Tre metri sopra il pelo",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SV",
+        "title": "Super Cool",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AU",
+        "title": "Superbad - UR",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Superbad - Meine letzte Nacht als Jungfrau",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BG",
+        "title": "Суперяки",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Supersalidos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Супер-перці",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Súper cool",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スーパーバッド 童貞ウォーズ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Екстра лоши",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Super malades",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "request": {
+    "path": "/3/tv/83867/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:16.282Z",
+  "response": {
+    "id": 83867,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Andor: Uma História Star Wars",
+        "type": "season 2"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战：安多",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "安多",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Andor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ანდორი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: უბოროტო",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס: אנדור",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "אנדור: סיפור מלחמת הכוכבים",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים: אנדור",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "اندور",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "جنگ ستارگان: اندور",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "آندور",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Star Wars：キャシアン・アンドー",
+        "type": "logo"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "キャシアン・アンドー",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타 워즈 안도르",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "안도르",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Андор",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звездные войны: Андор",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Андор",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "حرب النجوم: أندور",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yıldız Savaşları: Andor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "星際大戰：安道爾",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Андор",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: Andor",
+        "type": "2022-2025"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Andor: A Star Wars Story",
+        "type": "season 2"
+      },
+      {
+        "iso_3166_1": "YE",
+        "title": "أندور",
+        "type": ""
+      }
+    ]
+  }
+}

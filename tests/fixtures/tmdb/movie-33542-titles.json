@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/movie/33542/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.032Z",
+  "response": {
+    "id": 33542,
+    "titles": [
+      {
+        "iso_3166_1": "AR",
+        "title": "Masacre en N.Y.",
+        "type": "DVD Title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Hung fan kui",
+        "type": "Transliterated Cantonese Title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Red Bronx",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Hung faan keoi",
+        "type": "Transliterated Alternative Cantonese Title"
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "Hong fan qu",
+        "type": "Transliterated Mandarin Title"
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "홍번구",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BE",
+        "title": "Zizanie dans le Bronx",
+        "type": "French TV Title"
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Zizanie dans le Bronx",
+        "type": "French Title"
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Rajua menoa Bronxissa",
+        "type": "TV Title"
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Orkanen i Bronx",
+        "type": "Swedish Title"
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "In der Bronx ist die Hölle los",
+        "type": "alternative title"
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Hamos sto Bronx",
+        "type": "transliteration"
+      },
+      {
+        "iso_3166_1": "SI",
+        "title": "Pretep v Bronxu",
+        "type": "DVD Title"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Duel al Bronx",
+        "type": "Catalan Title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Rumble in the Bronx",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Arrebentando em Nova York",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "レッド・ブロンクス",
+        "type": "Japanese title translation: “Red Bronx\""
+      }
+    ]
+  }
+}

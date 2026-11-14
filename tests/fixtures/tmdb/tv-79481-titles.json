@@ -1,0 +1,162 @@
+{
+  "request": {
+    "path": "/3/tv/79481/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:30.923Z",
+  "response": {
+    "id": 79481,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Batalha pelos Céus",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹年番",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹之迦南学院",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Dou Po Cang Qiong Nian Fan",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Doupo Cangqiong",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹 第五季 年番",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Doupo Cangqiong：Nian Fan",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Doupo Cangqiong Nian Fan",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Doupo.Cangqiong：Nian.Fan",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "dpcq",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹特别篇1魔兽山脉",
+        "type": "specials part 1"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹特别篇2沙之澜歌",
+        "type": "specials part 2"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹特别篇3三年之约",
+        "type": "specials part 3"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹特别篇4缘起",
+        "type": "specials part 4"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "斗破苍穹 动画版",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Battle Through the Heavens",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Batalla a través de los cielos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "斗破蒼穹",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "Battle Through the Heaven",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Doupo Cangqiong",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Battle Through the Heavens",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "鬥破蒼穹",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fight Through the Sky",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Battle Through the Heavens",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fights Break Sphere Ⅴ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Break through the sky",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Fights Break Sphere",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "BTTH",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Đấu Phá Thương Khung",
+        "type": ""
+      }
+    ]
+  }
+}

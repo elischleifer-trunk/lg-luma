@@ -1,0 +1,237 @@
+{
+  "request": {
+    "path": "/3/movie/140607/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.799Z",
+  "response": {
+    "id": 140607,
+    "titles": [
+      {
+        "iso_3166_1": "ES",
+        "title": "Star Wars: Episodio VII - El Despertar de la Fuerza",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars: Episodio VII - Il risveglio della Forza",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Star Wars: Episódio VII - O Despertar da Força",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "スター・ウォーズ／フォースの覚醒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "جنگ ستارگان: نیرو بر می خیزد",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Зоряні війни: Пробудження сили",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Star Wars: Episodi VII - Voima herää",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode VII - Das Erwachen der Macht",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Star Wars: Güç Uyanıyor",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Звёздные войны: Пробуждение силы",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Žvaigždžių karai: Epizodas VII – galia nubunda",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "NL",
+        "title": "Star Wars - Episode VII - The Force Awakens",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars - Episode VII - Le Réveil de la Force",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Star Wars: Epizoda VII – Síla se probouzí",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "스타워즈-깨어난 포스",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "Star Wars Episode VII Das Erwachen der Macht",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Star Wars: Episode VII - The Force Awakens",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "La guerra de las galaxias. Episodio VII. El despertar de la fuerza",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Star Wars: The Force Awakens (Episode VII)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "EC",
+        "title": "Star Wars:  Espisodio VII: El despertar de la fuerza.",
+        "type": "complete title"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Gwiezdne Wojny VII - Przebudzenie Mocy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "星球大战7：原力觉醒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Csillagok Háborúja VII. - Az Ébredő Erő",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ძალის გამოღვიძება (ეპიზოდი VII)",
+        "type": "Disney+"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი VII – ძალის გამოღვიძება",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი 7",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები 7",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები: ეპიზოდი IX",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ვარსკვლავური ომები VII",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars: Episode 7 - Das Erwachen der Macht",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סטאר וורס פרק VII: הכח מתעורר",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Star Wars, épisode VII - Le Réveil de la Force",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Աստղային պատերազմներ. ուժի զարթոնքը",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chiến Tranh Giữa Các Vì Sao 7: Thần Lực Thức Tỉnh",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Force Awakens",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "La guerre des étoiles VII - Le réveil de la force",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Star Wars : Le réveil de la force",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Star Wars - Episodio VII - Il risveglio della Forza",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "星球大戰：原力覺醒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Star Wars - Episode 7 - Das Erwachen der Macht",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "Star Wars: 原力覺醒",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "TFA",
+        "type": "abbreviation"
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Ulduz müharibələri: Gücün oyanışı",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Ulduz müharibələri: VII Epizod – Gücün oyanması",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלחמת הכוכבים - פרק 7: הכוח מתעורר",
+        "type": ""
+      }
+    ]
+  }
+}

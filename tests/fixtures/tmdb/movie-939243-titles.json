@@ -1,0 +1,102 @@
+{
+  "request": {
+    "path": "/3/movie/939243/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.272Z",
+  "response": {
+    "id": 939243,
+    "titles": [
+      {
+        "iso_3166_1": "JP",
+        "title": "ソニック・ザ・ヘッジホッグ3",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Sonic 3: O Filme",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Соник 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Sonic x Shadow TOKYO MISSION",
+        "type": "literal translation"
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "סוניק 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "音速小子3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Սոնիկ Ոզնին 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Sonic 3",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "超音鼠大電影3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "수퍼 소닉 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "슈퍼 소닉 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "슈퍼소닉 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "수퍼소닉 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "سونيك الفيلم ٣",
+        "type": "Four Star Films ME"
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Sonic 3: Szybki jak błyskawica",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "XK",
+        "title": "Sonik iriqi 3",
+        "type": "SkyShowtime"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "Sonikku × Shadō TOKYO MISSION",
+        "type": "romaji"
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Kirpi Sonik 3",
+        "type": ""
+      }
+    ]
+  }
+}

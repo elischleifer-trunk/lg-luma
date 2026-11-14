@@ -1,0 +1,77 @@
+{
+  "request": {
+    "path": "/3/tv/120462/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:26.836Z",
+  "response": {
+    "id": 120462,
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "title": "Outros",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Eles: O Medo",
+        "type": "season 2"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "他们",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "异类",
+        "type": "prime官方中文名（切勿乱改官方名称）"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Ellos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Them",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ゼム Them",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "뎀",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Ellos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Oni: Pakt",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Они",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Them: Covenant",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Them: The Scare",
+        "type": "season 2"
+      }
+    ]
+  }
+}

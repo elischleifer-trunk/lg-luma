@@ -1,0 +1,187 @@
+{
+  "request": {
+    "path": "/3/movie/693134/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:20.354Z",
+  "response": {
+    "id": 693134,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Dune 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune: Part 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "デューン 砂の惑星PART2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Duna 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Hành Tinh Cát 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Diuna: Część druga",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "Duna: Parte Dois",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Kopa. II dalis",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Dune: Del 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Dune : Deuxième Partie",
+        "type": "Québec"
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "Dűne: Második rész",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IN",
+        "title": "ड्यून पार्ट टू",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Kopa. Antra dalis",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Дюна: Часть 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Дина 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "沙丘：第二部",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "Дюна 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Dyun 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "Duna: Parte 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune Two",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FI",
+        "title": "Dyyni: Osa kaksi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "沙丘2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Duna 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Duna Parte 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Dune Part Two",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Hành Tinh Cát II",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "듄: 파트 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Duna: Parte 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "დიუნი: ნაწილი ორი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "沙丘瀚戰：第二章",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UZ",
+        "title": "Dyuna: Ikkinchi Qism",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "სილახვავი",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Dune 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Dune 2 - Lang leben die Kämpfer",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Dyun: İkinci Hissə",
+        "type": ""
+      }
+    ]
+  }
+}

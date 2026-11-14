@@ -1,0 +1,27 @@
+{
+  "request": {
+    "path": "/3/movie/1113119/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.475Z",
+  "response": {
+    "id": 1113119,
+    "titles": [
+      {
+        "iso_3166_1": "TH",
+        "title": "Sup Pa Ror",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "ไทบ้านเดอะซีรี่ส์: สัปเหร่อ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Undertaker",
+        "type": ""
+      }
+    ]
+  }
+}

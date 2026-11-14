@@ -1,0 +1,87 @@
+{
+  "request": {
+    "path": "/3/tv/224372/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.146Z",
+  "response": {
+    "id": 224372,
+    "results": [
+      {
+        "iso_3166_1": "BD",
+        "title": "সাত রাজ্যের এক যোদ্ধা",
+        "type": "Translated Title"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Cavaleiro dos Sete Reinos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Rytíř Sedmi království",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Ενας ιππότης των επτά βασιλείων",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HR",
+        "title": "Vitez sedam kraljevstava",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HU",
+        "title": "A Hét Királyság lovagja",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "칠왕국의 기사",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Rycerz siedmiu królestw",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "O Cavaleiro dos Sete Reinos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Cavalerul celor Șapte Regate",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Рыцарь Семи королевств: Межевой рыцарь",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yedi Krallığın Şövalyesi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Game of Thrones - A Knight of the Seven Kingdoms: The Hedge Knight",
+        "type": "former logo title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "A Knight of the Seven Kingdoms: The Hedge Knight",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Game of Thrones: A Knight of the Seven Kingdoms",
+        "type": ""
+      }
+    ]
+  }
+}

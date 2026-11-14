@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/tv/18131/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:14.311Z",
+  "response": {
+    "id": 18131,
+    "results": [
+      {
+        "iso_3166_1": "DE",
+        "title": "Filmation Ghostbusters",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "Cazafantasmas de Filmation",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Filmation's Ghostbusters",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Ghostbusters: The Animated Series",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "request": {
+    "path": "/3/movie/1175942/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:35.058Z",
+  "response": {
+    "id": 1175942,
+    "titles": [
+      {
+        "iso_3166_1": "PL",
+        "title": "Pan Wilk i spółka. Bad Guys 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "الأشرار 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Băng Đảng Quái Kiệt 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Troppo cattivi 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "Bad Guys 2 - De er super barske",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BA",
+        "title": "Loši Momci 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Pahalased 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Os Caras Malvados 2",
+        "type": ""
+      }
+    ]
+  }
+}

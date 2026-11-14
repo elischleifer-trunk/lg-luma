@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1216195/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:31.688Z",
+  "response": {
+    "id": 1216195,
+    "titles": [
+      {
+        "iso_3166_1": "TH",
+        "title": "Hor Taew Tak Hak Sup Pa Yod",
+        "type": ""
+      }
+    ]
+  }
+}

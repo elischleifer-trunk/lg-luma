@@ -1,0 +1,72 @@
+{
+  "request": {
+    "path": "/3/movie/1272837/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-14T17:21:27.785Z",
+  "response": {
+    "id": 1272837,
+    "titles": [
+      {
+        "iso_3166_1": "GB",
+        "title": "28 Years Later 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "28년 후: 뼈의 사원",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Extermínio 4",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Extermínio 4: O Templo dos Ossos",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AT",
+        "title": "28 Years Later II: The Bone Temple",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "28 Năm Sau: Thánh Địa Xương",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "UA",
+        "title": "28 років по тому: Храм кісток",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "28 let poté: Chrám z kostí",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "28 Ans plus tard - Le Temple des morts",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TH",
+        "title": "28 ปีให้หลัง เชื้อเขมือบคน: วิหารซากกะโหลก",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Bone Temple",
+        "type": "on-screen title"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "28 лет спустя: Часть II. Храм костей",
+        "type": ""
+      }
+    ]
+  }
+}
