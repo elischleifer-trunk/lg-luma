@@ -167,7 +167,11 @@ fn scene(state: &State) -> view::Scene {
         metrics: BTreeMap::new(),
         artwork: crate::app_artwork::Service::new(false),
     };
-    let navigation = view::navigation(&assets, state.preferences.language);
+    let navigation = view::navigation(
+        &assets,
+        state.preferences.language,
+        state.page == crate::state::Page::Search,
+    );
     view::scene_with_pill(
         state,
         &assets,

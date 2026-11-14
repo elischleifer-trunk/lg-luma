@@ -97,7 +97,7 @@ It does not execute the test suites. A desktop display is required; on headless 
 Backspace deletes while editing. Native Back uses SDL's webOS-specific keycode. Back dismisses
 the keyboard first; Weather Location then returns to its parent Location row, HDMI choices to
 that HDMI row, and the Background gallery to Background in the sidebar. Back from the sidebar
-focuses the Settings tab, then returns Home. The header holds Home, Apps and Settings, and at
+focuses the Settings tab, then returns Home. The header holds Search, Home, Apps and Settings, and at
 the right margin a search button (`Target::LgSearch`) that launches LG's own search app. It is
 shown only when `listApps` reports one: `platform::lg_search_app` takes the first known ID
 (`com.webos.app.search`, `…searchapp`, `…lgsearch`, `…searchviewer`), else any LG system app
@@ -1078,7 +1078,12 @@ failure retries after five minutes. Unit changes convert unrounded cached Celsiu
 Removing a city clears its cache. The `.weather.json` sidecar uses Unix-seconds timestamps.
 Mock servers accept only literal loopback HTTP origins and are refused in TV builds.
 
-Movie and show search follows the Apps search text once a Movie of the Night key is stored.
+The Search tab (tab index 3, `state::SEARCH_TAB`, drawn left of Home so the other tabs keep their
+indices) turns into the search field and opens the keyboard (`TextField::Titles`). Its search
+follows `title_query` once a Movie of the Night key is stored. The selected result is shown at
+the top with its US rating, which comes from TMDB details fetched with `release_dates` or
+`content_ratings` appended (MDBList's certifications are not reliably American), and wide
+artwork loaded by `posters` like the posters.
 `streaming::Incremental` waits for three characters and a 350 ms pause, answers repeats from
 memory and drops replies for text that has since changed. `streaming_search::Service` runs each
 search on its own worker thread, reading `streaming-keys.json` per search so new keys apply at

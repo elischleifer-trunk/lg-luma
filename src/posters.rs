@@ -14,18 +14,49 @@ use std::{
     time::Duration,
 };
 
-/// Card size in logical pixels; posters are 2:3.
+/// Largest poster card in logical pixels; posters are 2:3.
 pub const SIZE: (u32, u32) = (270, 405);
+/// The selected title's wide artwork at the top of the Search page, 16:9.
+pub const BACKDROP_SIZE: (u32, u32) = (720, 405);
+
+/// Which image of a show to load.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Kind {
+    Poster,
+    Backdrop,
+}
+
+impl Kind {
+    fn size(self) -> (u32, u32) {
+        match self {
+            Kind::Poster => SIZE,
+            Kind::Backdrop => BACKDROP_SIZE,
+        }
+    }
+}
 const HOST: &str = "https://cdn.movieofthenight.com/";
 /// A 360px poster is about 30 KB; nothing legitimate comes close to this.
 const LIMIT: u64 = 1024 * 1024;
 /// Posters load a few at a time, top results first.
 const WORKERS: usize = 3;
 
+fn on_cdn(url: &str) -> Option<&str> {
+    (url.starts_with(HOST) && !url[HOST.len()..].contains(['@', '\\'])).then_some(url)
+}
+
 /// The poster link for a show: its 360px-wide vertical poster, if it is on the CDN.
 pub fn url(show: &Show) -> Option<&str> {
-    let url = show.image_set.vertical_poster.w360.as_str();
-    (url.starts_with(HOST) && !url[HOST.len()..].contains(['@', '\\'])).then_some(url)
+    on_cdn(&show.image_set.vertical_poster.w360)
+}
+
+/// Wide artwork for a show: its backdrop without lettering, else its horizontal poster.
+pub fn backdrop_url(show: &Show) -> Option<&str> {
+    let images = &show.image_set;
+    images
+        .horizontal_backdrop
+        .as_ref()
+        .and_then(|backdrop| on_cdn(&backdrop.w720))
+        .or_else(|| on_cdn(&images.horizontal_poster.w720))
 }
 
 /// The cache key: the link without its signature, which changes while the image does not.
@@ -38,13 +69,18 @@ pub fn texture_key(show_id: &str) -> String {
     format!("poster:{show_id}")
 }
 
+pub fn backdrop_texture_key(show_id: &str) -> String {
+    format!("backdrop:{show_id}")
+}
+
 pub struct Request {
     pub show_id: String,
     pub url: String,
+    pub kind: Kind,
 }
 
-/// A poster, or None when it could not be fetched or decoded.
-pub type Reply = (String, Option<Arc<Frame>>);
+/// An image, or None when it could not be fetched or decoded.
+pub type Reply = (String, Kind, Option<Arc<Frame>>);
 
 pub struct Service {
     sender: mpsc::Sender<Request>,
@@ -95,15 +131,22 @@ impl Service {
                     {
                         continue;
                     }
-                    let frame = load(&cache, &*fetch, &request.url).map(|pixels| {
+                    let size = request.kind.size();
+                    let frame = load(&cache, &*fetch, &request.url, size).map(|pixels| {
                         Arc::new(Frame {
-                            key: texture_key(&request.show_id),
+                            key: match request.kind {
+                                Kind::Poster => texture_key(&request.show_id),
+                                Kind::Backdrop => backdrop_texture_key(&request.show_id),
+                            },
                             serial: 1,
                             pixels,
                             live: false,
                         })
                     });
-                    if replies.send((request.show_id, frame)).is_err() {
+                    if replies
+                        .send((request.show_id, request.kind, frame))
+                        .is_err()
+                    {
                         return;
                     }
                 }
@@ -133,17 +176,18 @@ fn load(
     cache: &DiskCache,
     fetch: &dyn Fn(&str) -> Result<Vec<u8>, String>,
     url: &str,
+    size: (u32, u32),
 ) -> Option<RgbaImage> {
     let key = cache_key(url);
     if let Some(bytes) = cache.get_bytes(&key)
-        && let Some(image) = crate::cameras::decode(&bytes, SIZE)
+        && let Some(image) = crate::cameras::decode(&bytes, size)
     {
         return Some(image);
     }
     let bytes = fetch(url)
         .map_err(|error| eprintln!("Luma poster: {error}"))
         .ok()?;
-    let image = crate::cameras::decode(&bytes, SIZE)?;
+    let image = crate::cameras::decode(&bytes, size)?;
     cache.put_bytes(&key, &bytes);
     Some(image)
 }
@@ -229,18 +273,18 @@ mod tests {
             calls.fetch_add(1, Ordering::Relaxed);
             Ok(png(360, 540))
         };
-        let first = load(&cache, &fetch, &format!("{LINK}?Signature=a")).unwrap();
+        let first = load(&cache, &fetch, &format!("{LINK}?Signature=a"), SIZE).unwrap();
         assert_eq!(first.dimensions(), SIZE);
         // A new signature for the same image is a cache hit.
-        load(&cache, &fetch, &format!("{LINK}?Signature=b")).unwrap();
+        load(&cache, &fetch, &format!("{LINK}?Signature=b"), SIZE).unwrap();
         assert_eq!(calls.load(Ordering::Relaxed), 1);
 
         let broken = |_: &str| Ok(b"not an image".to_vec());
         let other = "https://cdn.movieofthenight.com/show/1/poster.jpg";
-        assert!(load(&cache, &broken, other).is_none());
+        assert!(load(&cache, &broken, other, SIZE).is_none());
         assert_eq!(cache.get_bytes(&cache_key(other)), None, "not cached");
         let failed = |_: &str| Err("offline".to_owned());
-        assert!(load(&cache, &failed, other).is_none());
+        assert!(load(&cache, &failed, other, SIZE).is_none());
     }
 
     #[test]
@@ -256,13 +300,14 @@ mod tests {
             service.send(Request {
                 show_id: id.into(),
                 url: format!("https://cdn.movieofthenight.com/{id}.jpg"),
+                kind: Kind::Poster,
             });
         }
-        let (id, frame) = service
+        let (id, kind, frame) = service
             .receiver
             .recv_timeout(Duration::from_secs(5))
             .unwrap();
-        assert_eq!(id, "kept");
+        assert_eq!((id.as_str(), kind), ("kept", Kind::Poster));
         let frame = frame.unwrap();
         assert_eq!(frame.key, "poster:kept");
         assert_eq!(frame.pixels.dimensions(), (36, 54));

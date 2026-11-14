@@ -463,6 +463,10 @@ fn script(
             state.open(1);
             vec![]
         }
+        "search" => {
+            state.open(state::SEARCH_TAB);
+            vec![]
+        }
         "settings" => {
             state.open(2);
             vec![]
@@ -492,6 +496,7 @@ fn script(
                     Some(state::Subpage::Greeting) => state::TextField::Name,
                     Some(state::Subpage::WeatherLocation) => state::TextField::Location,
                     Some(state::Subpage::Input(_)) => state::TextField::InputName,
+                    _ if state.page == state::Page::Search => state::TextField::Titles,
                     _ => state::TextField::Apps,
                 }
             };
@@ -1054,7 +1059,11 @@ fn run() -> Result<(), String> {
     let mut focused = true;
     let mut press: Option<Press> = None;
     let mut back_button = BackButton::default();
-    let initial_nav = view::navigation(&assets, state.preferences.language);
+    let initial_nav = view::navigation(
+        &assets,
+        state.preferences.language,
+        state.page == state::Page::Search,
+    );
     let mut pill = initial_nav.items[0].x;
     let mut pill_width = initial_nav.items[0].w;
     if options.frames.is_some() {
@@ -1965,8 +1974,11 @@ fn run() -> Result<(), String> {
                 posters.send(request);
             }
         }
-        for (show_id, poster) in posters.receiver.try_iter() {
-            state.accept_poster(&show_id, poster);
+        if let Some(request) = state.backdrop_request() {
+            posters.send(request);
+        }
+        for (show_id, kind, image) in posters.receiver.try_iter() {
+            state.accept_poster(&show_id, kind, image);
         }
         if let Some(ids) = state.score_requests() {
             scores.send(ids);
@@ -2004,7 +2016,11 @@ fn run() -> Result<(), String> {
         }
         let dt = clock::since(last_frame).as_secs_f32().min(0.1);
         last_frame = clock::now();
-        let navigation = view::navigation(&assets, state.preferences.language);
+        let navigation = view::navigation(
+            &assets,
+            state.preferences.language,
+            state.page == state::Page::Search,
+        );
         let target = navigation.items[state.page_index()].x;
         let target_width = navigation.items[state.page_index()].w;
         if state.preferences.reduced_motion

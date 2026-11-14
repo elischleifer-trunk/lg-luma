@@ -1,8 +1,8 @@
-//! Movies and shows under the Apps search: when searches are sent, how results are drawn and
-//! reached with the remote, and what OK opens.
+//! The Search tab: how it opens, when searches are sent, how the selected title and the
+//! results are drawn and reached with the remote, and what OK opens.
 use super::{controls, ready, scene};
 use crate::renderer::Draw;
-use crate::state::{Direction, Effect, State, TITLE_COLUMNS, Target};
+use crate::state::{Direction, Effect, Overlay, Page, SEARCH_TAB, State, TITLE_COLUMNS, Target};
 use crate::streaming::{self, DEBOUNCE, Show};
 use std::time::Instant;
 
@@ -13,12 +13,14 @@ fn fixture(name: &str) -> Vec<Show> {
     streaming::parse_search(&record["response"]).unwrap()
 }
 
-/// The Apps page with `query` typed and a Movie of the Night key stored.
+/// The Search page with `query` typed, the keyboard closed and a Movie of the Night key stored.
 fn typed(query: &str) -> State {
     let mut state = ready();
-    state.open(1);
     state.streaming_keys.motn = true;
-    state.query = query.into();
+    state.open(SEARCH_TAB);
+    state.text(query);
+    state.back();
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
     state
 }
 
@@ -32,7 +34,7 @@ fn answer(state: &mut State, reply: &str) {
     let request = state
         .sync_titles(now + DEBOUNCE)
         .expect("searches after the pause");
-    assert_eq!(request.query, state.query.to_lowercase());
+    assert_eq!(request.query, state.title_query.to_lowercase());
     let ranked = streaming::rank(&fixture(reply), "us", &state.streaming_services());
     state.accept_titles(&request, Ok(ranked));
 }
@@ -45,17 +47,67 @@ fn shows_text(state: &State, value: &str) -> bool {
 }
 
 #[test]
-fn without_a_key_the_apps_search_stays_apps_only() {
+fn the_search_tab_sits_left_of_home_and_opens_with_the_keyboard() {
+    let mut state = ready();
+    state.focus = Target::Nav(0);
+    state.direction(Direction::Left, &controls(&state));
+    assert_eq!(state.page, Page::Search);
+    assert!(state.text_input_active(), "the keyboard comes up");
+    assert!(matches!(state.overlay, Some(Overlay::Keyboard)));
+    state.text("dune");
+    assert_eq!(state.title_query, "dune");
+    assert!(state.query.is_empty(), "the Apps search is separate");
+    state.back();
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
+    // The tab is now the field, wider than any other tab.
+    let field = controls(&state)
+        .into_iter()
+        .find(|control| control.target == Target::Nav(SEARCH_TAB))
+        .unwrap();
+    let home = controls(&state)
+        .into_iter()
+        .find(|control| control.target == Target::Nav(0))
+        .unwrap();
+    assert!(
+        field.rect.w > home.rect.w * 3.,
+        "{} vs {}",
+        field.rect.w,
+        home.rect.w
+    );
+    assert!(field.rect.w <= crate::view::SEARCH_FIELD_WIDTH);
+    assert!(field.rect.x >= 300., "clear of the clock");
+    assert!(shows_text(&state, "dune"));
+    // OK on the field brings the keyboard back; Right goes on to Home.
+    state.activate();
+    assert!(state.text_input_active());
+    state.back();
+    state.direction(Direction::Right, &controls(&state));
+    assert_eq!(state.page, Page::Home);
+    // Leftmost tab: Left goes nowhere.
+    state.open(SEARCH_TAB);
+    state.back();
+    state.direction(Direction::Left, &controls(&state));
+    assert_eq!(state.page, Page::Search);
+    assert!(
+        state.title_query.is_empty(),
+        "the field starts empty each time"
+    );
+}
+
+#[test]
+fn without_a_key_the_search_page_says_how_to_add_one() {
     let mut state = typed("dune");
     state.streaming_keys.motn = false;
     let now = Instant::now();
     assert!(state.sync_titles(now).is_none());
     assert!(state.sync_titles(now + DEBOUNCE * 4).is_none());
-    assert!(!shows_text(&state, "Movies & shows"));
-    state.query.clear();
+    assert!(shows_text(
+        &state,
+        "Add a Movie of the Night key in Settings → System → Streaming search keys to search movies and shows."
+    ));
+    // The Apps search finds apps only.
+    state.open(1);
     assert!(shows_text(&state, "Find an app"));
-    state.streaming_keys.motn = true;
-    assert!(shows_text(&state, "Apps, movies, shows"));
 }
 
 #[test]
@@ -69,13 +121,12 @@ fn short_queries_ask_for_more_typing_and_send_nothing() {
 }
 
 #[test]
-fn results_replace_the_no_apps_empty_state_and_take_focus_from_the_search_field() {
+fn results_are_reached_from_the_field_and_the_first_is_shown_large() {
     let mut state = typed("Dune");
     state.sync_titles(Instant::now());
     assert!(shows_text(&state, "Searching…"));
     answer(&mut state, "dune");
     assert!(!state.titles.results.is_empty());
-    assert!(!shows_text(&state, "No matches"));
     assert!(!shows_text(&state, "Searching…"));
     let titles = controls(&state)
         .iter()
@@ -84,38 +135,64 @@ fn results_replace_the_no_apps_empty_state_and_take_focus_from_the_search_field(
     assert_eq!(titles, state.titles.results.len());
     assert_eq!(state.first_content(), Target::Title(0));
 
-    // The field is at the right, so Down lands on the first row's right-hand card.
-    state.focus = Target::Search;
+    // The first result is shown large until another is selected.
+    let first = state.titles.results[0].show.title.clone();
+    let second = state.titles.results[1].show.title.clone();
+    let large = |state: &State, title: &str| {
+        scene(state).draw.iter().any(|draw| {
+            matches!(draw, Draw::Text(text, _, style, ..) if text == title && style.size > 40.)
+        })
+    };
+    assert!(large(&state, &first));
+
     state.direction(Direction::Down, &controls(&state));
-    assert_eq!(state.focus, Target::Title(TITLE_COLUMNS - 1));
-    for _ in 1..TITLE_COLUMNS {
-        state.direction(Direction::Left, &controls(&state));
-    }
     assert_eq!(state.focus, Target::Title(0));
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::Title(1));
+    assert!(
+        large(&state, &second),
+        "the selected title moves to the top"
+    );
     state.direction(Direction::Down, &controls(&state));
     assert_eq!(state.focus, Target::Title(1 + TITLE_COLUMNS));
     state.direction(Direction::Up, &controls(&state));
     state.direction(Direction::Up, &controls(&state));
     assert_eq!(
         state.focus,
-        Target::Search,
-        "no apps: Up returns to the field"
+        Target::Nav(SEARCH_TAB),
+        "Up returns to the field"
     );
+
+    // Back from a result returns to the field, then to Home.
+    state.focus = Target::Title(2);
+    state.back();
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
+    state.back();
+    assert_eq!(state.page, Page::Home);
 }
 
 #[test]
-fn remote_moves_between_the_app_grid_and_the_results() {
-    let mut state = typed("netflix");
-    let netflix = Target::App("netflix".into());
-    assert_eq!(state.first_content(), netflix);
+fn the_selected_title_shows_its_us_rating_length_and_where_it_plays() {
+    let mut state = typed("dune");
     answer(&mut state, "dune");
-    state.focus = netflix.clone();
-    state.direction(Direction::Down, &controls(&state));
-    assert_eq!(state.focus, Target::Title(0));
-    state.direction(Direction::Up, &controls(&state));
-    assert_eq!(state.focus, netflix);
+    let index = state
+        .titles
+        .results
+        .iter()
+        .position(|r| r.show.tmdb_id == "movie/438631")
+        .unwrap();
+    state.titles.results[index].rating = Some("PG-13".into());
+    state.focus = Target::Title(index);
+    for text in ["2021", "PG-13", "2h 35m", "Movie"] {
+        assert!(shows_text(&state, text), "{text}");
+    }
+    // Wide artwork is asked for once, for the selected title only.
+    let request = state
+        .backdrop_request()
+        .expect("artwork for the selected title");
+    assert_eq!(request.show_id, state.titles.results[index].show.id);
+    assert_eq!(request.kind, crate::posters::Kind::Backdrop);
+    assert!(state.backdrop_request().is_none());
 }
 
 #[test]
@@ -157,7 +234,7 @@ fn editing_the_query_drops_stale_replies_and_keeps_focus_on_a_result() {
     let now = Instant::now();
     state.sync_titles(now);
     let stale = state.sync_titles(now + DEBOUNCE).unwrap();
-    state.query = "the office".into();
+    state.title_query = "the office".into();
     state.sync_titles(now);
     state.accept_titles(
         &stale,
@@ -175,11 +252,14 @@ fn editing_the_query_drops_stale_replies_and_keeps_focus_on_a_result() {
     answer(&mut state, "the-office");
     let last = state.titles.results.len() - 1;
     state.focus = Target::Title(last);
-    state.query.clear();
+    state.title_query.clear();
     state.sync_titles(Instant::now());
     assert!(state.titles.results.is_empty());
     assert!(!matches!(state.focus, Target::Title(_)));
-    assert!(!shows_text(&state, "Movies & shows"));
+    assert!(shows_text(
+        &state,
+        "Type a title to see where it streams on your TV’s apps."
+    ));
 }
 
 #[test]
@@ -219,7 +299,7 @@ fn posters_are_requested_once_per_result_and_dropped_with_it() {
         pixels: image::RgbaImage::new(2, 3),
         live: false,
     });
-    state.accept_poster(&first, Some(poster));
+    state.accept_poster(&first, crate::posters::Kind::Poster, Some(poster));
     let posters = scene(&state)
         .draw
         .iter()
@@ -227,10 +307,10 @@ fn posters_are_requested_once_per_result_and_dropped_with_it() {
         .count();
     assert_eq!(posters, 1);
     // A late poster for a show no longer listed is ignored.
-    state.accept_poster("gone", None);
+    state.accept_poster("gone", crate::posters::Kind::Poster, None);
     assert!(!state.posters.contains_key("gone"));
 
-    state.query.clear();
+    state.title_query.clear();
     state.sync_titles(Instant::now());
     assert_eq!(state.poster_requests().map(|r| r.len()), Some(0));
     assert!(state.posters.is_empty(), "decoded posters are freed");
@@ -299,7 +379,7 @@ fn scores_are_fetched_in_one_batch_only_with_an_mdblist_key() {
     state.accept_scores(vec![("tt0000001".into(), dune)]);
     assert!(!state.scores.contains_key("tt0000001"));
 
-    state.query.clear();
+    state.title_query.clear();
     state.sync_titles(Instant::now());
     assert!(state.score_requests().is_none());
     assert!(
