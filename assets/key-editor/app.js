@@ -58,7 +58,9 @@ async function save(body, working) {
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  const body = change({ motn: element('motn').value, tmdb: element('tmdb').value });
+  const body = change(
+    Object.fromEntries(SERVICES.map((service) => [service, element(service).value])),
+  );
   if (!Object.keys(body).length) {
     message('Paste a key first.', true);
     return;

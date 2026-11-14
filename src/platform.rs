@@ -180,6 +180,11 @@ pub enum Request {
     /// Bring Home to the front.
     GoHome,
     Launch(String),
+    /// Launch an app with webOS launch `params`, such as a streaming title to open.
+    LaunchWith {
+        id: String,
+        params: Value,
+    },
     Uninstall(String),
     SyncSplash(String),
     Recent {
@@ -356,6 +361,11 @@ impl Platform {
                             )
                             .map(|_| ())
                         }
+                    } else {
+                        Ok(())
+                    }),
+                    Request::LaunchWith { id, params } => Response::Launched(if webos {
+                        launch_with_params(&id, &params)
                     } else {
                         Ok(())
                     }),
