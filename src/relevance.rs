@@ -542,7 +542,7 @@ fn best_tier(query: &str, show: &Show, signals: &Signals) -> u8 {
 }
 
 /// "Ghostbusters: Afterlife" and "Ghostbusters II" share the base title "ghostbusters".
-fn base_title(title: &str) -> String {
+pub fn base_title(title: &str) -> String {
     let main = title.split([':', '(']).next().unwrap_or(title);
     let mut words = words(main.split(" - ").next().unwrap_or(main));
     while words.len() > 1

@@ -10,8 +10,10 @@
 //! 3. TMDB details for results the search summary did not already rule out (foreign or
 //!    little-seen titles are skipped), a few at a time over connections that stay open. TMDB
 //!    has no batch endpoint; details are cached for a month, so each title costs one call.
-//! 4. For a franchise the query names, the films the title search missed: the TMDB collection,
-//!    then Movie of the Night for each missing film (metered, so capped).
+//! 4. For a franchise the query names or has begun to name ("gho" → *Ghostbusters*), the films
+//!    the title search missed: the TMDB collection and, for half-typed text, TMDB's free
+//!    search for the franchise's title, then Movie of the Night for each missing film
+//!    (metered, so capped).
 //!
 //! A search the user has typed past is dropped between steps, before it spends more calls.
 use crate::motn_api::{self, GetShowParams, SearchShowsByTitleParams, Show};
@@ -193,7 +195,12 @@ fn fetch_details(source: &impl Source, enrichment: &mut Enrichment, ids: &[(Kind
     }
 }
 
-/// Adds films from the franchises the query names that the title search did not return.
+/// Adds films from the franchises the query names, or has begun to name, that the title
+/// search did not return. Movie of the Night matches whole words, so "gho" brings back
+/// *Ghostbusters* and one sequel but not the rest. A franchise is a film whose title starts
+/// with the text and that belongs to a TMDB collection; its other films are the collection's
+/// parts and, for half-typed text, films TMDB lists under the same base title (the 2016
+/// *Ghostbusters* is in no collection).
 fn expand_franchises(
     source: &impl Source,
     query: &str,
@@ -203,23 +210,27 @@ fn expand_franchises(
     wanted: &dyn Fn() -> bool,
 ) {
     let present: HashSet<String> = shows.iter().map(|show| show.tmdb_id.clone()).collect();
-    let mut collections = Vec::new();
+    // (how the lead matches, its collection, its base title), named franchises first.
+    let mut franchises: Vec<(u8, i64, String)> = Vec::new();
     for show in shows.iter() {
         let Some(id @ (Kind::Movie, _)) = tmdb_id(show) else {
             continue;
         };
-        let named = match_tier(query, &show.title) == 0;
+        let tier = match_tier(query, &show.title);
         if let Some(signals) = enrichment.signals.get(&id)
-            && named
-            && signals.keep(Kind::Movie, true)
+            && tier <= 1
+            && signals.keep(Kind::Movie, tier == 0)
             && let Some(collection) = signals.collection
-            && !collections.contains(&collection)
+            && !franchises.iter().any(|(_, known, _)| *known == collection)
         {
-            collections.push(collection);
+            franchises.push((tier, collection, relevance::base_title(&show.title)));
         }
     }
+    franchises.sort_by_key(|(tier, _, _)| *tier);
     let mut missing = Vec::new();
-    let collections = parallel(&collections, CONNECTIONS, |&id| source.collection(id).ok());
+    let collections = parallel(&franchises, CONNECTIONS, |(_, id, _)| {
+        source.collection(*id).ok()
+    });
     for details in collections.into_iter().flatten().flatten() {
         for part in details.parts.iter().flatten() {
             let Some(id) = part.id else { continue };
@@ -228,6 +239,26 @@ fn expand_franchises(
             if !present.contains(&key)
                 && !missing.contains(&id)
                 && part.vote_count.unwrap_or(0) >= relevance::MIN_MOVIE_VOTES
+            {
+                missing.push(id);
+            }
+        }
+    }
+    // Typed in full, the title search itself returns the films that share the title.
+    for (_, _, base) in franchises.iter().filter(|(tier, _, _)| *tier == 1) {
+        let Some(Ok(results)) = source.tmdb_search(base) else {
+            continue;
+        };
+        for result in &results {
+            let (Some("movie"), Some(id), Some(title)) =
+                (result.media_type.as_deref(), result.id, &result.title)
+            else {
+                continue;
+            };
+            if relevance::base_title(title) == *base
+                && Signals::from_search(result).keep(Kind::Movie, false)
+                && !present.contains(&format!("movie/{id}"))
+                && !missing.contains(&id)
             {
                 missing.push(id);
             }

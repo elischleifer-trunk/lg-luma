@@ -20,7 +20,8 @@ title you are thinking of comes first, often before you finish typing it.
    words, then anywhere. Within a group: major US studio or network, US production, how widely
    seen, budget and box office.
 3. **Franchises stay together, oldest first.** "ghostbusters" lists the five films from 1984,
-   including sequels the title search missed (looked up through the TMDB collection).
+   including sequels the title search missed (looked up through the TMDB collection). So does
+   "gho": a film whose title starts with the text brings its franchise with it.
 4. **Foreign and obscure titles stay out**, unless the query names them: "amélie" finds
    _Amélie_. English-language work from abroad stays, ranked lower (BBC _Ghosts_).
 5. **Punctuation and spacing do not matter.** "oceans" finds _Ocean's Eleven_, "spiderman" finds
@@ -50,6 +51,7 @@ more without re-fetching the rest).
 | super        | _Superman_, _Super 8_, _Superbad_; not _8MM_, _The Bad Guys 2_, _Argylle_ | `super_drops_titles_that_do_not_say_super`                  |
 | fan          | Only titles with "fan" in them; not _One Piece_, _Rumble in the Bronx_    | `fan_lists_only_titles_with_fan_in_them`                    |
 | gho          | _Ghosts_ (US) above _Ghosts_ (UK); no Marathi or Kannada titles           | `english_language_work_from_abroad_stays_but_ranks_below_…` |
+| gho          | All five _Ghostbusters_ films together, though only two were returned     | `half_a_franchise_title_lists_all_its_films`                |
 | amélie       | _Amélie_ first, though it is French                                       | `foreign_language_titles_from_abroad_are_filtered_out_…`    |
 | sup          | Nothing matches yet: keep the near misses rather than show nothing        | `when_nothing_matches_the_near_misses_stay`                 |
 | ghostb       | The "ghostbusters" results, from one metered search for the whole word    | `half_a_word_is_completed_before_the_metered_search`        |
@@ -83,6 +85,12 @@ TV" in [agents.md](agents.md).
 - Prime links with older ASIN-style IDs (`B0FV8FQK6M`) cannot be converted and open the app.
 
 ## Decisions
+
+- **2026-11:** "gho" listed _Ghostbusters_ (1984) and _Frozen Empire_ only: Movie of the Night
+  returned those two, and missing franchise films were looked up only for a whole typed word.
+  They are now looked up for a title the text begins too, from its TMDB collection and from
+  TMDB's free search for its base title (the 2016 film is in no collection). Each missing film
+  is a metered call (still capped at four a search, cached, and reused as the rest is typed).
 
 - **2026-11:** Add-on channels (a paid channel inside another app) are ignored: the household
   has none, and the services sold that way that it does subscribe to (Hulu inside Disney+, HBO
