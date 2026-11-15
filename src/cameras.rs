@@ -696,7 +696,7 @@ fn hls_address(agent: &ureq::Agent, endpoint: &str) -> Result<String, String> {
     Ok(format!("{}{path}", origin(endpoint)))
 }
 
-pub(crate) fn agent() -> ureq::Agent {
+fn agent() -> ureq::Agent {
     ureq::Agent::config_builder()
         .max_redirects(2)
         .timeout_connect(Some(Duration::from_secs(3)))
@@ -1309,6 +1309,16 @@ impl Gallery {
             self.stop_native = true;
         }
         self.start_native = None;
+    }
+
+    /// Luma was hidden or is seen again. Hidden, the decoder's video stops like every camera
+    /// worker; seen again, a camera still enlarged and live asks for its video anew.
+    pub fn seen(&mut self, visible: bool) {
+        if !visible {
+            self.end_native();
+        } else if self.enlarged.is_some() && self.playback == Playback::Live {
+            self.request_video();
+        }
     }
 
     /// The decoder's picture shows: the gallery draws nothing over it but its controls.

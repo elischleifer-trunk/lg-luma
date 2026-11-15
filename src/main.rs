@@ -1486,7 +1486,11 @@ fn run() -> Result<(), String> {
         if let Some((id, endpoint)) = state.cameras.resolve.take() {
             camera_service.resolve(id, endpoint);
         }
-        // The camera's own video on the TV's decoder: loaded and unloaded on this thread.
+        // The camera's own video on the TV's decoder: loaded and unloaded on this thread, and
+        // not played while another app hides Luma.
+        if state.cameras_visible() {
+            state.cameras.seen(visible);
+        }
         if std::mem::take(&mut state.cameras.stop_native) {
             camera_live = None;
         }

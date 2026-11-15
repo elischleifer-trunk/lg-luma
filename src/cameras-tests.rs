@@ -1255,3 +1255,31 @@ fn recorded_cameras_on_screen_have_their_relays_started_when_the_gallery_opens()
             .is_empty()
     );
 }
+
+#[test]
+fn the_decoders_video_stops_while_luma_is_hidden_and_starts_again_when_seen() {
+    let mut state = streaming(&["a"]);
+    state.cameras.decoder = true;
+    state.cameras.cameras[0].live = Some("http://ha:8123/api/luma/live/camera.a?token=t".into());
+    state.activate();
+    assert_eq!(state.cameras.native, Native::Starting("0/camera.a".into()));
+    assert!(state.cameras.start_native.take().is_some());
+    state.camera_native("0/camera.a", crate::live::Event::Showing);
+    assert!(state.cameras.see_through());
+    // Seen, nothing changes; hidden by another app, the video stops.
+    state.cameras.seen(true);
+    assert!(state.cameras.see_through() && !state.cameras.stop_native);
+    state.cameras.seen(false);
+    assert_eq!(state.cameras.native, Native::Off);
+    assert!(std::mem::take(&mut state.cameras.stop_native));
+    assert!(!state.cameras.see_through());
+    // Seen again with the camera still enlarged: its video is asked for anew.
+    state.cameras.seen(true);
+    assert_eq!(state.cameras.native, Native::Starting("0/camera.a".into()));
+    assert!(state.cameras.start_native.is_some());
+    // A failure plays HLS instead, and does not come back to the decoder this visit.
+    state.camera_native("0/camera.a", crate::live::Event::Failed("no route".into()));
+    assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
+    state.cameras.seen(true);
+    assert_eq!(state.cameras.native, Native::Off);
+}

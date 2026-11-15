@@ -228,7 +228,8 @@ class Relay:
     @callback
     def start(self) -> None:
         """Starts reading (if it is not), and stops again unless someone listens in time."""
-        if not self.running:
+        # A reader told to stop may still be waiting on its camera: it is replaced, not reused.
+        if not self.running or self._stop.is_set():
             self._stop = threading.Event()
             self.error = None
             self._thread = threading.Thread(

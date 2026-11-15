@@ -506,6 +506,10 @@ async def test_frigates_copies_of_cameras_start_hidden_in_the_gallery(
         ("camera.frontdoor", True),
         ("camera.plain", False),
     ]
+    # With no other integration's cameras, Frigate's are the cameras: shown.
+    hass.states.async_remove("camera.front_door")
+    hass.states.async_remove("camera.plain")
+    assert [camera.get("hidden", False) for camera in camera_list(hass)] == [False]
 
 
 async def test_the_stream_view_starts_hls_only_with_the_camera_token(

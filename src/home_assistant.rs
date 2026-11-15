@@ -53,7 +53,9 @@ const MIN_INTEGRATION: u32 = 1;
 /// The level of an integration that sends no `X-Luma-Integration` header: every integration from
 /// before the header existed.
 const INTEGRATION_UNSTATED: u32 = 1;
-const MAX_BODY: usize = 32 * 1024;
+/// Thirty-two cameras with five addresses each, long entity IDs and a long base URL come to
+/// about 33 KiB.
+const MAX_BODY: usize = 64 * 1024;
 /// Cameras kept from Home Assistant's list; more are dropped.
 pub const MAX_CAMERAS: usize = 32;
 /// Remembered entries in the gallery's order and hidden lists, including absent cameras.

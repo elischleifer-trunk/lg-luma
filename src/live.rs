@@ -13,11 +13,11 @@ use std::{
     io::Read,
     sync::{
         Arc,
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         mpsc,
     },
     thread,
-    time::Instant,
+    time::{Duration, Instant},
 };
 
 const MAGIC: &[u8; 8] = b"LUMAVID1";
@@ -93,6 +93,20 @@ pub fn read_frame(reader: &mut impl Read, data: &mut Vec<u8>) -> Result<(u8, i64
     Ok((head[4], i64::from_be_bytes(pts)))
 }
 
+/// The relay may take as long as Home Assistant allows it to reach a camera before it answers,
+/// and a camera with nothing kept sends nothing until its next keyframe: longer waits than a
+/// snapshot's.
+fn agent() -> ureq::Agent {
+    ureq::Agent::config_builder()
+        .max_redirects(0)
+        .timeout_connect(Some(Duration::from_secs(3)))
+        .timeout_recv_response(Some(Duration::from_secs(20)))
+        .timeout_per_read(Some(Duration::from_secs(20)))
+        .proxy(None)
+        .build()
+        .new_agent()
+}
+
 /// Whether this TV has a decoder Luma can feed.
 pub fn available() -> bool {
     decoder::available()
@@ -101,16 +115,16 @@ pub fn available() -> bool {
 /// One camera's video: the reader thread and, once loaded, the decoder.
 pub struct Live {
     stop: Arc<AtomicBool>,
-    /// Set once the decoder is loaded: the reader feeds it from then on.
-    loaded: Arc<AtomicBool>,
+    /// The decoder's load for this video, once loaded (0 before): the reader feeds it from
+    /// then on, and only that load.
+    loaded: Arc<AtomicU64>,
     events: mpsc::Receiver<Event>,
-    opened: bool,
 }
 
 impl Live {
     pub fn start(url: String) -> Self {
         let stop = Arc::new(AtomicBool::new(false));
-        let loaded = Arc::new(AtomicBool::new(false));
+        let loaded = Arc::new(AtomicU64::new(0));
         let (sender, events) = mpsc::channel();
         let (stopped, ready) = (stop.clone(), loaded.clone());
         let spawned = thread::Builder::new()
@@ -129,7 +143,6 @@ impl Live {
             stop,
             loaded,
             events,
-            opened: false,
         }
     }
 
@@ -146,9 +159,8 @@ impl Live {
                 }) => {
                     let started = Instant::now();
                     match decoder::open(codec, width, height) {
-                        Ok(()) => {
-                            self.opened = true;
-                            self.loaded.store(true, Ordering::Release);
+                        Ok(load) => {
+                            self.loaded.store(load, Ordering::Release);
                             crate::telemetry::log_info!(
                                 "cameras",
                                 "decoder loaded for {width}x{height} {codec:?} in {} ms",
@@ -179,9 +191,10 @@ impl Live {
 impl Drop for Live {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::Release);
-        self.loaded.store(false, Ordering::Release);
-        if self.opened {
-            decoder::close();
+        // Unloading waits for a frame being fed; the reader's later frames are refused.
+        let load = self.loaded.swap(0, Ordering::AcqRel);
+        if load != 0 {
+            decoder::close(load);
         }
     }
 }
@@ -189,13 +202,10 @@ impl Drop for Live {
 fn read(
     url: &str,
     stop: &AtomicBool,
-    loaded: &AtomicBool,
+    loaded: &AtomicU64,
     events: &mpsc::Sender<Event>,
 ) -> Result<(), String> {
-    let response = crate::cameras::agent()
-        .get(url)
-        .call()
-        .map_err(|e| e.to_string())?;
+    let response = agent().get(url).call().map_err(|e| e.to_string())?;
     let mut reader =
         std::io::BufReader::with_capacity(256 * 1024, response.into_body().into_reader());
     let (codec, width, height) = parse_header(&mut reader)?;
@@ -210,8 +220,8 @@ fn read(
     let mut data = Vec::new();
     let mut fed = 0usize;
     let mut shown = false;
-    let mut feed = |bytes: &[u8]| -> Result<(), String> {
-        decoder::feed(bytes, began.elapsed().as_millis() as i64)?;
+    let mut feed = |load: u64, bytes: &[u8]| -> Result<(), String> {
+        decoder::feed(load, bytes, began.elapsed().as_millis() as i64)?;
         fed += 1;
         if !shown && fed >= SHOWN_AFTER {
             shown = true;
@@ -221,7 +231,8 @@ fn read(
     };
     while !stop.load(Ordering::Acquire) {
         let (flags, _pts) = read_frame(&mut reader, &mut data)?;
-        if !loaded.load(Ordering::Acquire) {
+        let load = loaded.load(Ordering::Acquire);
+        if load == 0 {
             if flags & KEYFRAME != 0 {
                 waiting.clear();
             }
@@ -231,10 +242,10 @@ fn read(
             continue;
         }
         for frame in waiting.drain(..) {
-            feed(&frame)?;
+            feed(load, &frame)?;
         }
         let _ = flags & CACHED;
-        feed(&data)?;
+        feed(load, &data)?;
     }
     Ok(())
 }
@@ -279,8 +290,10 @@ mod decoder {
     }
 
     static LIBRARY: OnceLock<Option<Library>> = OnceLock::new();
-    /// Whether the library was initialised, and whether a video is loaded.
-    static STATE: Mutex<(bool, bool)> = Mutex::new((false, false));
+    /// Whether the library was initialised, the load now in the decoder (0 for none) and the
+    /// number of loads so far. Loading, feeding and unloading all hold this, so a frame is never
+    /// fed while the decoder unloads, nor into another video's load.
+    static STATE: Mutex<(bool, u64, u64)> = Mutex::new((false, 0, 0));
 
     fn library() -> Option<&'static Library> {
         LIBRARY
@@ -360,7 +373,7 @@ mod decoder {
     }
 
     /// Loads the decoder for a video, drawn as large as fits the screen. SDL thread only.
-    pub fn open(codec: Codec, width: u32, height: u32) -> Result<(), String> {
+    pub fn open(codec: Codec, width: u32, height: u32) -> Result<u64, String> {
         let library = library().ok_or("this TV has no decoder Luma can use")?;
         let mut state = STATE.lock().unwrap_or_else(|e| e.into_inner());
         // SAFETY: called on the SDL thread with a current GL window, as the library expects.
@@ -373,9 +386,9 @@ mod decoder {
                 }
                 state.0 = true;
             }
-            if state.1 {
+            if state.1 != 0 {
                 (library.unload)();
-                state.1 = false;
+                state.1 = 0;
             }
             let mut info = Info {
                 width: width as c_int,
@@ -390,7 +403,8 @@ mod decoder {
             if (library.load)((&raw mut info).cast(), loaded) != 0 {
                 return Err(last_error(library));
             }
-            state.1 = true;
+            state.2 += 1;
+            state.1 = state.2;
             // Keep the picture's shape inside the 1920x1080 screen.
             let scale = (1920. / width as f32).min(1080. / height as f32);
             let (w, h) = (
@@ -401,14 +415,20 @@ mod decoder {
                 (library.area)((1920 - w) / 2, (1080 - h) / 2, w, h);
             }
         }
-        Ok(())
+        Ok(state.1)
     }
 
-    pub fn feed(bytes: &[u8], pts: i64) -> Result<(), String> {
+    /// Feeds a frame to `load`; refused once that load is gone.
+    pub fn feed(load: u64, bytes: &[u8], pts: i64) -> Result<(), String> {
         let library = library().ok_or("no decoder")?;
-        // SAFETY: the library copies the frame during the call.
+        let state = STATE.lock().unwrap_or_else(|e| e.into_inner());
+        if state.1 != load {
+            return Err("the decoder was unloaded".into());
+        }
+        // SAFETY: the library copies the frame during the call, and the lock keeps the load.
         let result =
             unsafe { (library.play)(bytes.as_ptr().cast_mut().cast(), bytes.len() as c_uint, pts) };
+        drop(state);
         if result == 0 {
             Ok(())
         } else {
@@ -416,13 +436,14 @@ mod decoder {
         }
     }
 
-    pub fn close() {
+    /// Unloads `load`, unless another video has been loaded since.
+    pub fn close(load: u64) {
         let Some(library) = library() else { return };
         let mut state = STATE.lock().unwrap_or_else(|e| e.into_inner());
-        if state.1 {
+        if state.1 == load {
             // SAFETY: unloading the video this module loaded.
             unsafe { (library.unload)() };
-            state.1 = false;
+            state.1 = 0;
         }
     }
 }
@@ -434,13 +455,13 @@ mod decoder {
     pub fn available() -> bool {
         false
     }
-    pub fn open(_codec: Codec, _width: u32, _height: u32) -> Result<(), String> {
+    pub fn open(_codec: Codec, _width: u32, _height: u32) -> Result<u64, String> {
         Err("no decoder in desktop builds".into())
     }
-    pub fn feed(_bytes: &[u8], _pts: i64) -> Result<(), String> {
+    pub fn feed(_load: u64, _bytes: &[u8], _pts: i64) -> Result<(), String> {
         Err("no decoder in desktop builds".into())
     }
-    pub fn close() {}
+    pub fn close(_load: u64) {}
 }
 
 #[cfg(test)]

@@ -197,8 +197,17 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, Any]]:
     # HLS needs Home Assistant's stream integration (part of default_config).
     streams = "stream" in hass.config.components
     registry = er.async_get(hass)
+
+    def copies(entity_id: str) -> bool:
+        entry = registry.async_get(entity_id)
+        return entry is not None and entry.platform in SECOND_COPIES
+
+    # Frigate's cameras repeat ones another integration provides, where there is one: hidden
+    # until the owner shows them in the gallery's settings. Alone, they are the cameras.
+    states = hass.states.async_all("camera")
+    repeated = any(not copies(state.entity_id) for state in states)
     cameras = []
-    for state in sorted(hass.states.async_all("camera"), key=lambda state: state.name.casefold()):
+    for state in sorted(states, key=lambda state: state.name.casefold()):
         token = state.attributes.get("access_token")
         if not token or state.state == "unavailable":
             continue
@@ -218,10 +227,7 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, Any]]:
         if protect_entry(hass, state.entity_id):
             path = HISTORY_VIEW_URL.format(entity_id=state.entity_id)
             camera["history_url"] = f"{base_url}{path}?token={token}"
-        # Frigate's cameras repeat ones another integration provides: hidden until the owner
-        # shows them in the gallery's settings.
-        entry = registry.async_get(state.entity_id)
-        if entry is not None and entry.platform in SECOND_COPIES:
+        if repeated and copies(state.entity_id):
             camera["hidden"] = True
         cameras.append(camera)
     return cameras[:MAX_CAMERAS]
