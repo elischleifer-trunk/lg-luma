@@ -27,3 +27,18 @@ SERVICE_NOTIFY = "notify"
 
 POSITIONS = ["top-right", "top-left", "bottom-right", "bottom-left"]
 SIZES = ["small", "medium", "large"]
+
+# Developer access (off by default): cloud development sessions ask for a short-lived TV SSH key,
+# approved on a phone. See dev_access.py. Options:
+CONF_DEV_ACCESS = "dev_access"
+CONF_DEV_PHONE = "dev_access_phone"
+CONF_DEV_SSH_PORT = "dev_access_ssh_port"
+CONF_DEV_TUNNEL = "dev_access_tunnel_hostname"
+CONF_DEV_CF_ID = "dev_access_cloudflare_client_id"
+CONF_DEV_CF_SECRET = "dev_access_cloudflare_client_secret"
+# Entry data, created when developer access is first turned on:
+CONF_DEV_TOKEN_HASH = "dev_access_token_hash"
+CONF_DEV_KEY = "dev_access_management_key"
+# Loaded only when developer access is on, so other installations never install it.
+DEV_REQUIREMENTS = ["asyncssh==2.23.1"]
+DEV_TOKEN_HEADER = "X-Luma-Dev-Token"

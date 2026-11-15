@@ -321,6 +321,11 @@ async def test_a_tv_that_forgot_the_server_starts_reauth(
     await hass.async_block_till_done()
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert [flow["context"]["source"] for flow in flows] == ["reauth"]
+    # What else the entry keeps in its data must survive pairing again.
+    hass.config_entries.async_update_entry(
+        config, data={**config.data, "dev_access_token_hash": "kept"}
+    )
+    webhook_id = config.data["webhook_id"]
 
     # Pairing again replaces the token and reloads the entry.
     new_token = "e" * 64
@@ -333,6 +338,8 @@ async def test_a_tv_that_forgot_the_server_starts_reauth(
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"code": "654321"})
     assert result["reason"] == "reauth_successful"
     assert config.data["token"] == new_token
+    assert config.data["webhook_id"] == webhook_id
+    assert config.data["dev_access_token_hash"] == "kept"
 
 
 async def test_setup_with_a_revoked_token_asks_to_pair_again(
@@ -785,7 +792,7 @@ async def keys_form(hass: HomeAssistant, config: MockConfigEntry):
     """Configure opens a menu; streaming search keys are one of its pages."""
     result = await hass.config_entries.options.async_init(config.entry_id)
     assert result["type"] is FlowResultType.MENU
-    assert result["menu_options"] == ["phone_keyboard", "streaming_keys"]
+    assert result["menu_options"] == ["phone_keyboard", "streaming_keys", "developer_access"]
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {"next_step_id": "streaming_keys"}
     )

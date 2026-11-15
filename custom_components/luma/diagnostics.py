@@ -10,10 +10,29 @@ from homeassistant.core import HomeAssistant
 
 from . import LumaConfigEntry
 from .api import LumaError
-from .const import CONF_MDBLIST_KEY, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_TOKEN
+from .const import (
+    CONF_DEV_CF_ID,
+    CONF_DEV_CF_SECRET,
+    CONF_DEV_KEY,
+    CONF_DEV_TOKEN_HASH,
+    CONF_MDBLIST_KEY,
+    CONF_MOTN_KEY,
+    CONF_TMDB_TOKEN,
+    CONF_TOKEN,
+)
 
 # The keyboard webhook's ID is its only secret: anyone who has it can call it.
-REDACT = {CONF_TOKEN, CONF_MOTN_KEY, CONF_TMDB_TOKEN, CONF_MDBLIST_KEY, CONF_WEBHOOK_ID}
+REDACT = {
+    CONF_TOKEN,
+    CONF_MOTN_KEY,
+    CONF_TMDB_TOKEN,
+    CONF_MDBLIST_KEY,
+    CONF_WEBHOOK_ID,
+    CONF_DEV_KEY,
+    CONF_DEV_TOKEN_HASH,
+    CONF_DEV_CF_ID,
+    CONF_DEV_CF_SECRET,
+}
 
 
 async def async_get_config_entry_diagnostics(

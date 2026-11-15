@@ -41,8 +41,32 @@
         "title": "Luma",
         "menu_options": {
           "phone_keyboard": "Type on your phone",
-          "streaming_keys": "Streaming search keys"
+          "streaming_keys": "Streaming search keys",
+          "developer_access": "Developer access"
         }
+      },
+      "developer_access": {
+        "title": "Developer access",
+        "description": "For developing Luma: lets cloud development sessions (such as Claude Code) SSH to this TV for up to 8 hours at a time. Each request waits for your tap on the phone chosen here; Home Assistant then adds a new key to the TV and removes it when it expires. Off by default.\n\nHome Assistant's own key for the TV: append this line to `/home/root/.ssh/authorized_keys` on the TV.\n\n`{authorized_keys_line}`",
+        "data": {
+          "dev_access": "Allow developer access",
+          "dev_access_phone": "Phone that approves requests",
+          "dev_access_ssh_port": "TV SSH port",
+          "dev_access_tunnel_hostname": "Tunnel hostname (optional)",
+          "dev_access_cloudflare_client_id": "Cloudflare Access service token Client ID (optional)",
+          "dev_access_cloudflare_client_secret": "Cloudflare Access service token Client Secret (optional)",
+          "dev_access_rotate_token": "Make a new dev token (the old one stops working)",
+          "dev_access_forget_host_key": "Forget the TV's SSH host key (after a TV reset)"
+        },
+        "data_description": {
+          "dev_access_phone": "Only this phone's Home Assistant app can approve. Requests show Approve and Deny.",
+          "dev_access_tunnel_hostname": "A Cloudflare Access tunnel to the TV's SSH, for sessions outside your network. Empty: sessions connect to the TV's address directly.",
+          "dev_access_cloudflare_client_id": "Handed to approved sessions so cloudflared reaches the tunnel without a login."
+        }
+      },
+      "developer_token": {
+        "title": "Dev token",
+        "description": "**Dev token** (shown only now). Give it to the development environment as `LUMA_DEV_TOKEN`; it can only ask for access, which you approve on your phone.\n\n`{token}`\n\nIf you have not yet, append Home Assistant's key line to `/home/root/.ssh/authorized_keys` on the TV:\n\n`{authorized_keys_line}`"
       },
       "phone_keyboard": {
         "title": "Type on your phone",
@@ -70,7 +94,9 @@
     "error": {
       "motn_refused": "Movie of the Night refused this key. Check it is complete and the subscription is active.",
       "tmdb_refused": "TMDB refused this token. Use the API Read Access Token, not the API key.",
-      "mdblist_refused": "MDBList refused this key. Copy the whole key from mdblist.com → Preferences."
+      "mdblist_refused": "MDBList refused this key. Copy the whole key from mdblist.com → Preferences.",
+      "phone_required": "Choose the phone that approves requests.",
+      "cloudflare_pair": "Enter both the Client ID and the Client Secret, or neither."
     }
   },
   "entity": {

@@ -296,6 +296,40 @@ example after a reset, or if they were changed on the TV. Clearing a field in Ho
 leaves the TV's key in place. Without Home Assistant, enter them on the TV under **Settings →
 System → Streaming search keys**, which shows a QR code for your phone.
 
+## Developer access
+
+For people developing Luma. Off by default, and nothing changes until you turn it on: the
+endpoints below answer 404 and the SSH library (asyncssh) is not even installed.
+
+It lets a cloud development session (such as Claude Code on the web) SSH to the TV as root for up
+to 8 hours, only after you tap **Approve** on your phone:
+
+1. The session sends its **dev token** to `POST /api/luma/dev/request` with a reason. The token
+   says which TV.
+2. Home Assistant sends the phone you chose a notification with **Approve** and **Deny**. Only
+   that tap can approve; unanswered requests expire after 10 minutes.
+3. On approval Home Assistant makes a new SSH key, adds it to the TV's
+   `/home/root/.ssh/authorized_keys` over your network (keys it adds cannot forward ports), and
+   checks the TV accepts it.
+4. The session receives, once: the key, how to reach the TV (a Cloudflare Access tunnel hostname
+   and service token, or the TV's address), and the streaming search keys.
+5. The key is removed when the session releases it, when it expires, or by a check every 15
+   minutes. Lines in `authorized_keys` that Home Assistant did not add are never touched.
+
+To turn it on: **Settings → Devices & services → Luma → Configure → Developer access.** Tick
+**Allow developer access**, choose the phone that approves, and optionally a tunnel hostname and
+Cloudflare service token. Submitting shows two things once:
+
+- the **dev token**: give it to the development environment as `LUMA_DEV_TOKEN`. It can only ask;
+  ten wrong tokens in an hour lock the endpoints for an hour and notify your phone.
+- **Home Assistant's key line**: append it to `/home/root/.ssh/authorized_keys` on the TV, so Home
+  Assistant can add and remove session keys.
+
+The same page makes a new dev token (the old one stops working at once) and forgets the TV's SSH
+host key after a TV reset; Home Assistant pins it on first contact and refuses to continue if it
+changes. From a session, `node tools/tv-access.mjs request` asks and sets up `ssh tv`; see
+`agents.md`.
+
 ## Keeping Luma and the integration in step
 
 Home Assistant's device page for the TV shows which Luma version it runs. When the TV and the

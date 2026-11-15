@@ -83,21 +83,30 @@ Match the current native design without on-screen weather credits; attribution r
 
 ## Reaching the development TV
 
-The maintainer's rooted TV is reachable for root SSH through a Cloudflare Access tunnel at
-`tv.elischleifer.com`. The maintainer wants agents to be able to use it for testing on the TV.
-From a cloud session:
+The maintainer's rooted TV (SSH server: Homebrew Channel's Dropbear) is reachable for root SSH
+through a Cloudflare Access tunnel at `tv.elischleifer.com`. The maintainer wants agents to be able
+to use it for testing on the TV. From a cloud session:
 
-1. Install `openssh-client` and `cloudflared` (the official linux-amd64 release binary).
-2. SSH key: if the environment variable `TV_SSH_PRIVATE_KEY` is set (the key itself, or its
-   base64), write it to `~/.ssh/id_ed25519` with mode 600; its public key is already in the TV's
-   `/home/root/.ssh/authorized_keys`. Otherwise generate a key and ask the maintainer to append
-   the public key there.
-3. Cloudflare Access: if `TUNNEL_SERVICE_TOKEN_ID` and `TUNNEL_SERVICE_TOKEN_SECRET` are set,
-   `cloudflared access ssh` uses that service token and no login is needed. Otherwise run
-   `cloudflared access login https://tv.elischleifer.com` and give the maintainer the printed URL
-   to approve; leave it running until it prints the token. Never print either token.
-4. `~/.ssh/config`: `Host tv` → `HostName tv.elischleifer.com`, `User root`,
-   `ProxyCommand cloudflared access ssh --hostname %h`.
+1. **Preferred, when `LUMA_DEV_TOKEN` is set:** install `openssh-client`, then run
+   `node tools/tv-access.mjs request --reason "<what you will test>"`. It asks Home Assistant
+   (`ha.elischleifer.com`; Luma's developer access, see `home-assistant.md#developer-access`),
+   which asks the maintainer to approve on their phone; tell the maintainer you are waiting. On
+   approval it sets up `ssh tv` with a key valid for
+   up to 8 hours, the Cloudflare service token, and streaming search keys in `.env`. Run
+   `node tools/tv-access.mjs check` to confirm, and `node tools/tv-access.mjs release` when done
+   with the TV. Never print the key or tokens, and never copy them anywhere else.
+2. **Fallback, otherwise:** install `openssh-client` and `cloudflared` (the official linux-amd64
+   release binary).
+   - SSH key: if `TV_SSH_PRIVATE_KEY` is set (the key itself, or its base64), write it to
+     `~/.ssh/id_ed25519` with mode 600; its public key is already in the TV's
+     `/home/root/.ssh/authorized_keys`. Otherwise generate a key and ask the maintainer to append
+     the public key there.
+   - Cloudflare Access: if `TUNNEL_SERVICE_TOKEN_ID` and `TUNNEL_SERVICE_TOKEN_SECRET` are set,
+     `cloudflared access ssh` uses that service token and no login is needed. Otherwise run
+     `cloudflared access login https://tv.elischleifer.com` and give the maintainer the printed
+     URL to approve; leave it running until it prints the token. Never print either token.
+   - `~/.ssh/config`: `Host tv` → `HostName tv.elischleifer.com`, `User root`,
+     `ProxyCommand cloudflared access ssh --hostname %h`.
 
 **Run `luna-send` with `ssh -tt`.** Without a TTY it exits 0, prints nothing and does nothing,
 which looks like a launch the app ignored. Check with
