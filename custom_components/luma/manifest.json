@@ -1,7 +1,7 @@
 {
   "domain": "luma",
   "name": "Luma for LG webOS",
-  "after_dependencies": ["camera", "http", "mobile_app", "webostv"],
+  "after_dependencies": ["camera", "frontend", "http", "mobile_app", "webostv"],
   "codeowners": [],
   "config_flow": true,
   "dependencies": ["webhook"],
