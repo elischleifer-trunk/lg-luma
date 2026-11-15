@@ -110,6 +110,10 @@
     return 'http://127.0.0.1:' + port + '/api/overlay/expand';
   }
 
+  function playingUrl(port) {
+    return 'http://127.0.0.1:' + port + '/api/overlay/playing';
+  }
+
   // The Cameras video's scrubber: seconds of video the TV has kept, oldest to newest. Closer
   // than this to the newest counts as live.
   var LIVE_EDGE_S = 3;
@@ -145,6 +149,7 @@
     frameUrl: frameUrl,
     closedUrl: closedUrl,
     expandUrl: expandUrl,
+    playingUrl: playingUrl,
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.LumaOverlay = api;

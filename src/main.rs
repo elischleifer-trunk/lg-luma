@@ -19,6 +19,7 @@ mod i18n;
 mod input_refresh;
 #[path = "key-editor.rs"]
 mod key_editor;
+mod live;
 #[cfg(all(feature = "webos", target_os = "linux", target_arch = "arm"))]
 mod luna;
 mod mdblist;
@@ -826,6 +827,10 @@ fn run() -> Result<(), String> {
     let webhook_service = webhook::Service::new();
     // Pairings sit beside the preferences; a temporary --preferences profile keeps its own.
     let mut camera_service = cameras::Service::default();
+    let mut cameras_asked: Option<Instant> = None;
+    // The enlarged camera's own video on the TV's decoder, and the camera it is for.
+    let mut camera_live: Option<(String, live::Live)> = None;
+    state.cameras.decoder = webos && live::available();
     let mut home_assistant = home_assistant::Service::new(
         home_assistant::Live { webos },
         Some(preferences_path.with_file_name("home-assistant.json")),
@@ -1380,6 +1385,7 @@ fn run() -> Result<(), String> {
         home_assistant.set_enabled(state.preferences.home_assistant);
         if std::mem::take(&mut state.show_cameras) {
             home_assistant.show_cameras();
+            cameras_asked = Some(Instant::now());
         }
         while let Ok(event) = home_assistant.events.try_recv() {
             let language = state.preferences.language;
@@ -1479,6 +1485,27 @@ fn run() -> Result<(), String> {
         // overlay app; close it when the gallery leaves the camera.
         if let Some((id, endpoint)) = state.cameras.resolve.take() {
             camera_service.resolve(id, endpoint);
+        }
+        // The camera's own video on the TV's decoder: loaded and unloaded on this thread.
+        if std::mem::take(&mut state.cameras.stop_native) {
+            camera_live = None;
+        }
+        if let Some((id, url)) = state.cameras.start_native.take() {
+            // The earlier video unloads before the next one loads.
+            drop(camera_live.take());
+            camera_live = Some((id, live::Live::start(url)));
+        }
+        if let Some((id, video)) = &mut camera_live {
+            for event in video.poll() {
+                state.camera_native(id, event);
+            }
+        }
+        // The focused camera's video stream starts ahead of OK.
+        if let Some((id, endpoint)) = state.camera_warm(visible, Instant::now()) {
+            camera_service.warm(id, endpoint);
+        }
+        for (id, endpoint) in state.camera_relays(visible, Instant::now()) {
+            camera_service.warm(id, endpoint);
         }
         if let Some(video) = state.cameras.play.take() {
             home_assistant.show_video(video);
@@ -2113,6 +2140,10 @@ fn run() -> Result<(), String> {
                         options.capture_size.unwrap_or(Size::HD),
                     )?);
                 }
+                if renderer.see_through != scene.see_through {
+                    renderer.see_through = scene.see_through;
+                    damage_tracker.reset();
+                }
                 let damage = partial.as_ref().and_then(|partial| {
                     if last_drawable != Some(Size::new(width, height)) {
                         damage_tracker.reset();
@@ -2274,6 +2305,10 @@ fn run() -> Result<(), String> {
             || assets.artwork.pending()
         {
             8
+        } else if cameras_asked.is_some_and(|at| at.elapsed() < Duration::from_millis(300)) {
+            // The Home Assistant thread answers with the cameras at once: open without waiting
+            // out an idle screen's long wake.
+            4
         } else if state.cameras_visible() {
             // Camera frames arrive from worker threads, not as SDL events.
             16

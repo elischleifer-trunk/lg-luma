@@ -11,7 +11,10 @@ const RADIUS: f32 = 18.;
 
 pub fn render(out: &mut Scene, state: &State, assets: &Assets, now: OffsetDateTime) {
     let gallery = &state.cameras;
-    out.shape(Rect::new(0., 0., 1920., 1080.), 0., c(BACKDROP, 1.));
+    // Over the decoder's video the window stays transparent: only the controls are drawn.
+    if !gallery.see_through() {
+        out.shape(Rect::new(0., 0., 1920., 1080.), 0., c(BACKDROP, 1.));
+    }
     if let Some(id) = &gallery.enlarged {
         enlarged(out, state, assets, id, now);
         return;
@@ -129,8 +132,19 @@ fn grid(out: &mut Scene, state: &State) {
         out.shape(frame, RADIUS, c(0x000000, 1.));
         match gallery.frames.get(&camera.id) {
             Some(picture) => {
-                out.draw
-                    .push(Draw::Camera(picture.clone(), frame, RADIUS, false, [1.; 4]))
+                // A picture from the last visit is dimmed until this one's first arrives.
+                let shade = if picture.serial < gallery.fresh {
+                    0.45
+                } else {
+                    1.
+                };
+                out.draw.push(Draw::Camera(
+                    picture.clone(),
+                    frame,
+                    RADIUS,
+                    false,
+                    [shade, shade, shade, 1.],
+                ))
             }
             None => status(
                 out,
@@ -186,7 +200,10 @@ fn enlarged(out: &mut Scene, state: &State, assets: &Assets, id: &str, now: Offs
     let language = state.preferences.language;
     let gallery = &state.cameras;
     let screen = Rect::new(0., 0., 1920., 1080.);
-    out.shape(screen, 0., c(0x000000, 1.));
+    let decoded = gallery.see_through();
+    if !decoded {
+        out.shape(screen, 0., c(0x000000, 1.));
+    }
     let live = gallery.playback == Playback::Live;
     // Not live: the past picture, or the last live one until it shows.
     let picture = if live {
@@ -195,6 +212,7 @@ fn enlarged(out: &mut Scene, state: &State, assets: &Assets, id: &str, now: Offs
         gallery.replay.as_ref().or_else(|| gallery.frames.get(id))
     };
     match picture {
+        _ if decoded => {}
         Some(picture) => out
             .draw
             .push(Draw::Camera(picture.clone(), screen, 0., true, [1.; 4])),
@@ -263,6 +281,7 @@ fn enlarged(out: &mut Scene, state: &State, assets: &Assets, id: &str, now: Offs
         (Playback::Replay { speed: 0, .. }, _) => (language.t("cameraPaused").to_owned(), false),
         (Playback::Replay { speed: 1, .. }, Some(scrub)) => (moment(state, scrub, now), false),
         (Playback::Replay { speed, .. }, _) => (speed_label(speed), false),
+        (Playback::Live, _) if decoded => (language.t("cameraLive").to_owned(), true),
         (Playback::Live, _) => match picture {
             Some(picture) if picture.live => (language.t("cameraLive").to_owned(), true),
             Some(_) => (language.t("cameraSnapshots").to_owned(), false),

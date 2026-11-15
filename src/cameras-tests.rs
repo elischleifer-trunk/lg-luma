@@ -99,6 +99,7 @@ fn camera(id: &str) -> Camera {
         stream: Some(format!("http://ha/stream/{id}")),
         snapshot: Some(format!("http://ha/snap/{id}")),
         hls: None,
+        live: None,
         history: None,
         hidden: false,
         label: None,
@@ -405,13 +406,128 @@ fn frames_from_a_closed_gallery_never_reappear() {
     state.back();
     assert!(!state.cameras_open());
     // A frame queued before the workers stopped arrives after the gallery closed.
+    let kept = state.cameras.frames["0/camera.a"].serial;
     state.camera_update(frame(true));
     state.camera_update(Update::Unavailable("0/camera.a".into()));
-    assert!(state.cameras.frames.is_empty());
+    assert_eq!(state.cameras.frames["0/camera.a"].serial, kept);
     assert!(state.cameras.unavailable.is_empty());
-    // Reopening starts without any earlier picture.
-    state.camera_list(vec![camera("a")], true, true);
-    assert!(state.cameras.frames.is_empty());
+}
+
+#[test]
+fn a_reopened_gallery_shows_its_last_pictures_until_new_ones_load() {
+    let mut state = open(&["a", "b"]);
+    let frame = |id: &str, size: u32| {
+        Update::Frame(Arc::new(Frame::new(
+            &format!("0/camera.{id}"),
+            RgbaImage::new(size, 1),
+            false,
+        )))
+    };
+    state.camera_update(frame("a", 8));
+    // An enlarged camera's full-size frame is too large to keep.
+    state.camera_update(frame("b", 1920));
+    assert!(state.cameras_shown());
+    state.back();
+    assert_eq!(state.cameras.frames.len(), 1);
+    // Reopened: the kept picture shows, as an old one, and a camera that is gone loses its.
+    state.camera_list(vec![camera("a"), camera("b")], true, true);
+    let old = &state.cameras.frames["0/camera.a"];
+    assert!(old.serial < state.cameras.fresh);
+    assert!(!state.cameras_shown());
+    state.camera_update(frame("a", 8));
+    state.camera_update(frame("b", 8));
+    assert!(state.cameras.frames["0/camera.a"].serial >= state.cameras.fresh);
+    assert!(state.cameras_shown());
+    state.back();
+    state.camera_list(vec![camera("b")], true, true);
+    assert_eq!(state.cameras.frames.len(), 1);
+    assert!(state.cameras.frames.contains_key("0/camera.b"));
+}
+
+#[test]
+fn snapshots_ask_home_assistant_for_the_size_they_are_drawn_at() {
+    let proxy = "http://ha:8123/api/camera_proxy/camera.a?token=t";
+    assert_eq!(
+        sized(proxy, (560, 315)),
+        format!("{proxy}&width=560&height=315")
+    );
+    assert_eq!(
+        sized("http://ha:8123/api/camera_proxy/camera.a", (560, 315)),
+        "http://ha:8123/api/camera_proxy/camera.a?width=560&height=315"
+    );
+    // Only Home Assistant's camera proxy scales; other addresses stay as given.
+    assert_eq!(
+        sized("http://cam/snap.jpg?x=1", (560, 315)),
+        "http://cam/snap.jpg?x=1"
+    );
+    let stream = "http://ha:8123/api/camera_proxy_stream/camera.a?token=t";
+    assert_eq!(sized(stream, (560, 315)), stream);
+    let mut state = open(&["a", "b", "c"]);
+    for camera in &mut state.cameras.cameras {
+        camera.snapshot = Some(proxy.into());
+    }
+    let size = Layout::new(3).frame_size();
+    let asked = format!("{proxy}&width={}&height={}", size.0, size.1);
+    assert!(
+        state
+            .camera_watches(true)
+            .iter()
+            .all(|watch| matches!(&watch.source, Source::Snapshots { url, .. } if *url == asked))
+    );
+    // Enlarged, the stream's fallback snapshots are asked for at the screen's size.
+    state.activate();
+    assert!(matches!(
+        &state.camera_watches(true)[0].source,
+        Source::Stream { fallback: Some(url), .. } if *url == format!("{proxy}&width=1920&height=1080")
+    ));
+}
+
+#[test]
+fn a_focused_cameras_video_stream_starts_before_it_is_enlarged() {
+    let mut state = streaming(&["a", "b"]);
+    let start = Instant::now();
+    let after = |millis| start + Duration::from_millis(millis);
+    let a = (
+        "0/camera.a".to_owned(),
+        "http://ha:8123/api/luma/stream/camera.a?token=t".to_owned(),
+    );
+    // Not while focus is only passing over the camera, and once per rest on it.
+    assert_eq!(state.camera_warm(true, start), None);
+    assert_eq!(state.camera_warm(true, after(200)), None);
+    assert_eq!(state.camera_warm(true, after(450)), Some(a.clone()));
+    assert_eq!(state.camera_warm(true, after(900)), None);
+    // Home Assistant stops a stream nobody loads: asked again while focus stays, for a while.
+    assert_eq!(state.camera_warm(true, after(71_000)), Some(a.clone()));
+    assert_eq!(state.camera_warm(true, after(400_000)), None);
+    // Another camera starts over.
+    state.direction(Direction::Right, &[]);
+    assert_eq!(state.camera_warm(true, after(401_000)), None);
+    assert_eq!(
+        state.camera_warm(true, after(401_500)).map(|(id, _)| id),
+        Some("0/camera.b".into())
+    );
+    // Nothing while a camera is enlarged, a sheet is open, Luma is hidden, live video is off or
+    // the camera's video already failed.
+    state.activate();
+    assert_eq!(state.camera_warm(true, after(500_000)), None);
+    state.back();
+    state.camera_options();
+    assert_eq!(state.camera_warm(true, after(501_000)), None);
+    assert_eq!(state.camera_warm(true, after(502_000)), None);
+    state.back();
+    assert_eq!(state.camera_warm(false, after(503_000)), None);
+    assert_eq!(state.camera_warm(false, after(504_000)), None);
+    state.cameras.live = false;
+    assert_eq!(state.camera_warm(true, after(505_000)), None);
+    assert_eq!(state.camera_warm(true, after(506_000)), None);
+    state.cameras.live = true;
+    state.cameras.video_failed.push("0/camera.b".into());
+    assert_eq!(state.camera_warm(true, after(507_000)), None);
+    assert_eq!(state.camera_warm(true, after(508_000)), None);
+    // A camera that cannot stream has nothing to start.
+    let mut plain = open(&["a"]);
+    assert_eq!(plain.camera_warm(true, start), None);
+    assert_eq!(plain.camera_warm(true, after(1000)), None);
 }
 
 fn streaming(ids: &[&str]) -> State {
@@ -1067,4 +1183,75 @@ fn up_on_the_live_video_with_nothing_earlier_stays_live() {
     );
     assert_eq!(state.cameras.playback, Playback::Live);
     assert_eq!(state.cameras.video, Video::Resolving("0/camera.a".into()));
+}
+
+#[test]
+fn recorded_cameras_on_screen_have_their_relays_started_when_the_gallery_opens() {
+    let live = |id: &str| format!("http://ha:8123/api/luma/live/camera.{id}?token=t");
+    let mut state = protect(&["a", "b", "c", "d", "e", "f", "g", "h"]);
+    for camera in &mut state.cameras.cameras {
+        let name = camera.name.clone();
+        camera.live = Some(live(&name));
+    }
+    // A camera nothing records may run on a battery: it waits for focus to rest on it.
+    state.cameras.cameras[1].history = None;
+    let start = Instant::now();
+    // No decoder on this TV: nothing to start.
+    assert!(state.camera_relays(true, start).is_empty());
+    state.cameras.decoder = true;
+    let ids = |relays: Vec<(String, String)>| -> Vec<String> {
+        relays
+            .into_iter()
+            .map(|(id, _)| id.replace("0/camera.", ""))
+            .collect()
+    };
+    let first = state.camera_relays(true, start);
+    assert_eq!(first[0].1, format!("{}&warm=1", live("a")));
+    // The six tiles on screen, less the unrecorded one; once, then again after a while.
+    assert_eq!(ids(first), ["a", "c", "d", "e", "f"]);
+    assert!(
+        state
+            .camera_relays(true, start + Duration::from_secs(60))
+            .is_empty()
+    );
+    assert_eq!(
+        ids(state.camera_relays(true, start + Duration::from_secs(91))),
+        ["a", "c", "d", "e", "f"]
+    );
+    // Focus on a recorded camera asks nothing more; on the unrecorded one, its relay.
+    assert_eq!(state.camera_warm(true, start), None);
+    assert_eq!(
+        state.camera_warm(true, start + Duration::from_secs(1)),
+        None
+    );
+    state.direction(Direction::Right, &[]);
+    assert_eq!(
+        state.camera_warm(true, start + Duration::from_secs(2)),
+        None
+    );
+    assert_eq!(
+        state.camera_warm(true, start + Duration::from_secs(3)),
+        Some(("0/camera.b".into(), format!("{}&warm=1", live("b"))))
+    );
+    // Scrolled to the next row: the cameras that came on screen start too.
+    for _ in 0..2 {
+        state.direction(Direction::Down, &[]);
+    }
+    assert_eq!(state.cameras.first_row, 1);
+    assert_eq!(
+        ids(state.camera_relays(true, start + Duration::from_secs(95))),
+        ["d", "e", "f", "g", "h"]
+    );
+    // Not while Luma is hidden or live video is off.
+    assert!(
+        state
+            .camera_relays(false, start + Duration::from_secs(300))
+            .is_empty()
+    );
+    state.cameras.live = false;
+    assert!(
+        state
+            .camera_relays(true, start + Duration::from_secs(600))
+            .is_empty()
+    );
 }

@@ -325,6 +325,8 @@ fn snap_rect(rect: Rect, scale: f32) -> Rect {
 }
 
 pub struct Renderer {
+    /// Clear to transparent, so the TV's video plane shows where nothing is drawn.
+    pub see_through: bool,
     program: GLuint,
     vector_program: GLuint,
     text_program: GLuint,
@@ -442,6 +444,7 @@ impl Renderer {
         }
         let white = texture(1, 1, &[255; 4]);
         Ok(Self {
+            see_through: false,
             program,
             vector_program,
             text_program,
@@ -1382,7 +1385,11 @@ impl Renderer {
         unsafe {
             gl::Viewport(0, 0, width as i32, height as i32);
             scissor(damage);
-            gl::ClearColor(0.04, 0.04, 0.05, 1.);
+            if self.see_through {
+                gl::ClearColor(0., 0., 0., 0.);
+            } else {
+                gl::ClearColor(0.04, 0.04, 0.05, 1.);
+            }
             gl::Clear(gl::COLOR_BUFFER_BIT);
             gl::Viewport(vx, vy, vw, vh);
             if self.vao != 0 {
