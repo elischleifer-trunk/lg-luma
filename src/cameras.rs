@@ -69,6 +69,16 @@ const EVENTS_REFRESH: Duration = Duration::from_secs(60);
 const SETTLE: Duration = Duration::from_millis(1500);
 /// A Left or Right within this of the last continues a hold.
 const HOLD_GAP: Duration = Duration::from_millis(500);
+/// Focus rests on a camera this long before Home Assistant is asked to start its video stream,
+/// so passing over cameras starts nothing.
+const WARM_AFTER: Duration = Duration::from_millis(400);
+/// Home Assistant stops a stream nobody loads about a minute after it starts: ask again then.
+const WARM_AGAIN: Duration = Duration::from_secs(70);
+/// Relays of the cameras on screen are asked to start again this often while the gallery is open
+/// (a relay nobody listens to stops after two minutes).
+const RELAYS_AGAIN: Duration = Duration::from_secs(90);
+/// A camera left focused longer than this is no longer kept ready.
+const WARM_FOR: Duration = Duration::from_secs(5 * 60);
 /// Faster playback, forward or (negated) backward.
 pub const SPEEDS: [i32; 6] = [2, 4, 8, 16, 32, 64];
 
@@ -101,6 +111,8 @@ pub struct Camera {
     pub snapshot: Option<String>,
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
+    /// The integration's relay of the camera's own video, for the TV's decoder (see `live`).
+    pub live: Option<String>,
     /// The integration's endpoint into what UniFi Protect recorded of this camera.
     pub history: Option<String>,
     pub hidden: bool,
@@ -224,6 +236,17 @@ pub enum Video {
     Recorded(String),
 }
 
+/// The enlarged camera's own video on the TV's decoder (see `live`).
+#[derive(Clone, Debug, Default, PartialEq)]
+pub enum Native {
+    #[default]
+    Off,
+    /// Connecting to the relay and loading the decoder; the motion-JPEG stream shows meanwhile.
+    Starting(String),
+    /// The decoder has pictures: the gallery leaves its window transparent over them.
+    Showing(String),
+}
+
 /// How the overlay app's camera video closed. A video left by a key the gallery handles
 /// reports how far behind live it was (and whether paused) and the key, so the gallery carries
 /// on from there; Back reports neither and leaves the camera.
@@ -294,6 +317,17 @@ pub enum Want {
     Kept(Instant),
     /// A picture UniFi Protect recorded, at this URL.
     Recorded(String),
+}
+
+/// A snapshot address asking Home Assistant's camera proxy for a picture about `size`: it
+/// scales a JPEG down to the nearest size it can at or above that, so a grid tile's picture is
+/// a fraction of the bytes to load and decode. Other addresses are left as they are.
+fn sized(url: &str, (width, height): (u32, u32)) -> String {
+    if !url.contains("/api/camera_proxy/") || url.contains("width=") {
+        return url.to_owned();
+    }
+    let join = if url.contains('?') { '&' } else { '?' };
+    format!("{url}{join}width={width}&height={height}")
 }
 
 /// `http://host:port` of a URL.
@@ -436,6 +470,31 @@ impl Service {
             .spawn(move || {
                 let result = hls_address(&agent(), &endpoint);
                 let _ = sender.send(Update::Video { id, result });
+            });
+        if let Err(error) = spawned {
+            crate::telemetry::log_warn!("cameras", "{error}");
+        }
+    }
+
+    /// Asks the integration's HLS endpoint to start a camera's stream before it is enlarged:
+    /// Home Assistant needs several seconds to connect to a camera and cut its first video, and
+    /// stops a stream nobody loads by itself.
+    pub fn warm(&self, id: String, endpoint: String) {
+        let spawned = thread::Builder::new()
+            .name("camera-warm".into())
+            .spawn(move || {
+                let started = Instant::now();
+                match fetch(&agent(), &endpoint) {
+                    Ok(_) => crate::telemetry::log_info!(
+                        "cameras",
+                        "{id}: video stream started ahead in {} ms",
+                        started.elapsed().as_millis()
+                    ),
+                    Err(error) => crate::telemetry::log_info!(
+                        "cameras",
+                        "{id}: video stream not started ahead: {error}"
+                    ),
+                }
             });
         if let Err(error) = spawned {
             crate::telemetry::log_warn!("cameras", "{error}");
@@ -1027,6 +1086,14 @@ pub fn speed_label(speed: i32) -> String {
     format!("{speed}\u{d7}")
 }
 
+/// The focused camera whose video stream Home Assistant is asked to start ahead.
+struct Warm {
+    id: String,
+    /// When focus came to rest on it.
+    since: Instant,
+    asked: Option<Instant>,
+}
+
 #[derive(Default)]
 pub struct Gallery {
     /// Every camera in the owner's order, hidden ones included.
@@ -1034,6 +1101,9 @@ pub struct Gallery {
     /// Enlarged cameras open the live stream; off, they poll snapshots.
     pub live: bool,
     pub frames: HashMap<String, Arc<Frame>>,
+    /// Frames with an earlier serial are from the gallery's last visit: they show, dimmed, until
+    /// each camera's first new picture.
+    pub fresh: u64,
     pub unavailable: Vec<String>,
     pub enlarged: Option<String>,
     pub sheet: Option<Sheet>,
@@ -1044,6 +1114,15 @@ pub struct Gallery {
     /// The arrangement to save, taken by the main loop for the Home Assistant service.
     pub save: Option<Value>,
     pub video: Video,
+    /// This TV has a decoder Luma can feed (set once by the main loop).
+    pub decoder: bool,
+    pub native: Native,
+    /// Cameras whose own video could not be decoded: they play HLS video instead.
+    pub native_failed: Vec<String>,
+    /// For the main loop: decode this camera's relayed video (id, URL).
+    pub start_native: Option<(String, String)>,
+    /// For the main loop: stop decoding.
+    pub stop_native: bool,
     /// Cameras whose HLS video could not be played: they stay on the motion-JPEG stream.
     pub video_failed: Vec<String>,
     /// For the main loop: start this camera's HLS stream (id, endpoint).
@@ -1078,6 +1157,16 @@ pub struct Gallery {
     held: Option<(bool, Instant, Instant)>,
     /// The latest scrubbing key: recorded video waits until scrubbing settles.
     scrubbed: Option<Instant>,
+    warm: Option<Warm>,
+    /// When the relays of the cameras on screen were last asked to start, and for which row.
+    relays_warmed: Option<(Instant, usize)>,
+    /// The enlarged camera's first live picture has been logged.
+    live_logged: bool,
+    /// When the gallery opened, until every picture on screen has loaded (and whether the
+    /// first has): how long opening took goes to the log.
+    opened: Option<(Instant, bool)>,
+    /// When the enlarged camera was enlarged, for the log.
+    enlarged_at: Option<Instant>,
 }
 
 impl Gallery {
@@ -1162,6 +1251,8 @@ impl Gallery {
     /// Leaves the enlarged camera, closing its video.
     fn shrink(&mut self) {
         self.enlarged = None;
+        self.enlarged_at = None;
+        self.end_native();
         if matches!(
             std::mem::take(&mut self.video),
             Video::Playing(_) | Video::Recorded(_)
@@ -1186,6 +1277,22 @@ impl Gallery {
         let Some(id) = self.enlarged.clone() else {
             return;
         };
+        // The camera's own video on the TV's decoder, where both exist: no HLS, no overlay app.
+        if self.live
+            && self.decoder
+            && self.native == Native::Off
+            && self.video == Video::Off
+            && !self.native_failed.contains(&id)
+            && let Some(url) = self.camera(&id).and_then(|c| c.live.clone())
+        {
+            self.native = Native::Starting(id.clone());
+            self.stop_native = false;
+            self.start_native = Some((id, url));
+            return;
+        }
+        if self.native != Native::Off {
+            return;
+        }
         if self.live
             && self.video == Video::Off
             && !self.video_failed.contains(&id)
@@ -1194,6 +1301,31 @@ impl Gallery {
             self.video = Video::Resolving(id.clone());
             self.resolve = Some((id, endpoint));
         }
+    }
+
+    /// Stops decoding the camera's own video.
+    fn end_native(&mut self) {
+        if std::mem::take(&mut self.native) != Native::Off {
+            self.stop_native = true;
+        }
+        self.start_native = None;
+    }
+
+    /// Luma was hidden or is seen again. Hidden, the decoder's video stops like every camera
+    /// worker; seen again, a camera still enlarged and live asks for its video anew.
+    pub fn seen(&mut self, visible: bool) {
+        if !visible {
+            self.end_native();
+        } else if self.enlarged.is_some() && self.playback == Playback::Live {
+            self.request_video();
+        }
+    }
+
+    /// The decoder's picture shows: the gallery draws nothing over it but its controls.
+    pub fn see_through(&self) -> bool {
+        matches!(self.native, Native::Showing(_))
+            && self.enlarged.is_some()
+            && self.playback == Playback::Live
     }
 
     /// The enlarged camera's endpoint into what Protect recorded.
@@ -1390,6 +1522,10 @@ impl Gallery {
                 format!("{history}&events=1&start={start}&end={unix}"),
             ));
         }
+        // Paused or rewound: the decoder's live video gives way to the gallery's own pictures.
+        if self.playback != Playback::Live {
+            self.end_native();
+        }
         let lag = self.lag(now);
         let speed = self.speed();
         if let Playback::Replay { .. } = self.playback {
@@ -1453,6 +1589,40 @@ impl Gallery {
         (Some(want), changed)
     }
 
+    /// Every camera on screen has a picture loaded since the gallery opened.
+    fn loaded(&self) -> bool {
+        self.watches().iter().all(|watch| {
+            self.frames.get(&watch.id).is_some_and(|frame| {
+                frame.serial >= self.fresh
+                    // An enlarged camera waits for the source it is watched with.
+                    && (self.enlarged.is_none()
+                        || frame.live == matches!(watch.source, Source::Stream { .. }))
+            })
+        })
+    }
+
+    /// Logs how long the gallery took to show its first picture and all of them.
+    fn log_opening(&mut self) {
+        let Some((opened, first)) = self.opened else {
+            return;
+        };
+        let waited = opened.elapsed().as_millis();
+        if !first {
+            crate::telemetry::log_info!("cameras", "first picture {waited} ms after opening");
+            self.opened = Some((opened, true));
+        }
+        if self.enlarged.is_some() {
+            self.opened = None;
+        } else if self.loaded() {
+            crate::telemetry::log_info!(
+                "cameras",
+                "all {} pictures {waited} ms after opening",
+                self.watches().len()
+            );
+            self.opened = None;
+        }
+    }
+
     pub fn watches(&self) -> Vec<Watch> {
         if let Some(camera) = self.enlarged.as_deref().and_then(|id| self.camera(id)) {
             let live = camera
@@ -1462,11 +1632,11 @@ impl Gallery {
             let source = if let Some(stream) = live {
                 Source::Stream {
                     url: stream.clone(),
-                    fallback: camera.snapshot.clone(),
+                    fallback: camera.snapshot.as_deref().map(|url| sized(url, FULL_SIZE)),
                 }
             } else if let Some(snapshot) = &camera.snapshot {
                 Source::Snapshots {
-                    url: snapshot.clone(),
+                    url: sized(snapshot, FULL_SIZE),
                     every: SNAPSHOT_GAP,
                 }
             } else {
@@ -1491,7 +1661,7 @@ impl Gallery {
             .filter_map(|camera| {
                 let source = match (&camera.snapshot, &camera.stream) {
                     (Some(url), _) => Source::Snapshots {
-                        url: url.clone(),
+                        url: sized(url, layout.frame_size()),
                         every,
                     },
                     // No snapshot URL: the tile shows the stream itself.
@@ -1529,16 +1699,18 @@ impl State {
         let already_open = self.cameras_visible();
         let gallery = &mut self.cameras;
         if open {
-            if already_open {
-                gallery
-                    .frames
-                    .retain(|id, _| cameras.iter().any(|c| &c.id == id));
-            } else {
-                gallery.frames.clear();
+            // Pictures kept from the last visit show at once, until new ones load.
+            gallery
+                .frames
+                .retain(|id, _| cameras.iter().any(|c| &c.id == id));
+            if !already_open {
+                gallery.fresh = SERIAL.load(Ordering::Relaxed);
+                gallery.opened = Some((Instant::now(), false));
             }
             gallery.cameras = cameras;
             gallery.live = live;
             gallery.unavailable.clear();
+            gallery.native_failed.clear();
             gallery.video_failed.clear();
             gallery.recorded_failed.clear();
             gallery.shrink();
@@ -1646,7 +1818,20 @@ impl State {
                     return;
                 }
                 gallery.unavailable.retain(|id| *id != frame.key);
+                if frame.live
+                    && gallery.enlarged.as_deref() == Some(frame.key.as_str())
+                    && !std::mem::replace(&mut gallery.live_logged, true)
+                    && let Some(at) = gallery.enlarged_at
+                {
+                    crate::telemetry::log_info!(
+                        "cameras",
+                        "{}: live picture {} ms after it was enlarged",
+                        frame.key,
+                        at.elapsed().as_millis()
+                    );
+                }
                 gallery.frames.insert(frame.key.clone(), frame);
+                gallery.log_opening();
             }
             Update::Unavailable(id) => {
                 if !gallery.unavailable.contains(&id) {
@@ -1679,6 +1864,13 @@ impl State {
                     // Rewound meanwhile: the video waits until the camera is live again.
                     Ok(_) if gallery.playback != Playback::Live => gallery.video = Video::Off,
                     Ok(url) => {
+                        if let Some(at) = gallery.enlarged_at {
+                            crate::telemetry::log_info!(
+                                "cameras",
+                                "{id}: video stream address {} ms after it was enlarged",
+                                at.elapsed().as_millis()
+                            );
+                        }
                         let title = gallery
                             .camera(&id)
                             .map_or_else(String::new, |c| c.title().to_owned());
@@ -1698,6 +1890,37 @@ impl State {
                         gallery.video = Video::Off;
                         gallery.video_failed.push(id);
                     }
+                }
+            }
+        }
+        self.dirty = true;
+    }
+
+    /// What the decoder's video did (see `live`), for the camera it was started for.
+    pub fn camera_native(&mut self, id: &str, event: crate::live::Event) {
+        let gallery = &mut self.cameras;
+        if !matches!(&gallery.native, Native::Starting(now) | Native::Showing(now) if now == id) {
+            return;
+        }
+        match event {
+            crate::live::Event::Opened { .. } => {}
+            crate::live::Event::Showing => {
+                if let Some(at) = gallery.enlarged_at {
+                    crate::telemetry::log_info!(
+                        "cameras",
+                        "{id}: decoded video {} ms after it was enlarged",
+                        at.elapsed().as_millis()
+                    );
+                }
+                gallery.native = Native::Showing(id.to_owned());
+            }
+            // The camera plays Home Assistant's HLS video instead, for the rest of this visit.
+            crate::live::Event::Failed(error) => {
+                crate::telemetry::log_warn!("cameras", "{id}: no decoded video: {error}");
+                gallery.end_native();
+                gallery.native_failed.push(id.to_owned());
+                if gallery.playback == Playback::Live {
+                    gallery.request_video();
                 }
             }
         }
@@ -1785,14 +2008,103 @@ impl State {
     /// The gallery is open and every camera on screen has a frame (scripted captures wait
     /// for this).
     pub fn cameras_shown(&self) -> bool {
-        self.cameras_open()
-            && self.cameras.watches().iter().all(|watch| {
-                self.cameras.frames.get(&watch.id).is_some_and(|frame| {
-                    // An enlarged camera waits for the source it is watched with.
-                    self.cameras.enlarged.is_none()
-                        || frame.live == matches!(watch.source, Source::Stream { .. })
-                })
+        self.cameras_open() && self.cameras.loaded()
+    }
+
+    /// The relays to start now: those of the recorded cameras on screen, as soon as the gallery
+    /// opens and again while it stays open, so whichever camera is enlarged is already being
+    /// read and its video starts at once. Only cameras UniFi Protect records, which stream to
+    /// their recorder all the time anyway: starting a stream would wake a battery camera, so
+    /// other cameras wait for focus to rest on them (`camera_warm`).
+    pub fn camera_relays(&mut self, visible: bool, now: Instant) -> Vec<(String, String)> {
+        let gallery = &mut self.cameras;
+        if !visible
+            || !matches!(self.overlay, Some(Overlay::Cameras { .. }))
+            || !gallery.live
+            || !gallery.decoder
+        {
+            gallery.relays_warmed = None;
+            return vec![];
+        }
+        if gallery.relays_warmed.is_some_and(|(at, row)| {
+            row == gallery.first_row && now.saturating_duration_since(at) < RELAYS_AGAIN
+        }) {
+            return vec![];
+        }
+        gallery.relays_warmed = Some((now, gallery.first_row));
+        let shown = gallery.visible();
+        let layout = Layout::new(shown.len());
+        shown
+            .iter()
+            .skip(gallery.first_row * layout.cols)
+            .take(layout.visible_rows * layout.cols)
+            .filter(|camera| {
+                camera.history.is_some() && !gallery.native_failed.contains(&camera.id)
             })
+            .filter_map(|camera| {
+                Some((
+                    camera.id.clone(),
+                    format!("{}&warm=1", camera.live.as_ref()?),
+                ))
+            })
+            .collect()
+    }
+
+    /// The focused camera's HLS endpoint, once focus has rested on it: the main loop asks Home
+    /// Assistant to start its video stream, so it is already running when OK enlarges the
+    /// camera. Asked again while focus stays, since Home Assistant stops an unwatched stream.
+    pub fn camera_warm(&mut self, visible: bool, now: Instant) -> Option<(String, String)> {
+        let gallery = &mut self.cameras;
+        let focused = match &self.focus {
+            Target::Camera(id)
+                if visible
+                    && matches!(self.overlay, Some(Overlay::Cameras { .. }))
+                    && gallery.live
+                    && gallery.enlarged.is_none()
+                    && gallery.sheet.is_none()
+                    && !gallery.moving
+                    && !gallery.video_failed.contains(id) =>
+            {
+                id
+            }
+            _ => {
+                gallery.warm = None;
+                return None;
+            }
+        };
+        // The relay when this TV decodes the camera's own video (unless `camera_relays` already
+        // keeps it running), else Home Assistant's HLS.
+        let camera = gallery.camera(focused)?;
+        let relayed = camera
+            .live
+            .as_ref()
+            .filter(|_| gallery.decoder && !gallery.native_failed.contains(focused));
+        if relayed.is_some() && camera.history.is_some() {
+            gallery.warm = None;
+            return None;
+        }
+        let endpoint = relayed
+            .map(|url| format!("{url}&warm=1"))
+            .or_else(|| camera.hls.clone())?;
+        if gallery.warm.as_ref().is_none_or(|warm| warm.id != *focused) {
+            gallery.warm = Some(Warm {
+                id: focused.clone(),
+                since: now,
+                asked: None,
+            });
+        }
+        let warm = gallery.warm.as_mut()?;
+        let rested = now.saturating_duration_since(warm.since);
+        if rested < WARM_AFTER
+            || rested > WARM_FOR
+            || warm
+                .asked
+                .is_some_and(|asked| now.saturating_duration_since(asked) < WARM_AGAIN)
+        {
+            return None;
+        }
+        warm.asked = Some(now);
+        Some((warm.id.clone(), endpoint))
     }
 
     /// The main loop's tick for the enlarged camera: takes the span of its kept frames and
@@ -1844,8 +2156,15 @@ impl State {
         gallery.shrink();
         gallery.sheet = None;
         gallery.moving = false;
-        // Frames are large; a reopened gallery fetches fresh ones.
-        gallery.frames.clear();
+        // Tile pictures stay for the next visit, which shows them until new ones load; an
+        // enlarged camera's full-size frame is large and goes.
+        let tile = Layout::new(gallery.visible().len()).frame_size();
+        gallery.frames.retain(|_, frame| {
+            let (width, height) = frame.pixels.dimensions();
+            width <= tile.0 && height <= tile.1
+        });
+        gallery.opened = None;
+        gallery.warm = None;
         gallery.unavailable.clear();
         self.pressed = None;
         self.dirty = true;
@@ -1956,6 +2275,8 @@ impl State {
         match self.focus.clone() {
             Target::Camera(id) if gallery.sheet.is_none() => {
                 gallery.enlarged = Some(id);
+                gallery.enlarged_at = Some(Instant::now());
+                gallery.live_logged = false;
                 gallery.request_video();
             }
             Target::CameraGear => self.open_camera_settings(),
