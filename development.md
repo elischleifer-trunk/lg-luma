@@ -462,7 +462,8 @@ button sends a snapshot-only overlay of `custom_components/luma/example.jpg`, se
 `/api/luma/example.jpg`, so owners can preview the card without a camera.
 
 **Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
-(Frigate's cameras, `SECOND_COPIES`, are left out as copies of cameras another integration provides)
+(Frigate's cameras, `SECOND_COPIES`, carry `hidden: true` as copies of cameras another integration
+provides: Luma hides such a camera until a saved arrangement lists it)
 camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds
 after any `camera.*` state change, which includes every access-token rotation, coalescing bursts.
 Every minute it also reads `GET /api/status`, whose `cameras` counts only the asking server's list, and resends when it is 0, since

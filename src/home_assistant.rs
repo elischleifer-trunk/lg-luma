@@ -173,6 +173,8 @@ pub struct Camera {
     pub hls: Option<String>,
     /// The integration's relay of the camera's own video.
     pub live: Option<String>,
+    /// Hidden in the gallery until the owner arranges it (a second copy of another camera).
+    pub hidden: bool,
     /// The integration's endpoint into what UniFi Protect recorded of this camera.
     pub history: Option<String>,
 }
@@ -1358,6 +1360,7 @@ impl<T: Tv> Api<T> {
                     snapshot,
                     hls,
                     live,
+                    hidden: entry["hidden"] == true,
                     history,
                 })
             })();
@@ -1496,7 +1499,10 @@ impl<T: Tv> Api<T> {
         cameras
             .into_iter()
             .map(|(camera, id)| crate::cameras::Camera {
-                hidden: arranged.hidden.contains(&id),
+                // A camera Home Assistant marks hidden stays so until the owner has arranged
+                // the gallery with it, which records whether it is shown.
+                hidden: arranged.hidden.contains(&id)
+                    || (camera.hidden && !arranged.order.contains(&id)),
                 label: arranged.names.get(&id).cloned(),
                 id,
                 name: camera.name.clone(),

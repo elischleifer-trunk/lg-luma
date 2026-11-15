@@ -547,6 +547,46 @@ fn cameras_are_validated_and_sent_to_the_gallery_with_new_urls() {
 }
 
 #[test]
+fn a_camera_home_assistant_marks_hidden_stays_so_until_the_owner_shows_it() {
+    let mut h = Harness::new();
+    let token = h.pair();
+    let cameras = json!({"cameras": [
+        {"id": "camera.door", "snapshot_url": "http://ha/door"},
+        {"id": "camera.copy", "snapshot_url": "http://ha/copy", "hidden": true},
+    ]});
+    h.call("POST", "/api/cameras", Some(&token), cameras.clone());
+    let hidden = |h: &Harness| -> Vec<(String, bool)> {
+        let mut cameras: Vec<_> = h
+            .api
+            .gallery()
+            .into_iter()
+            .map(|c| (c.id, c.hidden))
+            .collect();
+        cameras.sort();
+        cameras
+    };
+    assert_eq!(
+        hidden(&h),
+        [
+            ("0/camera.copy".into(), true),
+            ("0/camera.door".into(), false)
+        ]
+    );
+    // The gallery saves what it shows: the copy stays hidden through an unrelated change.
+    let saved = h.api.arrange(&json!({
+        "order": ["0/camera.door", "0/camera.copy"],
+        "hidden": ["0/camera.copy"],
+    }));
+    assert_eq!(saved.status, 200);
+    assert_eq!(hidden(&h)[0], ("0/camera.copy".into(), true));
+    // Shown by the owner, it stays shown when Home Assistant sends the list again.
+    h.api
+        .arrange(&json!({"order": ["0/camera.door", "0/camera.copy"], "hidden": []}));
+    h.call("POST", "/api/cameras", Some(&token), cameras);
+    assert_eq!(hidden(&h)[0], ("0/camera.copy".into(), false));
+}
+
+#[test]
 fn each_server_keeps_its_own_cameras_and_unpairing_drops_only_them() {
     let mut h = Harness::new();
     let first = h.pair();

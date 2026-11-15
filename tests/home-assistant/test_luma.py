@@ -487,7 +487,7 @@ async def test_streaming_cameras_get_an_hls_url_signed_with_their_token(
     assert "hls_url" not in yard
 
 
-async def test_frigates_copies_of_cameras_are_left_out_of_the_gallery(
+async def test_frigates_copies_of_cameras_start_hidden_in_the_gallery(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from homeassistant.helpers import entity_registry as er
@@ -500,8 +500,12 @@ async def test_frigates_copies_of_cameras_are_left_out_of_the_gallery(
     registry.async_get_or_create("camera", "unifiprotect", "u1", suggested_object_id="front_door")
     for entity in ("camera.frontdoor", "camera.front_door", "camera.plain"):
         hass.states.async_set(entity, "idle", {"access_token": "t", "friendly_name": entity})
-    # The recorder's own camera and one outside the registry stay; Frigate's copy does not.
-    assert [camera["id"] for camera in camera_list(hass)] == ["camera.front_door", "camera.plain"]
+    # Frigate's copy starts hidden; the recorder's own camera and one outside the registry do not.
+    assert [(camera["id"], camera.get("hidden", False)) for camera in camera_list(hass)] == [
+        ("camera.front_door", False),
+        ("camera.frontdoor", True),
+        ("camera.plain", False),
+    ]
 
 
 async def test_the_stream_view_starts_hls_only_with_the_camera_token(

@@ -91,7 +91,8 @@ LIVE_VIEW_URL = "/api/luma/live/{entity_id}"
 # A TV waits at most this long for a relay to reach its camera.
 LIVE_START_TIMEOUT = 15.0
 RELAYS = f"{DOMAIN}_relays"
-# Integrations whose cameras repeat ones another integration provides: left out of the gallery.
+# Integrations whose cameras repeat ones another integration provides: hidden in the gallery
+# until the owner shows them.
 SECOND_COPIES = frozenset({"frigate"})
 HISTORY_VIEW_URL = "/api/luma/history/{entity_id}"
 PROTECT = "unifiprotect"
@@ -185,7 +186,7 @@ async def _push_keys(entry: LumaConfigEntry) -> None:
     await streaming_keys.push(data.client, dict(entry.options), data.compatibility.missing_endpoint)
 
 
-def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
+def camera_list(hass: HomeAssistant) -> list[dict[str, Any]]:
     """Every available camera with signed proxy URLs, for Luma's Cameras app."""
     try:
         base_url = local_url(hass)
@@ -196,10 +197,6 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
     registry = er.async_get(hass)
     cameras = []
     for state in sorted(hass.states.async_all("camera"), key=lambda state: state.name.casefold()):
-        # Frigate's cameras are second copies of cameras another integration already provides.
-        entry = registry.async_get(state.entity_id)
-        if entry is not None and entry.platform in SECOND_COPIES:
-            continue
         token = state.attributes.get("access_token")
         if not token or state.state == "unavailable":
             continue
@@ -219,6 +216,11 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
         if protect_entry(hass, state.entity_id):
             path = HISTORY_VIEW_URL.format(entity_id=state.entity_id)
             camera["history_url"] = f"{base_url}{path}?token={token}"
+        # Frigate's cameras repeat ones another integration provides: hidden until the owner
+        # shows them in the gallery's settings.
+        entry = registry.async_get(state.entity_id)
+        if entry is not None and entry.platform in SECOND_COPIES:
+            camera["hidden"] = True
         cameras.append(camera)
     return cameras[:MAX_CAMERAS]
 
