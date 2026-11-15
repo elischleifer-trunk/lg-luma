@@ -506,8 +506,9 @@ async def test_frigates_copies_of_cameras_start_hidden_in_the_gallery(
         ("camera.frontdoor", True),
         ("camera.plain", False),
     ]
-    # With no other integration's cameras, Frigate's are the cameras: shown.
-    hass.states.async_remove("camera.front_door")
+    # With no other integration's camera to list (one that is unavailable does not count),
+    # Frigate's are the cameras: shown.
+    hass.states.async_set("camera.front_door", "unavailable", {"access_token": "t"})
     hass.states.async_remove("camera.plain")
     assert [camera.get("hidden", False) for camera in camera_list(hass)] == [False]
 

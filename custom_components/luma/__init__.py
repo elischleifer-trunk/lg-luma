@@ -204,13 +204,15 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, Any]]:
 
     # Frigate's cameras repeat ones another integration provides, where there is one: hidden
     # until the owner shows them in the gallery's settings. Alone, they are the cameras.
-    states = hass.states.async_all("camera")
+    states = [
+        state
+        for state in hass.states.async_all("camera")
+        if state.attributes.get("access_token") and state.state != "unavailable"
+    ]
     repeated = any(not copies(state.entity_id) for state in states)
     cameras = []
     for state in sorted(states, key=lambda state: state.name.casefold()):
-        token = state.attributes.get("access_token")
-        if not token or state.state == "unavailable":
-            continue
+        token = state.attributes["access_token"]
         stream, snapshot = _proxy_urls(base_url, state.entity_id, token)
         camera = {
             "id": state.entity_id,
