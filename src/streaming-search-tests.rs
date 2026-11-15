@@ -8,6 +8,8 @@ struct Fixtures {
     calls: Mutex<Vec<String>>,
     tmdb_down: bool,
     no_tmdb: bool,
+    /// A captured title search whose shows also answer lookups of one show.
+    shows_from: Option<&'static str>,
 }
 
 fn missing() -> Error {
@@ -58,7 +60,15 @@ impl Source for Fixtures {
         self.read("streaming", &format!("search-title-{}", slug(query)))
     }
     fn show(&self, id: &str, _country: &str) -> Result<Show, Error> {
-        self.read("streaming", &format!("show-{}", id.replace('/', "-")))
+        let captured = self.read("streaming", &format!("show-{}", id.replace('/', "-")));
+        match (captured, self.shows_from) {
+            (Err(_), Some(search)) => self
+                .read::<Vec<Show>>("streaming", &format!("search-title-{search}"))?
+                .into_iter()
+                .find(|show| show.tmdb_id == id)
+                .ok_or_else(missing),
+            (captured, _) => captured,
+        }
     }
     fn tmdb_search(&self, query: &str) -> Option<Result<Vec<SearchMultiResponseResult>, Error>> {
         if self.no_tmdb {
@@ -133,6 +143,40 @@ fn the_free_search_summary_spares_details_calls_for_titles_that_cannot_rank() {
     // Ghost (2023, Kannada) is not on TMDB's first page for "gho", so it has no summary: it
     // is looked up, then filtered out like the others.
     assert_eq!(source.calls("tmdb/movie-1040194").len(), 1);
+}
+
+#[test]
+fn half_a_franchise_title_lists_all_its_films() {
+    // Movie of the Night returns Ghostbusters (1984) and Frozen Empire for "gho". The other
+    // films are not captured one by one, so they are read from the "ghostbusters" search.
+    let source = Fixtures {
+        shows_from: Some("ghostbusters"),
+        ..Default::default()
+    };
+    let results = search(&source, "gho", "us", &Services::default()).unwrap();
+    let all = ids(&results);
+    let first = all.iter().position(|id| *id == "movie/620").unwrap();
+    // Together, oldest first: the collection's films and the 2016 film, which is in none.
+    assert_eq!(
+        all[first..first + 5],
+        [
+            "movie/620",
+            "movie/2978",
+            "movie/43074",
+            "movie/425909",
+            "movie/967847"
+        ],
+        "{all:?}"
+    );
+    // One metered call for each film the title search missed.
+    assert_eq!(
+        source.calls("streaming/show-"),
+        [
+            "streaming/show-movie-2978",
+            "streaming/show-movie-425909",
+            "streaming/show-movie-43074"
+        ]
+    );
 }
 
 #[test]
