@@ -3,12 +3,18 @@
 //! preferences, named by a SHA-256 of its key. Each read states how old a reply may be, so one
 //! cache serves short-lived data (where a show streams) and long-lived data (a film's studio).
 //! The directory is capped; the oldest replies go first. Any unreadable entry is a miss.
+//! Fitting the cap means listing the whole directory, so it is done once per `limit / 16`
+//! bytes written rather than for every reply: a search stores twenty at once.
 //! Posters use their own capped directory of raw image files (`get_bytes`/`put_bytes`).
 use ring::digest;
 use serde::{Serialize, de::DeserializeOwned};
 use std::{
     fs,
     path::{Path, PathBuf},
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
@@ -34,6 +40,8 @@ const IMAGE: &str = "img";
 pub struct DiskCache {
     dir: PathBuf,
     limit: u64,
+    /// Bytes written since the directory was last fitted to its limit, shared by clones.
+    unchecked: Arc<AtomicU64>,
 }
 
 #[derive(serde::Deserialize)]
@@ -56,7 +64,12 @@ fn unix(time: SystemTime) -> u64 {
 
 impl DiskCache {
     pub fn new(dir: PathBuf, limit: u64) -> Self {
-        Self { dir, limit }
+        Self {
+            dir,
+            limit,
+            // The first write of a run fits the directory: an earlier run may have left it full.
+            unchecked: Arc::new(AtomicU64::new(u64::MAX)),
+        }
     }
 
     /// The cache directory beside the preferences.
@@ -109,10 +122,10 @@ impl DiskCache {
                 value,
             })
             .map_err(|e| e.to_string())?;
-            crate::storage::write_atomic(&self.file(key), &bytes)
+            crate::storage::write_atomic(&self.file(key), &bytes).map(|()| bytes.len())
         })();
         match result {
-            Ok(()) => self.evict(),
+            Ok(written) => self.wrote(written),
             Err(error) => crate::telemetry::log_warn!("streaming", "cache: {error}"),
         }
     }
@@ -125,8 +138,21 @@ impl DiskCache {
     /// Stores an image; like `put`, failures are logged and ignored.
     pub fn put_bytes(&self, key: &str, bytes: &[u8]) {
         match crate::storage::write_atomic(&self.named(key, IMAGE), bytes) {
-            Ok(()) => self.evict(),
-            Err(error) => eprintln!("Luma streaming cache: {error}"),
+            Ok(()) => self.wrote(bytes.len()),
+            Err(error) => crate::telemetry::log_warn!("streaming", "cache: {error}"),
+        }
+    }
+
+    /// Counts a write, and fits the directory to its limit once enough has been written to
+    /// overshoot it by a sixteenth.
+    fn wrote(&self, bytes: usize) {
+        let unchecked = self
+            .unchecked
+            .fetch_add(bytes as u64, Ordering::Relaxed)
+            .saturating_add(bytes as u64);
+        if unchecked >= self.limit / 16 {
+            self.unchecked.store(0, Ordering::Relaxed);
+            self.evict();
         }
     }
 

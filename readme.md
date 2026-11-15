@@ -273,8 +273,11 @@ or **Settings → System → Streaming search keys**); a TMDB token puts well-kn
 Opening the tab turns it into the search field and brings up the keyboard. After three letters
 and a short pause, results appear as posters, two rows of eight on screen. Above them, a few
 lines describe the selected title: year, US rating (PG-13, TV-14), length or seasons, genres,
-review scores, the app on your TV that carries it with what it costs there (included, an add-on
-channel, or rent or buy with the price), and what it is about. Titles on none of your TV's apps are dimmed at the end.
+review scores, the app on your TV that carries it with what it costs there (included, or rent
+or buy with the price), and what it is about. Each poster is marked in its corner: a check when one of your TV's apps includes the title, or
+**$** when it is a rental or purchase there. Titles on none of your TV's apps have no mark and
+are dimmed at the end; that includes titles only on a paid add-on channel inside another app
+(Shout! TV on Prime Video), which Luma does not count.
 
 An optional MDBList key adds review scores: the Rotten Tomatoes critics score (tomato, red when
 fresh at 60% or more) and audience score (popcorn), and the IMDb rating (star). One MDBList

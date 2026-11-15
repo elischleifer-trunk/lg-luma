@@ -339,3 +339,86 @@ fn when_nothing_matches_the_near_misses_stay() {
         .count();
     assert_eq!(ranked.len(), kept, "nothing dropped for not matching");
 }
+
+#[test]
+fn half_a_word_is_completed_before_the_metered_search() {
+    let source = Fixtures::default();
+    let typed = search(&source, "ghostb", "us", &Services::default()).unwrap();
+    // TMDB's free search says "ghostb" can only become "ghostbusters"; Movie of the Night is
+    // asked for that, never for the half word.
+    assert_eq!(
+        source.calls("streaming/search-"),
+        ["streaming/search-title-ghostbusters"]
+    );
+    // The results are those of the whole word, so they do not move as the rest is typed.
+    let whole = search(
+        &Fixtures::default(),
+        "ghostbusters",
+        "us",
+        &Services::default(),
+    )
+    .unwrap();
+    assert_eq!(ids(&typed), ids(&whole));
+    assert_eq!(ids(&typed)[0], "movie/620");
+
+    let source = Fixtures::default();
+    search(&source, "star w", "us", &Services::default()).unwrap();
+    assert_eq!(
+        source.calls("streaming/search-"),
+        ["streaming/search-title-star-wars"]
+    );
+}
+
+#[test]
+fn text_that_could_become_several_words_is_searched_as_typed() {
+    let tmdb = |query: &str| Fixtures::default().tmdb_search(query).unwrap().unwrap();
+    // Ghost, Ghosts and Ghostbusters all start with "gho".
+    assert_eq!(relevance::complete("gho", &tmdb("gho")), None);
+    // Already a whole word of well-known titles.
+    assert_eq!(relevance::complete("super", &tmdb("super")), None);
+    assert_eq!(relevance::complete("fan", &tmdb("fan")), None);
+    assert_eq!(relevance::complete("star wars", &tmdb("star wars")), None);
+    // No well-known title starts a word with "sup" on TMDB's first page.
+    assert_eq!(relevance::complete("sup", &tmdb("sup")), None);
+    // Punctuation ends the word.
+    assert_eq!(relevance::complete("ghostb:", &tmdb("ghostb")), None);
+    assert_eq!(
+        relevance::complete("ghostb", &tmdb("ghostb")).as_deref(),
+        Some("ghostbusters")
+    );
+}
+
+#[test]
+fn a_search_typed_past_stops_before_its_next_call() {
+    let source = Fixtures::default();
+    // Typed past before the metered search: nothing is asked of Movie of the Night.
+    assert!(search_while(&source, "star wars", "us", &Services::default(), &|| false).is_none());
+    assert!(source.calls("streaming/").is_empty());
+
+    // Typed past once the title search has answered: no details, no franchise lookups.
+    let source = Fixtures::default();
+    let wanted = || source.calls("streaming/search-").is_empty();
+    assert!(search_while(&source, "star wars", "us", &Services::default(), &wanted).is_none());
+    assert!(source.calls("streaming/show-").is_empty());
+    assert!(source.calls("tmdb/movie-").is_empty());
+}
+
+#[test]
+fn work_runs_on_a_few_threads_and_keeps_its_order() {
+    let running = AtomicUsize::new(0);
+    let most = AtomicUsize::new(0);
+    let items: Vec<usize> = (0..20).collect();
+    let doubled = parallel(&items, 3, |&item| {
+        let now = running.fetch_add(1, Ordering::SeqCst) + 1;
+        most.fetch_max(now, Ordering::SeqCst);
+        std::thread::sleep(std::time::Duration::from_millis(2));
+        running.fetch_sub(1, Ordering::SeqCst);
+        item * 2
+    });
+    assert_eq!(
+        doubled,
+        items.iter().map(|item| Some(item * 2)).collect::<Vec<_>>()
+    );
+    assert!(most.load(Ordering::SeqCst) <= 3);
+    assert!(parallel(&[] as &[usize], 3, |&item| item).is_empty());
+}

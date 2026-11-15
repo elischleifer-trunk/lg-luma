@@ -268,9 +268,13 @@ on your phone, Luma can ask you for the text instead:
 2. On the TV, open a text field: app search, Movies & shows search, a weather location, your name
    or a new name for an input
    or camera.
-3. The phones get a notification from the TV. Reply to it (on iPhone, press and hold it or swipe
-   down; on Android, tap **Type**), type, and send. The text goes into the field, and the TV's
-   keyboard closes.
+3. The phones get a notification from the TV. Tap it: the Home Assistant app opens on a page with
+   one text box. Type and send. The text goes into the field, and the TV's keyboard closes.
+   To stay out of the app, reply to the notification instead (on iPhone, press and hold it or
+   swipe down; on Android, tap **Type**).
+
+The page is `/luma-keyboard` in Home Assistant, for any signed-in user. It is not in the sidebar,
+but you can open it by hand or link to it from a dashboard; with several TVs it lets you choose one.
 
 Closing the field on the TV clears the notification. On Android the notifications have their own
 **Luma keyboard** channel, so you can change their sound or silence them in the phone's settings.
