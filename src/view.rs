@@ -162,6 +162,8 @@ impl Assets {
 }
 
 pub struct Scene {
+    /// The window is cleared transparent, uncovering the TV's video plane behind it.
+    pub see_through: bool,
     pub draw: Vec<Draw>,
     pub controls: Vec<Control>,
     pub modal: Option<Rect>,
@@ -169,6 +171,7 @@ pub struct Scene {
 impl Scene {
     fn new() -> Self {
         Self {
+            see_through: false,
             draw: Vec::new(),
             controls: Vec::new(),
             modal: None,
@@ -675,6 +678,10 @@ pub fn scene_with_pill(
     let content_start = out.draw.len();
     // The Cameras gallery is opaque and full screen: the page underneath is not drawn.
     if state.cameras_visible() {
+        if state.cameras.see_through() {
+            out.draw.clear();
+            out.see_through = true;
+        }
         cameras_view::render(&mut out, state, assets, now);
         if let Some((notice, _)) = &state.notice {
             toast(&mut out, state, assets, notice);

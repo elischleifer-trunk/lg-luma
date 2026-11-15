@@ -487,6 +487,31 @@ async def test_streaming_cameras_get_an_hls_url_signed_with_their_token(
     assert "hls_url" not in yard
 
 
+async def test_frigates_copies_of_cameras_start_hidden_in_the_gallery(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from homeassistant.helpers import entity_registry as er
+
+    from custom_components.luma import camera_list
+
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    registry = er.async_get(hass)
+    registry.async_get_or_create("camera", "frigate", "f1", suggested_object_id="frontdoor")
+    registry.async_get_or_create("camera", "unifiprotect", "u1", suggested_object_id="front_door")
+    for entity in ("camera.frontdoor", "camera.front_door", "camera.plain"):
+        hass.states.async_set(entity, "idle", {"access_token": "t", "friendly_name": entity})
+    # Frigate's copy starts hidden; the recorder's own camera and one outside the registry do not.
+    assert [(camera["id"], camera.get("hidden", False)) for camera in camera_list(hass)] == [
+        ("camera.front_door", False),
+        ("camera.frontdoor", True),
+        ("camera.plain", False),
+    ]
+    # With no other integration's cameras, Frigate's are the cameras: shown.
+    hass.states.async_remove("camera.front_door")
+    hass.states.async_remove("camera.plain")
+    assert [camera.get("hidden", False) for camera in camera_list(hass)] == [False]
+
+
 async def test_the_stream_view_starts_hls_only_with_the_camera_token(
     hass: HomeAssistant, hass_client_no_auth, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1287,6 +1312,133 @@ async def test_phones_chosen_in_options_are_offered_typing_when_a_tv_field_opens
     )
     await hass.async_block_till_done()
     assert keyboard_calls(aioclient_mock, "/api/keyboard") == [{}]
+
+
+async def test_the_live_view_relays_a_cameras_video_from_its_last_keyframe(
+    hass: HomeAssistant, hass_client_no_auth, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+    import struct
+    import threading
+
+    from homeassistant.setup import async_setup_component
+
+    from custom_components.luma import relay
+
+    assert await async_setup_component(hass, "http", {})
+    assert await async_setup_component(hass, DOMAIN, {})
+
+    class Camera:
+        def __init__(self, source: str | None) -> None:
+            self.access_tokens = ["old", "new"]
+            self.stream_options = {"rtsp_transport": "tcp"}
+            self.source = source
+
+        async def stream_source(self) -> str | None:
+            return self.source
+
+    cameras = {
+        "camera.door": Camera("rtsp://nvr/door"),
+        "camera.still": Camera(None),
+        "camera.broken": Camera("rtsp://nvr/broken"),
+    }
+    monkeypatch.setattr("custom_components.luma._camera", lambda _hass, entity: cameras.get(entity))
+    opened: list[tuple[str, dict[str, str]]] = []
+    more = threading.Event()
+    finish = threading.Event()
+    key = b"\x00\x00\x00\x01\x67sps\x00\x00\x00\x01\x65idr"
+
+    def reader(source: str, options: dict[str, str]):
+        opened.append((source, options))
+        if source.endswith("broken"):
+            raise ValueError("no route to camera")
+        yield "h264", 1920, 1080
+        # Before anyone listens: an old keyframe group, then the one a new listener starts from.
+        yield relay.Frame(b"old-key", 0, True)
+        yield relay.Frame(b"old-next", 33_000, False)
+        yield relay.Frame(key, 66_000, True)
+        yield relay.Frame(b"p1", 99_000, False)
+        more.wait(5)
+        yield relay.Frame(b"p2", 132_000, False)
+        finish.wait(30)
+
+    monkeypatch.setattr(relay, "read_source", reader)
+    hass.data.pop("luma_relays", None)
+    monkeypatch.setattr("custom_components.luma.Relays", lambda hass_: relay.Relays(hass_, reader))
+    client = await hass_client_no_auth()
+
+    assert (await client.get("/api/luma/live/camera.door?token=guess")).status == 403
+    assert (await client.get("/api/luma/live/camera.gone?token=new")).status == 404
+    assert (await client.get("/api/luma/live/camera.still?token=new")).status == 404
+    assert (await client.get("/api/luma/live/camera.broken?token=new")).status == 502
+
+    # Warming starts the relay without sending video.
+    warm = await client.get("/api/luma/live/camera.door?token=new&warm=1")
+    assert await warm.json() == {"warm": True}
+    live = hass.data["luma_relays"].relays["camera.door"]
+    for _ in range(100):
+        if len(live.kept.frames) == 2:
+            break
+        await asyncio.sleep(0.01)
+    assert [frame.data for frame in live.kept.frames] == [key, b"p1"]
+
+    response = await client.get("/api/luma/live/camera.door?token=old")
+    assert response.status == 200
+
+    async def frame() -> tuple[int, int, bytes]:
+        length, flags, pts = struct.unpack(">IBq", await response.content.readexactly(13))
+        return flags, pts, await response.content.readexactly(length)
+
+    assert await response.content.readexactly(8) == b"LUMAVID1"
+    (length,) = struct.unpack(">I", await response.content.readexactly(4))
+    assert json.loads(await response.content.readexactly(length)) == {
+        "codec": "h264",
+        "width": 1920,
+        "height": 1080,
+    }
+    # What the camera sent since its last keyframe, marked as earlier, then live frames.
+    assert await frame() == (relay.KEYFRAME | relay.CACHED, 66_000, key)
+    assert await frame() == (relay.CACHED, 99_000, b"p1")
+    more.set()
+    assert await frame() == (0, 132_000, b"p2")
+    # One reader served the warm-up and the listener, with the camera's own stream options.
+    assert opened.count(("rtsp://nvr/door", opened[-1][1])) == 1
+    assert opened[-1][1]["rtsp_transport"] == "tcp"
+    assert opened[-1][1]["rtsp_flags"] == "prefer_tcp"
+    # Cameras and recorders use self-signed certificates, as Home Assistant's own stream allows.
+    assert opened[-1][1]["tls_verify"] == "0"
+    response.close()
+    hass.data["luma_relays"].stop()
+    finish.set()
+    for _ in range(200):
+        if not any(thread.name.startswith("luma-relay") for thread in threading.enumerate()):
+            break
+        await asyncio.sleep(0.01)
+
+
+def test_relayed_keyframes_carry_their_parameter_sets() -> None:
+    from custom_components.luma import relay
+
+    sps_idr = b"\x00\x00\x00\x01\x67a\x00\x00\x00\x01\x68b\x00\x00\x01\x65c"
+    assert relay.nal_types(sps_idr, "h264") == [7, 8, 5]
+    assert relay.has_parameter_sets(sps_idr, "h264")
+    assert not relay.has_parameter_sets(b"\x00\x00\x00\x01\x65idr", "h264")
+    hevc = b"\x00\x00\x01\x40v\x00\x00\x01\x42s\x00\x00\x01\x44p\x00\x00\x01\x26i"
+    assert relay.nal_types(hevc, "hevc") == [32, 33, 34, 19]
+    assert relay.has_parameter_sets(hevc, "hevc")
+    assert relay.annex_b(b"\x00\x00\x00\x01\x67") == b"\x00\x00\x00\x01\x67"
+    # MP4-style extradata is not Annex B: those streams go through a bitstream filter.
+    assert relay.annex_b(b"\x01\x64\x00\x1f") is None
+    # A listener too far behind drops what is queued and resumes at the next keyframe.
+    kept = relay.Kept()
+    listener = relay.Listener(kept)
+    kept.listeners.add(listener)
+    kept.add(relay.Frame(b"k", 0, True))
+    for index in range(relay.MAX_QUEUED + 5):
+        kept.add(relay.Frame(b"p", index, False))
+    assert listener.queue.qsize() < 10 and listener.waiting
+    kept.add(relay.Frame(b"k2", 9, True))
+    assert not listener.waiting
 
 
 async def test_tapping_the_notification_opens_a_page_that_types_on_the_tv(

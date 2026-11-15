@@ -488,11 +488,14 @@
     document.getElementById('video-title').textContent = settings.title;
     videoLive.hidden = true;
     videoView.hidden = false;
+    var asked = Date.now();
     cover(settings);
     video = playHls(
       player,
       settings.url,
       function () {
+        // Luma logs how long the video took to show.
+        send(settings, logic.playingUrl(settings.port), { waited: Date.now() - asked });
         videoView.className = 'video playing';
         videoCover.hidden = true;
         videoLive.hidden = false;

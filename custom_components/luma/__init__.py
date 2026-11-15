@@ -37,8 +37,14 @@ from homeassistant.components import webhook
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.components.http.auth import async_sign_path
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PORT, EVENT_STATE_CHANGED, Platform
-from homeassistant.core import HomeAssistant, ServiceCall, callback
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PORT,
+    EVENT_HOMEASSISTANT_STOP,
+    EVENT_STATE_CHANGED,
+    Platform,
+)
+from homeassistant.core import Event, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import (
     ConfigEntryAuthFailed,
     HomeAssistantError,
@@ -67,6 +73,8 @@ from .const import (
 )
 from .events import LumaEvents
 from .events import store as events_store
+from .relay import Relays
+from .relay import header as relay_header
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.BUTTON, Platform.NOTIFY, Platform.SENSOR]
@@ -79,6 +87,13 @@ ATTR_SNAPSHOT_URL = "snapshot_url"
 ATTR_MODE = "mode"
 ATTR_BASE_URL = "base_url"
 HLS_VIEW_URL = "/api/luma/stream/{entity_id}"
+LIVE_VIEW_URL = "/api/luma/live/{entity_id}"
+# A TV waits at most this long for a relay to reach its camera.
+LIVE_START_TIMEOUT = 15.0
+RELAYS = f"{DOMAIN}_relays"
+# Integrations whose cameras repeat ones another integration provides: hidden in the gallery
+# until the owner shows them.
+SECOND_COPIES = frozenset({"frigate"})
 HISTORY_VIEW_URL = "/api/luma/history/{entity_id}"
 PROTECT = "unifiprotect"
 PROTECT_SNAPSHOT = "/api/unifiprotect/snapshot/{nvr}/{camera}/{timestamp}"
@@ -173,7 +188,7 @@ async def _push_keys(entry: LumaConfigEntry) -> None:
     await streaming_keys.push(data.client, dict(entry.options), data.compatibility.missing_endpoint)
 
 
-def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
+def camera_list(hass: HomeAssistant) -> list[dict[str, Any]]:
     """Every available camera with signed proxy URLs, for Luma's Cameras app."""
     try:
         base_url = local_url(hass)
@@ -181,8 +196,18 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
         return []
     # HLS needs Home Assistant's stream integration (part of default_config).
     streams = "stream" in hass.config.components
+    registry = er.async_get(hass)
+
+    def copies(entity_id: str) -> bool:
+        entry = registry.async_get(entity_id)
+        return entry is not None and entry.platform in SECOND_COPIES
+
+    # Frigate's cameras repeat ones another integration provides, where there is one: hidden
+    # until the owner shows them in the gallery's settings. Alone, they are the cameras.
+    states = hass.states.async_all("camera")
+    repeated = any(not copies(state.entity_id) for state in states)
     cameras = []
-    for state in sorted(hass.states.async_all("camera"), key=lambda state: state.name.casefold()):
+    for state in sorted(states, key=lambda state: state.name.casefold()):
         token = state.attributes.get("access_token")
         if not token or state.state == "unavailable":
             continue
@@ -197,9 +222,13 @@ def camera_list(hass: HomeAssistant) -> list[dict[str, str]]:
         if streams and features & CAMERA_STREAM:
             path = HLS_VIEW_URL.format(entity_id=state.entity_id)
             camera["hls_url"] = f"{base_url}{path}?token={token}"
+            path = LIVE_VIEW_URL.format(entity_id=state.entity_id)
+            camera["live_url"] = f"{base_url}{path}?token={token}"
         if protect_entry(hass, state.entity_id):
             path = HISTORY_VIEW_URL.format(entity_id=state.entity_id)
             camera["history_url"] = f"{base_url}{path}?token={token}"
+        if repeated and copies(state.entity_id):
+            camera["hidden"] = True
         cameras.append(camera)
     return cameras[:MAX_CAMERAS]
 
@@ -659,10 +688,95 @@ class StreamView(HomeAssistantView):
         return self.json({"url": url})
 
 
+def relays(hass: HomeAssistant) -> Relays:
+    """The camera relays, which stop with Home Assistant."""
+    if RELAYS not in hass.data:
+        hass.data[RELAYS] = Relays(hass)
+
+        async def stop(_event: Event) -> None:
+            hass.data[RELAYS].stop()
+
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
+    return hass.data[RELAYS]
+
+
+class LiveView(HomeAssistantView):
+    """A camera's own video for the TV, as it arrives (see `relay`).
+
+    Checked with the camera's access token like `StreamView`. `warm` only starts the relay, so
+    the camera is already being read when the TV asks for its video; a relay nobody listens to
+    stops by itself. A camera whose stream cannot be relayed answers 404 or 502 and the TV plays
+    Home Assistant's HLS stream instead.
+    """
+
+    url = LIVE_VIEW_URL
+    name = "api:luma:live"
+    requires_auth = False
+
+    def __init__(self, hass: HomeAssistant) -> None:
+        self.hass = hass
+
+    async def get(self, request: web.Request, entity_id: str) -> web.StreamResponse:
+        camera = _camera(self.hass, entity_id) if entity_id.startswith("camera.") else None
+        if camera is None:
+            return self.json_message("Camera not found", 404)
+        if request.query.get("token") not in camera.access_tokens:
+            return self.json_message("Invalid camera token", 403)
+        try:
+            source = await camera.stream_source()
+        except HomeAssistantError as err:
+            return self.json_message(str(err), 404)
+        if not source or source.split(":", 1)[0] not in ("rtsp", "rtsps", "http", "https"):
+            return self.json_message("This camera's stream cannot be relayed", 404)
+        # As Home Assistant's stream integration opens a camera: its certificate is checked only
+        # when the camera asks for that (cameras and recorders use self-signed certificates).
+        chosen = camera.stream_options
+        options = {
+            "rtsp_flags": "prefer_tcp",
+            "timeout": "5000000",
+            "tls_verify": "1" if chosen.get("verify_ssl") else "0",
+        }
+        if transport := chosen.get("rtsp_transport"):
+            options["rtsp_transport"] = str(transport)
+        if chosen.get("use_wallclock_as_timestamps"):
+            options["use_wallclock_as_timestamps"] = "1"
+        relay = relays(self.hass).get(entity_id, source, options)
+        if "warm" in request.query:
+            relay.start()
+            return self.json({"warm": True})
+        listener = relay.listen()
+        try:
+            try:
+                async with asyncio.timeout(LIVE_START_TIMEOUT):
+                    await relay.ready.wait()
+            except TimeoutError:
+                return self.json_message("The camera did not answer", 504)
+            if relay.format is None:
+                return self.json_message(relay.error or "The camera could not be read", 502)
+            response = web.StreamResponse(
+                headers={"Content-Type": "application/octet-stream", "Cache-Control": "no-store"}
+            )
+            await response.prepare(request)
+            await response.write(relay_header(*relay.format))
+            while (chunk := await listener.queue.get()) is not None:
+                # Everything already waiting goes out together.
+                parts = [chunk]
+                while not listener.queue.empty():
+                    if (more := listener.queue.get_nowait()) is None:
+                        await response.write(b"".join(parts))
+                        return response
+                    parts.append(more)
+                await response.write(b"".join(parts))
+            return response
+        finally:
+            relay.leave(listener)
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     if hass.http is not None:
         hass.http.register_view(ExampleImageView())
         hass.http.register_view(StreamView(hass))
+        hass.http.register_view(LiveView(hass))
         hass.http.register_view(HistoryView(hass))
     await keyboard.async_setup_panel(hass)
 

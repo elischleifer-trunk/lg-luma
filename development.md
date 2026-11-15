@@ -462,6 +462,8 @@ button sends a snapshot-only overlay of `custom_components/luma/example.jpg`, se
 `/api/luma/example.jpg`, so owners can preview the card without a camera.
 
 **Cameras app.** Each loaded config entry also sends `POST /api/cameras` with every available
+(Frigate's cameras, `SECOND_COPIES`, carry `hidden: true` as copies of cameras another integration
+provides: Luma hides such a camera until a saved arrangement lists it)
 camera entity (sorted by name, at most 32) and its signed proxy URLs: once at setup and two seconds
 after any `camera.*` state change, which includes every access-token rotation, coalescing bursts.
 Every minute it also reads `GET /api/status`, whose `cameras` counts only the asking server's list, and resends when it is 0, since
@@ -496,6 +498,16 @@ and shrunk to their drawn size on the worker, then drawn with `Draw::Camera`, wh
 GPU texture per camera, re-uploaded only for a newer frame; damage tracking compares frames by
 pointer, so a new frame redraws only its tile. The main loop wakes every 16 ms while the gallery
 is open.
+
+Opening is kept short in three ways. Snapshot addresses on Home Assistant's camera proxy get
+`&width=&height=` of the size they are drawn at (`cameras::sized`: the tile's size in the grid,
+1920×1080 enlarged), and the proxy scales the JPEG down to the nearest size it can at or above
+that, so a tile loads and decodes a fraction of the camera's full picture. Closing the gallery
+keeps its tile pictures (not an enlarged camera's full-size frame): the next visit shows them at
+once, dimmed, until each camera's first new picture (`Gallery::fresh` is the frame serial that
+visit began at). And the main loop wakes every 4 ms for 300 ms after asking the Home Assistant
+thread for the cameras, instead of waiting out an idle screen's 100 ms. The log (area `cameras`)
+says how long the first picture and all of them took after opening.
 
 The enlarged camera can be rewound. Its worker (`Watch::record`) keeps every frame as the camera
 sent it, undecoded, for `cameras::REWIND` (two minutes, at most 48 MB) in the service's
@@ -535,6 +547,40 @@ motion and detection binary sensors and doorbell event entity (`event_spans`), t
 entity's own key (its unique ID after the MAC address), never by entity IDs that carry the device
 name.
 
+**The camera's own video on the TV's decoder.** Where the TV has LG's direct media decoder
+(`libNDL_directmedia`, webOS 5 and later, loaded with `dlopen` so Luma starts without it) and the
+camera has a `live_url`, an enlarged camera with **Live video** on skips HLS and the overlay app.
+The integration's `LiveView` (`/api/luma/live/<entity>?token=<camera token>`, checked like
+`StreamView`) answers from a relay (`custom_components/luma/relay.py`): one thread per camera
+reads the source Home Assistant's stream integration would read, with PyAV and the same options
+(`tls_verify` off unless the camera asks, since recorders use self-signed certificates), never
+decoding. The event loop keeps the frames since the last keyframe (at most 48 MB) and hands each
+listener that stretch flagged as earlier, then every frame as it arrives; a listener 240 frames
+behind skips to the next keyframe. The body is `LUMAVID1`, a length-prefixed JSON header (`codec`
+`h264` or `hevc`, `width`, `height`), then frames of `u32 length, u8 flags, i64 pts` (microseconds)
+and Annex B bytes with parameter sets before each keyframe. `&warm=1` only starts the relay, which
+stops by itself two minutes after its last listener. While the gallery is open,
+`State::camera_relays` asks it for every camera on screen that UniFi Protect records, at once and
+every 90 s (and when the grid scrolls), so whichever camera is enlarged is already being read;
+other cameras, which may run on a battery, are asked by `State::camera_warm` only once focus
+rests on them, instead of the HLS endpoint. On a TV, UniFi Protect cameras sent a keyframe every 5 s: a
+relay already reading delivered its first frame in 25-49 ms, one that had to connect in 1-2 s.
+
+`src/live.rs` reads that stream on a `camera-live` thread and feeds `NDL_DirectVideoPlay`. The
+decoder is initialised, loaded and unloaded on the SDL thread (`Live::poll`, `Drop`), because the
+library looks up the current GL window to export it; in a test app on a webOS 11.2 TV, loading took
+about 130 ms and frames showed as fast as they were fed, at twice real time without queueing.
+`cameras::Native` is `Starting` until three frames are fed, then `Showing`: `Gallery::see_through`
+makes the scene drop its wallpaper, backdrop and picture and the renderer clear to transparent
+(`Renderer::see_through`), so the video plane behind Luma's window shows with the controls over
+it. Pausing or scrubbing ends the decoder's video and the gallery's own pictures take over; going
+live starts it again. A relay or decoder failure puts the camera in `native_failed`, which plays
+HLS in the overlay app as before. The motion-JPEG worker keeps running underneath, for the frames
+the gallery rewinds through. There is no sound yet. On an OLED G4 (webOS 11.2) with Luma as Home,
+three UniFi Protect cameras played smoothly with the controls drawn over them; the decoder loaded
+in 459 ms the first time and about 75 ms after that, and what remained of the wait was the relay
+connecting to a camera it was not yet reading (1-2 s), which starting relays at opening removes.
+
 Home Assistant's `camera_proxy_stream` is built from snapshots for most camera integrations
 (`Camera.frame_interval` defaults to 0.5 s, so about two frames a second). For real video the
 integration adds `hls_url` to every camera with the stream feature while the `stream`
@@ -544,7 +590,19 @@ HLS stream and answers `{"url": "/api/hls/<stream token>/master_playlist.m3u8"}`
 camera with **Live video** on sets `cameras::Video::Resolving`; `cameras::Service::resolve` asks
 that endpoint off the SDL thread, and the answer makes the Home Assistant thread launch the
 overlay app with `mode: "video"` (`Api::show_video`); the motion-JPEG worker keeps running
-underneath. `luma.dismiss` (`DELETE /api/overlay`) closes only a doorbell card, never a camera video.
+underneath. Home Assistant answers the master playlist only once a stream has its second
+segment, so a stream started by OK cannot show video before Home Assistant has connected to the
+camera and cut one whole segment (`stream:` `segment_duration`, 6 s by default, then the next
+keyframe). So the stream is started ahead: once focus has rested 400 ms on a camera with **Live
+video** on, `State::camera_warm` hands the main loop its endpoint and `cameras::Service::warm`
+asks it, discarding the answer (the address is asked for again on OK, which is quick once the
+stream runs). Home Assistant stops a stream nobody loads about a minute after it starts, so
+focus that stays asks again every 70 s, for five minutes. Only the focused camera is started,
+since starting a stream wakes a battery camera. The log says how long each stage took: the
+`cameras` area logs the stream started ahead, the stream address and the first live motion-JPEG
+frame after enlarging; the page reports its first frames to `POST /api/overlay/playing` (loopback,
+session and nonce like `closed`), and the `overlay` area logs the time since Luma asked for the
+video and how much of it passed in the page. `luma.dismiss` (`DELETE /api/overlay`) closes only a doorbell card, never a camera video.
 The page plays the playlist with the bundled hls.js light build (1.5.20, ES5, Apache-2.0,
 `overlay/vendor/`) through Media Source Extensions: it reads Home Assistant's low-latency HLS
 parts (about 1 s) instead of waiting for whole segments (about 6 s), so the video starts in a

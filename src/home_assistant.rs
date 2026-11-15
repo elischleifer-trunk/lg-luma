@@ -53,7 +53,9 @@ const MIN_INTEGRATION: u32 = 1;
 /// The level of an integration that sends no `X-Luma-Integration` header: every integration from
 /// before the header existed.
 const INTEGRATION_UNSTATED: u32 = 1;
-const MAX_BODY: usize = 32 * 1024;
+/// Thirty-two cameras with five addresses each, long entity IDs and a long base URL come to
+/// about 33 KiB.
+const MAX_BODY: usize = 64 * 1024;
 /// Cameras kept from Home Assistant's list; more are dropped.
 pub const MAX_CAMERAS: usize = 32;
 /// Remembered entries in the gallery's order and hidden lists, including absent cameras.
@@ -171,6 +173,10 @@ pub struct Camera {
     pub snapshot: Option<String>,
     /// The integration's endpoint that starts Home Assistant's HLS stream for this camera.
     pub hls: Option<String>,
+    /// The integration's relay of the camera's own video.
+    pub live: Option<String>,
+    /// Hidden in the gallery until the owner arranges it (a second copy of another camera).
+    pub hidden: bool,
     /// The integration's endpoint into what UniFi Protect recorded of this camera.
     pub history: Option<String>,
 }
@@ -379,6 +385,8 @@ struct Session {
     ends: Instant,
     /// A camera video from the Cameras app rather than a doorbell card.
     video: bool,
+    /// When Luma asked the overlay app to open, for the log.
+    asked: Instant,
     /// Recorded video of this gallery camera, which the overlay app loads piece by piece.
     recorded: Option<String>,
 }
@@ -793,7 +801,10 @@ impl<T: Tv> Api<T> {
         }
         let closed = matches!(
             request.path,
-            "/api/overlay/closed" | "/api/overlay/expand" | "/api/overlay/recorded"
+            "/api/overlay/closed"
+                | "/api/overlay/expand"
+                | "/api/overlay/playing"
+                | "/api/overlay/recorded"
         );
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
@@ -836,6 +847,26 @@ impl<T: Tv> Api<T> {
                     session.ends = now + VIDEO_TTL;
                 }
                 reply(200, json!({"expanded": expanded}))
+            }
+            // A camera video shows its first frames: how long that took goes to the log.
+            ("POST", "/api/overlay/playing") => {
+                if !request.peer.is_loopback() {
+                    return error(403, "Only the overlay app reports playing");
+                }
+                let session = self.session.as_ref().filter(|session| {
+                    session.video
+                        && body["session"] == session.id.as_str()
+                        && body["nonce"] == session.nonce.as_str()
+                });
+                if let Some(session) = session {
+                    crate::telemetry::log_info!(
+                        "overlay",
+                        "camera video playing {} ms after Luma asked for it ({} ms of that in the overlay app)",
+                        now.saturating_duration_since(session.asked).as_millis(),
+                        body["waited"].as_u64().unwrap_or(0)
+                    );
+                }
+                reply(200, json!({"playing": session.is_some()}))
             }
             ("POST", "/api/overlay/closed") => {
                 if !request.peer.is_loopback() {
@@ -1223,6 +1254,7 @@ impl<T: Tv> Api<T> {
             media,
             ends: now + Duration::from_secs_f64(duration) + SESSION_GRACE,
             video: false,
+            asked: now,
             recorded: None,
         });
         let launching = Instant::now();
@@ -1317,6 +1349,7 @@ impl<T: Tv> Api<T> {
                 let stream = camera_url(entry, "stream_url")?;
                 let snapshot = camera_url(entry, "snapshot_url")?;
                 let hls = camera_url(entry, "hls_url")?;
+                let live = camera_url(entry, "live_url")?;
                 let history = camera_url(entry, "history_url")?;
                 if stream.is_none() && snapshot.is_none() {
                     return Err(error(400, "stream_url or snapshot_url is required"));
@@ -1328,6 +1361,8 @@ impl<T: Tv> Api<T> {
                     stream,
                     snapshot,
                     hls,
+                    live,
+                    hidden: entry["hidden"] == true,
                     history,
                 })
             })();
@@ -1466,13 +1501,17 @@ impl<T: Tv> Api<T> {
         cameras
             .into_iter()
             .map(|(camera, id)| crate::cameras::Camera {
-                hidden: arranged.hidden.contains(&id),
+                // A camera Home Assistant marks hidden stays so until the owner has arranged
+                // the gallery with it, which records whether it is shown.
+                hidden: arranged.hidden.contains(&id)
+                    || (camera.hidden && !arranged.order.contains(&id)),
                 label: arranged.names.get(&id).cloned(),
                 id,
                 name: camera.name.clone(),
                 stream: camera.stream.clone(),
                 snapshot: camera.snapshot.clone(),
                 hls: camera.hls.clone(),
+                live: camera.live.clone(),
                 history: camera.history.clone(),
             })
             .collect()
@@ -1580,6 +1619,7 @@ impl<T: Tv> Api<T> {
             media,
             ends: now + VIDEO_TTL,
             video: true,
+            asked: now,
         });
         if let Err(error) = self.tv.launch_overlay(&params) {
             crate::telemetry::log_warn!("overlay", "video: {error}");
