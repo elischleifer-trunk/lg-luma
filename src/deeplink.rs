@@ -116,7 +116,8 @@ pub fn resolve(service: &str, link: &str) -> Option<Launch> {
 /// `<numeric id>_content` (captured with ls-monitor on a TV, 2026-11). The numeric ID is the
 /// middle field of the title's `EAB::<uuid>::<id>::<asset>` ID on its hulu.com page.
 /// A movie page carries its own EAB ID. A series page has none for the series, only for its
-/// episodes, so a series opens its first listed episode (not yet confirmed on a TV).
+/// episodes, so a series opens its first listed episode (not yet confirmed on a TV). Episodes
+/// count only when their entry links back to this series: other shows' episodes may be on the page.
 fn hulu_launch(page: &str, link: &str) -> Option<Launch> {
     let (kind, entity) = hulu_entity(validated_path("hulu", link)?)?;
     let (id, confidence) = if kind == "movie" {
@@ -125,7 +126,12 @@ fn hulu_launch(page: &str, link: &str) -> Option<Launch> {
             Confidence::Verified,
         )
     } else {
-        let episode = eab_ids(page).find(|eab| eab.kind == Some("episode"))?;
+        // Each episode entry is `…"href":"/series/<slug>-<series uuid>","eabId":"EAB::…`.
+        let own = format!("{entity}\",\"eabId\":\"");
+        let episode = page
+            .match_indices(&own)
+            .filter_map(|(at, _)| eab_ids(&page[at + own.len()..]).next())
+            .find(|eab| eab.kind == Some("episode"))?;
         (episode.id, Confidence::Unverified)
     };
     Some(Launch {
@@ -399,8 +405,10 @@ mod tests {
         // Trimmed from hulu.com/series/the-handmaid%27s-tale-565d8976-… (2026-11).
         let page = concat!(
             r#"{"id":"565d8976-9d26-4e63-866c-40f8a137ce5f","name":"The Handmaid's Tale"},"#,
-            r#"{"eabId":"EAB::671f8878-bdba-40bd-ae6d-f85c55cecbb4::60873890::3450585","type":"episode","name":"Offred"},"#,
-            r#"{"eabId":"EAB::8aad3f97-4531-47ab-b5d3-18daa78da42d::61095299::24055531","type":"episode","name":"June"}"#,
+            // Another show's episode, as a recommendation rail could list it, comes first.
+            r#"{"href":"/series/ghosts-2b0a7c1e-91ab-4c7e-9a3a-2e6f1c1d1b2f","eabId":"EAB::11111111-2222-3333-4444-555555555555::99999999::1","type":"episode"},"#,
+            r#"{"href":"/series/the-handmaids-tale-565d8976-9d26-4e63-866c-40f8a137ce5f","eabId":"EAB::671f8878-bdba-40bd-ae6d-f85c55cecbb4::60873890::3450585","type":"episode","name":"Offred"},"#,
+            r#"{"href":"/series/the-handmaids-tale-565d8976-9d26-4e63-866c-40f8a137ce5f","eabId":"EAB::8aad3f97-4531-47ab-b5d3-18daa78da42d::61095299::24055531","type":"episode","name":"June"}"#,
         );
         let link = "https://www.hulu.com/series/the-handmaid%27s-tale-565d8976-9d26-4e63-866c-40f8a137ce5f";
         assert_eq!(

@@ -438,19 +438,20 @@ impl Platform {
                     } else {
                         Ok(())
                     }),
-                    Request::LaunchTitle { id, service, link } => Response::Launched(if webos {
-                        match crate::deeplink::resolve(&service, &link) {
-                            Some(launch) => launch_with_params(&id, &launch.params),
-                            None if valid_app_id(&id) => call(
-                                "luna://com.webos.applicationManager/launch",
-                                json!({"id": id}),
-                            )
-                            .map(|_| ()),
-                            None => Err("Invalid application identifier".into()),
-                        }
-                    } else {
-                        Ok(())
-                    }),
+                    // Resolving may read the title's web page (Hulu), so it runs on its own
+                    // thread: refresh, recents and GoHome keep being served meanwhile.
+                    Request::LaunchTitle { id, service, link } => {
+                        let responses = responses.clone();
+                        thread::spawn(move || {
+                            let result = if webos {
+                                launch_title(&id, &service, &link)
+                            } else {
+                                Ok(())
+                            };
+                            let _ = responses.send(Response::Launched(result));
+                        });
+                        continue;
+                    }
                     Request::SyncSplash(background) => {
                         if webos
                             && splash_enabled
@@ -603,6 +604,20 @@ fn sync_splash(background: &str) -> Result<(), String> {
         return Err("Splash background was not updated".into());
     }
     Ok(())
+}
+
+/// Opens a streaming title in `id`, or the app plainly when its link gives no parameters.
+/// Blocking: `deeplink::resolve` may read the title's web page.
+fn launch_title(id: &str, service: &str, link: &str) -> Result<(), String> {
+    match crate::deeplink::resolve(service, link) {
+        Some(launch) => launch_with_params(id, &launch.params),
+        None if valid_app_id(id) => call(
+            "luna://com.webos.applicationManager/launch",
+            json!({"id": id}),
+        )
+        .map(|_| ()),
+        None => Err("Invalid application identifier".into()),
+    }
 }
 
 /// Launches (or relaunches, for an app that is already open) `id` with launch parameters.
