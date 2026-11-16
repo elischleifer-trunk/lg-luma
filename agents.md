@@ -121,6 +121,41 @@ refresh token, for one): grep them on the TV, never copy them off, and delete th
 An app's `appinfo.json` (`/media/cryptofs/apps/usr/palm/applications/<id>/`) may declare its
 `deeplinkingParams`.
 
+### Debugging a deep link that opens the app's home screen
+
+What worked for Hulu (2026-11), in order:
+
+1. **Reproduce.** Look up the title's link with Movie of the Night (`MOTN_API_KEY`; `motn-key-…`
+   keys go to `api.movieofthenight.com/v4` with `X-API-Key`), build what `src/deeplink.rs` sends,
+   and launch it yourself: close the app first
+   (`luna-send -n 1 luna://com.webos.applicationManager/closeByAppId '{"id":"<app>"}'`), then
+   `…/launch '{"id":"<app>","params":{…}}'`, both under `ssh -tt`.
+2. **See the screen.** `luna-send -n 1 luna://com.webos.service.capture/executeOneShot
+   '{"path":"/tmp/cap.png","method":"DISPLAY","format":"PNG","width":960,"height":540}'`, then
+   `scp tv:/tmp/cap.png` and look at it. Give the app ~15 s to load.
+3. **Press keys.** Apps often stop at a profile picker (Hulu: the first profile is the
+   maintainer's). `tools/tv-keys.py` presses remote keys (`28` is OK). Don't press keys while the
+   maintainer is using the TV, and don't trust screenshots taken then.
+4. **Sniff what LG does.** Start the capture detached so it survives the SSH session:
+   `ssh tv 'nohup timeout 600 /usr/sbin/ls-monitor > /tmp/lsmon.txt 2>&1 < /dev/null &'`. Then ask
+   the maintainer to open any title in that app from LG search or voice. Grep on the TV for
+   `"id":"<app>"` with `//launch` (also `//launchApp`, which shows the final `parameters`). Stop it
+   with `pkill ls-monitor` (not `pkill -f`, which matches and kills your own SSH command) and
+   `rm /tmp/lsmon.txt`.
+5. **Find the ID's source.** LG search's IDs are often the service's internal IDs, not what web
+   links carry. Look for them on the title's public web page (Hulu: the middle number of
+   `EAB::<uuid>::<id>::<asset>`). Encrypted app bundles (an `NCGFILE_HEADER` index.html) can't be
+   read.
+
+Access gotchas: if `tv-access.mjs request` fails with HTTP 502 after approval, check Home
+Assistant's log. "the TV refused the key" means HA's own `luma-dev-manager` line is missing from the
+TV's `authorized_keys`. If the approved route is the TV's LAN address, the integration has no tunnel
+hostname set. Point `Host tv` at `tv.elischleifer.com` with
+`ProxyCommand cloudflared access ssh --hostname %h`, and without a service token run
+`cloudflared access login https://tv.elischleifer.com` in the background and give the maintainer
+its URL. A tunnel answering `websocket: bad handshake` (origin 502) means the TV itself is
+unreachable, often because it's off or asleep.
+
 ## Assets
 
 When adding, removing or renaming a UI language, update `Language::ALL`/picker ordering in

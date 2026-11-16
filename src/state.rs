@@ -250,10 +250,12 @@ pub enum Effect {
     /// Refresh apps: read the inventory and every app icon again.
     Reload,
     Launch(String),
-    /// Open a movie or show: its app, with launch parameters for the title when known.
+    /// Open a movie or show in `app` from its `link` on `service`; `deeplink::resolve` turns that
+    /// into launch parameters on the platform worker (it may read the title's web page).
     LaunchTitle {
         app: String,
-        params: Option<serde_json::Value>,
+        service: String,
+        link: String,
     },
     Uninstall(String),
     DeleteWallpaper(String),
@@ -860,6 +862,15 @@ impl State {
 
     /// The result of a launch request. Only an app that opened moves to the front of
     /// favorites, so a failed launch leaves the saved order as it was.
+    /// A title launch was dropped for a newer one: stop showing it as opening, and don't count
+    /// its app as used.
+    pub fn launch_dropped(&mut self) {
+        self.launching = false;
+        self.launch_requested = None;
+        self.notice = None;
+        self.dirty = true;
+    }
+
     pub fn launch_response(&mut self, result: Result<(), String>) -> Vec<Effect> {
         self.launching = false;
         let id = self.launch_requested.take();
@@ -2541,10 +2552,10 @@ impl State {
             self.notify(self.preferences.language.t("titleNotOnApps"));
             return vec![];
         };
-        let params = crate::deeplink::launch(&pick.service_id, &pick.link).map(|l| l.params);
         vec![Effect::LaunchTitle {
             app: pick.app_id.clone(),
-            params,
+            service: pick.service_id.clone(),
+            link: pick.link.clone(),
         }]
     }
 
