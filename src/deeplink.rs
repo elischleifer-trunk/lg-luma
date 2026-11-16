@@ -6,7 +6,11 @@
 //! Formats marked `Unverified` are best-known community formats that have not been confirmed on
 //! a TV. Confirm them with `pnpm deeplink:probe` (tools/deeplink-probe.mjs) and flip them to
 //! `Verified` here; the probe's candidate list is where alternatives are tried.
+//!
+//! Hulu's ID is not in its links: `resolve` reads it from the title's web page, so it blocks
+//! and must run on a worker thread. `launch` never touches the network.
 use serde_json::{Value, json};
+use std::{io::Read, time::Duration};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Confidence {
@@ -65,9 +69,7 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
             confidence: Confidence::Verified,
         }),
         // Apps believed to take the title's web URL as their DIAL/contentTarget.
-        "disney" | "hbo" | "hulu" | "peacock" | "paramount" => {
-            unverified(json!({ "contentTarget": link }))
-        }
+        "disney" | "hbo" | "peacock" | "paramount" => unverified(json!({ "contentTarget": link })),
         // Prime Video's appinfo.json declares `{"contentTarget":"$CONTENTID"}`, and LG's own
         // search fills it with the title's GTI (`amzn1.dv.gti.<uuid>`), captured with
         // ls-monitor on a TV (2026-11). A GTI converted from a Movie of the Night link opened
@@ -84,8 +86,148 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
                 confidence: Confidence::Verified,
             })
         }
+        // Hulu ignores web links and its own UUIDs (both open its home screen); see `resolve`.
         _ => None,
     }
+}
+
+/// Like `launch`, but may read the title's web page first (Hulu). Blocking: call it from a
+/// worker thread, never the SDL thread.
+pub fn resolve(service: &str, link: &str) -> Option<Launch> {
+    if service != "hulu" {
+        return launch(service, link);
+    }
+    let page_url = hulu_page(link)?;
+    let page = match fetch_page(&page_url) {
+        Ok(page) => page,
+        Err(error) => {
+            crate::telemetry::log_warn!("deeplink", "Hulu page for {page_url}: {error}");
+            return None;
+        }
+    };
+    let result = hulu_launch(&page, link);
+    if result.is_none() {
+        crate::telemetry::log_warn!("deeplink", "No Hulu content ID on {page_url}");
+    }
+    result
+}
+
+/// Hulu's webOS app declares `{"contentTarget":"$CONTENTID"}`, and LG's own search fills it with
+/// `<numeric id>_content` (captured with ls-monitor on a TV, 2026-11). The numeric ID is the
+/// middle field of the title's `EAB::<uuid>::<id>::<asset>` ID on its hulu.com page.
+/// A movie page carries its own EAB ID. A series page has none for the series, only for its
+/// episodes, so a series opens its first listed episode (not yet confirmed on a TV).
+fn hulu_launch(page: &str, link: &str) -> Option<Launch> {
+    let (kind, entity) = hulu_entity(validated_path("hulu", link)?)?;
+    let (id, confidence) = if kind == "movie" {
+        (
+            eab_ids(page).find(|eab| eab.entity == entity)?.id,
+            Confidence::Verified,
+        )
+    } else {
+        let episode = eab_ids(page).find(|eab| eab.kind == Some("episode"))?;
+        (episode.id, Confidence::Unverified)
+    };
+    Some(Launch {
+        params: json!({ "contentTarget": format!("{id}_content") }),
+        confidence,
+    })
+}
+
+/// `/movie/<slug>-<uuid>` or `/series/<slug>-<uuid>` → (kind, uuid).
+fn hulu_entity(path: &str) -> Option<(&str, &str)> {
+    let path = path.split(['?', '#']).next()?;
+    let mut segments = path.split('/').filter(|s| !s.is_empty());
+    let kind = segments
+        .next()
+        .filter(|k| matches!(*k, "movie" | "series"))?;
+    let slug = segments.next()?;
+    let entity = slug.get(slug.len().checked_sub(36)?..)?;
+    is_uuid(entity).then_some((kind, entity))
+}
+
+/// The page to read for a Hulu link, on Hulu's canonical host (the bare host redirects).
+fn hulu_page(link: &str) -> Option<String> {
+    let path = validated_path("hulu", link)?;
+    let (kind, _) = hulu_entity(path)?;
+    let slug = path
+        .split(['?', '#'])
+        .next()?
+        .trim_matches('/')
+        .split('/')
+        .nth(1)?;
+    Some(format!("https://www.hulu.com/{kind}/{slug}"))
+}
+
+/// A lowercase UUID, as Hulu writes entity IDs.
+fn is_uuid(text: &str) -> bool {
+    text.len() == 36
+        && text.char_indices().all(|(i, c)| match i {
+            8 | 13 | 18 | 23 => c == '-',
+            _ => c.is_ascii_digit() || ('a'..='f').contains(&c),
+        })
+}
+
+struct Eab<'a> {
+    entity: &'a str,
+    id: &'a str,
+    /// The `"type"` written right after the ID in the page's JSON, when there is one.
+    kind: Option<&'a str>,
+}
+
+/// Every `EAB::<uuid>::<numeric id>::…` ID on a page, in page order.
+fn eab_ids(page: &str) -> impl Iterator<Item = Eab<'_>> {
+    page.match_indices("EAB::").filter_map(|(at, _)| {
+        let rest = &page[at + 5..];
+        let entity = rest.get(..36).filter(|e| is_uuid(e))?;
+        let rest = rest[36..].strip_prefix("::")?;
+        let digits = rest.bytes().take_while(u8::is_ascii_digit).count();
+        if !(1..=12).contains(&digits) || !rest[digits..].starts_with("::") {
+            return None;
+        }
+        let kind = rest[digits..]
+            .split_once('"')
+            .and_then(|(_, after)| after.strip_prefix(",\"type\":\""))
+            .and_then(|after| after.split('"').next());
+        Some(Eab {
+            entity,
+            id: &rest[..digits],
+            kind,
+        })
+    })
+}
+
+/// A hulu.com page: no proxy or redirects, a short timeout and a bounded reply.
+fn fetch_page(url: &str) -> Result<String, String> {
+    const LIMIT: u64 = 3 * 1024 * 1024;
+    let agent = ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(8)))
+        .max_redirects(0)
+        .proxy(None)
+        .http_status_as_error(false)
+        .build()
+        .new_agent();
+    let mut response = agent
+        .get(url)
+        .header("User-Agent", "LumaNative")
+        .header("Accept", "text/html")
+        .call()
+        .map_err(|e| e.to_string())?;
+    let status = response.status().as_u16();
+    if status != 200 {
+        return Err(format!("HTTP {status}"));
+    }
+    let mut bytes = Vec::new();
+    response
+        .body_mut()
+        .as_reader()
+        .take(LIMIT + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| e.to_string())?;
+    if bytes.len() as u64 > LIMIT {
+        return Err("the page is too large".into());
+    }
+    Ok(String::from_utf8_lossy(&bytes).into_owned())
 }
 
 /// The path of an https link on one of the service's own hosts, with no userinfo, port or odd
@@ -201,10 +343,93 @@ mod tests {
 
     #[test]
     fn other_services_pass_their_own_web_link() {
-        let link = "https://www.hulu.com/series/ghosts-2b0a7c1e-91ab-4c7e-9a3a-2e6f1c1d1b2f";
-        let result = launch("hulu", link).unwrap();
+        let link = "https://www.disneyplus.com/browse/entity-2b0a7c1e-91ab-4c7e-9a3a-2e6f1c1d1b2f";
+        let result = launch("disney", link).unwrap();
         assert_eq!(result.params, json!({"contentTarget": link}));
         assert_eq!(result.confidence, Confidence::Unverified);
+    }
+
+    /// Trimmed from hulu.com/movie/ghostbusters-0a7184af-… (2026-11): the movie's own EAB ID
+    /// comes after other titles' in "You May Also Like".
+    const GHOSTBUSTERS_PAGE: &str = concat!(
+        r#"{"id":"7790712b-297b-4898-8fc0-f4dee57c068f","href":"/movie/batman-returns-7790712b-297b-4898-8fc0-f4dee57c068f","eabId":null,"type":"movie"},"#,
+        r#"{"eabId":"EAB::9ff68316-f6e5-475f-874c-7732f0c4dcf5::169127190::346067506","type":"movie","name":"Ghostbusters II"},"#,
+        r#"{"id":"0a7184af-7705-4884-bcef-908c27edb1af","eabId":"EAB::0a7184af-7705-4884-bcef-908c27edb1af::169126830::353249532","type":"movie","name":"Ghostbusters"}"#,
+    );
+    const GHOSTBUSTERS: &str =
+        "https://www.hulu.com/movie/ghostbusters-0a7184af-7705-4884-bcef-908c27edb1af";
+
+    #[test]
+    fn hulu_movies_open_with_their_numeric_content_id() {
+        assert!(launch("hulu", GHOSTBUSTERS).is_none(), "needs the page");
+        assert_eq!(
+            hulu_page(GHOSTBUSTERS).as_deref(),
+            Some(GHOSTBUSTERS),
+            "already canonical"
+        );
+        assert_eq!(
+            hulu_launch(GHOSTBUSTERS_PAGE, GHOSTBUSTERS).unwrap(),
+            Launch {
+                params: json!({"contentTarget": "169126830_content"}),
+                confidence: Confidence::Verified,
+            }
+        );
+        // Percent-encoded slugs, the bare host and query strings resolve to the same page.
+        let spanish = "https://hulu.com/movie/ghostbusters-%28en-espa%C3%B1ol%29-da941add-b21a-4a5a-b991-96de6e0f2188?x=1";
+        assert_eq!(
+            hulu_page(spanish).as_deref(),
+            Some(
+                "https://www.hulu.com/movie/ghostbusters-%28en-espa%C3%B1ol%29-da941add-b21a-4a5a-b991-96de6e0f2188"
+            )
+        );
+        // Each movie takes its own ID, wherever it is on the page; a page without it opens the
+        // app plainly, never another title.
+        let other =
+            "https://www.hulu.com/movie/ghostbusters-ii-9ff68316-f6e5-475f-874c-7732f0c4dcf5";
+        assert_eq!(
+            hulu_launch(GHOSTBUSTERS_PAGE, other).unwrap().params,
+            json!({"contentTarget": "169127190_content"})
+        );
+        let missing = "https://www.hulu.com/movie/x-11111111-2222-3333-4444-555555555555";
+        assert!(hulu_launch(GHOSTBUSTERS_PAGE, missing).is_none());
+    }
+
+    #[test]
+    fn hulu_series_open_their_first_listed_episode() {
+        // Trimmed from hulu.com/series/the-handmaid%27s-tale-565d8976-… (2026-11).
+        let page = concat!(
+            r#"{"id":"565d8976-9d26-4e63-866c-40f8a137ce5f","name":"The Handmaid's Tale"},"#,
+            r#"{"eabId":"EAB::671f8878-bdba-40bd-ae6d-f85c55cecbb4::60873890::3450585","type":"episode","name":"Offred"},"#,
+            r#"{"eabId":"EAB::8aad3f97-4531-47ab-b5d3-18daa78da42d::61095299::24055531","type":"episode","name":"June"}"#,
+        );
+        let link = "https://www.hulu.com/series/the-handmaid%27s-tale-565d8976-9d26-4e63-866c-40f8a137ce5f";
+        assert_eq!(
+            hulu_launch(page, link).unwrap(),
+            Launch {
+                params: json!({"contentTarget": "60873890_content"}),
+                confidence: Confidence::Unverified,
+            }
+        );
+        assert!(
+            hulu_launch(GHOSTBUSTERS_PAGE, link).is_none(),
+            "no episodes listed"
+        );
+    }
+
+    #[test]
+    fn hulu_links_without_a_title_id_are_not_fetched() {
+        for link in [
+            "https://www.hulu.com/hub/movies",
+            "https://www.hulu.com/watch/0a7184af-7705-4884-bcef-908c27edb1af",
+            "https://www.hulu.com/movie/ghostbusters-0A7184AF-7705-4884-bcef-908c27edb1af",
+            "https://www.hulu.com/movie/0a7184af-7705",
+            "https://www.hulu.com.evil.example/movie/x-0a7184af-7705-4884-bcef-908c27edb1af",
+        ] {
+            assert!(hulu_page(link).is_none(), "{link}");
+        }
+        // Malformed EAB IDs are skipped.
+        let page = r#""EAB::0a7184af-7705-4884-bcef-908c27edb1af::12x::3" "EAB::0a7184af-7705-4884-bcef-908c27edb1af::::3""#;
+        assert_eq!(eab_ids(page).count(), 0);
     }
 
     #[test]

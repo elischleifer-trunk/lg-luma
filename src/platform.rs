@@ -241,10 +241,12 @@ pub enum Request {
     /// Make Luma Home again if the LG Home tile lifted the takeover until the next boot.
     ReclaimHome,
     Launch(String),
-    /// Launch an app with webOS launch `params`, such as a streaming title to open.
-    LaunchWith {
+    /// Open a streaming title: `deeplink::resolve` builds its launch parameters here, off the
+    /// SDL thread, and the app opens plainly when there are none.
+    LaunchTitle {
         id: String,
-        params: Value,
+        service: String,
+        link: String,
     },
     Uninstall(String),
     SyncSplash(String),
@@ -436,8 +438,16 @@ impl Platform {
                     } else {
                         Ok(())
                     }),
-                    Request::LaunchWith { id, params } => Response::Launched(if webos {
-                        launch_with_params(&id, &params)
+                    Request::LaunchTitle { id, service, link } => Response::Launched(if webos {
+                        match crate::deeplink::resolve(&service, &link) {
+                            Some(launch) => launch_with_params(&id, &launch.params),
+                            None if valid_app_id(&id) => call(
+                                "luna://com.webos.applicationManager/launch",
+                                json!({"id": id}),
+                            )
+                            .map(|_| ()),
+                            None => Err("Invalid application identifier".into()),
+                        }
                     } else {
                         Ok(())
                     }),

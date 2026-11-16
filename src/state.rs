@@ -250,10 +250,12 @@ pub enum Effect {
     /// Refresh apps: read the inventory and every app icon again.
     Reload,
     Launch(String),
-    /// Open a movie or show: its app, with launch parameters for the title when known.
+    /// Open a movie or show in `app` from its `link` on `service`; `deeplink::resolve` turns that
+    /// into launch parameters on the platform worker (it may read the title's web page).
     LaunchTitle {
         app: String,
-        params: Option<serde_json::Value>,
+        service: String,
+        link: String,
     },
     Uninstall(String),
     DeleteWallpaper(String),
@@ -2541,10 +2543,10 @@ impl State {
             self.notify(self.preferences.language.t("titleNotOnApps"));
             return vec![];
         };
-        let params = crate::deeplink::launch(&pick.service_id, &pick.link).map(|l| l.params);
         vec![Effect::LaunchTitle {
             app: pick.app_id.clone(),
-            params,
+            service: pick.service_id.clone(),
+            link: pick.link.clone(),
         }]
     }
 

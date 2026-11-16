@@ -399,7 +399,7 @@ fn effects(
                     }
                 }
             }
-            Effect::LaunchTitle { app, params } => {
+            Effect::LaunchTitle { app, service, link } => {
                 if state.launching {
                     continue;
                 }
@@ -407,14 +407,19 @@ fn effects(
                     state.launching = true;
                     state.launch_requested = Some(app.clone());
                     state.notify(state.preferences.language.t("opening"));
-                    platform.send(match params {
-                        Some(params) => Request::LaunchWith { id: app, params },
-                        None => Request::Launch(app),
+                    platform.send(Request::LaunchTitle {
+                        id: app,
+                        service,
+                        link,
                     });
                 } else {
+                    // The desktop preview never fetches a title's page.
                     eprintln!(
                         "Luma desktop preview: would open {app} with {}",
-                        params.map_or_else(|| "no parameters".into(), |p| p.to_string())
+                        crate::deeplink::launch(&service, &link).map_or_else(
+                            || format!("{service} link {link}"),
+                            |l| l.params.to_string()
+                        )
                     );
                     let title = state
                         .inventory

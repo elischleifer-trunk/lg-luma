@@ -204,7 +204,8 @@ fn ok_opens_the_title_in_its_app_or_explains_why_it_cannot() {
         state.activate(),
         vec![Effect::LaunchTitle {
             app: pick.app_id.clone(),
-            params: crate::deeplink::launch(&pick.service_id, &pick.link).map(|l| l.params),
+            service: pick.service_id.clone(),
+            link: pick.link.clone(),
         }]
     );
     let missing = state
