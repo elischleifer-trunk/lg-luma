@@ -862,6 +862,15 @@ impl State {
 
     /// The result of a launch request. Only an app that opened moves to the front of
     /// favorites, so a failed launch leaves the saved order as it was.
+    /// A title launch was dropped for a newer one: stop showing it as opening, and don't count
+    /// its app as used.
+    pub fn launch_dropped(&mut self) {
+        self.launching = false;
+        self.launch_requested = None;
+        self.notice = None;
+        self.dirty = true;
+    }
+
     pub fn launch_response(&mut self, result: Result<(), String>) -> Vec<Effect> {
         self.launching = false;
         let id = self.launch_requested.take();

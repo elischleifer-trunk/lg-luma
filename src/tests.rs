@@ -284,6 +284,18 @@ fn launching_a_favorite_moves_it_to_the_front_once_it_opens() {
 }
 
 #[test]
+fn a_dropped_title_launch_neither_opens_nor_counts_its_app_as_used() {
+    // A title still resolving when a newer launch or GoHome was asked for is dropped.
+    let (mut state, favorites) = nine_favorites();
+    state.launching = true;
+    state.launch_requested = Some(favorites[4].clone());
+    state.launch_dropped();
+    assert!(!state.launching);
+    assert!(state.launch_requested.is_none());
+    assert_eq!(state.preferences.favorites.clone().unwrap(), favorites);
+}
+
+#[test]
 fn reordering_down_into_a_short_last_row_takes_its_last_slot() {
     let (mut state, favorites) = nine_favorites();
     state.focus = Target::App(favorites[5].clone());

@@ -1334,6 +1334,7 @@ fn run() -> Result<(), String> {
                         crate::telemetry::log_warn!("inputs", "HDMI signal watch: {error}")
                     }
                 },
+                Response::LaunchDropped => state.launch_dropped(),
                 Response::Launched(result) => {
                     let pending = state.launch_response(result);
                     running &= effects(

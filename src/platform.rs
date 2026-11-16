@@ -6,7 +6,15 @@ use crate::{
     model::{App, Console, Input, Inventory, demo_inventory, valid_app_id},
 };
 use serde_json::{Value, json};
-use std::{collections::HashSet, sync::mpsc, thread};
+use std::{
+    collections::HashSet,
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+        mpsc,
+    },
+    thread,
+};
 
 #[path = "platform-install.rs"]
 mod installation;
@@ -260,6 +268,9 @@ pub enum Response {
     Inputs(Result<Vec<Input>, String>),
     Signal(Result<crate::signal_watch::Snapshot, String>),
     Launched(Result<(), String>),
+    /// A title launch was dropped because a newer launch or GoHome was asked for while it
+    /// resolved: nothing opened, and the newer request reports for itself.
+    LaunchDropped,
     Uninstalled {
         id: String,
         result: Result<(), String>,
@@ -290,7 +301,22 @@ impl Platform {
             } else {
                 crate::recents::demo()
             };
+            // Counts requests that bring an app (or Home) to the front, so a title launch still
+            // resolving off this thread can tell that a newer one was asked for and step aside.
+            let launches = Arc::new(AtomicU64::new(0));
             while let Ok(request) = requests.recv() {
+                if matches!(
+                    request,
+                    Request::Launch(_)
+                        | Request::LaunchTitle { .. }
+                        | Request::GoHome
+                        | Request::Recent {
+                            command: crate::recents::Command::Launch(_),
+                            ..
+                        }
+                ) {
+                    launches.fetch_add(1, Ordering::SeqCst);
+                }
                 let response = match request {
                     Request::Recent {
                         generation,
@@ -439,16 +465,23 @@ impl Platform {
                         Ok(())
                     }),
                     // Resolving may read the title's web page (Hulu), so it runs on its own
-                    // thread: refresh, recents and GoHome keep being served meanwhile.
+                    // thread: refresh, recents and GoHome keep being served meanwhile. A launch,
+                    // Recents launch or GoHome asked for while it resolves wins: the title is
+                    // then dropped rather than opened on top of it.
                     Request::LaunchTitle { id, service, link } => {
                         let responses = responses.clone();
+                        let launches = Arc::clone(&launches);
+                        let ticket = launches.load(Ordering::SeqCst);
                         thread::spawn(move || {
-                            let result = if webos {
-                                launch_title(&id, &service, &link)
+                            let response = if webos {
+                                launch_title(&id, &service, &link, || {
+                                    launches.load(Ordering::SeqCst) == ticket
+                                })
+                                .map_or(Response::LaunchDropped, Response::Launched)
                             } else {
-                                Ok(())
+                                Response::Launched(Ok(()))
                             };
-                            let _ = responses.send(Response::Launched(result));
+                            let _ = responses.send(response);
                         });
                         continue;
                     }
@@ -607,9 +640,20 @@ fn sync_splash(background: &str) -> Result<(), String> {
 }
 
 /// Opens a streaming title in `id`, or the app plainly when its link gives no parameters.
-/// Blocking: `deeplink::resolve` may read the title's web page.
-fn launch_title(id: &str, service: &str, link: &str) -> Result<(), String> {
-    match crate::deeplink::resolve(service, link) {
+/// Blocking: `deeplink::resolve` may read the title's web page. `still_current` is asked once
+/// that is done; when a newer launch was requested meanwhile, nothing is opened (None).
+fn launch_title(
+    id: &str,
+    service: &str,
+    link: &str,
+    still_current: impl Fn() -> bool,
+) -> Option<Result<(), String>> {
+    let resolved = crate::deeplink::resolve(service, link);
+    if !still_current() {
+        crate::telemetry::log_info!("launch", "Dropped {id}: a newer launch was requested");
+        return None;
+    }
+    Some(match resolved {
         Some(launch) => launch_with_params(id, &launch.params),
         None if valid_app_id(id) => call(
             "luna://com.webos.applicationManager/launch",
@@ -617,7 +661,7 @@ fn launch_title(id: &str, service: &str, link: &str) -> Result<(), String> {
         )
         .map(|_| ()),
         None => Err("Invalid application identifier".into()),
-    }
+    })
 }
 
 /// Launches (or relaunches, for an app that is already open) `id` with launch parameters.
