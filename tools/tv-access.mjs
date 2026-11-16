@@ -222,7 +222,9 @@ async function request({ reason, ttl, force }) {
   }
   const broker = new Broker();
   if (!which('ssh')) {
-    throw new Error('Install the OpenSSH client first: apt-get install -y openssh-client');
+    throw new Error(
+      'Install the OpenSSH client first: apt-get update && apt-get install -y openssh-client',
+    );
   }
   const asked = await broker.call('POST', 'request', { reason, ttl });
   if (asked.status !== 202) throw failure(asked.status, asked.json);

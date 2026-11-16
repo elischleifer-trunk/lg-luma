@@ -61,6 +61,7 @@ from homeassistant.util import dt as dt_util
 from . import dev_access, keyboard, streaming_keys, versions
 from .api import LumaAuthError, LumaClient, LumaError
 from .const import (
+    CONF_DEVICE_ID,
     CONF_TOKEN,
     CONF_WEBHOOK_ID,
     DEFAULT_PORT,
@@ -131,6 +132,8 @@ class LumaData:
     keyboard: bool = False
     # The text field the TV last reported open, by its key; None when closed.
     field: str | None = None
+    # Whether developer access was on when the entry set up, so its sensor and buttons exist.
+    dev_entities: bool = False
 
 
 type LumaConfigEntry = ConfigEntry[LumaData]
@@ -158,7 +161,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
             entry, data={**entry.data, CONF_WEBHOOK_ID: webhook.async_generate_id()}
         )
     events = LumaEvents(hass, entry, client)
-    entry.runtime_data = LumaData(client, events, compatibility)
+    entry.runtime_data = LumaData(
+        client, events, compatibility, dev_entities=dev_access.enabled(entry)
+    )
+    if not entry.runtime_data.dev_entities:
+        _remove_dev_entities(hass, entry)
     keyboard.setup(hass, entry, client)
     if keyboard.phones(entry):
         entry.async_create_background_task(
@@ -181,6 +188,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     return True
 
 
+# Developer access entities, by platform: removed from the registry while it is off, so the
+# device page does not keep them as "no longer provided".
+DEV_ENTITIES = {
+    "sensor": ("dev_access",),
+    "button": ("dev_access_approve", "dev_access_deny", "dev_access_revoke"),
+}
+
+
+def _remove_dev_entities(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
+    registry = er.async_get(hass)
+    device_id = entry.data[CONF_DEVICE_ID]
+    for platform, keys in DEV_ENTITIES.items():
+        for key in keys:
+            if entity_id := registry.async_get_entity_id(platform, DOMAIN, f"{device_id}_{key}"):
+                registry.async_remove(entity_id)
+
+
 async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
     await _push_keys(entry)
     # Only when phone typing is on, or was: turning it off tells the TV to stop calling.
@@ -188,6 +212,10 @@ async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
         await keyboard.register(hass, entry, entry.runtime_data.client, partial(local_url, hass))
     # Last, so nothing in developer access can hold up the keys or phone typing.
     await dev_access.async_update(hass, entry)
+    if dev_access.enabled(entry) != entry.runtime_data.dev_entities:
+        # Turned on or off: reload so its sensor and buttons appear or go. Turning it off has
+        # already taken the session keys off the TV above.
+        hass.config_entries.async_schedule_reload(entry.entry_id)
 
 
 async def _push_keys(entry: LumaConfigEntry) -> None:
