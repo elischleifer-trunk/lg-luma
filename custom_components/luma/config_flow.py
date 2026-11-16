@@ -43,6 +43,7 @@ from .const import (
     CONF_DEV_TOKEN_HASH,
     CONF_DEV_TUNNEL,
     CONF_DEVICE_ID,
+    CONF_KEYBOARD_ENTITY,
     CONF_KEYBOARD_PHONES,
     CONF_MDBLIST_KEY,
     CONF_MOTN_KEY,
@@ -355,7 +356,11 @@ class LumaOptionsFlow(OptionsFlow):
         current = self.config_entry.options
         if user_input is not None:
             return self.async_create_entry(
-                data={**current, CONF_KEYBOARD_PHONES: user_input.get(CONF_KEYBOARD_PHONES, [])}
+                data={
+                    **current,
+                    CONF_KEYBOARD_PHONES: user_input.get(CONF_KEYBOARD_PHONES, []),
+                    CONF_KEYBOARD_ENTITY: bool(user_input.get(CONF_KEYBOARD_ENTITY)),
+                }
             )
         available = keyboard.available_phones(self.hass)
         chosen = list(current.get(CONF_KEYBOARD_PHONES) or [])
@@ -379,6 +384,10 @@ class LumaOptionsFlow(OptionsFlow):
                             options=options, multiple=True, mode=SelectSelectorMode.LIST
                         )
                     ),
+                    vol.Optional(
+                        CONF_KEYBOARD_ENTITY,
+                        default=bool(current.get(CONF_KEYBOARD_ENTITY)),
+                    ): BooleanSelector(),
                 }
             ),
         )

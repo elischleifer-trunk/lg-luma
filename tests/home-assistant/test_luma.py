@@ -1220,6 +1220,74 @@ def keyboard_calls(aioclient_mock: AiohttpClientMocker, path: str) -> list:
     return [call[2] for call in aioclient_mock.mock_calls if call[1].path == path]
 
 
+async def test_tv_keyboard_entity_types_into_the_open_field(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    hass_client_no_auth,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    hass.config.internal_url = "http://192.168.1.10:8123"
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    config = await setup(hass, aioclient_mock)
+    webhook_id = config.data["webhook_id"]
+    from homeassistant.helpers import entity_registry as er
+
+    registry = er.async_get(hass)
+    assert registry.async_get_entity_id("text", DOMAIN, f"{DEVICE}_keyboard") is None
+
+    async def phone_keyboard(form: dict) -> None:
+        result = await hass.config_entries.options.async_init(config.entry_id)
+        result = await hass.config_entries.options.async_configure(
+            result["flow_id"], {"next_step_id": "phone_keyboard"}
+        )
+        result = await hass.config_entries.options.async_configure(result["flow_id"], form)
+        assert result["type"] is FlowResultType.CREATE_ENTRY
+        await hass.async_block_till_done(wait_background_tasks=True)
+
+    # On without any phone: the TV is asked to report its fields, and the entity appears.
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    await phone_keyboard({"keyboard_phones": [], "keyboard_entity": True})
+    assert {"webhook": f"http://192.168.1.10:8123/api/webhook/{webhook_id}"} in keyboard_calls(
+        aioclient_mock, "/api/keyboard"
+    )
+    entity_id = registry.async_get_entity_id("text", DOMAIN, f"{DEVICE}_keyboard")
+    assert hass.states.get(entity_id).state == "unavailable"  # no field open
+
+    client = await hass_client_no_auth()
+    await client.post(f"/api/webhook/{webhook_id}", json={"open": True, "field": "search"})
+    await hass.async_block_till_done()
+    state = hass.states.get(entity_id)
+    assert state.state == ""
+    assert state.attributes["field"] == "search" and state.attributes["prompt"] == "Search"
+
+    aioclient_mock.post(f"{TV}/api/keyboard/text", json={"typed": True})
+    await hass.services.async_call(
+        "text", "set_value", {"entity_id": entity_id, "value": " Dune\nTwo "}, blocking=True
+    )
+    assert keyboard_calls(aioclient_mock, "/api/keyboard/text") == [{"text": "Dune Two"}]
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{TV}/api/keyboard/text", status=409, json={"error": "No field"})
+    with pytest.raises(HomeAssistantError, match="No text field is open"):
+        await hass.services.async_call(
+            "text", "set_value", {"entity_id": entity_id, "value": "Alien"}, blocking=True
+        )
+
+    await client.post(f"/api/webhook/{webhook_id}", json={"open": False})
+    await hass.async_block_till_done()
+    assert hass.states.get(entity_id).state == "unavailable"
+
+    # Off again: the TV stops reporting and the entity goes from the registry.
+    aioclient_mock.clear_requests()
+    aioclient_mock.put(f"{TV}/api/keyboard", json={"keyboard": None})
+    aioclient_mock.get(f"{TV}/api/status", json={"overlay": None, "overlay_ready": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    await phone_keyboard({"keyboard_phones": [], "keyboard_entity": False})
+    assert {} in keyboard_calls(aioclient_mock, "/api/keyboard")
+    assert registry.async_get_entity_id("text", DOMAIN, f"{DEVICE}_keyboard") is None
+
+
 async def test_phones_chosen_in_options_are_offered_typing_when_a_tv_field_opens(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,

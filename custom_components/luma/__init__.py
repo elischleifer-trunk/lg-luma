@@ -78,7 +78,7 @@ from .relay import Relays
 from .relay import header as relay_header
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = [Platform.BUTTON, Platform.NOTIFY, Platform.SENSOR]
+PLATFORMS = [Platform.BUTTON, Platform.NOTIFY, Platform.SENSOR, Platform.TEXT]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 ATTR_CONFIG_ENTRY = "config_entry_id"
@@ -134,6 +134,8 @@ class LumaData:
     field: str | None = None
     # Whether developer access was on when the entry set up, so its sensor and buttons exist.
     dev_entities: bool = False
+    # Whether the TV keyboard text entity was on when the entry set up.
+    keyboard_entity: bool = False
 
 
 type LumaConfigEntry = ConfigEntry[LumaData]
@@ -162,12 +164,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         )
     events = LumaEvents(hass, entry, client)
     entry.runtime_data = LumaData(
-        client, events, compatibility, dev_entities=dev_access.enabled(entry)
+        client,
+        events,
+        compatibility,
+        dev_entities=dev_access.enabled(entry),
+        keyboard_entity=keyboard.entity_enabled(entry),
     )
+    if not entry.runtime_data.keyboard_entity:
+        _remove_entity(hass, entry, "text", "keyboard")
     if not entry.runtime_data.dev_entities:
         _remove_dev_entities(hass, entry)
     keyboard.setup(hass, entry, client)
-    if keyboard.phones(entry):
+    if keyboard.wanted(entry):
         entry.async_create_background_task(
             hass,
             keyboard.register(hass, entry, client, partial(local_url, hass)),
@@ -197,24 +205,33 @@ DEV_ENTITIES = {
 
 
 def _remove_dev_entities(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
-    registry = er.async_get(hass)
-    device_id = entry.data[CONF_DEVICE_ID]
     for platform, keys in DEV_ENTITIES.items():
         for key in keys:
-            if entity_id := registry.async_get_entity_id(platform, DOMAIN, f"{device_id}_{key}"):
-                registry.async_remove(entity_id)
+            _remove_entity(hass, entry, platform, key)
+
+
+def _remove_entity(hass: HomeAssistant, entry: LumaConfigEntry, platform: str, key: str) -> None:
+    """Drop an optional entity's registry entry while its option is off."""
+    registry = er.async_get(hass)
+    unique_id = f"{entry.data[CONF_DEVICE_ID]}_{key}"
+    if entity_id := registry.async_get_entity_id(platform, DOMAIN, unique_id):
+        registry.async_remove(entity_id)
 
 
 async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
     await _push_keys(entry)
     # Only when phone typing is on, or was: turning it off tells the TV to stop calling.
-    if keyboard.phones(entry) or entry.runtime_data.keyboard:
+    if keyboard.wanted(entry) or entry.runtime_data.keyboard:
         await keyboard.register(hass, entry, entry.runtime_data.client, partial(local_url, hass))
     # Last, so nothing in developer access can hold up the keys or phone typing.
     await dev_access.async_update(hass, entry)
-    if dev_access.enabled(entry) != entry.runtime_data.dev_entities:
-        # Turned on or off: reload so its sensor and buttons appear or go. Turning it off has
-        # already taken the session keys off the TV above.
+    # An optional entity turned on or off: reload so it appears or goes. Turning developer
+    # access off has already taken the session keys off the TV above.
+    data = entry.runtime_data
+    if (
+        dev_access.enabled(entry) != data.dev_entities
+        or keyboard.entity_enabled(entry) != data.keyboard_entity
+    ):
         hass.config_entries.async_schedule_reload(entry.entry_id)
 
 

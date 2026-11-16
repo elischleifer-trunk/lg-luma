@@ -18,6 +18,8 @@ CONF_TMDB_TOKEN = "tmdb_read_access_token"
 CONF_MDBLIST_KEY = "mdblist_api_key"
 # Phones (their mobile_app notify services) that offer to type into the TV's text fields.
 CONF_KEYBOARD_PHONES = "keyboard_phones"
+# Whether the TV keyboard text entity exists, so dashboards can type into the TV's fields.
+CONF_KEYBOARD_ENTITY = "keyboard_entity"
 # The webhook the TV calls when a text field opens or closes, kept in the entry's data.
 CONF_WEBHOOK_ID = "webhook_id"
 

@@ -24,11 +24,12 @@ from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.loader import async_get_integration
 from homeassistant.util import slugify
 
 from .api import LumaApiError, LumaAuthError, LumaClient, LumaError
-from .const import CONF_KEYBOARD_PHONES, CONF_WEBHOOK_ID, DOMAIN
+from .const import CONF_KEYBOARD_ENTITY, CONF_KEYBOARD_PHONES, CONF_WEBHOOK_ID, DOMAIN
 
 if TYPE_CHECKING:
     from . import LumaConfigEntry
@@ -69,6 +70,25 @@ def available_phones(hass: HomeAssistant) -> dict[str, str]:
 
 def phones(entry: LumaConfigEntry) -> list[str]:
     return list(entry.options.get(CONF_KEYBOARD_PHONES) or [])
+
+
+def entity_enabled(entry: LumaConfigEntry) -> bool:
+    """Whether the TV keyboard text entity is on (Type on your phone → from Home Assistant)."""
+    return bool(entry.options.get(CONF_KEYBOARD_ENTITY))
+
+
+def wanted(entry: LumaConfigEntry) -> bool:
+    """Whether anything here wants the TV to report its text fields: phones or the entity."""
+    return bool(phones(entry)) or entity_enabled(entry)
+
+
+def signal(entry_id: str) -> str:
+    """Dispatched when the TV's open text field changes."""
+    return f"{DOMAIN}_keyboard_{entry_id}"
+
+
+def prompt(field: str | None) -> str | None:
+    return PROMPTS.get(field or "", "Text") if field is not None else None
 
 
 def tag(entry: LumaConfigEntry) -> str:
@@ -140,7 +160,7 @@ async def register(
     """Tell the TV where to report its text fields, or that it need not; best effort. A field
     that is open already is reported to the new webhook straight away."""
     url = None
-    if phones(entry):
+    if wanted(entry):
         try:
             url = base_url() + webhook.async_generate_path(entry.data[CONF_WEBHOOK_ID])
         except HomeAssistantError as err:
@@ -152,6 +172,7 @@ async def register(
         # A TV that restarted or was switched off never reported its field closing.
         held = reply.get("keyboard") if url else None
         entry.runtime_data.field = held if isinstance(held, str) else None
+        async_dispatcher_send(hass, signal(entry.entry_id))
     except LumaApiError as err:
         # A Luma from before phone typing answers 404: Repairs asks for a Luma update, but only
         # when phone typing was turned on, so removing a webhook never raises it.
@@ -167,7 +188,7 @@ def needs_register(entry: LumaConfigEntry, status: dict[str, Any]) -> bool:
     held = status.get("keyboard_hook")
     if not isinstance(held, bool):
         return False  # A Luma from before phone typing.
-    return held != bool(phones(entry))
+    return held != wanted(entry)
 
 
 @callback
@@ -179,14 +200,16 @@ def setup(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClient) -> No
             body = await request.json()
         except ValueError:
             return
-        if not isinstance(body, dict) or not phones(entry):
+        if not isinstance(body, dict) or not wanted(entry):
             return
         if body.get("open"):
             field = str(body.get("field") or "")
             entry.runtime_data.field = field
+            async_dispatcher_send(hass, signal(entry.entry_id))
             await _notify(hass, entry, notification(entry, field))
         else:
             entry.runtime_data.field = None
+            async_dispatcher_send(hass, signal(entry.entry_id))
             await _notify(
                 hass, entry, {"message": "clear_notification", "data": {"tag": tag(entry)}}
             )

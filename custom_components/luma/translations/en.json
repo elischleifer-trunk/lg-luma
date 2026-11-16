@@ -71,9 +71,13 @@
       "phone_keyboard": {
         "title": "Type on your phone",
         "description": "When a text field opens on the TV, such as search, these phones get a notification. Reply to it to type into the TV instead of using the remote. Phones need the Home Assistant app.",
-        "data": { "keyboard_phones": "Phones" },
+        "data": {
+          "keyboard_phones": "Phones",
+          "keyboard_entity": "Type from Home Assistant too"
+        },
         "data_description": {
-          "keyboard_phones": "None chosen turns this off. Phones only appear here once the Home Assistant app is signed in on them."
+          "keyboard_phones": "None chosen turns this off. Phones only appear here once the Home Assistant app is signed in on them.",
+          "keyboard_entity": "Adds a TV keyboard text entity, available only while a text field is open on the TV. Put it on a dashboard to type into the TV from there."
         }
       },
       "streaming_keys": {
@@ -109,6 +113,7 @@
       "dev_access_revoke": { "name": "Revoke all developer access" }
     },
     "notify": { "toast": { "name": "Toast" } },
+    "text": { "keyboard": { "name": "TV keyboard" } },
     "sensor": {
       "frame_time": { "name": "Frame time" },
       "dropped_frames": { "name": "Dropped frames" },

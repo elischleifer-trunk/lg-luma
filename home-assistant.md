@@ -273,6 +273,15 @@ on your phone, Luma can ask you for the text instead:
    To stay out of the app, reply to the notification instead (on iPhone, press and hold it or
    swipe down; on Android, tap **Type**).
 
+### From a dashboard
+
+Tick **Type from Home Assistant too** on the same page, with or without phones. The TV then gets a
+**TV keyboard** text entity. It is available only while a text field is open on the TV; its
+`field` and `prompt` attributes say what the TV is asking for (for example `search` and
+"Search"). Setting its value types the text into the field and closes the TV's keyboard. Put it on
+a dashboard, in a conditional card that shows only while it is available, to get a type-to-TV box
+just when the TV asks for text. Unticking it removes the entity.
+
 The page is `/luma-keyboard` in Home Assistant, for any signed-in user. It is not in the sidebar,
 but you can open it by hand or link to it from a dashboard; with several TVs it lets you choose one.
 
@@ -281,8 +290,8 @@ Closing the field on the TV clears the notification. On Android the notification
 
 The TV tells Home Assistant about text fields through a webhook that only accepts calls from your
 local network. It only sends which kind of field opened, never what you typed on the TV. Typed text
-comes back over the same paired connection as everything else. Turning it off (no phones ticked)
-tells the TV to stop. Home Assistant needs a **local network URL** the TV can reach (**Settings →
+comes back over the same paired connection as everything else. Turning it off (no phones ticked
+and no TV keyboard entity) tells the TV to stop. Home Assistant needs a **local network URL** the TV can reach (**Settings →
 System → Network**), as for camera images.
 
 ## Streaming search keys
