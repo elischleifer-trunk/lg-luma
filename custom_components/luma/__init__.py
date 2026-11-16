@@ -131,6 +131,8 @@ class LumaData:
     keyboard: bool = False
     # The text field the TV last reported open, by its key; None when closed.
     field: str | None = None
+    # Whether developer access was on when the entry set up, so its sensor and buttons exist.
+    dev_entities: bool = False
 
 
 type LumaConfigEntry = ConfigEntry[LumaData]
@@ -158,7 +160,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
             entry, data={**entry.data, CONF_WEBHOOK_ID: webhook.async_generate_id()}
         )
     events = LumaEvents(hass, entry, client)
-    entry.runtime_data = LumaData(client, events, compatibility)
+    entry.runtime_data = LumaData(
+        client, events, compatibility, dev_entities=dev_access.enabled(entry)
+    )
     keyboard.setup(hass, entry, client)
     if keyboard.phones(entry):
         entry.async_create_background_task(
@@ -188,6 +192,10 @@ async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
         await keyboard.register(hass, entry, entry.runtime_data.client, partial(local_url, hass))
     # Last, so nothing in developer access can hold up the keys or phone typing.
     await dev_access.async_update(hass, entry)
+    if dev_access.enabled(entry) != entry.runtime_data.dev_entities:
+        # Turned on or off: reload so its sensor and buttons appear or go. Turning it off has
+        # already taken the session keys off the TV above.
+        hass.config_entries.async_schedule_reload(entry.entry_id)
 
 
 async def _push_keys(entry: LumaConfigEntry) -> None:

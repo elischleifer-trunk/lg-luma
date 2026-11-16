@@ -18,7 +18,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import LumaConfigEntry
+from . import LumaConfigEntry, dev_access
 from .entity import LumaEntity
 from .events import LumaEvents, entry_time, signal
 
@@ -84,7 +84,10 @@ SENSORS = (
 async def async_setup_entry(
     hass: HomeAssistant, entry: LumaConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    async_add_entities(LumaSensor(entry, description) for description in SENSORS)
+    entities: list[SensorEntity] = [LumaSensor(entry, description) for description in SENSORS]
+    if entry.runtime_data.dev_entities:
+        entities.append(LumaDevAccessSensor(entry))
+    async_add_entities(entities)
 
 
 class LumaSensor(LumaEntity, SensorEntity):
@@ -117,3 +120,52 @@ class LumaSensor(LumaEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
         return self.entity_description.attributes(self._events)
+
+
+class LumaDevAccessSensor(LumaEntity, SensorEntity):
+    """Developer access at a glance: idle, a request waiting for an answer, or a session key on
+    the TV. Its attributes list recent requests, and its history is the Logbook record of who
+    asked for what and how it ended."""
+
+    _attr_should_poll = False
+    _attr_device_class = SensorDeviceClass.ENUM
+
+    def __init__(self, entry: LumaConfigEntry) -> None:
+        super().__init__(entry, "dev_access")
+        self._entry_id = entry.entry_id
+        self._attr_options = ["idle", "pending", "active"]
+
+    async def async_added_to_hass(self) -> None:
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, dev_access.signal(self._entry_id), self.async_write_ha_state
+            )
+        )
+
+    @property
+    def _broker(self) -> dev_access.Broker | None:
+        return dev_access.broker_for(self.hass, self._entry_id)
+
+    @property
+    def available(self) -> bool:
+        return self._broker is not None
+
+    @property
+    def native_value(self) -> str | None:
+        broker = self._broker
+        return broker.state if broker else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        broker = self._broker
+        if broker is None:
+            return None
+        until = broker.active_until
+        return {
+            "active_until": until.isoformat() if until else None,
+            # Newest first; ids are the first characters of each request's id.
+            "requests": [
+                {key: value for key, value in item.items() if key != "key"}
+                for item in reversed(broker.history.values())
+            ],
+        }

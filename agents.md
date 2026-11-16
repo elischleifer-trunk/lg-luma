@@ -87,7 +87,8 @@ The maintainer's rooted TV (SSH server: Homebrew Channel's Dropbear) is reachabl
 through a Cloudflare Access tunnel at `tv.elischleifer.com`. The maintainer wants agents to be able
 to use it for testing on the TV. From a cloud session:
 
-1. **Preferred, when `LUMA_DEV_TOKEN` is set:** install `openssh-client`, then run
+1. **Preferred, when `LUMA_DEV_TOKEN` is set:** install the SSH client
+   (`apt-get update && apt-get install -y openssh-client`), then run
    `node tools/tv-access.mjs request --reason "<what you will test>"`. It asks Home Assistant
    (`ha.elischleifer.com`; Luma's developer access, see `home-assistant.md#developer-access`),
    which asks the maintainer to approve on their phone; tell the maintainer you are waiting. On

@@ -19,10 +19,12 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import hashlib
+import importlib
 import logging
 import secrets
 import time
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Any
@@ -33,6 +35,8 @@ from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST
 from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant, callback
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.helpers.storage import Store
 from homeassistant.requirements import async_process_requirements
@@ -47,6 +51,7 @@ from .const import (
     CONF_DEV_SSH_PORT,
     CONF_DEV_TOKEN_HASH,
     CONF_DEV_TUNNEL,
+    CONF_DEVICE_ID,
     CONF_MDBLIST_KEY,
     CONF_MOTN_KEY,
     CONF_TMDB_TOKEN,
@@ -92,7 +97,12 @@ DENIED = "denied"
 EXPIRED = "expired"
 FAILED = "failed"
 RELEASED = "released"
+# Approved, then removed from the TV by Revoke all developer access.
+REVOKED = "revoked"
 KEY_ON_TV = {APPROVED, DELIVERED}
+FINISHED = {DENIED, EXPIRED, FAILED, RELEASED, REVOKED}
+# Requests kept in the sensor's history (and in storage, so a restart keeps them).
+HISTORY = 20
 
 
 class DevAccessError(Exception):
@@ -152,6 +162,7 @@ async def async_update(hass: HomeAssistant, entry: ConfigEntry) -> None:
         _LOGGER.exception("Developer access could not start; it stays off")
         return
     registry.brokers[entry.entry_id] = broker
+    async_dispatcher_send(hass, signal(entry.entry_id))
     if not registry.views and hass.http is not None:
         for view in (RequestView, ResultView, ReleaseView):
             hass.http.register_view(view())
@@ -165,6 +176,7 @@ async def async_stop(hass: HomeAssistant, entry: ConfigEntry, *, revoke: bool = 
     broker = _registry(hass).brokers.pop(entry.entry_id, None)
     if broker is not None:
         await broker.async_stop(revoke=revoke)
+        async_dispatcher_send(hass, signal(entry.entry_id))
 
 
 async def async_revoke_removed(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -177,8 +189,7 @@ async def async_revoke_removed(hass: HomeAssistant, entry: ConfigEntry) -> None:
         await _store(hass, entry).async_remove()
         return
     try:
-        from . import dev_tv
-
+        dev_tv = await _import_dev_tv(hass)
         stored = await _store(hass, entry).async_load() or {}
         tv = dev_tv.Tv(
             entry.data[CONF_HOST],
@@ -212,7 +223,8 @@ async def _requirements(hass: HomeAssistant) -> bool:
         _LOGGER.error("Developer access needs asyncssh, which could not be installed: %s", err)
         return False
     try:
-        import asyncssh  # noqa: F401
+        # Importing asyncssh reads files, so it runs in the import executor.
+        await hass.async_add_import_executor_job(importlib.import_module, "asyncssh")
     except ImportError:
         _LOGGER.error("Developer access needs asyncssh, which is not installed (skip_pip?)")
         return False
@@ -224,6 +236,22 @@ async def forget_host_key(hass: HomeAssistant, entry: ConfigEntry) -> None:
     stored = await store.async_load() or {}
     stored["tv_host_key"] = None
     await store.async_save(stored)
+
+
+async def _import_dev_tv(hass: HomeAssistant):
+    return await hass.async_add_import_executor_job(
+        importlib.import_module, f"{__package__}.dev_tv"
+    )
+
+
+def signal(entry_id: str) -> str:
+    """Dispatched whenever a request or session key of this entry changes."""
+    return f"{DOMAIN}_dev_access_{entry_id}"
+
+
+def broker_for(hass: HomeAssistant, entry_id: str) -> Broker | None:
+    registry = hass.data.get(DATA)
+    return registry.brokers.get(entry_id) if registry else None
 
 
 def _store(hass: HomeAssistant, entry: ConfigEntry) -> Store[dict[str, Any]]:
@@ -314,13 +342,18 @@ class Request:
     expires_at: int | None = None
     payload: dict[str, Any] | None = None
     error: str | None = None
+    # Who decided: "phone" or "home_assistant" (a button on the TV's device page).
+    decided_by: str | None = None
     changed: asyncio.Event = field(default_factory=asyncio.Event)
     timer: CALLBACK_TYPE | None = None
+    on_change: Callable[[Request], None] | None = None
 
     def set_state(self, state: str) -> None:
         self.state = state
         self.changed.set()
         self.changed = asyncio.Event()
+        if self.on_change:
+            self.on_change(self)
 
 
 def clean_reason(reason: Any) -> str:
@@ -344,13 +377,17 @@ class Broker:
         self._tasks: set[asyncio.Task] = set()
         # Released keys the TV was not reachable to remove; each sweep retries them.
         self._pending_removal: set[str] = set()
+        # Session keys on the TV: request id -> expiry (Unix seconds).
+        self._key_expiry: dict[str, int] = {}
+        # Recent requests for the sensor, oldest first: request id -> summary (no secrets).
+        self.history: dict[str, dict[str, Any]] = {}
         self.tv: dev_tv.Tv | None = None
 
     async def async_start(self) -> None:
-        from . import dev_tv
-
+        dev_tv = await _import_dev_tv(self.hass)
         self._dev_tv = dev_tv
         stored = await self._store.async_load() or {}
+        self.history = {item["key"]: item for item in stored.get("history") or []}
         self.tv = dev_tv.Tv(
             self.entry.data[CONF_HOST],
             int(self.entry.options.get(CONF_DEV_SSH_PORT) or DEFAULT_SSH_PORT),
@@ -384,23 +421,89 @@ class Broker:
         for cancel in self._key_timers.values():
             cancel()
         self._key_timers.clear()
+        self._key_expiry.clear()
         for request in self._requests.values():
             if request.timer:
                 request.timer()
+            request.on_change = None
             request.changed.set()
+            if request.state == PENDING:
+                persistent_notification.async_dismiss(self.hass, self._notice_id(request))
         for task in list(self._tasks):
             task.cancel()
+        # History is saved with a short delay; write it now so a reload keeps it.
+        await self._save()
 
     def _background(self, coro) -> None:
         task = self.hass.async_create_background_task(coro, f"{DOMAIN} dev access")
         self._tasks.add(task)
         task.add_done_callback(self._tasks.discard)
 
+    def _data(self) -> dict[str, Any]:
+        return {
+            "tv_host_key": self.tv.host_key if self.tv else None,
+            "pending_removal": sorted(self._pending_removal),
+            "history": list(self.history.values()),
+        }
+
     async def _save(self) -> None:
-        assert self.tv
-        await self._store.async_save(
-            {"tv_host_key": self.tv.host_key, "pending_removal": sorted(self._pending_removal)}
+        await self._store.async_save(self._data())
+
+    # ---- what the sensor and buttons show ----------------------------------------------------
+
+    @property
+    def state(self) -> str:
+        if any(r.state in (PENDING, INSTALLING) for r in self._requests.values()):
+            return "pending"
+        return "active" if self._key_expiry else "idle"
+
+    @property
+    def active_until(self) -> datetime | None:
+        if not self._key_expiry:
+            return None
+        return datetime.fromtimestamp(max(self._key_expiry.values()), UTC)
+
+    def oldest_pending(self) -> Request | None:
+        pending = [r for r in self._requests.values() if r.state == PENDING]
+        return min(pending, key=lambda r: r.created) if pending else None
+
+    @callback
+    def _request_changed(self, request: Request) -> None:
+        # Re-inserted so the most recently changed request is last.
+        self.history.pop(request.id, None)
+        self.history[request.id] = self._history_entry(request)
+        while len(self.history) > HISTORY:
+            del self.history[next(iter(self.history))]
+        if request.state != PENDING:
+            persistent_notification.async_dismiss(self.hass, self._notice_id(request))
+        self._store.async_delay_save(self._data, 1)
+        async_dispatcher_send(self.hass, signal(self.entry.entry_id))
+
+    def _history_entry(self, request: Request) -> dict[str, Any]:
+        return {
+            "key": request.id,
+            "id": request.id[:6],
+            "reason": request.reason,
+            "minutes": request.ttl // 60,
+            "requested": datetime.fromtimestamp(request.created, UTC).isoformat(),
+            "state": "active" if request.state in KEY_ON_TV else request.state,
+            "expires": (
+                datetime.fromtimestamp(request.expires_at, UTC).isoformat()
+                if request.expires_at
+                else None
+            ),
+            "decided_by": request.decided_by,
+            "error": request.error,
+        }
+
+    def _notice_id(self, request: Request) -> str:
+        return f"{DOMAIN}_dev_request_{request.id[:12]}"
+
+    def _device_link(self) -> str:
+        device = dr.async_get(self.hass).async_get_device(
+            identifiers={(DOMAIN, self.entry.data.get(CONF_DEVICE_ID, ""))}
         )
+        return f"/config/devices/device/{device.id}" if device else "/config/devices/dashboard"
 
     async def create(self, reason: Any, ttl: Any) -> Request:
         now = time.time()
@@ -422,9 +525,11 @@ class Broker:
             reason=clean_reason(reason),
             ttl=seconds,
             created=now,
+            on_change=self._request_changed,
         )
         self._requests[request.id] = request
         self._forget_old(now)
+        self._request_changed(request)
 
         # A @callback runs on the event loop; a plain lambda would run in a worker thread.
         @callback
@@ -442,13 +547,20 @@ class Broker:
                 {"action": ACTION_DENY + request.nonce, "title": "Deny", "destructive": True},
             ],
         )
+        persistent_notification.async_create(
+            self.hass,
+            f"**{request.reason}**\n\nAccess for {hours}. Approve or deny it on your phone, or "
+            f"with the buttons on [{self.entry.title}]({self._device_link()}). Unanswered "
+            "requests expire after 10 minutes.",
+            title="Cloud session wants SSH access to the TV",
+            notification_id=self._notice_id(request),
+        )
         _LOGGER.info("Developer access request %s: %s", request.id[:6], request.reason)
         return request
 
     def _forget_old(self, now: float) -> None:
         for request_id, request in list(self._requests.items()):
-            finished = request.state in (DENIED, EXPIRED, FAILED, RELEASED)
-            if finished and request.created < now - 86400:
+            if request.state in FINISHED and request.created < now - 86400:
                 del self._requests[request_id]
 
     @staticmethod
@@ -472,18 +584,46 @@ class Broker:
         else:
             return
         request = next((r for r in self._requests.values() if r.nonce == nonce), None)
-        if request is None or request.state != PENDING:
-            return
+        if request is not None:
+            self.decide(request, approve=approve, by="phone")
+
+    @callback
+    def decide(self, request: Request, *, approve: bool, by: str) -> bool:
+        """Approve or deny a waiting request, from the phone or a button on the device page.
+        Returns False when it was no longer waiting."""
+        if request.state != PENDING:
+            return False
         if request.timer:
             request.timer()
             request.timer = None
+        request.decided_by = by
         if approve:
             request.set_state(INSTALLING)
             self._background(self._approve(request))
         else:
             request.set_state(DENIED)
-            _LOGGER.info("Developer access request %s denied", request.id[:6])
-            self.hass.async_create_task(self._clear(request))
+            _LOGGER.info("Developer access request %s denied (%s)", request.id[:6], by)
+        # Either way, take the Approve/Deny notification off the phone.
+        self.hass.async_create_task(self._clear(request))
+        return True
+
+    async def revoke_all(self) -> None:
+        """Take every session key off the TV now; developer access stays on. Raises TvError
+        when the TV cannot be reached."""
+        assert self.tv
+        await self.tv.remove_all()
+        for cancel in self._key_timers.values():
+            cancel()
+        self._key_timers.clear()
+        self._key_expiry.clear()
+        self._pending_removal.clear()
+        for request in self._requests.values():
+            if request.state in KEY_ON_TV:
+                request.payload = None
+                request.set_state(REVOKED)
+        await self._save()
+        async_dispatcher_send(self.hass, signal(self.entry.entry_id))
+        _LOGGER.info("Revoked all developer access keys on %s", self.entry.title)
 
     async def _approve(self, request: Request) -> None:
         assert self.tv
@@ -522,7 +662,6 @@ class Broker:
         self._schedule_removal(request.id, expires_at)
         request.set_state(APPROVED)
         _LOGGER.info("Developer access request %s approved until %s", request.id[:6], expires_at)
-        await self._clear(request)
 
     def _payload(self, private_key: str, expires_at: int) -> dict[str, Any]:
         options = self.entry.options
@@ -579,6 +718,7 @@ class Broker:
             FAILED: (502, request.error or "failed"),
             DELIVERED: (410, "already_delivered"),
             RELEASED: (410, "released"),
+            REVOKED: (410, "revoked"),
         }[request.state]
         raise DevAccessError(status, code)
 
@@ -606,9 +746,12 @@ class Broker:
         if cancel := self._key_timers.pop(request_id, None):
             cancel()
 
+        self._key_expiry[request_id] = expires_at
+
         @callback
         def _expired(_now: datetime) -> None:
             self._key_timers.pop(request_id, None)
+            self._key_expiry.pop(request_id, None)
             request = self._requests.get(request_id)
             if request and request.state in KEY_ON_TV:
                 request.payload = None
@@ -622,6 +765,8 @@ class Broker:
         assert self.tv
         if cancel := self._key_timers.pop(request_id, None):
             cancel()
+        self._key_expiry.pop(request_id, None)
+        async_dispatcher_send(self.hass, signal(self.entry.entry_id))
         try:
             await self.tv.remove({request_id})
         except self._dev_tv.TvError as err:
@@ -648,6 +793,7 @@ class Broker:
         for request_id, expires_at in remaining.items():
             if request_id not in self._key_timers:
                 self._schedule_removal(request_id, expires_at)
+        async_dispatcher_send(self.hass, signal(self.entry.entry_id))
 
     async def notify(
         self,

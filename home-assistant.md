@@ -325,6 +325,21 @@ Cloudflare service token. Submitting shows two things once:
 - **Home Assistant's key line**: append it to `/home/root/.ssh/authorized_keys` on the TV, so Home
   Assistant can add and remove session keys.
 
+While developer access is on, the TV's device page has:
+
+- **Developer access**, a sensor: _Idle_, _Waiting for approval_, or _Session key on the TV_. Its
+  attributes list the last 20 requests (reason, how long, when, the outcome and who decided), and
+  its history in the Logbook is a record of every request.
+- **Approve developer access request** and **Deny developer access request**: answer the oldest
+  waiting request, the same as the buttons on your phone. They are unavailable while nothing is
+  waiting.
+- **Revoke all developer access**: takes every session key off the TV now and leaves the feature
+  on.
+
+Each request also appears in Home Assistant's notifications with a link to that page, and goes
+away once it is answered or expires. On an iPhone, press and hold the phone notification to see
+Approve and Deny; tapping it only opens it.
+
 The same page makes a new dev token (the old one stops working at once) and forgets the TV's SSH
 host key after a TV reset; Home Assistant pins it on first contact and refuses to continue if it
 changes. From a session, `node tools/tv-access.mjs request` asks and sets up `ssh tv`; see

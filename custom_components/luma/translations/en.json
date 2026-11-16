@@ -103,7 +103,10 @@
     "button": {
       "dismiss_overlay": { "name": "Dismiss overlay" },
       "example_camera": { "name": "Show example camera card" },
-      "example_toast": { "name": "Show example toast" }
+      "example_toast": { "name": "Show example toast" },
+      "dev_access_approve": { "name": "Approve developer access request" },
+      "dev_access_deny": { "name": "Deny developer access request" },
+      "dev_access_revoke": { "name": "Revoke all developer access" }
     },
     "notify": { "toast": { "name": "Toast" } },
     "sensor": {
@@ -111,7 +114,15 @@
       "dropped_frames": { "name": "Dropped frames" },
       "memory": { "name": "Memory" },
       "cpu": { "name": "CPU" },
-      "last_problem": { "name": "Last problem" }
+      "last_problem": { "name": "Last problem" },
+      "dev_access": {
+        "name": "Developer access",
+        "state": {
+          "idle": "Idle",
+          "pending": "Waiting for approval",
+          "active": "Session key on the TV"
+        }
+      }
     }
   },
   "issues": {
