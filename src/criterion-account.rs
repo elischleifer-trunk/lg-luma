@@ -168,21 +168,19 @@ mod tests {
         assert_eq!(account.email, "me@example.com");
         assert_eq!(account.password, "hunter2 with spaces");
         let debug = format!("{account:?}");
-        assert!(
-            !debug.contains("hunter2") && !debug.contains("example"),
-            "{debug}"
-        );
-        for (email, password) in [
+        // Failure messages name the case, never the values.
+        assert!(!debug.contains("hunter2") && !debug.contains("example"));
+        for (case, (email, password)) in [
             ("not-an-email", "x"),
             ("a b@example.com", "x"),
             ("me@example.com", ""),
             ("me@example.com", "line\nbreak"),
             ("me\u{0}@example.com", "x"),
-        ] {
-            assert!(
-                Account::new(email, password).is_err(),
-                "{email:?} {password:?}"
-            );
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            assert!(Account::new(email, password).is_err(), "case {case}");
         }
         assert!(Account::new("me@example.com", &"x".repeat(257)).is_err());
     }
