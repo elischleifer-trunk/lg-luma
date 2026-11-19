@@ -29,6 +29,10 @@ const CODES_KEPT: usize = 4;
 pub struct Account {
     pub email: String,
     pub password: String,
+    /// Home Assistant's keyed hash of this account, reported back in `/api/status` so it can
+    /// tell whether the TV holds the account it has now (it says nothing about the password).
+    #[serde(default)]
+    pub fingerprint: String,
 }
 
 impl std::fmt::Debug for Account {
@@ -56,7 +60,17 @@ impl Account {
         Ok(Self {
             email: email.into(),
             password: password.into(),
+            fingerprint: String::new(),
         })
+    }
+
+    /// With Home Assistant's fingerprint: up to 128 letters and digits, or none.
+    pub fn with_fingerprint(mut self, fingerprint: &str) -> Result<Self, String> {
+        if fingerprint.len() > 128 || !fingerprint.bytes().all(|b| b.is_ascii_alphanumeric()) {
+            return Err("fingerprint must be up to 128 letters and digits".into());
+        }
+        self.fingerprint = fingerprint.into();
+        Ok(self)
     }
 }
 
@@ -68,7 +82,9 @@ pub fn path(store: &Path) -> PathBuf {
 pub fn load(path: &Path) -> Option<Account> {
     let bytes = std::fs::read(path).ok()?;
     let account: Account = serde_json::from_slice(&bytes).ok()?;
-    Account::new(&account.email, &account.password).ok()
+    Account::new(&account.email, &account.password)
+        .and_then(|valid| valid.with_fingerprint(&account.fingerprint))
+        .ok()
 }
 
 pub fn save(path: &Path, account: &Account) -> Result<(), String> {
@@ -179,7 +195,11 @@ mod tests {
         let file = path(&dir.join("home-assistant.json"));
         assert_eq!(file, dir.join("criterion-account.json"));
         assert_eq!(load(&file), None);
-        let account = Account::new("me@example.com", "secret").unwrap();
+        let account = Account::new("me@example.com", "secret")
+            .unwrap()
+            .with_fingerprint("abc123")
+            .unwrap();
+        assert!(account.clone().with_fingerprint("a-b").is_err());
         save(&file, &account).unwrap();
         assert_eq!(load(&file), Some(account));
         #[cfg(unix)]

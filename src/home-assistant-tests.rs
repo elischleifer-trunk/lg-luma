@@ -1677,7 +1677,8 @@ fn home_assistant_sets_the_criterion_account_and_only_the_player_reads_it() {
     let (sender, events) = mpsc::channel();
     h.api = Api::new(h.tv.clone(), Some(dir.join("home-assistant.json")), sender).unwrap();
     h.events = events;
-    let account = json!({"email": "me@example.com", "password": "secret pass"});
+    let account =
+        json!({"email": "me@example.com", "password": "secret pass", "fingerprint": "f00d"});
 
     assert_eq!(
         h.call("PUT", "/api/criterion-account", None, account.clone())
@@ -1697,10 +1698,14 @@ fn home_assistant_sets_the_criterion_account_and_only_the_player_reads_it() {
     assert_eq!(saved.status, 200, "{:?}", saved.body);
     assert!(file.exists());
     let status = h.call("GET", "/api/status", Some(&token), json!({}));
-    assert_eq!(status.body["criterion_account"], true);
-    assert!(
-        !status.body.to_string().contains("secret"),
-        "never the account itself"
+    // Home Assistant's fingerprint, never the account itself.
+    assert_eq!(status.body["criterion_account"], "f00d");
+    assert!(!status.body.to_string().contains("secret"));
+    let odd = json!({"email": "me@example.com", "password": "x", "fingerprint": "a b"});
+    assert_eq!(
+        h.call("PUT", "/api/criterion-account", Some(&token), odd)
+            .status,
+        400
     );
 
     let sign_in = |h: &mut Harness, method: &str, origin: Option<&str>, peer, body: Value| {
@@ -1754,5 +1759,20 @@ fn home_assistant_sets_the_criterion_account_and_only_the_player_reads_it() {
     assert!(!file.exists());
     let missing = sign_in(&mut h, "POST", page, LOOPBACK, json!({"code": code}));
     assert_eq!(missing.status, 404);
+
+    // The last server unpairing takes the account with it.
+    let account = json!({"email": "me@example.com", "password": "secret pass"});
+    h.call("PUT", "/api/criterion-account", Some(&token), account);
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(
+        status.body["criterion_account"], true,
+        "sent without a fingerprint"
+    );
+    assert_eq!(
+        h.call("DELETE", "/api/pair", Some(&token), json!({}))
+            .status,
+        200
+    );
+    assert!(!file.exists());
     let _ = std::fs::remove_dir_all(&dir);
 }

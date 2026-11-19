@@ -184,6 +184,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     _track_cameras(hass, entry, client)
     # Home Assistant holds the streaming search keys: send them now and whenever they change.
     entry.async_create_background_task(hass, _push_keys(entry), f"{DOMAIN} keys {entry.entry_id}")
+    entry.async_create_background_task(
+        hass, _push_criterion_account(entry), f"{DOMAIN} criterion {entry.entry_id}"
+    )
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     # Developer access is off unless turned on in the options (see dev_access.py).
     if dev_access.enabled(entry):
@@ -220,7 +223,7 @@ def _remove_entity(hass: HomeAssistant, entry: LumaConfigEntry, platform: str, k
 
 async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
     await _push_keys(entry)
-    # A cleared account leaves the TV at the next status check.
+    # A cleared account leaves the TV at the next status check, which compares fingerprints.
     await _push_criterion_account(entry)
     # Only when phone typing is on, or was: turning it off tells the TV to stop calling.
     if keyboard.wanted(entry) or entry.runtime_data.keyboard:
@@ -245,7 +248,11 @@ async def _push_keys(entry: LumaConfigEntry) -> None:
 async def _push_criterion_account(entry: LumaConfigEntry, *, forget: bool = False) -> None:
     data = entry.runtime_data
     await criterion_account.push(
-        data.client, dict(entry.options), data.compatibility.missing_endpoint, forget=forget
+        data.client,
+        entry.entry_id,
+        dict(entry.options),
+        data.compatibility.missing_endpoint,
+        forget=forget,
     )
 
 
@@ -352,7 +359,7 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
             schedule()
         if streaming_keys.needs_push(dict(entry.options), status):
             await _push_keys(entry)
-        if criterion_account.needs_push(dict(entry.options), status):
+        if criterion_account.needs_push(entry.entry_id, dict(entry.options), status):
             await _push_criterion_account(entry)
         elif criterion_account.needs_forget(dict(entry.options), status):
             await _push_criterion_account(entry, forget=True)

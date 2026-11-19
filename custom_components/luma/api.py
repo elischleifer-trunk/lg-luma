@@ -140,10 +140,15 @@ class LumaClient:
         }
         return await self._request("PUT", "/api/streaming-keys", payload)
 
-    async def criterion_account(self, email: str, password: str) -> dict[str, Any]:
-        """Set the account the TV's Criterion player signs in with."""
+    async def criterion_account(
+        self, email: str, password: str, fingerprint: str
+    ) -> dict[str, Any]:
+        """Set the account the TV's Criterion player signs in with. The TV reports
+        `fingerprint` back in its status, never the account."""
         return await self._request(
-            "PUT", "/api/criterion-account", {"email": email, "password": password}
+            "PUT",
+            "/api/criterion-account",
+            {"email": email, "password": password, "fingerprint": fingerprint},
         )
 
     async def forget_criterion_account(self) -> dict[str, Any]:

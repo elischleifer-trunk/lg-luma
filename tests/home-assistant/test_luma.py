@@ -1657,12 +1657,13 @@ async def account_form(hass: HomeAssistant, config: MockConfigEntry):
     return result
 
 
-async def test_the_criterion_account_is_checked_sent_and_removed(
+async def test_the_criterion_account_is_checked_sent_and_never_in_diagnostics(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
+    from custom_components.luma.criterion_account import fingerprint
+
     config = await setup(hass, aioclient_mock)
     aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
-    aioclient_mock.delete(f"{TV}/api/criterion-account", json={"criterion_account": False})
     aioclient_mock.put(f"{TV}/api/streaming-keys", json={})
 
     result = await account_form(hass, config)
@@ -1682,11 +1683,18 @@ async def test_the_criterion_account_is_checked_sent_and_removed(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
     assert config.options["criterion_email"] == "me@example.com"
+    mark = fingerprint(config.entry_id, "me@example.com", "pw 1")
+    assert len(mark) == 64 and "pw" not in mark
     assert account_calls(aioclient_mock) == [
-        ("PUT", {"email": "me@example.com", "password": "pw 1"})
+        ("PUT", {"email": "me@example.com", "password": "pw 1", "fingerprint": mark})
     ]
 
-    # Both fields cleared: nothing is sent now; the next status check removes it.
+    aioclient_mock.get(f"{TV}/api/diagnostics", json={"boot": "ab", "entries": []})
+    diagnostics = await async_get_config_entry_diagnostics(hass, config)
+    for key in ("criterion_email", "criterion_password"):
+        assert diagnostics["entry"]["options"][key] == "**REDACTED**"
+
+    # Both fields cleared: nothing is sent now, and what was cleared is remembered.
     aioclient_mock.clear_requests()
     aioclient_mock.put(f"{TV}/api/streaming-keys", json={})
     result = await account_form(hass, config)
@@ -1696,6 +1704,71 @@ async def test_the_criterion_account_is_checked_sent_and_removed(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
     assert account_calls(aioclient_mock) == []
+    assert config.options["criterion_cleared"] == mark
+
+
+def test_only_the_account_cleared_here_is_forgotten() -> None:
+    from custom_components.luma.criterion_account import fingerprint, needs_forget, saved
+
+    mine = fingerprint("entry", "me@example.com", "pw")
+    held = {"criterion_email": "me@example.com", "criterion_password": "pw"}
+    cleared = saved("entry", held, "", "")
+    assert cleared["criterion_cleared"] == mine
+    assert needs_forget(cleared, {"criterion_account": mine})
+    # Another Home Assistant server's account, or none: left alone.
+    assert not needs_forget(cleared, {"criterion_account": "theirs"})
+    assert not needs_forget(cleared, {"criterion_account": False})
+    # A server that never held one forgets nothing.
+    assert not needs_forget({}, {"criterion_account": mine})
+    # Saving the empty form again keeps the record; setting an account drops it.
+    assert saved("entry", cleared, "", "")["criterion_cleared"] == mine
+    assert "criterion_cleared" not in saved("entry", cleared, "a@b.c", "x")
+
+
+@pytest.mark.parametrize(
+    ("held", "action"),
+    [
+        ("mine", None),
+        # Reset, or changed here while the TV was off.
+        (False, "PUT"),
+        ("old", "PUT"),
+        # An older Luma reports nothing.
+        ("absent", None),
+    ],
+)
+async def test_the_tv_gets_the_criterion_account_whenever_it_holds_another(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    monkeypatch: pytest.MonkeyPatch,
+    held,
+    action,
+) -> None:
+    from custom_components.luma.criterion_account import fingerprint
+
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    config = entry(hass)
+    hass.config_entries.async_update_entry(
+        config, options={"criterion_email": "me@example.com", "criterion_password": "pw"}
+    )
+    status = {"overlay": None, "overlay_ready": True, "cameras": 0}
+    if held != "absent":
+        status["criterion_account"] = (
+            fingerprint(config.entry_id, "me@example.com", "pw") if held == "mine" else held
+        )
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    # Setup sends it once, whatever the TV holds.
+    assert [method for method, _ in account_calls(aioclient_mock)] == ["PUT"]
+    aioclient_mock.clear_requests()
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert [method for method, _ in account_calls(aioclient_mock)] == ([action] if action else [])
 
 
 async def test_a_cleared_criterion_account_leaves_the_tv(
@@ -1703,7 +1776,8 @@ async def test_a_cleared_criterion_account_leaves_the_tv(
 ) -> None:
     monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
     config = entry(hass)
-    status = {"overlay": None, "overlay_ready": True, "cameras": 0, "criterion_account": True}
+    hass.config_entries.async_update_entry(config, options={"criterion_cleared": "f00d"})
+    status = {"overlay": None, "overlay_ready": True, "cameras": 0, "criterion_account": "f00d"}
     aioclient_mock.get(f"{TV}/api/status", json=status)
     aioclient_mock.delete(f"{TV}/api/criterion-account", json={"criterion_account": False})
     aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
@@ -1712,33 +1786,3 @@ async def test_a_cleared_criterion_account_leaves_the_tv(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert ("DELETE", None) in account_calls(aioclient_mock)
-
-
-@pytest.mark.parametrize(
-    ("held", "pushed"),
-    [(True, False), (False, True), (None, False)],
-)
-async def test_the_tv_gets_the_criterion_account_again_after_a_reset(
-    hass: HomeAssistant,
-    aioclient_mock: AiohttpClientMocker,
-    monkeypatch: pytest.MonkeyPatch,
-    held,
-    pushed,
-) -> None:
-    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
-    config = entry(hass)
-    hass.config_entries.async_update_entry(
-        config, options={"criterion_email": "me@example.com", "criterion_password": "pw"}
-    )
-    status = {"overlay": None, "overlay_ready": True, "cameras": 0}
-    if held is not None:
-        status["criterion_account"] = held
-    aioclient_mock.get(f"{TV}/api/status", json=status)
-    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
-    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
-    assert await hass.config_entries.async_setup(config.entry_id)
-    await hass.async_block_till_done(wait_background_tasks=True)
-    before = len(account_calls(aioclient_mock))
-    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
-    await hass.async_block_till_done(wait_background_tasks=True)
-    assert (len(account_calls(aioclient_mock)) > before) is pushed

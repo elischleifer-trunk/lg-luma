@@ -681,6 +681,7 @@ impl<T: Tv> Api<T> {
         self.keyboard_hooks.clear();
         self.keyboard = None;
         self.outbox.clear();
+        self.forget_criterion_file();
         let before = self.store.clone();
         // Gallery IDs name servers by pairing order, which starts over; each server's
         // arrangement is parked until it pairs again.
@@ -923,6 +924,10 @@ impl<T: Tv> Api<T> {
                         self.pairings.fetch_add(1, Ordering::AcqRel);
                         crate::telemetry::wake_streams();
                         let removed = self.store.clients.remove(client);
+                        // The account came from Home Assistant: with no server left, it goes.
+                        if self.store.clients.is_empty() {
+                            self.forget_criterion_file();
+                        }
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
                         self.keyboard_hooks
                             .retain(|(owner, _)| *owner != removed.token);
@@ -995,8 +1000,16 @@ impl<T: Tv> Api<T> {
                             }),
                             // Whether the TV holds a Criterion Channel account, so Home
                             // Assistant sends its own again after a reset. Never the account.
-                            "criterion_account": self.criterion_account_path()
-                                .map(|path| crate::criterion_account::load(&path).is_some()),
+                            // Its fingerprint (true for one sent without), or false.
+                            "criterion_account": self.criterion_account_path().map(|path| {
+                                match crate::criterion_account::load(&path) {
+                                    Some(account) if !account.fingerprint.is_empty() => {
+                                        json!(account.fingerprint)
+                                    }
+                                    Some(_) => json!(true),
+                                    None => json!(false),
+                                }
+                            }),
                             // Whether this server's keyboard webhook is registered, so it
                             // registers again after Luma restarts.
                             "keyboard_hook": self.keyboard_hooks.iter()
@@ -1327,7 +1340,14 @@ impl<T: Tv> Api<T> {
         ) else {
             return error(400, "email and password must be strings");
         };
-        let account = match crate::criterion_account::Account::new(email, password) {
+        let fingerprint = match body.get("fingerprint") {
+            None | Some(Value::Null) => "",
+            Some(Value::String(value)) => value.as_str(),
+            Some(_) => return error(400, "fingerprint must be a string"),
+        };
+        let account = match crate::criterion_account::Account::new(email, password)
+            .and_then(|account| account.with_fingerprint(fingerprint))
+        {
             Ok(account) => account,
             Err(message) => return error(400, &message),
         };
@@ -1342,6 +1362,18 @@ impl<T: Tv> Api<T> {
             crate::telemetry::log_info!("criterion", "Home Assistant set the account");
         }
         reply(200, json!({"criterion_account": true}))
+    }
+
+    /// Removes the account file, logging (never failing on) an error.
+    fn forget_criterion_file(&self) {
+        if let Some(path) = self.criterion_account_path()
+            && let Err(message) = crate::criterion_account::forget(&path)
+        {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion account: {message}"
+            );
+        }
     }
 
     fn forget_criterion_account(&mut self) -> Reply {
