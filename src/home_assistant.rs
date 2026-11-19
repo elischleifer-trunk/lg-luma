@@ -1020,8 +1020,8 @@ impl<T: Tv> Api<T> {
                     ("POST", "/api/keyboard/text") => self.typed(&body),
                     ("POST", "/api/cameras") => self.set_cameras(client, &body),
                     ("PUT", "/api/streaming-keys") => self.set_streaming_keys(&body),
-                    ("PUT", "/api/criterion-account") => self.set_criterion_account(&body),
-                    ("DELETE", "/api/criterion-account") => self.forget_criterion_account(),
+                    ("PUT", "/api/criterion-account") => self.set_criterion(&body),
+                    ("DELETE", "/api/criterion-account") => self.forget_criterion(),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         // Dismissing closes a doorbell card, never a camera the owner is
@@ -1330,7 +1330,7 @@ impl<T: Tv> Api<T> {
     }
 
     /// Home Assistant is the only source of the Criterion account: it replaces the TV's.
-    fn set_criterion_account(&mut self, body: &Value) -> Reply {
+    fn set_criterion(&mut self, body: &Value) -> Reply {
         let Some(path) = self.criterion_account_path() else {
             return error(503, "This TV has no storage for the account");
         };
@@ -1349,7 +1349,13 @@ impl<T: Tv> Api<T> {
             .and_then(|account| account.with_fingerprint(fingerprint))
         {
             Ok(account) => account,
-            Err(message) => return error(400, &message),
+            // A fixed message: the reply says nothing derived from what was sent.
+            Err(_) => {
+                return error(
+                    400,
+                    "email must be an email address and password 1 to 256 characters",
+                );
+            }
         };
         if crate::criterion_account::load(&path).as_ref() != Some(&account) {
             if let Err(message) = crate::criterion_account::save(&path, &account) {
@@ -1376,7 +1382,7 @@ impl<T: Tv> Api<T> {
         }
     }
 
-    fn forget_criterion_account(&mut self) -> Reply {
+    fn forget_criterion(&mut self) -> Reply {
         let Some(path) = self.criterion_account_path() else {
             return error(503, "This TV has no storage for the account");
         };
