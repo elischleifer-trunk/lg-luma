@@ -19,6 +19,8 @@ CONF_MDBLIST_KEY = "mdblist_api_key"
 # The Criterion Channel account the TV's Criterion player signs in with, kept in the options.
 CONF_CRITERION_EMAIL = "criterion_email"
 CONF_CRITERION_PASSWORD = "criterion_password"
+# A random fingerprint for the saved account, which TVs report back; never derived from it.
+CONF_CRITERION_FINGERPRINT = "criterion_fingerprint"
 # The fingerprint of an account cleared here, which TVs still holding it are told to forget.
 CONF_CRITERION_CLEARED = "criterion_cleared"
 # Phones (their mobile_app notify services) that offer to type into the TV's text fields.

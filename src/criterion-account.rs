@@ -29,8 +29,8 @@ const CODES_KEPT: usize = 4;
 pub struct Account {
     pub email: String,
     pub password: String,
-    /// Home Assistant's keyed hash of this account, reported back in `/api/status` so it can
-    /// tell whether the TV holds the account it has now (it says nothing about the password).
+    /// Home Assistant's random fingerprint for this account, reported back in `/api/status` so
+    /// it can tell whether the TV holds the account it has now. Not derived from the account.
     #[serde(default)]
     pub fingerprint: String,
 }

@@ -143,7 +143,7 @@ class LumaClient:
     async def criterion_account(
         self, email: str, password: str, fingerprint: str
     ) -> dict[str, Any]:
-        """Set the account the TV's Criterion player signs in with. The TV reports
+        """Set the account the TV's Criterion player signs in with. The TV reports the random
         `fingerprint` back in its status, never the account."""
         return await self._request(
             "PUT",

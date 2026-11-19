@@ -1660,8 +1660,6 @@ async def account_form(hass: HomeAssistant, config: MockConfigEntry):
 async def test_the_criterion_account_is_checked_sent_and_never_in_diagnostics(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    from custom_components.luma.criterion_account import fingerprint
-
     config = await setup(hass, aioclient_mock)
     aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
     aioclient_mock.put(f"{TV}/api/streaming-keys", json={})
@@ -1683,15 +1681,15 @@ async def test_the_criterion_account_is_checked_sent_and_never_in_diagnostics(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
     assert config.options["criterion_email"] == "me@example.com"
-    mark = fingerprint(config.entry_id, "me@example.com", "pw 1")
-    assert len(mark) == 64 and "pw" not in mark
+    mark = config.options["criterion_fingerprint"]
+    assert len(mark) == 32
     assert account_calls(aioclient_mock) == [
         ("PUT", {"email": "me@example.com", "password": "pw 1", "fingerprint": mark})
     ]
 
     aioclient_mock.get(f"{TV}/api/diagnostics", json={"boot": "ab", "entries": []})
     diagnostics = await async_get_config_entry_diagnostics(hass, config)
-    for key in ("criterion_email", "criterion_password"):
+    for key in ("criterion_email", "criterion_password", "criterion_fingerprint"):
         assert diagnostics["entry"]["options"][key] == "**REDACTED**"
 
     # Both fields cleared: nothing is sent now, and what was cleared is remembered.
@@ -1708,11 +1706,14 @@ async def test_the_criterion_account_is_checked_sent_and_never_in_diagnostics(
 
 
 def test_only_the_account_cleared_here_is_forgotten() -> None:
-    from custom_components.luma.criterion_account import fingerprint, needs_forget, saved
+    from custom_components.luma.criterion_account import needs_forget, saved
 
-    mine = fingerprint("entry", "me@example.com", "pw")
-    held = {"criterion_email": "me@example.com", "criterion_password": "pw"}
-    cleared = saved("entry", held, "", "")
+    held = saved({}, "me@example.com", "pw")
+    mine = held["criterion_fingerprint"]
+    # Saving the same account keeps its fingerprint; a new password gets a new one.
+    assert saved(held, "me@example.com", "pw")["criterion_fingerprint"] == mine
+    assert saved(held, "me@example.com", "pw2")["criterion_fingerprint"] != mine
+    cleared = saved(held, "", "")
     assert cleared["criterion_cleared"] == mine
     assert needs_forget(cleared, {"criterion_account": mine})
     # Another Home Assistant server's account, or none: left alone.
@@ -1721,8 +1722,9 @@ def test_only_the_account_cleared_here_is_forgotten() -> None:
     # A server that never held one forgets nothing.
     assert not needs_forget({}, {"criterion_account": mine})
     # Saving the empty form again keeps the record; setting an account drops it.
-    assert saved("entry", cleared, "", "")["criterion_cleared"] == mine
-    assert "criterion_cleared" not in saved("entry", cleared, "a@b.c", "x")
+    assert saved(cleared, "", "")["criterion_cleared"] == mine
+    assert "criterion_cleared" not in saved(cleared, "a@b.c", "x")
+    assert "criterion_fingerprint" not in cleared
 
 
 @pytest.mark.parametrize(
@@ -1743,18 +1745,19 @@ async def test_the_tv_gets_the_criterion_account_whenever_it_holds_another(
     held,
     action,
 ) -> None:
-    from custom_components.luma.criterion_account import fingerprint
-
     monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
     config = entry(hass)
     hass.config_entries.async_update_entry(
-        config, options={"criterion_email": "me@example.com", "criterion_password": "pw"}
+        config,
+        options={
+            "criterion_email": "me@example.com",
+            "criterion_password": "pw",
+            "criterion_fingerprint": "f00d",
+        },
     )
     status = {"overlay": None, "overlay_ready": True, "cameras": 0}
     if held != "absent":
-        status["criterion_account"] = (
-            fingerprint(config.entry_id, "me@example.com", "pw") if held == "mine" else held
-        )
+        status["criterion_account"] = "f00d" if held == "mine" else held
     aioclient_mock.get(f"{TV}/api/status", json=status)
     aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
     aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})

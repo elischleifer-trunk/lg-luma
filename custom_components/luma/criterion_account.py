@@ -1,9 +1,10 @@
 """The Criterion Channel account the TV's Criterion player signs in with.
 
-The owner enters it in this integration's options. Home Assistant sends it to every paired TV
-with a fingerprint: a hash keyed with this entry's ID, which says nothing about the password.
-Each TV reports the fingerprint of the account it holds, so Home Assistant sends the account
-again whenever the TV's differs: after a reset, or a change made while the TV was off.
+The owner enters it in this integration's options. Each save gives the account a new random
+fingerprint, kept beside it (never derived from the password). Home Assistant sends the account
+with it to every paired TV, and each TV reports the fingerprint of the account it holds, so Home
+Assistant sends the account again whenever the TV's differs: after a reset, or a change made
+while the TV was off.
 
 Clearing both fields records the fingerprint of the account that was cleared. A TV still holding
 that account is told to forget it; an account another Home Assistant server sent is left alone.
@@ -12,14 +13,18 @@ The TV hands the account only to its own Criterion player, on the Channel's sign
 
 from __future__ import annotations
 
-import hashlib
-import hmac
 import logging
+import secrets
 from collections.abc import Callable
 from typing import Any
 
 from .api import LumaApiError, LumaClient, LumaError
-from .const import CONF_CRITERION_CLEARED, CONF_CRITERION_EMAIL, CONF_CRITERION_PASSWORD
+from .const import (
+    CONF_CRITERION_CLEARED,
+    CONF_CRITERION_EMAIL,
+    CONF_CRITERION_FINGERPRINT,
+    CONF_CRITERION_PASSWORD,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,10 +36,10 @@ def account(options: dict[str, Any]) -> tuple[str, str] | None:
     return (email, password) if email and password else None
 
 
-def fingerprint(entry_id: str, email: str, password: str) -> str:
-    """A hash of the account keyed with the entry ID: equal accounts match, nothing more."""
-    message = f"{email}\n{password}".encode()
-    return hmac.new(entry_id.encode(), message, hashlib.sha256).hexdigest()
+def fingerprint(options: dict[str, Any]) -> str | None:
+    """The saved account's random fingerprint, when an account is saved."""
+    value = options.get(CONF_CRITERION_FINGERPRINT)
+    return value if account(options) is not None and isinstance(value, str) and value else None
 
 
 def check(email: str, password: str) -> dict[str, str]:
@@ -46,25 +51,30 @@ def check(email: str, password: str) -> dict[str, str]:
     return {}
 
 
-def saved(entry_id: str, current: dict[str, Any], email: str, password: str) -> dict[str, Any]:
-    """The options after the account form: cleared fields remember what was cleared."""
+def saved(current: dict[str, Any], email: str, password: str) -> dict[str, Any]:
+    """The options after the account form. A new or changed account gets a new fingerprint;
+    cleared fields remember the fingerprint of what was cleared."""
     options = {**current, CONF_CRITERION_EMAIL: email, CONF_CRITERION_PASSWORD: password}
     options.pop(CONF_CRITERION_CLEARED, None)
-    held = account(current)
-    if not (email or password) and held is not None:
-        options[CONF_CRITERION_CLEARED] = fingerprint(entry_id, *held)
-    elif not (email or password) and current.get(CONF_CRITERION_CLEARED):
+    options.pop(CONF_CRITERION_FINGERPRINT, None)
+    if email and password:
+        unchanged = account(current) == (email, password)
+        options[CONF_CRITERION_FINGERPRINT] = (
+            fingerprint(current) if unchanged and fingerprint(current) else secrets.token_hex(16)
+        )
+    elif fingerprint(current):
+        options[CONF_CRITERION_CLEARED] = fingerprint(current)
+    elif current.get(CONF_CRITERION_CLEARED):
         options[CONF_CRITERION_CLEARED] = current[CONF_CRITERION_CLEARED]
     return options
 
 
-def needs_push(entry_id: str, options: dict[str, Any], status: dict[str, Any]) -> bool:
+def needs_push(options: dict[str, Any], status: dict[str, Any]) -> bool:
     """Whether the TV holds another account than the one held here. A Luma without the
     Criterion player reports nothing and is left alone."""
     if "criterion_account" not in status:
         return False
-    held = account(options)
-    return held is not None and status["criterion_account"] != fingerprint(entry_id, *held)
+    return account(options) is not None and status["criterion_account"] != fingerprint(options)
 
 
 def needs_forget(options: dict[str, Any], status: dict[str, Any]) -> bool:
@@ -79,7 +89,6 @@ def needs_forget(options: dict[str, Any], status: dict[str, Any]) -> bool:
 
 async def push(
     client: LumaClient,
-    entry_id: str,
     options: dict[str, Any],
     missing_endpoint: Callable[[], None],
     *,
@@ -95,7 +104,7 @@ async def push(
         if held is None:
             await client.forget_criterion_account()
         else:
-            await client.criterion_account(*held, fingerprint(entry_id, *held))
+            await client.criterion_account(*held, fingerprint(options) or "")
     except LumaApiError as err:
         if err.status == 404:
             missing_endpoint()

@@ -262,9 +262,7 @@ class LumaOptionsFlow(OptionsFlow):
             errors = criterion_account.check(email, password)
             if not errors:
                 return self.async_create_entry(
-                    data=criterion_account.saved(
-                        self.config_entry.entry_id, dict(current), email, password
-                    )
+                    data=criterion_account.saved(dict(current), email, password)
                 )
         values = user_input or current
         return self.async_show_form(

@@ -249,7 +249,6 @@ async def _push_criterion_account(entry: LumaConfigEntry, *, forget: bool = Fals
     data = entry.runtime_data
     await criterion_account.push(
         data.client,
-        entry.entry_id,
         dict(entry.options),
         data.compatibility.missing_endpoint,
         forget=forget,
@@ -359,7 +358,7 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
             schedule()
         if streaming_keys.needs_push(dict(entry.options), status):
             await _push_keys(entry)
-        if criterion_account.needs_push(entry.entry_id, dict(entry.options), status):
+        if criterion_account.needs_push(dict(entry.options), status):
             await _push_criterion_account(entry)
         elif criterion_account.needs_forget(dict(entry.options), status):
             await _push_criterion_account(entry, forget=True)
