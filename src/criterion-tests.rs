@@ -416,20 +416,68 @@ fn new_rows_keep_the_focused_film() {
     assert_eq!(state.focus, Target::Film(0, 1));
 }
 
+fn frame() -> Arc<Frame> {
+    Arc::new(Frame {
+        key: "x".into(),
+        serial: 1,
+        pixels: image::RgbaImage::new(1, 1),
+        live: false,
+    })
+}
+
+fn requested(state: &mut State) -> Vec<String> {
+    state
+        .criterion_image_requests()
+        .map(|(_, requests)| requests.into_iter().map(|r| r.show_id).collect())
+        .unwrap_or_default()
+}
+
 #[test]
-fn artwork_is_asked_for_once_per_film_and_only_while_open() {
-    let mut state = opened(&[2, 2]);
-    let requests = state.criterion_image_requests().unwrap();
-    assert_eq!(requests.len(), 4);
-    assert_eq!(requests[0].show_id, image_key("film0x00"));
-    assert_eq!(requests[0].size, IMAGE_SIZE);
-    assert!(state.criterion_image_requests().is_none());
-    state.accept_criterion_image(&image_key("film0x00"), None);
+fn artwork_loads_only_near_the_screen_and_a_failure_is_tried_again_next_visit() {
+    let mut state = opened(&[10, 10, 10, 10, 10, 10, 10, 10]);
+    let first = state.criterion_image_requests().unwrap();
+    // Five rows from the top, each the cards on screen and two beyond: not all 80 films.
+    assert_eq!(first.1.len(), 5 * (VISIBLE_CARDS + 2));
+    assert_eq!(first.0.len(), first.1.len());
+    assert_eq!(first.1[0].show_id, image_key("film0x00"));
+    assert_eq!(first.1[0].size, IMAGE_SIZE);
+    assert!(state.criterion_image_requests().is_none(), "asked once");
+
+    state.accept_criterion_image(&image_key("film0x00"), Some(frame()));
+    state.accept_criterion_image(&image_key("film0x01"), None);
     state.accept_criterion_image("poster-for-search", None);
+    assert!(state.criterion.images.contains_key("film0x00"));
+    // A failure is not asked again during this visit.
+    assert!(requested(&mut state).is_empty());
+
+    // Moving down drops artwork that left the screen and asks for the new rows.
+    for _ in 0..4 {
+        state.direction(Direction::Down, &[]);
+    }
+    let asked = requested(&mut state);
+    assert!(asked.contains(&image_key("film5x00")), "{asked:?}");
+    assert!(!state.criterion.images.contains_key("film0x00"));
+
     state.back();
+    assert!(state.criterion_image_requests().is_none(), "closed");
     state.open_criterion();
-    // Reopened: only films without a request so far (none) are asked for.
-    assert_eq!(state.criterion_image_requests().map(|r| r.len()), Some(0));
-    state.back();
-    assert!(state.criterion_image_requests().is_none());
+    for _ in 0..4 {
+        state.direction(Direction::Up, &[]);
+    }
+    // The failed one is tried again on the next visit.
+    assert!(requested(&mut state).contains(&image_key("film0x01")));
+}
+
+#[test]
+fn back_from_a_film_keeps_the_grid_but_the_home_key_closes_it() {
+    let mut state = opened(&[3, 3]);
+    state.direction(Direction::Down, &[]);
+    assert_eq!(state.activate().len(), 1);
+    // Leaving the player relaunches Luma as Home.
+    state.return_home();
+    assert!(state.criterion_open());
+    assert_eq!(state.focus, Target::Film(1, 0));
+    // Home pressed with Luma in front.
+    state.return_home();
+    assert!(!state.criterion_open());
 }

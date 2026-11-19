@@ -623,6 +623,14 @@ impl State {
         if self.cameras_open() {
             self.close_cameras();
         }
+        // Back out of a film the Criterion screen opened also relaunches Home: stay on its grid.
+        // The Home key, pressed with Luma already in front, still closes it.
+        if self.criterion_open() && std::mem::take(&mut self.criterion.playing) {
+            self.pointer = false;
+            self.pressed = None;
+            self.dirty = true;
+            return pending;
+        }
         if self.criterion_open() {
             self.close_criterion();
         }

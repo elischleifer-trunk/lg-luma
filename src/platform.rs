@@ -650,12 +650,16 @@ fn launch_title(
 ) -> Option<Result<(), String>> {
     let resolved = crate::deeplink::resolve(service, link);
     // Luma's Criterion player ships inside Luma's package; it is installed, or updated to
-    // this release, the first time it opens a film.
-    if id == crate::criterion::PLAYER
-        && let Err(error) = overlay_helper("install-criterion", None)
-    {
-        crate::telemetry::log_error!("criterion", "Installing the player: {error}");
-        return Some(Err(error));
+    // this release, the first time this run of Luma opens a film. A failure is logged and the
+    // launch tried anyway: an earlier release's player still plays.
+    static PLAYER_READY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+    if id == crate::criterion::PLAYER && !PLAYER_READY.load(Ordering::Acquire) {
+        match overlay_helper("install-criterion", None) {
+            Ok(_) => PLAYER_READY.store(true, Ordering::Release),
+            Err(error) => {
+                crate::telemetry::log_error!("criterion", "Installing the player: {error}")
+            }
+        }
     }
     if !still_current() {
         crate::telemetry::log_info!("launch", "Dropped {id}: a newer launch was requested");

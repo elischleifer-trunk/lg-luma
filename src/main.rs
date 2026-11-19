@@ -2100,14 +2100,7 @@ fn run() -> Result<(), String> {
         for reply in criterion_catalog.receiver.try_iter() {
             state.accept_criterion(reply);
         }
-        if let Some(requests) = state.criterion_image_requests() {
-            let wanted: Vec<String> = state
-                .criterion
-                .rows
-                .iter()
-                .flat_map(|row| &row.films)
-                .map(|film| criterion::image_key(&film.id))
-                .collect();
+        if let Some((wanted, requests)) = state.criterion_image_requests() {
             criterion_images.want(wanted.iter().map(String::as_str));
             for request in requests {
                 criterion_images.send(request);

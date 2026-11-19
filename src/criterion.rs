@@ -22,7 +22,7 @@ use crate::state::{Direction, Effect, Overlay, State, Target};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     io::Read,
     path::PathBuf,
     sync::{Arc, mpsc},
@@ -650,17 +650,42 @@ pub struct Browser {
     pub first_row: usize,
     /// Per row, the first card on screen.
     pub first_card: Vec<usize>,
-    /// Artwork by film ID: None while loading or when unavailable.
-    pub images: HashMap<String, Option<Arc<Frame>>>,
-    /// Films whose artwork was asked for since the screen opened.
-    image_requests_sent: bool,
+    /// Artwork by film ID, only for cards on or near the screen: each is about 360 KB.
+    pub images: HashMap<String, Arc<Frame>>,
+    /// Artwork asked for and not yet answered.
+    pending: HashSet<String>,
+    /// Artwork that could not be fetched this visit; the next visit tries again.
+    failed: HashSet<String>,
+    /// A film was opened in the player: the relaunch that brings Luma back keeps this screen.
+    pub playing: bool,
     /// The film chosen whose page is being looked up; it opens when the page is found.
     pub resolving: Option<String>,
     /// A film whose page the main loop asks the catalog worker for.
     resolve_request: Option<Film>,
 }
 
+/// Rows kept around the screen's: the one above and the two below the three on screen.
+const ROWS_ABOVE: usize = 1;
+const ROWS_BELOW: usize = 5;
+/// Cards kept either side of a row's visible ones.
+const CARDS_AROUND: usize = 2;
+
 impl Browser {
+    /// Films whose artwork should be loaded: cards on screen and just beyond it, top row first.
+    fn nearby(&self) -> Vec<&Film> {
+        let rows = self.first_row.saturating_sub(ROWS_ABOVE)
+            ..(self.first_row + ROWS_BELOW).min(self.rows.len());
+        let mut films = Vec::new();
+        for index in rows {
+            let first = self.first_card(index);
+            let row = &self.rows[index].films;
+            let cards = first.saturating_sub(CARDS_AROUND)
+                ..(first + VISIBLE_CARDS + CARDS_AROUND).min(row.len());
+            films.extend(&row[cards]);
+        }
+        films
+    }
+
     pub fn film(&self, row: usize, card: usize) -> Option<&Film> {
         self.rows.get(row)?.films.get(card)
     }
@@ -703,7 +728,7 @@ impl State {
         browser.requested = true;
         browser.error = None;
         browser.loading = browser.rows.is_empty();
-        browser.image_requests_sent = false;
+        browser.failed.clear();
         self.focus = if browser.rows.is_empty() {
             Target::CriterionRetry
         } else {
@@ -736,14 +761,9 @@ impl State {
                         Target::Film(row, card) => browser.film(row, card).map(|f| f.id.clone()),
                         _ => None,
                     };
-                    browser.images.retain(|id, _| {
-                        rows.iter()
-                            .any(|row| row.films.iter().any(|film| &film.id == id))
-                    });
                     browser.rows = rows;
                     browser.first_card = vec![0; browser.rows.len()];
                     browser.first_row = 0;
-                    browser.image_requests_sent = false;
                     if open {
                         let found = focused.and_then(|id| {
                             browser.rows.iter().enumerate().find_map(|(r, row)| {
@@ -789,6 +809,7 @@ impl State {
     }
 
     pub fn criterion_direction(&mut self, direction: Direction) -> Vec<Effect> {
+        self.criterion.playing = false;
         let Target::Film(row, card) = self.focus else {
             return vec![];
         };
@@ -825,11 +846,14 @@ impl State {
             Target::Film(row, card) => match self.criterion.film(row, card).cloned() {
                 Some(Film {
                     link: Some(link), ..
-                }) => vec![Effect::LaunchTitle {
-                    app: PLAYER.into(),
-                    service: SERVICE.into(),
-                    link,
-                }],
+                }) => {
+                    self.criterion.playing = true;
+                    vec![Effect::LaunchTitle {
+                        app: PLAYER.into(),
+                        service: SERVICE.into(),
+                        link,
+                    }]
+                }
                 // Listed by TMDB: its page on the Channel is looked up first.
                 Some(film) => {
                     self.criterion.resolving = Some(film.id.clone());
@@ -878,6 +902,7 @@ impl State {
         if !self.criterion_open() {
             return vec![];
         }
+        self.criterion.playing = true;
         vec![Effect::LaunchTitle {
             app: PLAYER.into(),
             service: SERVICE.into(),
@@ -886,6 +911,7 @@ impl State {
     }
 
     pub fn criterion_back(&mut self) -> Vec<Effect> {
+        self.criterion.playing = false;
         self.close_criterion();
         vec![]
     }
@@ -895,38 +921,64 @@ impl State {
         std::mem::take(&mut self.criterion.requested)
     }
 
-    /// Artwork to fetch for the open screen, once per film, or None when nothing changed.
-    pub fn criterion_image_requests(&mut self) -> Option<Vec<crate::posters::Request>> {
-        let open = self.criterion_open();
-        let browser = &mut self.criterion;
-        if !open || browser.image_requests_sent || browser.rows.is_empty() {
+    /// Artwork to fetch for the cards on and near the screen, with every image the worker should
+    /// still load (`posters::Service::want`), or None when nothing changed. Artwork that moved
+    /// away from the screen is dropped.
+    pub fn criterion_image_requests(
+        &mut self,
+    ) -> Option<(Vec<String>, Vec<crate::posters::Request>)> {
+        if !self.criterion_open() {
             return None;
         }
-        browser.image_requests_sent = true;
+        let browser = &mut self.criterion;
+        let nearby: Vec<Film> = browser.nearby().into_iter().cloned().collect();
+        let before = browser.images.len();
+        browser
+            .images
+            .retain(|id, _| nearby.iter().any(|film| &film.id == id));
         let mut requests = Vec::new();
-        // Top rows first: they are on screen.
-        for film in browser.rows.iter().flat_map(|row| &row.films) {
-            if browser.images.contains_key(&film.id) {
+        for film in &nearby {
+            if browser.images.contains_key(&film.id)
+                || browser.pending.contains(&film.id)
+                || browser.failed.contains(&film.id)
+            {
                 continue;
             }
-            browser.images.insert(film.id.clone(), None);
+            browser.pending.insert(film.id.clone());
             requests.push(crate::posters::Request {
                 show_id: image_key(&film.id),
                 url: film.image.clone(),
                 size: IMAGE_SIZE,
             });
         }
-        Some(requests)
+        // Requests for films no longer nearby are skipped by the worker; forget them here.
+        browser
+            .pending
+            .retain(|id| nearby.iter().any(|film| &film.id == id));
+        if requests.is_empty() && browser.images.len() == before {
+            return None;
+        }
+        let wanted = nearby.iter().map(|film| image_key(&film.id)).collect();
+        Some((wanted, requests))
     }
 
     pub fn accept_criterion_image(&mut self, key: &str, image: Option<Arc<Frame>>) {
         let Some(id) = key.strip_prefix(IMAGE_PREFIX) else {
             return;
         };
-        if let Some(slot) = self.criterion.images.get_mut(id) {
-            *slot = image;
-            self.dirty = true;
+        let browser = &mut self.criterion;
+        if !browser.pending.remove(id) {
+            return;
         }
+        match image {
+            Some(image) => {
+                browser.images.insert(id.to_owned(), image);
+            }
+            None => {
+                browser.failed.insert(id.to_owned());
+            }
+        }
+        self.dirty = true;
     }
 }
 

@@ -120,7 +120,7 @@ fn rows(out: &mut Scene, state: &State) {
             }
             out.shape(rect, RADIUS, c(0x1b1f24, 1.));
             match browser.images.get(&film.id) {
-                Some(Some(image)) => {
+                Some(image) => {
                     let shade = if focused { 1. } else { 0.82 };
                     out.draw.push(Draw::Camera(
                         image.clone(),
