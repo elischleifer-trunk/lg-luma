@@ -3,8 +3,9 @@
 The owner enters it in this integration's options. Each save gives the account a new random
 fingerprint, kept beside it (never derived from the password). Home Assistant sends the account
 with it to every paired TV, and each TV reports the fingerprint of the account it holds, so Home
-Assistant sends the account again whenever the TV's differs: after a reset, or a change made
-while the TV was off.
+Assistant sends the account again when the TV holds none (a reset) or one this server sent
+earlier (a change made while the TV was off). An account another paired server sent is left
+alone, so two servers never take turns overwriting it.
 
 Clearing both fields records the fingerprint of the account that was cleared. A TV still holding
 that account is told to forget it; an account another Home Assistant server sent is left alone.
@@ -21,12 +22,15 @@ from typing import Any
 from .api import LumaApiError, LumaClient, LumaError
 from .const import (
     CONF_CRITERION_CLEARED,
+    CONF_CRITERION_EARLIER,
     CONF_CRITERION_EMAIL,
     CONF_CRITERION_FINGERPRINT,
     CONF_CRITERION_PASSWORD,
 )
 
 _LOGGER = logging.getLogger(__name__)
+# Fingerprints of accounts this server sent before, recognized as its own on a TV.
+EARLIER_KEPT = 5
 
 
 def account(options: dict[str, Any]) -> tuple[str, str] | None:
@@ -57,6 +61,10 @@ def saved(current: dict[str, Any], email: str, password: str) -> dict[str, Any]:
     options = {**current, CONF_CRITERION_EMAIL: email, CONF_CRITERION_PASSWORD: password}
     options.pop(CONF_CRITERION_CLEARED, None)
     options.pop(CONF_CRITERION_FINGERPRINT, None)
+    earlier = [mark for mark in current.get(CONF_CRITERION_EARLIER, []) if isinstance(mark, str)]
+    if fingerprint(current) and account(current) != (email, password):
+        earlier.append(fingerprint(current))
+    options[CONF_CRITERION_EARLIER] = earlier[-EARLIER_KEPT:]
     if email and password:
         unchanged = account(current) == (email, password)
         options[CONF_CRITERION_FINGERPRINT] = (
@@ -70,11 +78,14 @@ def saved(current: dict[str, Any], email: str, password: str) -> dict[str, Any]:
 
 
 def needs_push(options: dict[str, Any], status: dict[str, Any]) -> bool:
-    """Whether the TV holds another account than the one held here. A Luma without the
-    Criterion player reports nothing and is left alone."""
-    if "criterion_account" not in status:
+    """Whether the TV holds no account, or an earlier one from this server. A Luma without the
+    Criterion player reports nothing and is left alone, as is another server's account."""
+    if "criterion_account" not in status or account(options) is None:
         return False
-    return account(options) is not None and status["criterion_account"] != fingerprint(options)
+    held = status["criterion_account"]
+    if held is False or held is True:
+        return True
+    return held in options.get(CONF_CRITERION_EARLIER, [])
 
 
 def needs_forget(options: dict[str, Any], status: dict[str, Any]) -> bool:

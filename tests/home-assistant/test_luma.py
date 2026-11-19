@@ -1725,6 +1725,12 @@ def test_only_the_account_cleared_here_is_forgotten() -> None:
     assert saved(cleared, "", "")["criterion_cleared"] == mine
     assert "criterion_cleared" not in saved(cleared, "a@b.c", "x")
     assert "criterion_fingerprint" not in cleared
+    # Earlier fingerprints are remembered, a few at most, so a TV holding one is updated.
+    changed = saved(held, "me@example.com", "pw2")
+    assert changed["criterion_earlier"] == [mine]
+    for n in range(10):
+        changed = saved(changed, "me@example.com", f"pw{n + 3}")
+    assert len(changed["criterion_earlier"]) == 5
 
 
 @pytest.mark.parametrize(
@@ -1733,7 +1739,10 @@ def test_only_the_account_cleared_here_is_forgotten() -> None:
         ("mine", None),
         # Reset, or changed here while the TV was off.
         (False, "PUT"),
+        (True, "PUT"),
         ("old", "PUT"),
+        # Another paired server's account is left alone.
+        ("theirs", None),
         # An older Luma reports nothing.
         ("absent", None),
     ],
@@ -1753,6 +1762,7 @@ async def test_the_tv_gets_the_criterion_account_whenever_it_holds_another(
             "criterion_email": "me@example.com",
             "criterion_password": "pw",
             "criterion_fingerprint": "f00d",
+            "criterion_earlier": ["old"],
         },
     )
     status = {"overlay": None, "overlay_ready": True, "cameras": 0}

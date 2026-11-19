@@ -21,6 +21,8 @@ CONF_CRITERION_EMAIL = "criterion_email"
 CONF_CRITERION_PASSWORD = "criterion_password"
 # A random fingerprint for the saved account, which TVs report back; never derived from it.
 CONF_CRITERION_FINGERPRINT = "criterion_fingerprint"
+# Fingerprints of accounts this server saved before, so a TV still holding one gets the new one.
+CONF_CRITERION_EARLIER = "criterion_earlier"
 # The fingerprint of an account cleared here, which TVs still holding it are told to forget.
 CONF_CRITERION_CLEARED = "criterion_cleared"
 # Phones (their mobile_app notify services) that offer to type into the TV's text fields.
