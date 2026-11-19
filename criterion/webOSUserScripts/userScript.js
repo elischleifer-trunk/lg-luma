@@ -57,8 +57,32 @@
     }
   }
 
+  // The Channel's sign-in pages. Luma gives the player a one-time code with each film; on these
+  // pages it is traded for the account Home Assistant holds, at Luma's API on the TV itself.
+  var SIGN_IN_ORIGIN = 'https://login.criterion.com';
+
+  function signInRequest(params) {
+    var code = params && params.code;
+    var port = Number(params && params.port);
+    if (typeof code !== 'string' || !/^[0-9a-f]{32}$/.test(code)) return null;
+    if (!(port >= 1 && port <= 65535 && Math.floor(port) === port)) return null;
+    return {
+      url: 'http://127.0.0.1:' + port + '/api/criterion/sign-in',
+      // Plain text, so the browser sends it without asking Luma first.
+      body: JSON.stringify({ code: code }),
+    };
+  }
+
   var SKIP = 10;
-  root.LumaCriterion = { ORIGIN: ORIGIN, SKIP: SKIP, target: target, parse: parse, action: action };
+  root.LumaCriterion = {
+    ORIGIN: ORIGIN,
+    SIGN_IN_ORIGIN: SIGN_IN_ORIGIN,
+    SKIP: SKIP,
+    target: target,
+    parse: parse,
+    action: action,
+    signInRequest: signInRequest,
+  };
   if (typeof document === 'undefined') return;
 
   var palm = root.PalmSystem;
@@ -127,6 +151,100 @@
     },
     true
   );
+
+  // ---- Signing in ----------------------------------------------------------------------------
+
+  // Typed the way the page's own script notices: through the input's native value setter.
+  function type(input, value) {
+    var setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+    setter.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function visible(element) {
+    return element && element.offsetParent !== null && !element.disabled;
+  }
+
+  // At most a few tries per few minutes, so a wrong password never loops.
+  function mayTry() {
+    try {
+      var now = Date.now();
+      var tries = JSON.parse(sessionStorage.getItem('luma-sign-in') || '[]').filter(function (t) {
+        return now - t < 5 * 60 * 1000;
+      });
+      if (tries.length >= 2) return false;
+      tries.push(now);
+      sessionStorage.setItem('luma-sign-in', JSON.stringify(tries));
+      return true;
+    } catch (_error) {
+      return true;
+    }
+  }
+
+  var account = null;
+  var asked = false;
+
+  // Fills whichever of the email and password fields the page shows (the sign-in may ask for
+  // them one page at a time), then submits.
+  function fillIn() {
+    if (!account) return false;
+    var email = document.querySelector(
+      'input#username, input[name="username"], input[type="email"]'
+    );
+    var password = document.querySelector(
+      'input#password, input[name="password"], input[type="password"]'
+    );
+    var filled = false;
+    if (visible(email) && !email.value) {
+      type(email, account.email);
+      filled = true;
+    }
+    if (visible(password) && !password.value) {
+      type(password, account.password);
+      filled = true;
+    }
+    if (!filled) return false;
+    var form = (visible(password) ? password : email).form;
+    var submit =
+      (form && form.querySelector('button[type="submit"][name="action"], button[type="submit"]')) ||
+      document.querySelector('button[type="submit"]');
+    if (!mayTry()) return true;
+    if (submit) submit.click();
+    else if (form) form.submit();
+    return true;
+  }
+
+  function signIn() {
+    if (location.origin !== SIGN_IN_ORIGIN || asked) return;
+    var request = signInRequest(parse(palm && palm.launchParams));
+    if (!request) return;
+    asked = true;
+    fetch(request.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: request.body,
+      cache: 'no-store',
+    })
+      .then(function (response) {
+        return response.ok ? response.json() : null;
+      })
+      .then(function (reply) {
+        if (!reply || typeof reply.email !== 'string' || typeof reply.password !== 'string') return;
+        account = reply;
+        // The form may still be rendering: try until it appears, for a little while.
+        var attempts = 0;
+        var timer = setInterval(function () {
+          if (fillIn() || ++attempts > 40) clearInterval(timer);
+        }, 250);
+      })
+      .catch(function () {
+        // No account in Home Assistant, or an older Luma: the page is signed in by hand.
+      });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', signIn);
+  else signIn();
 
   // Luma opened another film while this app was still running.
   document.addEventListener('webOSRelaunch', function (event) {

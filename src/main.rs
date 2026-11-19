@@ -9,6 +9,8 @@ mod cameras;
 mod clock;
 mod companion;
 mod criterion;
+#[path = "criterion-account.rs"]
+mod criterion_account;
 mod damage;
 mod deeplink;
 mod diagnostics;

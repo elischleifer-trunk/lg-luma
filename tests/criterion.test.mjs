@@ -10,7 +10,7 @@ const source = await readFile(
 // No document: only the shared helpers load, as on the start page before it navigates.
 const context = { URL, window: {} };
 vm.runInNewContext(source, context);
-const { ORIGIN, target, parse, action } = context.window.LumaCriterion;
+const { ORIGIN, target, parse, action, signInRequest } = context.window.LumaCriterion;
 
 test('only Criterion Channel pages are opened', () => {
   const film = `${ORIGIN}/films/oZkRW7X1/laura?play=1`;
@@ -47,4 +47,22 @@ test('OK and the arrows control a film only while one is on screen', () => {
   assert.equal(action(39, true), 'forward');
   assert.equal(action(37, true), 'rewind');
   assert.equal(action(38, true), null);
+});
+
+test('the sign-in code goes only to Luma on the TV itself', () => {
+  const code = '0123456789abcdef0123456789abcdef';
+  const request = signInRequest({ code, port: 5862 });
+  assert.equal(request.url, 'http://127.0.0.1:5862/api/criterion/sign-in');
+  assert.equal(request.body, JSON.stringify({ code }));
+  for (const params of [
+    {},
+    { code, port: 'x' },
+    { code, port: 0 },
+    { code, port: 70000 },
+    { code: 'short', port: 5862 },
+    { code: `${code}"`, port: 5862 },
+    undefined,
+  ]) {
+    assert.equal(signInRequest(params), null, JSON.stringify(params));
+  }
 });

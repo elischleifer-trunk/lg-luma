@@ -662,6 +662,17 @@ fn launch_title(
         return None;
     }
     Some(match resolved {
+        Some(mut launch) if id == crate::criterion::PLAYER => {
+            // A one-time code (never the account itself) for signing in on the Channel's page.
+            match crate::criterion_account::issue(std::time::Instant::now()) {
+                Ok(code) => {
+                    launch.params["code"] = json!(code);
+                    launch.params["port"] = json!(crate::home_assistant::PORT);
+                }
+                Err(error) => crate::telemetry::log_warn!("criterion", "no sign-in code: {error}"),
+            }
+            launch_with_params(id, &launch.params)
+        }
         Some(launch) => launch_with_params(id, &launch.params),
         None if valid_app_id(id) => call(
             "luna://com.webos.applicationManager/launch",

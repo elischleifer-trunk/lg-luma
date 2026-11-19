@@ -30,7 +30,9 @@ fn rows(sizes: &[usize]) -> Vec<Row> {
 fn opened(sizes: &[usize]) -> State {
     let mut state = State::new(Preferences::default());
     state.sync_custom_tiles();
-    state.page = Page::Apps;
+    // Opened from its tile among the Home favorites, where Back returns.
+    state.preferences.favorites = Some(vec![APP.into()]);
+    state.page = Page::Home;
     state.focus = Target::App(APP.into());
     assert_eq!(state.activate(), vec![Effect::Launch(APP.into())]);
     state.open_criterion();

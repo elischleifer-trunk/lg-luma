@@ -1666,3 +1666,93 @@ fn keyboard_webhooks_hear_fields_open_and_close_and_typed_text_reaches_the_tv() 
     h.api.keyboard_changed(None);
     assert!(h.api.take_outbox().is_empty());
 }
+
+#[test]
+fn home_assistant_sets_the_criterion_account_and_only_the_player_reads_it() {
+    let dir = std::env::temp_dir().join(format!("luma-ha-criterion-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("criterion-account.json");
+    let mut h = Harness::new();
+    let (sender, events) = mpsc::channel();
+    h.api = Api::new(h.tv.clone(), Some(dir.join("home-assistant.json")), sender).unwrap();
+    h.events = events;
+    let account = json!({"email": "me@example.com", "password": "secret pass"});
+
+    assert_eq!(
+        h.call("PUT", "/api/criterion-account", None, account.clone())
+            .status,
+        401
+    );
+    let token = h.pair();
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(status.body["criterion_account"], false);
+    let bad = json!({"email": "nope", "password": "x"});
+    assert_eq!(
+        h.call("PUT", "/api/criterion-account", Some(&token), bad)
+            .status,
+        400
+    );
+    let saved = h.call("PUT", "/api/criterion-account", Some(&token), account);
+    assert_eq!(saved.status, 200, "{:?}", saved.body);
+    assert!(file.exists());
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(status.body["criterion_account"], true);
+    assert!(
+        !status.body.to_string().contains("secret"),
+        "never the account itself"
+    );
+
+    let sign_in = |h: &mut Harness, method: &str, origin: Option<&str>, peer, body: Value| {
+        let body = body.to_string();
+        h.api.handle(
+            &Request {
+                method,
+                path: "/api/criterion/sign-in",
+                query: "",
+                authorization: None,
+                origin,
+                integration: None,
+                peer,
+                body: body.as_bytes(),
+            },
+            Instant::now(),
+        )
+    };
+    let page = Some(crate::criterion_account::SIGN_IN_ORIGIN);
+    let code = crate::criterion_account::issue(Instant::now()).unwrap();
+    // Not from the sign-in page, or not from the TV itself: refused, without CORS.
+    for (origin, peer) in [
+        (Some("https://evil.example"), LOOPBACK),
+        (None, LOOPBACK),
+        (page, LAN),
+    ] {
+        let refused = sign_in(&mut h, "POST", origin, peer, json!({"code": code}));
+        assert_eq!(refused.status, 403);
+        assert_eq!(refused.allow_origin, None);
+    }
+    let preflight = sign_in(&mut h, "OPTIONS", page, LOOPBACK, json!({}));
+    assert_eq!((preflight.status, preflight.allow_origin), (200, page));
+    let wrong = sign_in(
+        &mut h,
+        "POST",
+        page,
+        LOOPBACK,
+        json!({"code": "0".repeat(32)}),
+    );
+    assert_eq!((wrong.status, wrong.allow_origin), (403, page));
+    let signed_in = sign_in(&mut h, "POST", page, LOOPBACK, json!({"code": code}));
+    assert_eq!(signed_in.status, 200);
+    assert_eq!(signed_in.allow_origin, page);
+    assert_eq!(
+        signed_in.body,
+        json!({"email": "me@example.com", "password": "secret pass"})
+    );
+
+    let forgotten = h.call("DELETE", "/api/criterion-account", Some(&token), json!({}));
+    assert_eq!(forgotten.status, 200);
+    assert!(!file.exists());
+    let missing = sign_in(&mut h, "POST", page, LOOPBACK, json!({"code": code}));
+    assert_eq!(missing.status, 404);
+    let _ = std::fs::remove_dir_all(&dir);
+}

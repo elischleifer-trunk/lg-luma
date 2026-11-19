@@ -510,8 +510,12 @@ impl Preferences {
                 if ids.len() >= 6 {
                     break;
                 }
-                // LG Home is an escape hatch in Apps, not a default favorite.
-                if !ids.contains(&app.id) && app.id != LG_HOME_APP {
+                // LG Home is an escape hatch in Apps, not a default favorite; Criterion is a
+                // subscription the household may not have.
+                if !ids.contains(&app.id)
+                    && app.id != LG_HOME_APP
+                    && app.id != crate::criterion::APP
+                {
                     ids.push(app.id.clone());
                 }
             }
