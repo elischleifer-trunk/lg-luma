@@ -792,7 +792,12 @@ async def keys_form(hass: HomeAssistant, config: MockConfigEntry):
     """Configure opens a menu; streaming search keys are one of its pages."""
     result = await hass.config_entries.options.async_init(config.entry_id)
     assert result["type"] is FlowResultType.MENU
-    assert result["menu_options"] == ["phone_keyboard", "streaming_keys", "developer_access"]
+    assert result["menu_options"] == [
+        "phone_keyboard",
+        "streaming_keys",
+        "criterion_account",
+        "developer_access",
+    ]
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {"next_step_id": "streaming_keys"}
     )
@@ -1633,3 +1638,167 @@ async def test_tapping_the_notification_opens_a_page_that_types_on_the_tv(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert (await call(type="luma/keyboard/tvs"))["result"] == {"tvs": [{**tv, "prompt": None}]}
+
+
+def account_calls(aioclient_mock: AiohttpClientMocker) -> list:
+    return [
+        (call[0], call[2])
+        for call in aioclient_mock.mock_calls
+        if call[1].path == "/api/criterion-account"
+    ]
+
+
+async def account_form(hass: HomeAssistant, config: MockConfigEntry):
+    result = await hass.config_entries.options.async_init(config.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"next_step_id": "criterion_account"}
+    )
+    assert result["step_id"] == "criterion_account"
+    return result
+
+
+async def test_the_criterion_account_is_checked_sent_and_never_in_diagnostics(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    config = await setup(hass, aioclient_mock)
+    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={})
+
+    result = await account_form(hass, config)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"criterion_email": "me@example.com"}
+    )
+    assert result["errors"] == {"base": "criterion_pair"}
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"criterion_email": "not an email", "criterion_password": "pw"}
+    )
+    assert result["errors"] == {"criterion_email": "criterion_email"}
+    assert account_calls(aioclient_mock) == []
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"criterion_email": " me@example.com ", "criterion_password": "pw 1"}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert config.options["criterion_email"] == "me@example.com"
+    mark = config.options["criterion_fingerprint"]
+    assert len(mark) == 32
+    assert account_calls(aioclient_mock) == [
+        ("PUT", {"email": "me@example.com", "password": "pw 1", "fingerprint": mark})
+    ]
+
+    aioclient_mock.get(f"{TV}/api/diagnostics", json={"boot": "ab", "entries": []})
+    diagnostics = await async_get_config_entry_diagnostics(hass, config)
+    for key in ("criterion_email", "criterion_password", "criterion_fingerprint"):
+        assert diagnostics["entry"]["options"][key] == "**REDACTED**"
+
+    # Both fields cleared: nothing is sent now, and what was cleared is remembered.
+    aioclient_mock.clear_requests()
+    aioclient_mock.put(f"{TV}/api/streaming-keys", json={})
+    result = await account_form(hass, config)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"criterion_email": "", "criterion_password": ""}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert account_calls(aioclient_mock) == []
+    assert config.options["criterion_cleared"] == mark
+
+
+def test_only_the_account_cleared_here_is_forgotten() -> None:
+    from custom_components.luma.criterion_account import needs_forget, saved
+
+    held = saved({}, "me@example.com", "pw")
+    mine = held["criterion_fingerprint"]
+    # Saving the same account keeps its fingerprint; a new password gets a new one.
+    assert saved(held, "me@example.com", "pw")["criterion_fingerprint"] == mine
+    assert saved(held, "me@example.com", "pw2")["criterion_fingerprint"] != mine
+    cleared = saved(held, "", "")
+    assert cleared["criterion_cleared"] == mine
+    assert needs_forget(cleared, {"criterion_account": mine})
+    # Another Home Assistant server's account, or none: left alone.
+    assert not needs_forget(cleared, {"criterion_account": "theirs"})
+    assert not needs_forget(cleared, {"criterion_account": False})
+    # A server that never held one forgets nothing.
+    assert not needs_forget({}, {"criterion_account": mine})
+    # Changed, then cleared, while the TV was off: the older account it holds goes too.
+    changed = saved(held, "me@example.com", "pw2")
+    assert needs_forget(saved(changed, "", ""), {"criterion_account": mine})
+    # Saving the empty form again keeps the record; setting an account drops it.
+    assert saved(cleared, "", "")["criterion_cleared"] == mine
+    assert "criterion_cleared" not in saved(cleared, "a@b.c", "x")
+    assert "criterion_fingerprint" not in cleared
+    # Earlier fingerprints are remembered, a few at most, so a TV holding one is updated.
+    changed = saved(held, "me@example.com", "pw2")
+    assert changed["criterion_earlier"] == [mine]
+    for n in range(10):
+        changed = saved(changed, "me@example.com", f"pw{n + 3}")
+    assert len(changed["criterion_earlier"]) == 5
+
+
+@pytest.mark.parametrize(
+    ("held", "action"),
+    [
+        ("mine", None),
+        # Reset, or changed here while the TV was off.
+        (False, "PUT"),
+        (True, "PUT"),
+        ("old", "PUT"),
+        # Another paired server's account is left alone.
+        ("theirs", None),
+        # An older Luma reports nothing.
+        ("absent", None),
+    ],
+)
+async def test_the_tv_gets_the_criterion_account_whenever_it_holds_another(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    monkeypatch: pytest.MonkeyPatch,
+    held,
+    action,
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    config = entry(hass)
+    hass.config_entries.async_update_entry(
+        config,
+        options={
+            "criterion_email": "me@example.com",
+            "criterion_password": "pw",
+            "criterion_fingerprint": "f00d",
+            "criterion_earlier": ["old"],
+        },
+    )
+    status = {"overlay": None, "overlay_ready": True, "cameras": 0}
+    if held != "absent":
+        status["criterion_account"] = "f00d" if held == "mine" else held
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    # Setup sends it once, whatever the TV holds.
+    assert [method for method, _ in account_calls(aioclient_mock)] == ["PUT"]
+    aioclient_mock.clear_requests()
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert [method for method, _ in account_calls(aioclient_mock)] == ([action] if action else [])
+
+
+async def test_a_cleared_criterion_account_leaves_the_tv(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.luma.CAMERAS_PUSH_DELAY", 0)
+    config = entry(hass)
+    hass.config_entries.async_update_entry(config, options={"criterion_cleared": "f00d"})
+    status = {"overlay": None, "overlay_ready": True, "cameras": 0, "criterion_account": "f00d"}
+    aioclient_mock.get(f"{TV}/api/status", json=status)
+    aioclient_mock.delete(f"{TV}/api/criterion-account", json={"criterion_account": False})
+    aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
+    assert await hass.config_entries.async_setup(config.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=1, seconds=1))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert ("DELETE", None) in account_calls(aioclient_mock)

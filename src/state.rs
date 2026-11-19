@@ -124,6 +124,9 @@ pub enum Target {
     CameraSettings,
     CameraLive,
     CameraShown(String),
+    /// Criterion screen: a film card by row and position, and Try again when nothing loaded.
+    Film(usize, usize),
+    CriterionRetry,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -185,6 +188,10 @@ pub enum Overlay {
     },
     /// The full-screen Cameras gallery; Back returns focus to `restore`.
     Cameras {
+        restore: Target,
+    },
+    /// The full-screen Criterion Channel screen; Back returns focus to `restore`.
+    Criterion {
         restore: Target,
     },
 }
@@ -345,6 +352,7 @@ pub struct State {
     /// The Cameras app was opened; the main loop asks the Home Assistant service.
     pub show_cameras: bool,
     pub cameras: crate::cameras::Gallery,
+    pub criterion: crate::criterion::Browser,
     /// Luma update (Settings → System), driven by the update worker.
     pub update: crate::update::InstallStatus,
     pub panel_started: Option<Instant>,
@@ -405,6 +413,7 @@ impl State {
             home_assistant_outdated: Vec::new(),
             show_cameras: false,
             cameras: crate::cameras::Gallery::default(),
+            criterion: crate::criterion::Browser::default(),
             update: crate::update::InstallStatus::default(),
             panel_started: None,
             weather: weather::Weather::default(),
@@ -613,6 +622,17 @@ impl State {
         let pending = self.finish_text_input();
         if self.cameras_open() {
             self.close_cameras();
+        }
+        // Back out of a film the Criterion screen opened also relaunches Home: stay on its grid.
+        // The Home key, pressed with Luma already in front, still closes it.
+        if self.criterion_open() && std::mem::take(&mut self.criterion.playing) {
+            self.pointer = false;
+            self.pressed = None;
+            self.dirty = true;
+            return pending;
+        }
+        if self.criterion_open() {
+            self.close_criterion();
         }
         self.recents.pending = None;
         self.recents.visibility = 0.;
@@ -1008,6 +1028,14 @@ impl State {
             });
         }
         self.inventory.apps.push(App {
+            id: crate::criterion::APP.into(),
+            title: "Criterion Channel".into(),
+            brand: "custom".into(),
+            category: "Streaming".into(),
+            icon: None,
+            mark: "popcorn",
+        });
+        self.inventory.apps.push(App {
             id: crate::model::LG_HOME_APP.into(),
             title: "LG Home".into(),
             brand: "custom".into(),
@@ -1342,6 +1370,9 @@ impl State {
         }
         if self.cameras_open() {
             return self.camera_direction(direction);
+        }
+        if self.criterion_open() {
+            return self.criterion_direction(direction);
         }
         if matches!(self.overlay, Some(Overlay::SystemKeyboard)) {
             // The TV keyboard owns its arrows until Done/Back dismisses it.
@@ -1937,6 +1968,9 @@ impl State {
             self.camera_options();
             return;
         }
+        if self.criterion_open() {
+            return;
+        }
         if self.overlay.is_some() || self.moving.is_some() {
             return;
         }
@@ -2075,6 +2109,9 @@ impl State {
     pub fn hold(&mut self) {
         if self.cameras_open() {
             self.camera_options();
+            return;
+        }
+        if self.criterion_open() {
             return;
         }
         if self.page == Page::Home && self.overlay.is_none() {
@@ -2475,6 +2512,7 @@ impl State {
                 requests.push(crate::posters::Request {
                     show_id: show.id.clone(),
                     url: url.to_owned(),
+                    size: crate::posters::SIZE,
                 });
             }
         }
@@ -2570,6 +2608,9 @@ impl State {
         }
         if self.cameras_open() {
             return self.camera_activate();
+        }
+        if self.criterion_open() {
+            return self.criterion_activate();
         }
         if self.moving.take().is_some() {
             // Order was saved at every move. A fresh OK release finishes the
@@ -3161,6 +3202,9 @@ impl State {
         self.dirty = true;
         if self.cameras_open() {
             return self.camera_back();
+        }
+        if self.criterion_open() {
+            return self.criterion_back();
         }
         if self.moving.take().is_some() {
             return vec![];

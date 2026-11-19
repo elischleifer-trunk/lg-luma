@@ -16,6 +16,15 @@ WEBOSTV_DOMAIN = "webostv"
 CONF_MOTN_KEY = "motn_api_key"
 CONF_TMDB_TOKEN = "tmdb_read_access_token"
 CONF_MDBLIST_KEY = "mdblist_api_key"
+# The Criterion Channel account the TV's Criterion player signs in with, kept in the options.
+CONF_CRITERION_EMAIL = "criterion_email"
+CONF_CRITERION_PASSWORD = "criterion_password"
+# A random fingerprint for the saved account, which TVs report back; never derived from it.
+CONF_CRITERION_FINGERPRINT = "criterion_fingerprint"
+# Fingerprints of accounts this server saved before, so a TV still holding one gets the new one.
+CONF_CRITERION_EARLIER = "criterion_earlier"
+# The fingerprint of an account cleared here, which TVs still holding it are told to forget.
+CONF_CRITERION_CLEARED = "criterion_cleared"
 # Phones (their mobile_app notify services) that offer to type into the TV's text fields.
 CONF_KEYBOARD_PHONES = "keyboard_phones"
 # Whether the TV keyboard text entity exists, so dashboards can type into the TV's fields.

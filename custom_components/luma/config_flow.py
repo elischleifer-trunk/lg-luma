@@ -31,9 +31,11 @@ try:  # Home Assistant 2025.1+
 except ImportError:  # pragma: no cover - older releases
     from homeassistant.components.ssdp import SsdpServiceInfo
 
-from . import dev_access, dev_keys, keyboard, streaming_keys
+from . import criterion_account, dev_access, dev_keys, keyboard, streaming_keys
 from .api import LumaApiError, LumaClient, LumaConnectionError, LumaError
 from .const import (
+    CONF_CRITERION_EMAIL,
+    CONF_CRITERION_PASSWORD,
     CONF_DEV_ACCESS,
     CONF_DEV_CF_ID,
     CONF_DEV_CF_SECRET,
@@ -239,7 +241,45 @@ class LumaOptionsFlow(OptionsFlow):
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         return self.async_show_menu(
-            step_id="init", menu_options=["phone_keyboard", "streaming_keys", "developer_access"]
+            step_id="init",
+            menu_options=[
+                "phone_keyboard",
+                "streaming_keys",
+                "criterion_account",
+                "developer_access",
+            ],
+        )
+
+    async def async_step_criterion_account(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """The account the TV's Criterion player signs in with. Both empty removes it."""
+        errors: dict[str, str] = {}
+        current = self.config_entry.options
+        if user_input is not None:
+            email = (user_input.get(CONF_CRITERION_EMAIL) or "").strip()
+            password = user_input.get(CONF_CRITERION_PASSWORD) or ""
+            errors = criterion_account.check(email, password)
+            if not errors:
+                return self.async_create_entry(
+                    data=criterion_account.saved(dict(current), email, password)
+                )
+        values = user_input or current
+        return self.async_show_form(
+            step_id="criterion_account",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_CRITERION_EMAIL,
+                        description={"suggested_value": values.get(CONF_CRITERION_EMAIL, "")},
+                    ): TextSelector(TextSelectorConfig(type=TextSelectorType.EMAIL)),
+                    vol.Optional(
+                        CONF_CRITERION_PASSWORD,
+                        description={"suggested_value": values.get(CONF_CRITERION_PASSWORD, "")},
+                    ): SECRET,
+                }
+            ),
+            errors=errors,
         )
 
     async def async_step_developer_access(

@@ -44,6 +44,7 @@ const HOSTS: &[(&str, &[&str])] = &[
     ("apple", &["tv.apple.com"]),
     ("peacock", &["www.peacocktv.com", "peacocktv.com"]),
     ("paramount", &["www.paramountplus.com", "paramountplus.com"]),
+    ("criterion", &["www.criterionchannel.com"]),
 ];
 
 /// Launch parameters for `link` on `service`, or None to open the app normally.
@@ -83,6 +84,23 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
             };
             Some(Launch {
                 params: json!({ "contentTarget": gti }),
+                confidence: Confidence::Verified,
+            })
+        }
+        // Luma's own Criterion player (`criterion/`) opens `target`; `?play=1` is the Channel's
+        // own link for starting a film rather than showing its page.
+        // A film the Criterion screen could not find a page for opens the Channel's search.
+        "criterion" => {
+            let page = path.split(['?', '#']).next().unwrap_or(path);
+            let target = if page.starts_with("/films/") {
+                format!("{}{page}?play=1", crate::criterion::ORIGIN)
+            } else if page == "/search" && path.starts_with("/search?q=") && !path.contains('#') {
+                format!("{}{path}", crate::criterion::ORIGIN)
+            } else {
+                return None;
+            };
+            Some(Launch {
+                params: json!({ "target": target }),
                 confidence: Confidence::Verified,
             })
         }
@@ -438,6 +456,28 @@ mod tests {
         // Malformed EAB IDs are skipped.
         let page = r#""EAB::0a7184af-7705-4884-bcef-908c27edb1af::12x::3" "EAB::0a7184af-7705-4884-bcef-908c27edb1af::::3""#;
         assert_eq!(eab_ids(page).count(), 0);
+    }
+
+    #[test]
+    fn criterion_films_open_playing_in_the_player() {
+        let link = "https://www.criterionchannel.com/films/oZkRW7X1/laura";
+        assert_eq!(
+            launch("criterion", link).unwrap().params,
+            json!({"target": "https://www.criterionchannel.com/films/oZkRW7X1/laura?play=1"})
+        );
+        assert_eq!(
+            launch("criterion", &format!("{link}?play=1#x"))
+                .unwrap()
+                .params,
+            json!({"target": "https://www.criterionchannel.com/films/oZkRW7X1/laura?play=1"})
+        );
+        assert!(launch("criterion", "https://www.criterionchannel.com/browse").is_none());
+        let search = "https://www.criterionchannel.com/search?q=La%20Haine";
+        assert_eq!(
+            launch("criterion", search).unwrap().params,
+            json!({"target": search})
+        );
+        assert!(launch("criterion", "https://evil.example/films/oZkRW7X1/laura").is_none());
     }
 
     #[test]

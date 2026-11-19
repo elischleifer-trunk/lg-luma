@@ -649,11 +649,34 @@ fn launch_title(
     still_current: impl Fn() -> bool,
 ) -> Option<Result<(), String>> {
     let resolved = crate::deeplink::resolve(service, link);
+    // Luma's Criterion player ships inside Luma's package; it is installed, or updated to
+    // this release, the first time this run of Luma opens a film. A failure is logged and the
+    // launch tried anyway: an earlier release's player still plays.
+    static PLAYER_READY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+    if id == crate::criterion::PLAYER && !PLAYER_READY.load(Ordering::Acquire) {
+        match overlay_helper("install-criterion", None) {
+            Ok(_) => PLAYER_READY.store(true, Ordering::Release),
+            Err(error) => {
+                crate::telemetry::log_error!("criterion", "Installing the player: {error}")
+            }
+        }
+    }
     if !still_current() {
         crate::telemetry::log_info!("launch", "Dropped {id}: a newer launch was requested");
         return None;
     }
     Some(match resolved {
+        Some(mut launch) if id == crate::criterion::PLAYER => {
+            // A one-time code (never the account itself) for signing in on the Channel's page.
+            match crate::criterion_account::issue(std::time::Instant::now()) {
+                Ok(code) => {
+                    launch.params["code"] = json!(code);
+                    launch.params["port"] = json!(crate::home_assistant::PORT);
+                }
+                Err(error) => crate::telemetry::log_warn!("criterion", "no sign-in code: {error}"),
+            }
+            launch_with_params(id, &launch.params)
+        }
         Some(launch) => launch_with_params(id, &launch.params),
         None if valid_app_id(id) => call(
             "luna://com.webos.applicationManager/launch",

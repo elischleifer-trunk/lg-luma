@@ -22,6 +22,8 @@ const RECENTS_BACKDROP_OPACITY: f32 = 0.86;
 
 #[path = "cameras-view.rs"]
 mod cameras_view;
+#[path = "criterion-view.rs"]
+mod criterion_view;
 #[path = "recents-view.rs"]
 mod recents_view;
 
@@ -688,6 +690,14 @@ pub fn scene_with_pill(
         }
         return out;
     }
+    // Like Cameras, the Criterion screen is opaque and full screen.
+    if state.criterion_open() {
+        criterion_view::render(&mut out, state, assets);
+        if let Some((notice, _)) = &state.notice {
+            toast(&mut out, state, assets, notice);
+        }
+        return out;
+    }
     if recents_replaces_page(state) {
         out.shape(
             Rect::new(0., 0., 1920., 1080.),
@@ -822,7 +832,10 @@ pub fn scene_with_pill(
             Overlay::TileEditor => tile_editor(&mut out, state, assets),
             Overlay::StreamingKeys => key_editor(&mut out, state, assets),
             Overlay::HomeAssistantSetup => home_assistant_setup(&mut out, state, assets),
-            Overlay::SystemKeyboard | Overlay::Recents { .. } | Overlay::Cameras { .. } => {}
+            Overlay::SystemKeyboard
+            | Overlay::Recents { .. }
+            | Overlay::Cameras { .. }
+            | Overlay::Criterion { .. } => {}
         }
         if !matches!(
             overlay,

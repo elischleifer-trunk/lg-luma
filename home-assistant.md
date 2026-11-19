@@ -305,6 +305,22 @@ example after a reset, or if they were changed on the TV. Clearing a field in Ho
 leaves the TV's key in place. Without Home Assistant, enter them on the TV under **Settings →
 System → Streaming search keys**, which shows a QR code for your phone.
 
+## Criterion Channel account
+
+Luma's Criterion Channel player can sign in by itself, so nobody types a password with the
+remote. Open **Settings → Devices & services → Luma → Configure → Criterion Channel account** and
+enter the email and password you use on criterionchannel.com. Home Assistant sends them to the
+TV, and again when the TV holds none (after a reset) or one this server sent before (a change
+made while the TV was off). Clear both fields to remove them: the TV drops its copy at the next status check,
+within a minute or so. With several Home Assistant servers paired, none replaces or removes an
+account another one sent. Unpairing the TV's last server also removes it, and diagnostics downloads redact it.
+
+The password is stored in Home Assistant's configuration storage and in a file on the TV that
+only Luma can read, like the streaming search keys. The TV never logs it and gives it only to
+its own Criterion player, on the Channel's sign-in page (`login.criterion.com`), in exchange for
+a one-time code Luma handed the player with the film. If the Channel ever asks the player to
+prove it is human, finish that sign-in once with the remote.
+
 ## Developer access
 
 For people developing Luma. Off by default, and nothing changes until you turn it on: the

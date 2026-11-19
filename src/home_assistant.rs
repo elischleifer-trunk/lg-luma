@@ -412,6 +412,8 @@ pub struct Reply {
     pub location: Option<String>,
     /// `GET /api/events`: the connection becomes a stream of Luma's log.
     pub events: Option<Box<Subscription>>,
+    /// A web page allowed to read this reply (CORS): the Criterion player's sign-in page.
+    pub allow_origin: Option<&'static str>,
 }
 
 /// One server's event stream: where it resumes, and which of its streams it is. A server that
@@ -429,6 +431,7 @@ fn reply(status: u16, body: Value) -> Reply {
         body,
         location: None,
         events: None,
+        allow_origin: None,
     }
 }
 
@@ -678,6 +681,7 @@ impl<T: Tv> Api<T> {
         self.keyboard_hooks.clear();
         self.keyboard = None;
         self.outbox.clear();
+        self.forget_criterion_file();
         let before = self.store.clone();
         // Gallery IDs name servers by pairing order, which starts over; each server's
         // arrangement is parked until it pairs again.
@@ -806,6 +810,10 @@ impl<T: Tv> Api<T> {
                 | "/api/overlay/playing"
                 | "/api/overlay/recorded"
         );
+        // The Criterion player's sign-in page asks for the account, from the TV only.
+        if request.path == "/api/criterion/sign-in" {
+            return self.criterion_sign_in(request, now);
+        }
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
         if request.origin.is_some() && !(closed && request.peer.is_loopback()) {
@@ -916,6 +924,10 @@ impl<T: Tv> Api<T> {
                         self.pairings.fetch_add(1, Ordering::AcqRel);
                         crate::telemetry::wake_streams();
                         let removed = self.store.clients.remove(client);
+                        // The account came from Home Assistant: with no server left, it goes.
+                        if self.store.clients.is_empty() {
+                            self.forget_criterion_file();
+                        }
                         self.cameras.retain(|(owner, _)| *owner != removed.token);
                         self.keyboard_hooks
                             .retain(|(owner, _)| *owner != removed.token);
@@ -986,6 +998,18 @@ impl<T: Tv> Api<T> {
                                     "home_assistant": status.home_assistant,
                                 })
                             }),
+                            // Whether the TV holds a Criterion Channel account, so Home
+                            // Assistant sends its own again after a reset. Never the account.
+                            // Its fingerprint (true for one sent without), or false.
+                            "criterion_account": self.criterion_account_path().map(|path| {
+                                match crate::criterion_account::load(&path) {
+                                    Some(account) if !account.fingerprint.is_empty() => {
+                                        json!(account.fingerprint)
+                                    }
+                                    Some(_) => json!(true),
+                                    None => json!(false),
+                                }
+                            }),
                             // Whether this server's keyboard webhook is registered, so it
                             // registers again after Luma restarts.
                             "keyboard_hook": self.keyboard_hooks.iter()
@@ -996,6 +1020,8 @@ impl<T: Tv> Api<T> {
                     ("POST", "/api/keyboard/text") => self.typed(&body),
                     ("POST", "/api/cameras") => self.set_cameras(client, &body),
                     ("PUT", "/api/streaming-keys") => self.set_streaming_keys(&body),
+                    ("PUT", "/api/criterion-account") => self.set_criterion(&body),
+                    ("DELETE", "/api/criterion-account") => self.forget_criterion(),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         // Dismissing closes a doorbell card, never a camera the owner is
@@ -1297,6 +1323,117 @@ impl<T: Tv> Api<T> {
             .map(|store| store.with_file_name("streaming-keys.json"))
     }
 
+    fn criterion_account_path(&self) -> Option<PathBuf> {
+        self.store_path
+            .as_deref()
+            .map(crate::criterion_account::path)
+    }
+
+    /// Home Assistant is the only source of the Criterion account: it replaces the TV's.
+    fn set_criterion(&mut self, body: &Value) -> Reply {
+        let Some(path) = self.criterion_account_path() else {
+            return error(503, "This TV has no storage for the account");
+        };
+        let (Some(email), Some(password)) = (
+            body.get("email").and_then(Value::as_str),
+            body.get("password").and_then(Value::as_str),
+        ) else {
+            return error(400, "email and password must be strings");
+        };
+        let fingerprint = match body.get("fingerprint") {
+            None | Some(Value::Null) => "",
+            Some(Value::String(value)) => value.as_str(),
+            Some(_) => return error(400, "fingerprint must be a string"),
+        };
+        let account = match crate::criterion_account::Account::new(email, password)
+            .and_then(|account| account.with_fingerprint(fingerprint))
+        {
+            Ok(account) => account,
+            // A fixed message: the reply says nothing derived from what was sent.
+            Err(_) => {
+                return error(
+                    400,
+                    "email must be an email address and password 1 to 256 characters",
+                );
+            }
+        };
+        if crate::criterion_account::load(&path).as_ref() != Some(&account) {
+            if let Err(message) = crate::criterion_account::save(&path, &account) {
+                crate::telemetry::log_error!(
+                    "home-assistant",
+                    "could not save the Criterion account: {message}"
+                );
+                return error(500, "Could not save the account");
+            }
+            crate::telemetry::log_info!("criterion", "Home Assistant set the account");
+        }
+        reply(200, json!({"criterion_account": true}))
+    }
+
+    /// Removes the account file, logging (never failing on) an error.
+    fn forget_criterion_file(&self) {
+        if let Some(path) = self.criterion_account_path()
+            && let Err(message) = crate::criterion_account::forget(&path)
+        {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion account: {message}"
+            );
+        }
+    }
+
+    fn forget_criterion(&mut self) -> Reply {
+        let Some(path) = self.criterion_account_path() else {
+            return error(503, "This TV has no storage for the account");
+        };
+        if let Err(message) = crate::criterion_account::forget(&path) {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion account: {message}"
+            );
+            return error(500, "Could not remove the account");
+        }
+        reply(200, json!({"criterion_account": false}))
+    }
+
+    /// The Criterion player's script, on the Channel's sign-in page, trades the one-time code
+    /// Luma gave the player for the account. Only from the TV itself, only from that page.
+    /// The page sends its JSON as text/plain, so browsers ask nothing first; a preflight that
+    /// comes anyway (Private Network Access) is answered here too.
+    fn criterion_sign_in(&mut self, request: &Request, now: Instant) -> Reply {
+        use crate::criterion_account::SIGN_IN_ORIGIN;
+        let allowed = |reply: Reply| Reply {
+            allow_origin: Some(SIGN_IN_ORIGIN),
+            ..reply
+        };
+        if !request.peer.is_loopback() || request.origin != Some(SIGN_IN_ORIGIN) {
+            return error(403, "Only the Criterion player signs in");
+        }
+        match request.method {
+            "OPTIONS" => return allowed(reply(200, json!({}))),
+            "POST" => {}
+            _ => return allowed(error(404, "Not found")),
+        }
+        let code = serde_json::from_slice::<Value>(request.body)
+            .ok()
+            .and_then(|body| body.get("code")?.as_str().map(str::to_owned));
+        if !code.is_some_and(|code| crate::criterion_account::redeem(&code, now)) {
+            crate::telemetry::log_warn!("criterion", "refused a sign-in without a current code");
+            return allowed(error(403, "Open the film from Luma again"));
+        }
+        let account = self
+            .criterion_account_path()
+            .and_then(|path| crate::criterion_account::load(&path));
+        let Some(account) = account else {
+            return allowed(error(404, "Add the Criterion account in Home Assistant"));
+        };
+        crate::telemetry::log_info!("criterion", "signing the player in");
+        allowed(reply(
+            200,
+            json!({"email": account.email, "password": account.password}),
+        ))
+    }
+
     /// Home Assistant is the source of truth for streaming search keys: a non-empty key it
     /// sends replaces the TV's, an empty or missing one leaves the TV's key alone.
     fn set_streaming_keys(&mut self, body: &Value) -> Reply {
@@ -1559,6 +1696,7 @@ impl<T: Tv> Api<T> {
             body: json!({}),
             location: Some(format!("{history}&start={start}&end={end}")),
             events: None,
+            allow_origin: None,
         }
     }
 
@@ -1956,11 +2094,21 @@ fn serve<T: Tv>(api: &mut Api<T>, mut stream: TcpStream, peer: SocketAddr) {
         503 => "503 Service Unavailable",
         _ => "500 Internal Server Error",
     };
+    let body = reply.body.to_string();
+    if let Some(origin) = reply.allow_origin {
+        use std::io::Write;
+        let _ = write!(
+            stream,
+            "HTTP/1.1 {status}\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\nX-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: {origin}\r\nAccess-Control-Allow-Methods: POST\r\nAccess-Control-Allow-Headers: content-type\r\nAccess-Control-Allow-Private-Network: true\r\nVary: Origin\r\n\r\n{body}",
+            body.len()
+        );
+        return;
+    }
     let _ = companion::response(
         &mut stream,
         status,
         "application/json; charset=utf-8",
-        reply.body.to_string().as_bytes(),
+        body.as_bytes(),
     );
 }
 

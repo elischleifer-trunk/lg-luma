@@ -1,0 +1,15 @@
+{
+  "id": "com.ecklf.luma.criterion",
+  "version": "0.0.0",
+  "vendor": "Luma",
+  "type": "web",
+  "main": "index.html",
+  "title": "Criterion Channel",
+  "icon": "icon.png",
+  "appDescription": "Plays Criterion Channel films that Luma's Criterion screen opens.",
+  "resolution": "1920x1080",
+  "visible": false,
+  "handlesRelaunch": true,
+  "disableBackHistoryAPI": true,
+  "requiredACG": []
+}

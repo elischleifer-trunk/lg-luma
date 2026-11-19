@@ -140,6 +140,21 @@ class LumaClient:
         }
         return await self._request("PUT", "/api/streaming-keys", payload)
 
+    async def criterion_account(
+        self, email: str, password: str, fingerprint: str
+    ) -> dict[str, Any]:
+        """Set the account the TV's Criterion player signs in with. The TV reports the random
+        `fingerprint` back in its status, never the account."""
+        return await self._request(
+            "PUT",
+            "/api/criterion-account",
+            {"email": email, "password": password, "fingerprint": fingerprint},
+        )
+
+    async def forget_criterion_account(self) -> dict[str, Any]:
+        """Remove the TV's Criterion account."""
+        return await self._request("DELETE", "/api/criterion-account")
+
     async def diagnostics(self) -> dict[str, Any]:
         """Everything Luma has kept of its log, its latest performance summary and its state."""
         return await self._request("GET", "/api/diagnostics")

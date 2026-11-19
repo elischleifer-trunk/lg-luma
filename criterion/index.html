@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Criterion Channel</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- webOS adds this script to the Channel's pages too; it runs once per page. -->
+    <script src="webOSUserScripts/userScript.js"></script>
+    <script>
+      // Straight on to the film Luma asked for; the Channel's own page does the rest.
+      var palm = window.PalmSystem;
+      location.replace(LumaCriterion.target(LumaCriterion.parse(palm && palm.launchParams)));
+    </script>
+  </body>
+</html>
