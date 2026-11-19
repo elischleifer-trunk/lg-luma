@@ -481,3 +481,32 @@ fn back_from_a_film_keeps_the_grid_but_the_home_key_closes_it() {
     state.return_home();
     assert!(!state.criterion_open());
 }
+
+#[test]
+fn a_film_given_up_on_does_not_start_when_its_page_is_found() {
+    let page = "https://www.criterionchannel.com/films/3sWhDjsA/la-haine";
+    let unlinked = |state: &mut State| {
+        let film = &mut state.criterion.rows[0].films[0];
+        film.link = None;
+        film.tmdb = Some(406);
+        film.id.clone()
+    };
+    // Another film chosen while it was looked up.
+    let mut state = opened(&[2]);
+    let id = unlinked(&mut state);
+    assert_eq!(state.activate(), vec![]);
+    state.direction(Direction::Right, &[]);
+    assert_eq!(state.activate().len(), 1);
+    assert_eq!(state.criterion_resolve_request(), None);
+    assert_eq!(state.criterion_resolved(&id, page.into()), vec![]);
+    // Its page is still kept.
+    assert_eq!(state.criterion.rows[0].films[0].link.as_deref(), Some(page));
+
+    // The screen closed and opened again while it was looked up.
+    let mut state = opened(&[2]);
+    let id = unlinked(&mut state);
+    assert_eq!(state.activate(), vec![]);
+    state.back();
+    state.open_criterion();
+    assert_eq!(state.criterion_resolved(&id, page.into()), vec![]);
+}

@@ -741,6 +741,9 @@ impl State {
     }
 
     pub fn close_criterion(&mut self) {
+        // A lookup answered after this only keeps the film's page; it opens nothing.
+        self.criterion.resolving = None;
+        self.criterion.resolve_request = None;
         if let Some(Overlay::Criterion { restore }) = self.overlay.take() {
             self.focus = restore;
             self.reconcile_focus();
@@ -847,6 +850,9 @@ impl State {
                 Some(Film {
                     link: Some(link), ..
                 }) => {
+                    // A film still being looked up is not opened after this one.
+                    self.criterion.resolving = None;
+                    self.criterion.resolve_request = None;
                     self.criterion.playing = true;
                     vec![Effect::LaunchTitle {
                         app: PLAYER.into(),
