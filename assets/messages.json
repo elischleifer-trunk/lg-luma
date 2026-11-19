@@ -4063,5 +4063,50 @@
     "vi": "{count} mùa",
     "nl": "{count} seizoenen",
     "sv": "{count} säsonger"
+  },
+  "criterionHint": {
+    "zh-tw": "按 OK 播放",
+    "en": "OK to play",
+    "de": "OK zum Abspielen",
+    "es": "OK para reproducir",
+    "zh": "按 OK 播放",
+    "pt": "OK para reproduzir",
+    "it": "OK per riprodurre",
+    "ru": "OK — смотреть",
+    "pl": "OK, aby odtworzyć",
+    "fr": "OK pour lancer la lecture",
+    "vi": "Nhấn OK để phát",
+    "nl": "OK om af te spelen",
+    "sv": "OK för att spela"
+  },
+  "criterionLoading": {
+    "zh-tw": "正在載入 Criterion Channel…",
+    "en": "Loading the Criterion Channel…",
+    "de": "Criterion Channel wird geladen …",
+    "es": "Cargando Criterion Channel…",
+    "zh": "正在加载 Criterion Channel…",
+    "pt": "Carregando o Criterion Channel…",
+    "it": "Caricamento di Criterion Channel…",
+    "ru": "Загрузка Criterion Channel…",
+    "pl": "Ładowanie Criterion Channel…",
+    "fr": "Chargement de Criterion Channel…",
+    "vi": "Đang tải Criterion Channel…",
+    "nl": "Criterion Channel laden…",
+    "sv": "Läser in Criterion Channel …"
+  },
+  "criterionError": {
+    "zh-tw": "無法連線至 Criterion Channel",
+    "en": "Couldn’t reach the Criterion Channel",
+    "de": "Criterion Channel ist nicht erreichbar",
+    "es": "No se pudo conectar con Criterion Channel",
+    "zh": "无法连接到 Criterion Channel",
+    "pt": "Não foi possível acessar o Criterion Channel",
+    "it": "Impossibile raggiungere Criterion Channel",
+    "ru": "Не удалось подключиться к Criterion Channel",
+    "pl": "Nie można połączyć się z Criterion Channel",
+    "fr": "Impossible de joindre Criterion Channel",
+    "vi": "Không thể kết nối với Criterion Channel",
+    "nl": "Criterion Channel is niet bereikbaar",
+    "sv": "Det gick inte att nå Criterion Channel"
   }
 }

@@ -42,6 +42,7 @@
         "menu_options": {
           "phone_keyboard": "Type on your phone",
           "streaming_keys": "Streaming search keys",
+          "criterion_account": "Criterion Channel account",
           "developer_access": "Developer access"
         }
       },
@@ -93,6 +94,11 @@
           "tmdb_read_access_token": "The long **API Read Access Token** in your [TMDB API settings]({tmdb_url}), not the short API key.",
           "mdblist_api_key": "For review scores on each poster. Find it in [MDBList's preferences]({mdblist_url}) under API access."
         }
+      },
+      "criterion_account": {
+        "title": "Criterion Channel account",
+        "description": "Luma's Criterion Channel player signs in with this account, so you never type a password with the remote. It is sent to the TV, which gives it only to its Criterion player on the Channel's sign-in page.\n\nClear both fields to remove the account from the TV.",
+        "data": { "criterion_email": "Email", "criterion_password": "Password" }
       }
     },
     "error": {
@@ -100,7 +106,9 @@
       "tmdb_refused": "TMDB refused this token. Use the API Read Access Token, not the API key.",
       "mdblist_refused": "MDBList refused this key. Copy the whole key from mdblist.com → Preferences.",
       "phone_required": "Choose the phone that approves requests.",
-      "cloudflare_pair": "Enter both the Client ID and the Client Secret, or neither."
+      "cloudflare_pair": "Enter both the Client ID and the Client Secret, or neither.",
+      "criterion_pair": "Enter both the email and the password, or neither.",
+      "criterion_email": "Enter the email address you sign in to the Criterion Channel with."
     }
   },
   "entity": {

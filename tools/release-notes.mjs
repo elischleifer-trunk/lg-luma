@@ -35,6 +35,7 @@ const GROUPS = [
       /^tv-helper\/src\//,
       /^assets\//,
       /^overlay\//,
+      /^criterion\//,
       /^vector-geometry\//,
       /^appinfo\.json$/,
     ],

@@ -1077,6 +1077,47 @@ fn overlay_install_skips_the_current_version_and_waits_for_an_update() {
     assert_eq!(f.pauses.get(), 2);
 }
 #[test]
+fn criterion_player_installs_from_its_own_bundle() {
+    let f = Fixture::new();
+    f.put_json(
+        &format!("{DIR}/criterion/appinfo.json"),
+        json!({"id":overlay::CRITERION,"version":"2.33.0"}),
+    );
+    f.put(&format!("{DIR}/criterion/criterion.package"), b"ipk");
+    for value in [
+        json!({"returnValue":false,"errorText":"not found"}),
+        json!({"returnValue":true,"appInfo":{"version":"2.33.0"}}),
+    ] {
+        f.reply("getAppInfo", Ok(value));
+    }
+    f.reply("install", Ok(json!({"returnValue":true})));
+    let reply = overlay::dispatch(&f, "install-criterion", None, Path::new(DIR)).unwrap();
+    assert_eq!(reply["changed"], true);
+    let install = f
+        .calls()
+        .into_iter()
+        .find(|c| c.contains("appInstallService/dev/install"))
+        .unwrap();
+    assert!(
+        install.contains(r#""id":"com.ecklf.luma.criterion""#),
+        "{install}"
+    );
+    assert!(
+        install.contains(r#""ipkUrl":"/tmp/luma-criterion.ipk""#),
+        "{install}"
+    );
+    assert!(!f.p("/tmp/luma-criterion.ipk").exists());
+
+    // The overlay's bundle is not the player's.
+    let f = Fixture::new();
+    overlay_bundle(&f, "2.33.0");
+    f.put_json(
+        &format!("{DIR}/criterion/appinfo.json"),
+        json!({"id":overlay::OVERLAY,"version":"2.33.0"}),
+    );
+    assert!(overlay::dispatch(&f, "install-criterion", None, Path::new(DIR)).is_err());
+}
+#[test]
 fn overlay_install_rejects_a_foreign_bundle_and_requires_root() {
     let f = Fixture::new();
     f.put_json(

@@ -157,32 +157,37 @@ function aresPackage(directory, outdir) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
-// The Home Assistant overlay is a separate web app (one app per IPK). Luma's helper installs
-// the copy staged inside Luma's package when Home Assistant is turned on; .build/overlay-dist
-// keeps it for manual installs without adding another release asset.
-const overlayInfo = JSON.parse(await fs.readFile(path.join(root, 'overlay/appinfo.json'), 'utf8'));
-if (overlayInfo.id !== 'com.ecklf.luma.overlay' || overlayInfo.defaultWindowType !== 'overlay')
-  throw new Error('The overlay app must be com.ecklf.luma.overlay with an overlay window.');
-overlayInfo.version = manifest.version;
-const overlayStage = path.join(out, 'overlay');
-const overlayDist = path.join(out, 'overlay-dist');
-await fs.rm(overlayStage, { recursive: true, force: true });
-await fs.rm(overlayDist, { recursive: true, force: true });
-await fs.mkdir(overlayDist, { recursive: true });
-await fs.cp(path.join(root, 'overlay'), overlayStage, { recursive: true });
-await fs.writeFile(
-  path.join(overlayStage, 'appinfo.json'),
-  `${JSON.stringify(overlayInfo, null, 2)}\n`,
+// The Home Assistant overlay and the Criterion player are separate web apps (one app per IPK).
+// Luma's helper installs the copies staged inside Luma's package when they are first needed;
+// .build/<name>-dist keeps each for manual installs without adding another release asset.
+async function bundleWebApp(name, id, check) {
+  const info = JSON.parse(await fs.readFile(path.join(root, name, 'appinfo.json'), 'utf8'));
+  if (info.id !== id || !check(info)) throw new Error(`The ${name} app must be ${id}.`);
+  info.version = manifest.version;
+  const appStage = path.join(out, name);
+  const appDist = path.join(out, `${name}-dist`);
+  await fs.rm(appStage, { recursive: true, force: true });
+  await fs.rm(appDist, { recursive: true, force: true });
+  await fs.mkdir(appDist, { recursive: true });
+  await fs.cp(path.join(root, name), appStage, { recursive: true });
+  await fs.writeFile(path.join(appStage, 'appinfo.json'), `${JSON.stringify(info, null, 2)}\n`);
+  await fs.copyFile(path.join(out, 'assets/app-icon.png'), path.join(appStage, 'icon.png'));
+  aresPackage(appStage, appDist);
+  const ipk = `${info.id}_${info.version}_all.ipk`;
+  await fs.mkdir(path.join(stage, name));
+  // ares-package drops any path containing ".ipk" from an app, so the bundle uses another name.
+  await fs.copyFile(path.join(appDist, ipk), path.join(stage, name, `${name}.package`));
+  await fs.writeFile(path.join(stage, name, 'appinfo.json'), `${JSON.stringify(info, null, 2)}\n`);
+}
+await bundleWebApp(
+  'overlay',
+  'com.ecklf.luma.overlay',
+  (info) => info.defaultWindowType === 'overlay',
 );
-await fs.copyFile(path.join(out, 'assets/app-icon.png'), path.join(overlayStage, 'icon.png'));
-aresPackage(overlayStage, overlayDist);
-const overlayIpk = `${overlayInfo.id}_${overlayInfo.version}_all.ipk`;
-await fs.mkdir(path.join(stage, 'overlay'));
-// ares-package drops any path containing ".ipk" from an app, so the bundle uses another name.
-await fs.copyFile(path.join(overlayDist, overlayIpk), path.join(stage, 'overlay/overlay.package'));
-await fs.writeFile(
-  path.join(stage, 'overlay/appinfo.json'),
-  `${JSON.stringify(overlayInfo, null, 2)}\n`,
+await bundleWebApp(
+  'criterion',
+  'com.ecklf.luma.criterion',
+  (info) => info.type === 'web' && info.visible === false,
 );
 aresPackage(stage, dist);
 const filename = `${manifest.id}_${manifest.version}_arm.ipk`;
