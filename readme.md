@@ -317,15 +317,22 @@ shows every Home Assistant camera in a full-screen grid. See [Home Assistant](ho
 
 ### Criterion Channel
 
-The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows the Channel's own
-rows of films (Popular Movies, Leaving Soon, its collections) in a full-screen grid. OK plays the
-film in a small player app that Luma installs the first time it is needed: the Channel's web
-player, full screen, with the remote's play, pause and skip keys. Back returns to the grid. The
-first film asks you to sign in to your Criterion Channel account, unless Home Assistant holds it
-(see [Criterion Channel account](home-assistant.md#criterion-channel-account)); the player then
-signs in by itself. The
-rows are read from the Channel's public home page, so a redesign of that page can empty the grid
-until Luma is updated.
+The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows films on the
+Channel in a full-screen grid: Popular, Top Rated, Recently Released and a row per genre. OK
+plays the film in a small player app that Luma installs the first time it is needed: the
+Channel's web player, full screen, with the remote's play, pause and skip keys. Back returns to
+the grid.
+
+The rows come from TMDB's streaming data when a TMDB token is stored (see
+[Search: movies and shows](#search-movies-and-shows)),
+refreshed twice a day. Choosing a film asks Movie of the Night once for its page on the
+Channel; without a Movie of the Night key, or when it does not know the film, the player opens
+the Channel's search for the title. Without a TMDB token, the rows are read from the Channel's
+public home page instead, so a redesign of that page can empty the grid until Luma is updated.
+
+The player signs in with the account kept in Home Assistant (see
+[Criterion Channel account](home-assistant.md#criterion-channel-account)); without one, the first
+film asks you to sign in with the remote, and the player remembers it.
 
 ## Development
 

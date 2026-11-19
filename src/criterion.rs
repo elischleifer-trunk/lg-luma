@@ -1,20 +1,30 @@
-//! The Criterion Channel screen: the Channel's own rows of films (Popular Movies, Leaving Soon,
-//! its featured collections), browsed with the remote like any other Luma screen. Choosing a
-//! film opens it in Luma's Criterion player (`criterion/`), a small web app that loads the
-//! Channel's web player full screen and keeps the viewer's own sign-in.
+//! The Criterion Channel screen: rows of films on the Channel, browsed with the remote like any
+//! other Luma screen. Choosing a film opens it in Luma's Criterion player (`criterion/`), a small
+//! web app that loads the Channel's web player full screen and signs in with the account Home
+//! Assistant holds (see `criterion_account`).
 //!
-//! The Channel has no public API. Its home page is public and server-rendered, so a worker reads
-//! the rows from its HTML and keeps the last good copy on disk. The page's class names are
-//! generated and change between deployments; parsing relies only on stable parts: each row's
-//! `<h2>` heading, the `/films/<id>/<slug>` card links and the card titles' element IDs.
-//! Artwork comes from the Channel's video host by film ID.
+//! The Channel has no public API, so the rows come from Luma's search partners when their keys
+//! are stored (Settings → Search, or Home Assistant):
+//! - TMDB, whose quota is generous, lists films on the Channel by its watch-provider data:
+//!   Popular, Top Rated, Recently Released and a row per genre, refreshed twice a day.
+//! - Movie of the Night, whose quota is small, is asked only when a film is chosen, for the
+//!   film's page on the Channel. Links are kept for a month. Without one, the player opens the
+//!   Channel's search for the title.
+//!
+//! Without a TMDB key, a worker reads the rows from the Channel's public home page instead. Its
+//! class names are generated and change between deployments; parsing relies only on stable
+//! parts: each row's `<h2>` heading, the `/films/<id>/<slug>` card links and the card titles'
+//! element IDs. That page's artwork comes from the Channel's video host by film ID.
 use crate::cameras::Frame;
+use crate::openapi::{Http, Query};
 use crate::search_cache::DiskCache;
 use crate::state::{Direction, Effect, Overlay, State, Target};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::{
     collections::HashMap,
     io::Read,
+    path::PathBuf,
     sync::{Arc, mpsc},
     time::{Duration, SystemTime},
 };
@@ -31,37 +41,35 @@ pub const IMAGE_SIZE: (u32, u32) = (400, 225);
 /// The home page is about 1 MB.
 const PAGE_LIMIT: u64 = 6 * 1024 * 1024;
 /// Rows change a few times a week; the copy on disk is used as is for this long.
-const FRESH: Duration = Duration::from_secs(6 * 3600);
+const FRESH: Duration = Duration::from_secs(12 * 3600);
 /// After that, it still fills the screen while a new copy loads, or when the Channel is away.
 const STALE: Duration = Duration::from_secs(30 * 24 * 3600);
-const CACHE_KEY: &str = "criterion:home";
+const CACHE_KEY: &str = "criterion:rows";
+/// A film's page on the Channel, found with Movie of the Night, rarely changes.
+const LINK_AGE: Duration = Duration::from_secs(30 * 24 * 3600);
+/// Movie of the Night lists Criterion's US catalog.
+const COUNTRY: &str = "us";
+const TMDB_IMAGES: &str = "https://image.tmdb.org/t/p/w780";
 const ROW_LIMIT: usize = 40;
 const FILM_LIMIT: usize = 100;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Film {
-    /// The Channel's 8-character film ID, which is also its artwork's ID.
+    /// Unique among the rows: the Channel's 8-character film ID, or `tmdb` and TMDB's ID.
     pub id: String,
-    pub slug: String,
     pub title: String,
-    /// Year and running time, as the Channel shows them under the card.
+    /// Year and running time, as far as they are known.
     pub year: String,
     pub length: String,
+    /// The film's page on the Channel, when known; TMDB films find it when chosen.
+    pub link: Option<String>,
+    /// TMDB's ID, for finding the film's page with Movie of the Night.
+    pub tmdb: Option<u64>,
+    /// 16:9 artwork.
+    pub image: String,
 }
 
 impl Film {
-    /// The film's page; the player starts it (see `deeplink`).
-    pub fn link(&self) -> String {
-        format!("{ORIGIN}/films/{}/{}", self.id, self.slug)
-    }
-
-    pub fn image_url(&self) -> String {
-        format!(
-            "https://cdn.jwplayer.com/v2/media/{}/images/regalia_16x9.webp?fallback=default_16x9&width=480",
-            self.id
-        )
-    }
-
     /// "1944 · 1 hr 28 min", or whichever of them the card has.
     pub fn details(&self) -> String {
         [self.year.as_str(), self.length.as_str()]
@@ -104,10 +112,14 @@ pub fn parse(html: &str) -> Vec<Row> {
             };
             films.push(Film {
                 id: id.into(),
-                slug: slug.into(),
                 title,
                 year: meta(card, "metaLeft"),
                 length: meta(card, "metaRight"),
+                link: Some(format!("{ORIGIN}/films/{id}/{slug}")),
+                tmdb: None,
+                image: format!(
+                    "https://cdn.jwplayer.com/v2/media/{id}/images/regalia_16x9.webp?fallback=default_16x9&width=480"
+                ),
             });
             if films.len() == FILM_LIMIT {
                 break;
@@ -210,6 +222,183 @@ fn clean(text: &str) -> String {
         .collect()
 }
 
+// ---- TMDB rows -------------------------------------------------------------------------------
+
+/// The rows built from TMDB, beyond Popular: (title, discover parameters).
+const TMDB_ROWS: &[(&str, &[(&str, &str)])] = &[
+    (
+        "Popular on the Criterion Channel",
+        &[("sort_by", "popularity.desc")],
+    ),
+    (
+        "Top Rated",
+        &[("sort_by", "vote_average.desc"), ("vote_count.gte", "300")],
+    ),
+    (
+        "Recently Released",
+        &[
+            ("sort_by", "primary_release_date.desc"),
+            ("vote_count.gte", "20"),
+        ],
+    ),
+    (
+        "Drama",
+        &[("sort_by", "popularity.desc"), ("with_genres", "18")],
+    ),
+    (
+        "Comedy",
+        &[("sort_by", "popularity.desc"), ("with_genres", "35")],
+    ),
+    (
+        "Crime",
+        &[("sort_by", "popularity.desc"), ("with_genres", "80")],
+    ),
+    (
+        "Romance",
+        &[("sort_by", "popularity.desc"), ("with_genres", "10749")],
+    ),
+    (
+        "Horror",
+        &[("sort_by", "popularity.desc"), ("with_genres", "27")],
+    ),
+    (
+        "Science Fiction",
+        &[("sort_by", "popularity.desc"), ("with_genres", "878")],
+    ),
+    (
+        "Documentary",
+        &[("sort_by", "popularity.desc"), ("with_genres", "99")],
+    ),
+    (
+        "Animation",
+        &[("sort_by", "popularity.desc"), ("with_genres", "16")],
+    ),
+];
+
+/// A TMDB GET: path and query in, JSON out.
+pub type TmdbGet<'a> = dyn Fn(&str, &[(&'static str, String)]) -> Result<Value, String> + 'a;
+
+/// The Channel's TMDB watch-provider ID, found by name: TMDB does not document its IDs.
+fn provider(get: &TmdbGet) -> Result<u64, String> {
+    let list = get(
+        "/3/watch/providers/movie",
+        &[("watch_region", COUNTRY.to_uppercase())],
+    )?;
+    list["results"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .find(|provider| {
+            provider["provider_name"]
+                .as_str()
+                .is_some_and(|name| name.to_lowercase().contains("criterion"))
+        })
+        .and_then(|provider| provider["provider_id"].as_u64())
+        .ok_or_else(|| "TMDB does not list the Criterion Channel".to_owned())
+}
+
+/// Rows of films TMDB lists on the Channel. Rows that fail or come back short are left out.
+pub fn tmdb_rows(get: &TmdbGet) -> Result<Vec<Row>, String> {
+    let provider = provider(get)?.to_string();
+    let mut rows = Vec::new();
+    let mut last_error = None;
+    for (title, parameters) in TMDB_ROWS {
+        let mut query = vec![
+            ("watch_region", COUNTRY.to_uppercase()),
+            ("with_watch_providers", provider.clone()),
+            ("with_watch_monetization_types", "flatrate".to_owned()),
+            ("include_adult", "false".to_owned()),
+        ];
+        query.extend(
+            parameters
+                .iter()
+                .map(|(name, value)| (*name, (*value).to_owned())),
+        );
+        match get("/3/discover/movie", &query) {
+            Ok(reply) => {
+                let films: Vec<Film> = reply["results"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(tmdb_film)
+                    .take(FILM_LIMIT)
+                    .collect();
+                if films.len() >= 2 {
+                    rows.push(Row {
+                        title: (*title).into(),
+                        films,
+                    });
+                }
+            }
+            Err(error) => last_error = Some(error),
+        }
+    }
+    match (rows.is_empty(), last_error) {
+        (true, Some(error)) => Err(error),
+        (true, None) => Err("TMDB lists no films on the Criterion Channel".into()),
+        _ => Ok(rows),
+    }
+}
+
+/// A discover result with a title and a 16:9 image.
+fn tmdb_film(movie: &Value) -> Option<Film> {
+    let id = movie["id"].as_u64()?;
+    let title = clean(movie["title"].as_str()?);
+    let backdrop = movie["backdrop_path"].as_str()?;
+    // Image paths are `/` and a file name; anything else is not fetched.
+    if title.is_empty()
+        || !backdrop.starts_with('/')
+        || !backdrop[1..]
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+    {
+        return None;
+    }
+    let year = movie["release_date"]
+        .as_str()
+        .and_then(|date| date.get(..4))
+        .filter(|year| year.bytes().all(|b| b.is_ascii_digit()))
+        .unwrap_or_default();
+    Some(Film {
+        id: format!("tmdb{id}"),
+        title,
+        year: year.into(),
+        length: String::new(),
+        link: None,
+        tmdb: Some(id),
+        image: format!("{TMDB_IMAGES}{backdrop}"),
+    })
+}
+
+// ---- Finding a film's page ------------------------------------------------------------------
+
+/// The film's page on the Channel among Movie of the Night's streaming options.
+pub fn criterion_link(show: &crate::motn_api::Show) -> Option<String> {
+    show.streaming_options
+        .get(COUNTRY)?
+        .iter()
+        .filter(|option| option.service.id == SERVICE)
+        .map(|option| option.link.as_str())
+        .find(|link| {
+            link.strip_prefix(ORIGIN)
+                .is_some_and(|path| path.starts_with("/films/"))
+        })
+        .map(str::to_owned)
+}
+
+/// The Channel's search for a title, when its page is not known.
+pub fn search_link(title: &str) -> String {
+    let mut query = String::new();
+    for byte in title.bytes() {
+        if byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'.' | b'_' | b'~') {
+            query.push(byte as char);
+        } else {
+            query.push_str(&format!("%{byte:02X}"));
+        }
+    }
+    format!("{ORIGIN}/search?q={query}")
+}
+
 // ---- Catalog worker -------------------------------------------------------------------------
 
 /// The rows, or why there are none. `stale` rows are an old copy shown while a new one loads.
@@ -219,13 +408,86 @@ pub struct Reply {
     pub stale: bool,
 }
 
+/// A film's page, for the film `id` asked about.
+pub type Resolved = (String, String);
+
+enum Request {
+    Rows,
+    Link {
+        id: String,
+        tmdb: u64,
+        title: String,
+    },
+}
+
 pub struct Service {
-    sender: mpsc::Sender<()>,
+    sender: mpsc::Sender<Request>,
     pub receiver: mpsc::Receiver<Reply>,
+    pub resolved: mpsc::Receiver<Resolved>,
+}
+
+/// Where the worker gets rows and links: the network, or a test's fixtures.
+pub trait Source: Send + 'static {
+    fn rows(&self) -> Result<Vec<Row>, String>;
+    /// None when no Movie of the Night key is stored.
+    fn link(&self, tmdb: u64) -> Option<Result<Option<String>, String>>;
+}
+
+/// Luma's search keys, read again for every request so a key set later is used at once.
+struct Network {
+    keys: Option<PathBuf>,
+    agent: ureq::Agent,
+}
+
+impl Network {
+    fn keys(&self) -> crate::streaming_keys::Keys {
+        self.keys
+            .as_deref()
+            .map(crate::streaming_keys::load)
+            .unwrap_or_default()
+    }
+}
+
+impl Source for Network {
+    fn rows(&self) -> Result<Vec<Row>, String> {
+        if let Some(http) = self.keys().tmdb_http() {
+            let get = |path: &str, query: &[(&'static str, String)]| {
+                http.get::<Value>(path, &Query(query.to_vec()))
+                    .map_err(|e| format!("TMDB: {e}"))
+            };
+            match tmdb_rows(&get) {
+                Ok(rows) => return Ok(rows),
+                Err(error) => crate::telemetry::log_warn!("criterion", "{error}"),
+            }
+        }
+        let rows = parse(&fetch(&self.agent)?);
+        if rows.is_empty() {
+            Err("The Criterion Channel page had no films".to_owned())
+        } else {
+            Ok(rows)
+        }
+    }
+
+    fn link(&self, tmdb: u64) -> Option<Result<Option<String>, String>> {
+        let http: Http = self.keys().motn_http()?;
+        let client = crate::motn_api::Client::new(http);
+        Some(
+            client
+                .get_show(&crate::motn_api::GetShowParams {
+                    id: format!("movie/{tmdb}"),
+                    country: Some(COUNTRY.into()),
+                    series_granularity: None,
+                    output_language: None,
+                })
+                .map(|show| criterion_link(&show))
+                .map_err(|e| format!("Movie of the Night: {e}")),
+        )
+    }
 }
 
 impl Service {
-    pub fn new(cache: DiskCache) -> Self {
+    /// `keys`: where Luma keeps its search keys (`streaming_keys::path`).
+    pub fn new(cache: DiskCache, keys: Option<PathBuf>) -> Self {
         let agent = ureq::Agent::config_builder()
             .timeout_global(Some(Duration::from_secs(20)))
             .max_redirects(0)
@@ -233,38 +495,82 @@ impl Service {
             .http_status_as_error(false)
             .build()
             .new_agent();
-        Self::with_fetch(cache, move || fetch(&agent))
+        Self::with_source(cache, Network { keys, agent })
     }
 
-    fn with_fetch(
-        cache: DiskCache,
-        fetch: impl Fn() -> Result<String, String> + Send + 'static,
-    ) -> Self {
-        let (sender, requests) = mpsc::channel::<()>();
+    fn with_source(cache: DiskCache, source: impl Source) -> Self {
+        let (sender, requests) = mpsc::channel::<Request>();
         let (replies, receiver) = mpsc::channel();
+        let (links, resolved) = mpsc::channel();
         std::thread::spawn(move || {
-            while requests.recv().is_ok() {
-                // Requests made while one was loading are answered by it.
-                while requests.try_recv().is_ok() {}
-                for reply in load(&cache, &fetch, SystemTime::now()) {
-                    if replies.send(reply).is_err() {
-                        return;
+            while let Ok(request) = requests.recv() {
+                match request {
+                    Request::Rows => {
+                        for reply in load(&cache, &|| source.rows(), SystemTime::now()) {
+                            if replies.send(reply).is_err() {
+                                return;
+                            }
+                        }
+                    }
+                    Request::Link { id, tmdb, title } => {
+                        let link = link(&cache, &source, tmdb, &title, SystemTime::now());
+                        if links.send((id, link)).is_err() {
+                            return;
+                        }
                     }
                 }
             }
         });
-        Self { sender, receiver }
+        Self {
+            sender,
+            receiver,
+            resolved,
+        }
     }
 
     pub fn load(&self) {
-        let _ = self.sender.send(());
+        let _ = self.sender.send(Request::Rows);
+    }
+
+    /// Finds the page of a film TMDB listed; the answer arrives on `resolved`.
+    pub fn resolve(&self, film: &Film) {
+        if let Some(tmdb) = film.tmdb {
+            let _ = self.sender.send(Request::Link {
+                id: film.id.clone(),
+                tmdb,
+                title: film.title.clone(),
+            });
+        }
     }
 }
 
-/// A fresh copy from disk; else any copy from disk at once, then the page from the network.
+/// A film's page: from disk, else from Movie of the Night, else the Channel's search.
+fn link(cache: &DiskCache, source: &dyn Source, tmdb: u64, title: &str, now: SystemTime) -> String {
+    let key = format!("criterion:link:{tmdb}");
+    if let Some(link) = cache.get::<String>(&key, LINK_AGE, now) {
+        return link;
+    }
+    match source.link(tmdb) {
+        Some(Ok(Some(link))) => {
+            cache.put(&key, &link, now);
+            link
+        }
+        Some(Ok(None)) => {
+            crate::telemetry::log_info!("criterion", "Movie of the Night has no page for {tmdb}");
+            search_link(title)
+        }
+        Some(Err(error)) => {
+            crate::telemetry::log_warn!("criterion", "{error}");
+            search_link(title)
+        }
+        None => search_link(title),
+    }
+}
+
+/// A fresh copy from disk; else any copy from disk at once, then new rows from the network.
 fn load(
     cache: &DiskCache,
-    fetch: &dyn Fn() -> Result<String, String>,
+    fetch: &dyn Fn() -> Result<Vec<Row>, String>,
     now: SystemTime,
 ) -> Vec<Reply> {
     if let Some(rows) = cache.get::<Vec<Row>>(CACHE_KEY, FRESH, now) {
@@ -281,15 +587,7 @@ fn load(
             stale: true,
         });
     }
-    let rows = fetch().and_then(|html| {
-        let rows = parse(&html);
-        if rows.is_empty() {
-            Err("The Criterion Channel page had no films".to_owned())
-        } else {
-            Ok(rows)
-        }
-    });
-    match rows {
+    match fetch() {
         Ok(rows) => {
             cache.put(CACHE_KEY, &rows, now);
             replies.push(Reply {
@@ -356,6 +654,10 @@ pub struct Browser {
     pub images: HashMap<String, Option<Arc<Frame>>>,
     /// Films whose artwork was asked for since the screen opened.
     image_requests_sent: bool,
+    /// The film chosen whose page is being looked up; it opens when the page is found.
+    pub resolving: Option<String>,
+    /// A film whose page the main loop asks the catalog worker for.
+    resolve_request: Option<Film>,
 }
 
 impl Browser {
@@ -520,12 +822,22 @@ impl State {
 
     pub fn criterion_activate(&mut self) -> Vec<Effect> {
         match self.focus {
-            Target::Film(row, card) => match self.criterion.film(row, card) {
-                Some(film) => vec![Effect::LaunchTitle {
+            Target::Film(row, card) => match self.criterion.film(row, card).cloned() {
+                Some(Film {
+                    link: Some(link), ..
+                }) => vec![Effect::LaunchTitle {
                     app: PLAYER.into(),
                     service: SERVICE.into(),
-                    link: film.link(),
+                    link,
                 }],
+                // Listed by TMDB: its page on the Channel is looked up first.
+                Some(film) => {
+                    self.criterion.resolving = Some(film.id.clone());
+                    self.criterion.resolve_request = Some(film);
+                    self.notify(self.preferences.language.t("opening"));
+                    self.dirty = true;
+                    vec![]
+                }
                 None => vec![],
             },
             Target::CriterionRetry => {
@@ -538,6 +850,39 @@ impl State {
             }
             _ => vec![],
         }
+    }
+
+    /// A film whose page to look up, once.
+    pub fn criterion_resolve_request(&mut self) -> Option<Film> {
+        self.criterion.resolve_request.take()
+    }
+
+    /// A film's page was found: it is kept on the film, and the film opens if it is still the
+    /// one chosen and the screen is still open.
+    pub fn criterion_resolved(&mut self, id: &str, link: String) -> Vec<Effect> {
+        let browser = &mut self.criterion;
+        let finds_page = link
+            .strip_prefix(ORIGIN)
+            .is_some_and(|path| path.starts_with("/films/"));
+        if finds_page {
+            for film in browser.rows.iter_mut().flat_map(|row| &mut row.films) {
+                if film.id == id {
+                    film.link = Some(link.clone());
+                }
+            }
+        }
+        if browser.resolving.as_deref() != Some(id) {
+            return vec![];
+        }
+        browser.resolving = None;
+        if !self.criterion_open() {
+            return vec![];
+        }
+        vec![Effect::LaunchTitle {
+            app: PLAYER.into(),
+            service: SERVICE.into(),
+            link,
+        }]
     }
 
     pub fn criterion_back(&mut self) -> Vec<Effect> {
@@ -567,7 +912,7 @@ impl State {
             browser.images.insert(film.id.clone(), None);
             requests.push(crate::posters::Request {
                 show_id: image_key(&film.id),
-                url: film.image_url(),
+                url: film.image.clone(),
                 size: IMAGE_SIZE,
             });
         }

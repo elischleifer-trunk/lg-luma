@@ -802,10 +802,13 @@ fn run() -> Result<(), String> {
         search_cache::DiskCache::beside(&preferences_path),
     );
     let posters = posters::Service::new(search_cache::DiskCache::posters_beside(&preferences_path));
-    let criterion_catalog = criterion::Service::new(search_cache::DiskCache::new(
-        preferences_path.with_file_name("criterion-cache"),
-        8 * 1024 * 1024,
-    ));
+    let criterion_catalog = criterion::Service::new(
+        search_cache::DiskCache::new(
+            preferences_path.with_file_name("criterion-cache"),
+            8 * 1024 * 1024,
+        ),
+        Some(keys_path.clone()),
+    );
     let criterion_images = posters::Service::new(search_cache::DiskCache::new(
         preferences_path.with_file_name("criterion-images"),
         search_cache::POSTER_LIMIT,
@@ -2112,6 +2115,23 @@ fn run() -> Result<(), String> {
         }
         for (key, image) in criterion_images.receiver.try_iter() {
             state.accept_criterion_image(&key, image);
+        }
+        if let Some(film) = state.criterion_resolve_request() {
+            criterion_catalog.resolve(&film);
+        }
+        let resolved: Vec<_> = criterion_catalog.resolved.try_iter().collect();
+        for (id, link) in resolved {
+            let pending = state.criterion_resolved(&id, link);
+            running &= effects(
+                pending,
+                &mut state,
+                &platform,
+                &preferences_path,
+                &weather_service,
+                &wallpaper_service,
+                &webhook_service,
+                &updates,
+            );
         }
         if let Some(ids) = state.score_requests() {
             scores.send(ids);

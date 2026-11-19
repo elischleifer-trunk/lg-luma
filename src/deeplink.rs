@@ -89,10 +89,18 @@ pub fn launch(service: &str, link: &str) -> Option<Launch> {
         }
         // Luma's own Criterion player (`criterion/`) opens `target`; `?play=1` is the Channel's
         // own link for starting a film rather than showing its page.
+        // A film the Criterion screen could not find a page for opens the Channel's search.
         "criterion" => {
-            let path = path.split(['?', '#']).next().unwrap_or(path);
-            path.starts_with("/films/").then(|| Launch {
-                params: json!({ "target": format!("{}{path}?play=1", crate::criterion::ORIGIN) }),
+            let page = path.split(['?', '#']).next().unwrap_or(path);
+            let target = if page.starts_with("/films/") {
+                format!("{}{page}?play=1", crate::criterion::ORIGIN)
+            } else if page == "/search" && path.starts_with("/search?q=") && !path.contains('#') {
+                format!("{}{path}", crate::criterion::ORIGIN)
+            } else {
+                return None;
+            };
+            Some(Launch {
+                params: json!({ "target": target }),
                 confidence: Confidence::Verified,
             })
         }
@@ -464,6 +472,11 @@ mod tests {
             json!({"target": "https://www.criterionchannel.com/films/oZkRW7X1/laura?play=1"})
         );
         assert!(launch("criterion", "https://www.criterionchannel.com/browse").is_none());
+        let search = "https://www.criterionchannel.com/search?q=La%20Haine";
+        assert_eq!(
+            launch("criterion", search).unwrap().params,
+            json!({"target": search})
+        );
         assert!(launch("criterion", "https://evil.example/films/oZkRW7X1/laura").is_none());
     }
 

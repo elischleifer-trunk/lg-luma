@@ -7,10 +7,15 @@ const PAGE: &str = include_str!("../tests/fixtures/criterion/home.html");
 fn film(id: &str, title: &str) -> Film {
     Film {
         id: id.into(),
-        slug: title.to_lowercase().replace(' ', "-"),
         title: title.into(),
         year: "1944".into(),
         length: "1 hr 28 min".into(),
+        link: Some(format!(
+            "{ORIGIN}/films/{id}/{}",
+            title.to_lowercase().replace(' ', "-")
+        )),
+        tmdb: None,
+        image: format!("https://cdn.jwplayer.com/v2/media/{id}/images/regalia_16x9.webp"),
     }
 }
 
@@ -61,22 +66,15 @@ fn the_home_page_gives_its_film_rows_in_order() {
         popular[1],
         Film {
             id: "oZkRW7X1".into(),
-            slug: "laura".into(),
             title: "Laura".into(),
             year: "1944".into(),
             length: "1 hr 28 min".into(),
+            link: Some("https://www.criterionchannel.com/films/oZkRW7X1/laura".into()),
+            tmdb: None,
+            image: "https://cdn.jwplayer.com/v2/media/oZkRW7X1/images/regalia_16x9.webp?fallback=default_16x9&width=480".into(),
         }
     );
     assert_eq!(popular[1].details(), "1944 · 1 hr 28 min");
-    assert_eq!(
-        popular[1].link(),
-        "https://www.criterionchannel.com/films/oZkRW7X1/laura"
-    );
-    assert!(
-        popular[1]
-            .image_url()
-            .starts_with("https://cdn.jwplayer.com/v2/media/oZkRW7X1/images/regalia_16x9.webp")
-    );
     // Every film appears once per row, with a title.
     for row in &rows {
         for (i, film) in row.films.iter().enumerate() {
@@ -126,7 +124,7 @@ fn card_markup_is_read_defensively() {
 fn the_catalog_uses_a_fresh_copy_and_shows_an_old_one_while_reloading() {
     let cache = cache("load");
     let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
-    let page = || Ok(PAGE.to_owned());
+    let page = || Ok(parse(PAGE));
     let offline = || Err("offline".to_owned());
 
     // Nothing stored and no network: an error.
@@ -165,10 +163,160 @@ fn the_catalog_uses_a_fresh_copy_and_shows_an_old_one_while_reloading() {
             }
         ]
     ));
-    // A page without films is an error, not an empty screen.
-    let empty = || Ok("<html></html>".to_owned());
-    let replies = load(&self::cache("empty"), &empty, now);
-    assert!(matches!(&replies[..], [Reply { rows: Err(_), .. }]));
+}
+
+/// TMDB's replies, by path, for `tmdb_rows`.
+fn tmdb(
+    providers: Value,
+    discover: impl Fn(&[(&'static str, String)]) -> Result<Value, String>,
+) -> impl Fn(&str, &[(&'static str, String)]) -> Result<Value, String> {
+    move |path, query| match path {
+        "/3/watch/providers/movie" => Ok(providers.clone()),
+        "/3/discover/movie" => discover(query),
+        _ => Err(format!("unexpected {path}")),
+    }
+}
+
+fn movie(id: u64, title: &str) -> Value {
+    serde_json::json!({
+        "id": id, "title": title, "release_date": "1995-05-31",
+        "backdrop_path": format!("/b{id}.jpg"),
+    })
+}
+
+#[test]
+fn tmdb_lists_the_channels_films_by_its_provider_id() {
+    let providers = serde_json::json!({"results": [
+        {"provider_id": 8, "provider_name": "Netflix"},
+        {"provider_id": 258, "provider_name": "Criterion Channel"},
+    ]});
+    let asked = std::sync::Mutex::new(Vec::new());
+    let get = tmdb(providers, |query| {
+        asked.lock().unwrap().push(query.to_vec());
+        let genre = query.iter().find(|(name, _)| *name == "with_genres");
+        Ok(match genre.map(|(_, value)| value.as_str()) {
+            // A genre with one film is not a row.
+            Some("99") => serde_json::json!({"results": [movie(1, "One")]}),
+            _ => serde_json::json!({"results": [
+                movie(406, "La Haine"),
+                movie(407, "Rope"),
+                // No 16:9 image, or an odd path: left out.
+                {"id": 408, "title": "No image", "backdrop_path": null},
+                {"id": 409, "title": "Odd", "backdrop_path": "/../x.jpg"},
+            ]}),
+        })
+    });
+    let rows = tmdb_rows(&get).unwrap();
+    assert_eq!(rows.len(), TMDB_ROWS.len() - 1);
+    assert_eq!(rows[0].title, "Popular on the Criterion Channel");
+    assert_eq!(
+        rows[0].films[0],
+        Film {
+            id: "tmdb406".into(),
+            title: "La Haine".into(),
+            year: "1995".into(),
+            length: String::new(),
+            link: None,
+            tmdb: Some(406),
+            image: "https://image.tmdb.org/t/p/w780/b406.jpg".into(),
+        }
+    );
+    assert_eq!(rows[0].films.len(), 2);
+    for query in asked.lock().unwrap().iter() {
+        assert!(query.contains(&("with_watch_providers", "258".into())));
+        assert!(query.contains(&("watch_region", "US".into())));
+    }
+
+    let none = tmdb(serde_json::json!({"results": []}), |_| {
+        Ok(serde_json::json!({}))
+    });
+    assert!(tmdb_rows(&none).is_err(), "no Criterion provider");
+    let failing = tmdb(
+        serde_json::json!({"results": [{"provider_id": 258, "provider_name": "Criterion Channel"}]}),
+        |_| Err("TMDB: offline".into()),
+    );
+    assert_eq!(tmdb_rows(&failing), Err("TMDB: offline".into()));
+}
+
+struct Fixed(
+    Option<Result<Option<String>, String>>,
+    std::sync::Mutex<u32>,
+);
+
+impl Source for Fixed {
+    fn rows(&self) -> Result<Vec<Row>, String> {
+        Ok(rows(&[2]))
+    }
+    fn link(&self, _: u64) -> Option<Result<Option<String>, String>> {
+        *self.1.lock().unwrap() += 1;
+        self.0.clone()
+    }
+}
+
+#[test]
+fn a_films_page_comes_from_movie_of_the_night_once_else_the_channels_search() {
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
+    let page = "https://www.criterionchannel.com/films/3sWhDjsA/la-haine";
+    let found = Fixed(Some(Ok(Some(page.into()))), Default::default());
+    let cache = cache("links");
+    assert_eq!(link(&cache, &found, 406, "La Haine", now), page);
+    assert_eq!(link(&cache, &found, 406, "La Haine", now), page);
+    assert_eq!(*found.1.lock().unwrap(), 1, "asked once, then from disk");
+    let search = "https://www.criterionchannel.com/search?q=La%20Haine%3A%20%C3%A9";
+    for source in [
+        Fixed(Some(Ok(None)), Default::default()),
+        Fixed(Some(Err("quota".into())), Default::default()),
+        Fixed(None, Default::default()),
+    ] {
+        assert_eq!(link(&cache, &source, 1, "La Haine: é", now), search);
+    }
+    // A search is not kept: the next try asks again.
+    let missing = Fixed(Some(Ok(None)), Default::default());
+    link(&cache, &missing, 2, "x", now);
+    link(&cache, &missing, 2, "x", now);
+    assert_eq!(*missing.1.lock().unwrap(), 2);
+}
+
+#[test]
+fn movie_of_the_night_gives_the_channels_page_for_a_film() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../tests/fixtures/streaming/search-title-bluey.json"
+    ))
+    .unwrap();
+    let shows: Vec<crate::motn_api::Show> =
+        serde_json::from_value(fixture["response"].clone()).unwrap();
+    let links: Vec<_> = shows.iter().filter_map(criterion_link).collect();
+    assert!(
+        links.contains(&"https://www.criterionchannel.com/films/3sWhDjsA/three-colors-blue".into()),
+        "{links:?}"
+    );
+}
+
+#[test]
+fn a_tmdb_film_opens_once_its_page_is_found() {
+    let mut state = opened(&[2]);
+    let mut listed = state.criterion.rows[0].films[1].clone();
+    listed.link = None;
+    listed.tmdb = Some(406);
+    state.criterion.rows[0].films[1] = listed.clone();
+    state.direction(Direction::Right, &[]);
+    assert_eq!(state.activate(), vec![]);
+    assert_eq!(state.criterion_resolve_request(), Some(listed.clone()));
+    assert_eq!(state.criterion_resolve_request(), None, "asked once");
+    // A late answer for another film opens nothing.
+    assert_eq!(state.criterion_resolved("other", "x".into()), vec![]);
+    let page = "https://www.criterionchannel.com/films/3sWhDjsA/la-haine";
+    assert_eq!(
+        state.criterion_resolved(&listed.id, page.into()),
+        vec![Effect::LaunchTitle {
+            app: PLAYER.into(),
+            service: SERVICE.into(),
+            link: page.into(),
+        }]
+    );
+    // Kept on the film: OK opens it at once next time.
+    assert_eq!(state.criterion.rows[0].films[1].link.as_deref(), Some(page));
+    assert_eq!(state.activate().len(), 1);
 }
 
 #[test]
