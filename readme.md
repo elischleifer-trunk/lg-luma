@@ -321,7 +321,9 @@ The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows the
 rows of films (Popular Movies, Leaving Soon, its collections) in a full-screen grid. OK plays the
 film in a small player app that Luma installs the first time it is needed: the Channel's web
 player, full screen, with the remote's play, pause and skip keys. Back returns to the grid. The
-first film asks you to sign in to your Criterion Channel account; the player remembers it. The
+first film asks you to sign in to your Criterion Channel account, unless Home Assistant holds it
+(see [Criterion Channel account](home-assistant.md#criterion-channel-account)); the player then
+signs in by itself. The
 rows are read from the Channel's public home page, so a redesign of that page can empty the grid
 until Luma is updated.
 
