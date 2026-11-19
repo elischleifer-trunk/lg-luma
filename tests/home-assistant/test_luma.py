@@ -1721,6 +1721,9 @@ def test_only_the_account_cleared_here_is_forgotten() -> None:
     assert not needs_forget(cleared, {"criterion_account": False})
     # A server that never held one forgets nothing.
     assert not needs_forget({}, {"criterion_account": mine})
+    # Changed, then cleared, while the TV was off: the older account it holds goes too.
+    changed = saved(held, "me@example.com", "pw2")
+    assert needs_forget(saved(changed, "", ""), {"criterion_account": mine})
     # Saving the empty form again keeps the record; setting an account drops it.
     assert saved(cleared, "", "")["criterion_cleared"] == mine
     assert "criterion_cleared" not in saved(cleared, "a@b.c", "x")

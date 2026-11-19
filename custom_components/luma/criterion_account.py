@@ -89,13 +89,13 @@ def needs_push(options: dict[str, Any], status: dict[str, Any]) -> bool:
 
 
 def needs_forget(options: dict[str, Any], status: dict[str, Any]) -> bool:
-    """Whether the TV still holds the account cleared here."""
-    cleared = options.get(CONF_CRITERION_CLEARED)
-    return (
-        account(options) is None
-        and isinstance(cleared, str)
-        and status.get("criterion_account") == cleared
-    )
+    """Whether the account was cleared here and the TV still holds one this server sent: the
+    cleared one, or an earlier one if the TV was off through a change and the clearing."""
+    if account(options) is not None:
+        return False
+    held = status.get("criterion_account")
+    sent = [options.get(CONF_CRITERION_CLEARED), *options.get(CONF_CRITERION_EARLIER, [])]
+    return isinstance(held, str) and held in [mark for mark in sent if isinstance(mark, str)]
 
 
 async def push(
