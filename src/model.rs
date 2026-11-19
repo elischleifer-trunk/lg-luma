@@ -321,9 +321,12 @@ pub const CAMERAS_APP: &str = "luma.cameras";
 /// that takeover until the next cold boot (see `platform::open_lg_home`).
 pub const LG_HOME_APP: &str = "luma.lg-home";
 
-/// Apps Luma adds itself (shortcut tiles, Cameras and LG Home); the TV never reports them.
+/// Apps Luma adds itself (shortcut tiles, Cameras, Criterion and LG Home); the TV never reports them.
 pub fn is_builtin(id: &str) -> bool {
-    id.starts_with(CUSTOM_TILE_PREFIX) || id == CAMERAS_APP || id == LG_HOME_APP
+    id.starts_with(CUSTOM_TILE_PREFIX)
+        || id == CAMERAS_APP
+        || id == LG_HOME_APP
+        || id == crate::criterion::APP
 }
 pub const TILE_LIMIT: usize = 64;
 pub const TILE_URL_LIMIT: usize = 512;

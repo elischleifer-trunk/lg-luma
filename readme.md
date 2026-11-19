@@ -315,6 +315,16 @@ your Home Assistant with the `luma` integration ready to install. Home Assistant
 and asks for the code shown on it. Once paired, a **Cameras** app appears among your apps and
 shows every Home Assistant camera in a full-screen grid. See [Home Assistant](home-assistant.md).
 
+### Criterion Channel
+
+The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows the Channel's own
+rows of films (Popular Movies, Leaving Soon, its collections) in a full-screen grid. OK plays the
+film in a small player app that Luma installs the first time it is needed: the Channel's web
+player, full screen, with the remote's play, pause and skip keys. Back returns to the grid. The
+first film asks you to sign in to your Criterion Channel account; the player remembers it. The
+rows are read from the Channel's public home page, so a redesign of that page can empty the grid
+until Luma is updated.
+
 ## Development
 
 ### Setup & Building

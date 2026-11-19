@@ -649,6 +649,14 @@ fn launch_title(
     still_current: impl Fn() -> bool,
 ) -> Option<Result<(), String>> {
     let resolved = crate::deeplink::resolve(service, link);
+    // Luma's Criterion player ships inside Luma's package; it is installed, or updated to
+    // this release, the first time it opens a film.
+    if id == crate::criterion::PLAYER
+        && let Err(error) = overlay_helper("install-criterion", None)
+    {
+        crate::telemetry::log_error!("criterion", "Installing the player: {error}");
+        return Some(Err(error));
+    }
     if !still_current() {
         crate::telemetry::log_info!("launch", "Dropped {id}: a newer launch was requested");
         return None;

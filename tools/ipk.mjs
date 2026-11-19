@@ -96,6 +96,8 @@ export function normalizeAndVerifyPackage(bytes, manifest) {
     'assets/version.txt',
     'overlay/appinfo.json',
     'overlay/overlay.package',
+    'criterion/appinfo.json',
+    'criterion/criterion.package',
     ...[350, 400, 450, 500, 550, 600, 650, 800].flatMap((weight) => [
       `assets/font-${weight}.ttf`,
       `assets/font-display-${weight}.ttf`,
@@ -157,6 +159,13 @@ export function normalizeAndVerifyPackage(bytes, manifest) {
   const overlayInfo = overlay && JSON.parse(overlay.data.toString());
   if (overlayInfo?.id !== 'com.ecklf.luma.overlay' || overlayInfo.version !== manifest.version)
     throw new Error('The bundled Home Assistant overlay does not match this release.');
+  const criterion = owned.find((file) => file.name.endsWith('/criterion/appinfo.json'));
+  const criterionInfo = criterion && JSON.parse(criterion.data.toString());
+  if (
+    criterionInfo?.id !== 'com.ecklf.luma.criterion' ||
+    criterionInfo.version !== manifest.version
+  )
+    throw new Error('The bundled Criterion player does not match this release.');
   const vectorFiles = owned.filter((file) => file.name.endsWith('.lvec'));
   for (const file of vectorFiles) {
     if (

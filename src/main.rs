@@ -8,6 +8,7 @@ mod branding;
 mod cameras;
 mod clock;
 mod companion;
+mod criterion;
 mod damage;
 mod deeplink;
 mod diagnostics;
@@ -372,6 +373,7 @@ fn effects(
             Effect::Launch(id) if id == model::CAMERAS_APP => {
                 state.show_cameras = true;
             }
+            Effect::Launch(id) if id == criterion::APP => state.open_criterion(),
             Effect::Launch(id) => {
                 if scroll_preview::is_placeholder(&id) {
                     state.notify(state.preferences.language.t("scrollTestOnly"));
@@ -487,6 +489,7 @@ fn script(
         "back" => state.back(),
         "recents" | "hold-back" => state.open_recents(),
         "cameras" => vec![Effect::Launch(model::CAMERAS_APP.into())],
+        "criterion" => vec![Effect::Launch(criterion::APP.into())],
         "menu" => {
             state.options();
             vec![]
@@ -797,6 +800,14 @@ fn run() -> Result<(), String> {
         search_cache::DiskCache::beside(&preferences_path),
     );
     let posters = posters::Service::new(search_cache::DiskCache::posters_beside(&preferences_path));
+    let criterion_catalog = criterion::Service::new(search_cache::DiskCache::new(
+        preferences_path.with_file_name("criterion-cache"),
+        8 * 1024 * 1024,
+    ));
+    let criterion_images = posters::Service::new(search_cache::DiskCache::new(
+        preferences_path.with_file_name("criterion-images"),
+        search_cache::POSTER_LIMIT,
+    ));
     let mut search_was_open = false;
     let scores = mdblist::Service::new(
         mdblist::Live::new(keys_path.clone()),
@@ -2076,6 +2087,29 @@ fn run() -> Result<(), String> {
         }
         for (show_id, poster) in posters.receiver.try_iter() {
             state.accept_poster(&show_id, poster);
+        }
+        // The Criterion screen's rows and artwork, read off the SDL thread.
+        if state.criterion_load_requested() {
+            criterion_catalog.load();
+        }
+        for reply in criterion_catalog.receiver.try_iter() {
+            state.accept_criterion(reply);
+        }
+        if let Some(requests) = state.criterion_image_requests() {
+            let wanted: Vec<String> = state
+                .criterion
+                .rows
+                .iter()
+                .flat_map(|row| &row.films)
+                .map(|film| criterion::image_key(&film.id))
+                .collect();
+            criterion_images.want(wanted.iter().map(String::as_str));
+            for request in requests {
+                criterion_images.send(request);
+            }
+        }
+        for (key, image) in criterion_images.receiver.try_iter() {
+            state.accept_criterion_image(&key, image);
         }
         if let Some(ids) = state.score_requests() {
             scores.send(ids);

@@ -13,7 +13,34 @@ pub const BUNDLE: &str = "overlay";
 /// The overlay IPK inside Luma's package. ares-package drops any path containing ".ipk" from an
 /// app, so it is stored under another name and copied to an `.ipk` path to install.
 pub const PACKAGE: &str = "overlay.package";
-const STAGED: &str = "/tmp/luma-overlay.ipk";
+
+/// The Criterion Channel player, a web app bundled the same way and installed the first time
+/// Luma's Criterion screen opens a film.
+pub const CRITERION: &str = "com.ecklf.luma.criterion";
+pub const CRITERION_BUNDLE: &str = "criterion";
+pub const CRITERION_PACKAGE: &str = "criterion.package";
+
+/// A web app Luma's package carries for the helper to install.
+pub struct Bundle {
+    pub id: &'static str,
+    pub directory: &'static str,
+    pub package: &'static str,
+    staged: &'static str,
+}
+
+pub const OVERLAY_BUNDLE: Bundle = Bundle {
+    id: OVERLAY,
+    directory: BUNDLE,
+    package: PACKAGE,
+    staged: "/tmp/luma-overlay.ipk",
+};
+
+pub const CRITERION_PLAYER: Bundle = Bundle {
+    id: CRITERION,
+    directory: CRITERION_BUNDLE,
+    package: CRITERION_PACKAGE,
+    staged: "/tmp/luma-criterion.ipk",
+};
 
 /// webOS media IDs are short opaque tokens such as `_3FzD9vJx1k2abc`.
 pub fn valid_media_id(id: &str) -> bool {
@@ -24,12 +51,12 @@ pub fn valid_media_id(id: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-' | b'.' | b':'))
 }
 
-fn installed_version(system: &impl System) -> Result<Option<String>> {
+fn installed_version(system: &impl System, id: &str) -> Result<Option<String>> {
     let reply = system::luna(
         system,
         "com.webos.applicationManager",
         "getAppInfo",
-        &json!({"id": OVERLAY}),
+        &json!({"id": id}),
     )?;
     if reply["returnValue"] != true {
         return Ok(None);
@@ -37,44 +64,53 @@ fn installed_version(system: &impl System) -> Result<Option<String>> {
     Ok(reply["appInfo"]["version"].as_str().map(str::to_owned))
 }
 
-/// Installs or updates the bundled overlay app when its version differs from the bundle.
-fn install(system: &impl System, directory: &Path) -> Result<Value> {
-    let bundle = directory.join(BUNDLE);
+/// Installs or updates a bundled web app when its version differs from the bundle.
+pub fn install(system: &impl System, directory: &Path, app: &Bundle) -> Result<Value> {
+    let bundle = directory.join(app.directory);
     let manifest = system::json(system, bundle.join("appinfo.json"))?;
-    if manifest["id"] != OVERLAY {
-        return Err("The bundled overlay has an unexpected app ID".into());
+    if manifest["id"] != app.id {
+        return Err(format!(
+            "The bundled {} has an unexpected app ID",
+            app.directory
+        ));
     }
     let expected = manifest["version"]
         .as_str()
-        .ok_or("The bundled overlay has no version")?
+        .ok_or_else(|| format!("The bundled {} has no version", app.directory))?
         .to_owned();
-    if installed_version(system)?.as_deref() == Some(expected.as_str()) {
+    if installed_version(system, app.id)?.as_deref() == Some(expected.as_str()) {
         return Ok(json!({"returnValue":true,"version":expected,"changed":false}));
     }
-    let package = bundle.join(PACKAGE);
+    let package = bundle.join(app.package);
     if !system::exists(system, &package) {
-        return Err("The Luma package does not include the overlay app".into());
+        return Err(format!(
+            "The Luma package does not include the {} app",
+            app.directory
+        ));
     }
     let bytes = system::read(system, &package, 16 * 1024 * 1024)?;
     system::mkdir(system, "/tmp")?;
-    system::write(system, STAGED, &bytes, 0o644)?;
+    system::write(system, app.staged, &bytes, 0o644)?;
     let result = (|| {
         accepted(system::luna(
             system,
             "com.webos.appInstallService",
             "dev/install",
-            &json!({"id": OVERLAY, "ipkUrl": STAGED, "subscribe": false}),
+            &json!({"id": app.id, "ipkUrl": app.staged, "subscribe": false}),
         )?)?;
         // dev/install answers before installing; the app manager lists the result once done.
         for _ in 0..60 {
             system.pause();
-            if installed_version(system)?.as_deref() == Some(expected.as_str()) {
+            if installed_version(system, app.id)?.as_deref() == Some(expected.as_str()) {
                 return Ok(json!({"returnValue":true,"version":expected,"changed":true}));
             }
         }
-        Err("The overlay app was not installed within a minute".into())
+        Err(format!(
+            "The {} app was not installed within a minute",
+            app.directory
+        ))
     })();
-    let _ = system::remove(system, STAGED);
+    let _ = system::remove(system, app.staged);
     result
 }
 
@@ -166,7 +202,8 @@ pub fn dispatch(
 ) -> Result<Value> {
     system::root(system)?;
     match command {
-        "install" => install(system, directory),
+        "install" => install(system, directory, &OVERLAY_BUNDLE),
+        "install-criterion" => install(system, directory, &CRITERION_PLAYER),
         "close" => close(system),
         "pause" => pause(system),
         "resume" => resume(system, argument.ok_or("Missing media ID")?),
