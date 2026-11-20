@@ -524,6 +524,11 @@ fn enter_in_the_apps_search_focuses_the_first_result() {
     assert!(!state.text_input_active());
     assert_eq!(state.query, "netflix");
     assert_eq!(state.focus, Target::App("netflix".into()));
+    // Back steps to the field, keeping the query and the Apps tab.
+    state.back();
+    assert_eq!(state.page, Page::Apps);
+    assert_eq!(state.focus, Target::Search);
+    assert_eq!(state.query, "netflix");
     // Nothing found: focus stays on the field.
     state.focus = Target::Search;
     state.activate();

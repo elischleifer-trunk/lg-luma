@@ -531,3 +531,20 @@ fn enter_focuses_the_first_result_once_the_search_is_in() {
     state.accept_titles(&request, Ok(ranked));
     assert_eq!(state.focus, Target::Nav(0));
 }
+
+#[test]
+fn enter_settles_when_the_search_fails_over_quick_filtered_results() {
+    let mut state = typed("Dun");
+    answer(&mut state, "dune");
+    state.activate();
+    state.text("e");
+    state.submit_text_input();
+    let now = Instant::now();
+    state.sync_titles(now);
+    assert!(state.titles.provisional, "narrowed from the cached \"dun\"");
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB), "waits for the reply");
+    let request = state.sync_titles(now + DEBOUNCE).unwrap();
+    state.accept_titles(&request, Err("offline".into()));
+    assert!(!state.titles.results.is_empty());
+    assert_eq!(state.focus, Target::Title(0));
+}

@@ -2288,7 +2288,8 @@ impl State {
         let settled = crate::streaming::normalize(typed) == titles.query()
             && titles.deadline().is_none()
             && !titles.searching
-            && !titles.provisional;
+            // A failed reply leaves quick-filtered results provisional; it still settles.
+            && (!titles.provisional || titles.error.is_some());
         if settled && !titles.results.is_empty() {
             self.focus = Target::Title(0);
             self.title_focus_pending = false;
@@ -3364,6 +3365,13 @@ impl State {
         if self.page == Page::Apps && matches!(self.focus, Target::Search | Target::ClearSearch) {
             self.query.clear();
             self.focus = Target::Nav(1);
+            self.scroll = 0.;
+            return vec![];
+        }
+        // A filtered app, reached from the field by Enter or Down, steps back to the field.
+        if self.page == Page::Apps && !self.query.is_empty() && matches!(self.focus, Target::App(_))
+        {
+            self.focus = Target::Search;
             self.scroll = 0.;
             return vec![];
         }

@@ -235,6 +235,8 @@ TV firmware fills has not been verified on hardware.
 System text events update app/location queries; Done/Back stops editing and restores focus.
 On the Apps and Search fields, Enter/Done (`State::submit_text_input`, also a phone's submit) moves
 focus to the first result instead; on Search it waits for the reply and gives up if focus moves first.
+On the TV this needs the system keyboard to forward Return: a panel closed without it is taken as
+Back (`finish_text_input`), which cannot tell Done from Back.
 
 ### Recent apps
 
