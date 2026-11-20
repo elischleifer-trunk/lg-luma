@@ -1191,7 +1191,7 @@ fn system_category_owns_refresh_and_quit_and_restores_sidebar_focus() {
     assert_eq!(state.section, crate::state::SYSTEM_SECTION);
     state.direction(Direction::Right, &controls(&state));
     assert_eq!(state.focus, Target::TvSettings);
-    for expected in [0, 4, 2, 11, 8, 10, 7, 3] {
+    for expected in [0, 4, 2, 11, 12, 8, 10, 7, 3] {
         state.direction(Direction::Down, &controls(&state));
         assert_eq!(state.focus, Target::Setting(expected));
     }
@@ -3911,4 +3911,40 @@ fn text_typed_on_a_phone_replaces_the_open_field_and_commits_it() {
         Some("Console")
     );
     assert!(!state.text_input_active());
+}
+
+#[test]
+fn the_update_channel_switches_between_releases_and_nightlies_and_checks_again() {
+    let mut state = ready();
+    assert!(
+        !state.preferences.nightly_updates,
+        "releases only by default"
+    );
+    state.available_update = Some("2.33.0".into());
+    state.open(2);
+    state.section = 3;
+    state.focus = Target::Setting(12);
+    assert_eq!(state.activate(), vec![Effect::Save]);
+    assert!(state.preferences.nightly_updates);
+    assert!(
+        state.update_check_requested,
+        "the new channel is checked at once"
+    );
+    assert_eq!(state.available_update, None);
+    assert_eq!(state.update_status, crate::update::Status::Checking);
+    assert_eq!(
+        crate::update::feeds(),
+        [crate::update::NIGHTLY_FEED, crate::update::FEED]
+    );
+    // Not while an update installs.
+    state.update = crate::update::InstallStatus::Installing("2.33.0".into());
+    assert_eq!(state.activate(), vec![]);
+    assert!(state.preferences.nightly_updates);
+    // Nor while the new channel is still being checked; once it answers, back to releases.
+    state.update = crate::update::InstallStatus::Idle;
+    assert_eq!(state.activate(), vec![]);
+    state.update_response(Ok(None));
+    assert_eq!(state.activate(), vec![Effect::Save]);
+    assert!(!state.preferences.nightly_updates);
+    assert_eq!(crate::update::feeds(), [crate::update::FEED]);
 }

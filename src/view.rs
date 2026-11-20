@@ -3261,6 +3261,17 @@ fn settings_content(out: &mut Scene, state: &State, assets: &Assets, now: Offset
                     false,
                 ),
                 (
+                    12,
+                    language.t("updateChannel"),
+                    "refresh",
+                    Some(language.t(if state.preferences.nightly_updates {
+                        "updateChannelNightly"
+                    } else {
+                        "updateChannelReleases"
+                    })),
+                    false,
+                ),
+                (
                     8,
                     language.t("homeAssistant"),
                     "tv",
