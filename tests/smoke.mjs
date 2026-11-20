@@ -138,10 +138,7 @@ try {
   const deleteConfirm = await scenario('delete-confirm', 'apps,down,hold,down,down,down,enter');
   assert.deepEqual(deleteConfirm.focus, 'CancelDelete');
   assert.ok(deleteConfirm.ui_text.some((value) => value.includes('uninstall “Netflix”')));
-  const deleteCancel = await scenario(
-    'delete-cancel',
-    'apps,down,hold,down,down,down,enter,enter',
-  );
+  const deleteCancel = await scenario('delete-cancel', 'apps,down,hold,down,down,down,enter,enter');
   assert.deepEqual(deleteCancel.focus, { Option: 2 });
   assert.ok(deleteCancel.apps.includes('netflix'));
   const hidden = await scenario('apps', 'apps,down,hold,down,down,enter');
