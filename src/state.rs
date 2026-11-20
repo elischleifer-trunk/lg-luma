@@ -2883,6 +2883,19 @@ impl State {
                         return vec![];
                     }
                     2 => self.preferences.reduced_motion = !self.preferences.reduced_motion,
+                    12 => {
+                        // Not while an update downloads or installs: it came from the old channel.
+                        if self.update_busy() {
+                            return vec![];
+                        }
+                        // Another channel: what it offers is checked again right away.
+                        self.preferences.nightly_updates = !self.preferences.nightly_updates;
+                        crate::update::set_nightly(self.preferences.nightly_updates);
+                        self.available_update = None;
+                        self.update = crate::update::InstallStatus::Idle;
+                        self.update_status = crate::update::Status::Checking;
+                        self.update_check_requested = true;
+                    }
                     11 => {
                         self.preferences.luma_home = !self.preferences.luma_home;
                         return if self.preferences.luma_home {

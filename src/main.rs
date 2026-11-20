@@ -781,6 +781,8 @@ fn run() -> Result<(), String> {
         options.test_update_version.is_some(),
     );
     let mut state = State::new(initial_preferences);
+    // Before the first check, which the update service makes as it starts.
+    update::set_nightly(state.preferences.nightly_updates);
     if let Some(version) = &options.test_update_version {
         eprintln!(
             "Luma update preview: simulated version {version}; public release check disabled"

@@ -4108,5 +4108,50 @@
     "vi": "Không thể kết nối với Criterion Channel",
     "nl": "Criterion Channel is niet bereikbaar",
     "sv": "Det gick inte att nå Criterion Channel"
+  },
+  "updateChannel": {
+    "zh-tw": "更新",
+    "en": "Updates",
+    "de": "Updates",
+    "es": "Actualizaciones",
+    "zh": "更新",
+    "pt": "Atualizações",
+    "it": "Aggiornamenti",
+    "ru": "Обновления",
+    "pl": "Aktualizacje",
+    "fr": "Mises à jour",
+    "vi": "Cập nhật",
+    "nl": "Updates",
+    "sv": "Uppdateringar"
+  },
+  "updateChannelReleases": {
+    "zh-tw": "正式版",
+    "en": "Releases",
+    "de": "Releases",
+    "es": "Versiones estables",
+    "zh": "正式版",
+    "pt": "Versões estáveis",
+    "it": "Versioni stabili",
+    "ru": "Стабильные",
+    "pl": "Wydania",
+    "fr": "Versions stables",
+    "vi": "Bản phát hành",
+    "nl": "Releases",
+    "sv": "Utgåvor"
+  },
+  "updateChannelNightly": {
+    "zh-tw": "正式版與每夜版",
+    "en": "Releases and nightlies",
+    "de": "Releases und Nightlys",
+    "es": "Estables y nocturnas",
+    "zh": "正式版和每夜版",
+    "pt": "Estáveis e noturnas",
+    "it": "Stabili e nightly",
+    "ru": "Стабильные и ночные",
+    "pl": "Wydania i nocne",
+    "fr": "Stables et nocturnes",
+    "vi": "Bản phát hành và bản nightly",
+    "nl": "Releases en nightlies",
+    "sv": "Utgåvor och nattliga"
   }
 }

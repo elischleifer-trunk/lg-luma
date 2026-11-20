@@ -2,7 +2,6 @@ pub mod discovery {
     use serde::{Deserialize, Serialize};
     use std::{io::Read, sync::mpsc, thread, time::Duration};
 
-    use super::FEED;
     const LIMIT: usize = 256 * 1024;
 
     #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
@@ -39,7 +38,11 @@ pub mod discovery {
                     .new_agent();
                 while command_rx.recv().is_ok() {
                     let result = if enabled {
-                        fetch(&agent, FEED, env!("CARGO_PKG_VERSION"))
+                        newest(
+                            super::feeds()
+                                .iter()
+                                .map(|url| fetch(&agent, url, env!("CARGO_PKG_VERSION"))),
+                        )
                     } else {
                         Err(
                             "Public release checks are disabled for scripted/simulated previews"
@@ -84,6 +87,33 @@ pub mod discovery {
             return Err("Release feed is too large".into());
         }
         newer_version(&bytes, current)
+    }
+
+    /// The newest version any feed offers, or None when none is newer than this build. An error
+    /// only when no feed could be read.
+    pub fn newest(
+        results: impl IntoIterator<Item = Result<Option<String>, String>>,
+    ) -> Result<Option<String>, String> {
+        let mut best: Option<String> = None;
+        let mut error = None;
+        let mut any = false;
+        for result in results {
+            match result {
+                Ok(found) => {
+                    any = true;
+                    if let Some(found) = found
+                        && best.as_deref().and_then(version) < version(&found)
+                    {
+                        best = Some(found);
+                    }
+                }
+                Err(failure) => error = Some(failure),
+            }
+        }
+        match (any, error) {
+            (false, Some(error)) => Err(error),
+            _ => Ok(best),
+        }
     }
 
     #[derive(Deserialize)]
@@ -273,6 +303,26 @@ use std::{
 
 /// The Homebrew Channel feed this fork mirrors to Cloudflare R2 (see `.github/workflows/publish-r2.yml`).
 pub const FEED: &str = "https://luma.elischleifer.com/repo.json";
+/// Nightly builds of main (`.github/workflows/nightly.yml`), offered when the owner chooses them
+/// in Settings → System. Their packages sit beside the releases', under [`RELEASES`].
+pub const NIGHTLY_FEED: &str = "https://luma.elischleifer.com/nightly/repo.json";
+
+/// Whether Settings → System asks for nightlies; the main loop keeps it in step with the
+/// preference, and both update workers read it for every check.
+static NIGHTLY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+pub fn set_nightly(on: bool) {
+    NIGHTLY.store(on, std::sync::atomic::Ordering::Relaxed);
+}
+
+/// The feeds to check, newest offer wins. Nightlies still move to a release once one is newer.
+pub fn feeds() -> &'static [&'static str] {
+    if NIGHTLY.load(std::sync::atomic::Ordering::Relaxed) {
+        &[NIGHTLY_FEED, FEED]
+    } else {
+        &[FEED]
+    }
+}
 pub const CURRENT: &str = env!("CARGO_PKG_VERSION");
 /// Only IPKs from this project's own release assets are installed.
 const RELEASES: &str = "https://luma.elischleifer.com/releases/";
@@ -416,8 +466,32 @@ fn agent() -> ureq::Agent {
 }
 
 fn check(agent: &ureq::Agent) -> Result<Option<Release>, String> {
+    let mut best: Option<Release> = None;
+    let mut error = None;
+    let mut any = false;
+    for url in feeds() {
+        match read_feed(agent, url) {
+            Ok(release) => {
+                any = true;
+                if best
+                    .as_ref()
+                    .is_none_or(|b| newer(&b.version, &release.version))
+                {
+                    best = Some(release);
+                }
+            }
+            Err(failure) => error = Some(failure),
+        }
+    }
+    if !any && let Some(error) = error {
+        return Err(error);
+    }
+    Ok(best.filter(|release| newer(CURRENT, &release.version)))
+}
+
+fn read_feed(agent: &ureq::Agent, url: &str) -> Result<Release, String> {
     let mut response = agent
-        .get(FEED)
+        .get(url)
         .header("User-Agent", "LumaNative")
         .call()
         .map_err(|_| "The release server is unavailable. Try again shortly.")?;
@@ -433,8 +507,7 @@ fn check(agent: &ureq::Agent) -> Result<Option<Release>, String> {
     }
     let feed: Value =
         serde_json::from_slice(&bytes).map_err(|_| "The release feed could not be read")?;
-    let release = parse_feed(&feed)?;
-    Ok(newer(CURRENT, &release.version).then_some(release))
+    parse_feed(&feed)
 }
 
 fn download(
@@ -587,6 +660,30 @@ mod tests {
     }
 
     const URL: &str = "https://luma.elischleifer.com/releases/v9.0.0/com.ecklf.luma_9.0.0_arm.ipk";
+
+    #[test]
+    fn nightlies_add_their_feed_and_the_newest_offer_wins() {
+        assert_eq!(FEED, "https://luma.elischleifer.com/repo.json");
+        assert!(NIGHTLY_FEED.starts_with("https://luma.elischleifer.com/"));
+        use discovery::newest;
+        let found = |v: &str| Ok(Some(v.to_owned()));
+        // A nightly newer than the release, and the next release newer than a nightly.
+        assert_eq!(newest([found("2.32.1"), found("2.32.0")]), found("2.32.1"));
+        assert_eq!(newest([found("2.32.4"), found("2.33.0")]), found("2.33.0"));
+        // Numeric, never lexical: 2.32.10 is newer than 2.32.9.
+        assert_eq!(
+            newest([found("2.32.9"), found("2.32.10")]),
+            found("2.32.10")
+        );
+        assert_eq!(newest([Ok(None), Ok(None)]), Ok(None));
+        // One feed down: the other still answers; both down: the error.
+        assert_eq!(
+            newest([Err("down".into()), found("2.33.0")]),
+            found("2.33.0")
+        );
+        assert_eq!(newest([Err("down".into()), Ok(None)]), Ok(None));
+        assert_eq!(newest([Err("down".into())]), Err("down".into()));
+    }
 
     #[test]
     fn attempt_paths_are_private_unique_and_results_are_terminal_only_when_finished() {

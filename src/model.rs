@@ -420,6 +420,8 @@ pub struct Preferences {
     pub home_assistant: bool,
     /// After the LG Home tile lifted Luma's Home takeover, opening Luma takes Home back.
     pub luma_home: bool,
+    /// Settings → System: also offer nightly builds of main, not only releases.
+    pub nightly_updates: bool,
     /// Unix seconds of the last automatic or chosen wallpaper change, for the timed modes.
     pub wallpaper_changed: u64,
     /// Settings this build does not know, from a newer Luma. They are written back unchanged so
@@ -478,6 +480,7 @@ impl Default for Preferences {
             wallpaper_gradient: true,
             home_assistant: false,
             luma_home: true,
+            nightly_updates: false,
             wallpaper_changed: 0,
             extra: serde_json::Map::new(),
         }

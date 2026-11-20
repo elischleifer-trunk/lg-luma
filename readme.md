@@ -134,6 +134,11 @@ https://luma.elischleifer.com/repo.json
 This fork mirrors every published release to Cloudflare R2; see
 [Release hosting](development.md#release-hosting-cloudflare-r2).
 
+Once installed, Luma updates itself from **Settings → System → Check now**. To also get nightly
+builds of `main`, set **Settings → System → Updates** to **Releases and nightlies**: Luma then
+checks `https://luma.elischleifer.com/nightly/repo.json` as well and offers whichever is newer, so
+it still moves on to the next release when one comes out.
+
 ### SSH
 
 On your computer, replace `TV_IP`:
