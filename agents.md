@@ -189,5 +189,6 @@ and artifacts. It validates only; `.github/workflows/release.yml` calls it and p
 `.github/workflows/release.yml` (manual dispatch on `main`) is the only publisher: it bumps the
 version (minor by default, or major) on a `release/vX.Y.Z` branch, validates it with `ci.yml`, fast-forwards `main`, creates the
 GitHub release and mirrors it to Cloudflare R2. PRs and merges never publish. See `development.md#releases` for setup and retries.
-Only create commits or PRs when explicitly requested. For PR descriptions follow the global
-`commands/pr.md` format instructions.
+When you finish the initial work for a request, commit it, push the branch and open a pull
+request without waiting to be asked. Later follow-ups on the same request go to that PR's branch.
+For PR descriptions follow the global `commands/pr.md` format instructions.

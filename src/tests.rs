@@ -1675,23 +1675,24 @@ fn deletion_completion_does_not_steal_focus_after_dismissal() {
 }
 
 #[test]
-fn app_activation_opens_options_with_open_focused_and_next_ok_launches() {
+fn app_activation_launches_and_holding_opens_options_with_open_focused() {
     for page in [0, 1] {
         let mut state = ready();
         state.open(page);
         state.focus = Target::App("netflix".into());
-        if page == 0 {
-            assert_eq!(state.activate(), vec![Effect::Launch("netflix".into())]);
-            assert!(state.overlay.is_none());
-            continue;
-        }
-        assert!(state.activate().is_empty());
-        assert!(matches!(state.overlay, Some(Overlay::Options { .. })));
-        assert_eq!(state.focus, Target::OpenApp);
         assert_eq!(state.activate(), vec![Effect::Launch("netflix".into())]);
         assert!(state.overlay.is_none());
-        assert_eq!(state.focus, Target::App("netflix".into()));
     }
+    // On the Apps page, a long press opens the options with Open focused.
+    let mut state = ready();
+    state.open(1);
+    state.focus = Target::App("netflix".into());
+    state.hold();
+    assert!(matches!(state.overlay, Some(Overlay::Options { .. })));
+    assert_eq!(state.focus, Target::OpenApp);
+    assert_eq!(state.activate(), vec![Effect::Launch("netflix".into())]);
+    assert!(state.overlay.is_none());
+    assert_eq!(state.focus, Target::App("netflix".into()));
 }
 
 #[test]
@@ -3387,7 +3388,8 @@ fn shortcut_tiles_keep_apps_options_and_never_launch_or_uninstall_a_platform_app
 
     state.open(1);
     state.focus = Target::App(tile.id.clone());
-    assert!(state.activate().is_empty());
+    assert_eq!(state.activate(), vec![Effect::FireWebhook(tile.clone())]);
+    state.hold();
     assert_eq!(state.focus, Target::OpenApp);
     assert!(matches!(state.overlay, Some(Overlay::Options { .. })));
     assert!(
