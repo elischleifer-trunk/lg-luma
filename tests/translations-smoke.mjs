@@ -278,10 +278,10 @@ try {
   assert.ok(vietnameseSettings.ui_text.includes('Tiếng Việt'));
   for (const key of ['language', 'appNames', 'reducedMotion'])
     contains(vietnameseSettings, key, 'vi');
-  const vietnameseOptions = await scenario('vi-app-options', 'apps,down,enter');
+  const vietnameseOptions = await scenario('vi-app-options', 'apps,down,hold');
   for (const key of ['open', 'removeFavorite', 'hideApp', 'deleteApp'])
     contains(vietnameseOptions, key, 'vi');
-  const deleteConfirmation = 'apps,down,enter,down,down,down,enter';
+  const deleteConfirmation = 'apps,down,hold,down,down,down,enter';
   const vietnameseDelete = await scenario('vi-delete-confirm', deleteConfirmation);
   assert.equal(vietnameseDelete.focus, 'CancelDelete');
   contains(vietnameseDelete, 'cancel', 'vi');
