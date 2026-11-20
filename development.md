@@ -233,6 +233,8 @@ name replaces the title, and a name such as "Switch" also picks the colour. Whic
 TV firmware fills has not been verified on hardware.
 
 System text events update app/location queries; Done/Back stops editing and restores focus.
+On the Apps and Search fields, Enter/Done (`State::submit_text_input`, also a phone's submit) moves
+focus to the first result instead; on Search it waits for the reply and gives up if focus moves first.
 
 ### Recent apps
 

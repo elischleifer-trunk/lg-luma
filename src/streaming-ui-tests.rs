@@ -488,3 +488,46 @@ fn every_poster_says_whether_watching_costs_money() {
         .count();
     assert_eq!(paid, picks.len() - included);
 }
+
+#[test]
+fn enter_focuses_the_first_result_once_the_search_is_in() {
+    // Enter before the reply: focus waits on the field, then moves to the first result.
+    let mut state = ready();
+    state.streaming_keys.motn = true;
+    state.open(SEARCH_TAB);
+    state.text("Dune");
+    state.submit_text_input();
+    assert!(!state.text_input_active());
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
+    answer(&mut state, "dune");
+    assert!(!state.titles.results.is_empty());
+    assert_eq!(state.focus, Target::Title(0));
+
+    // Enter with the results already in (cached): straight to the first result.
+    state.open(SEARCH_TAB);
+    state.text("Dune");
+    state.submit_text_input();
+    state.sync_titles(Instant::now());
+    assert_eq!(state.focus, Target::Title(0));
+
+    // Back closes the keyboard without leaving the field.
+    state.open(SEARCH_TAB);
+    state.text("Dune");
+    state.back();
+    state.sync_titles(Instant::now());
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
+
+    // Moving off the field before the reply cancels the jump.
+    let mut state = ready();
+    state.streaming_keys.motn = true;
+    state.open(SEARCH_TAB);
+    state.text("Dune");
+    state.submit_text_input();
+    state.focus = Target::Nav(0);
+    let now = Instant::now();
+    state.sync_titles(now);
+    let request = state.sync_titles(now + DEBOUNCE).unwrap();
+    let ranked = streaming::rank(&fixture("dune"), "us", &state.streaming_services());
+    state.accept_titles(&request, Ok(ranked));
+    assert_eq!(state.focus, Target::Nav(0));
+}
