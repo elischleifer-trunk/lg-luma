@@ -455,11 +455,11 @@ fn holding_an_input_card_opens_options_to_remove_it_from_favorites() {
         "focus moves to the card that took its slot"
     );
 
-    // On the Apps page it opens options like any app, and can be added back.
+    // On the Apps page a long press opens options like any app, and can be added back.
     state.open(1);
     assert_eq!(state.apps()[0].id, id);
     state.focus = Target::App(id.clone());
-    state.activate();
+    state.hold();
     assert_eq!(state.focus, Target::OpenApp);
     state.focus = Target::Option(0);
     assert_eq!(state.activate(), vec![Effect::Save]);
