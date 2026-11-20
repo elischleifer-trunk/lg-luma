@@ -514,6 +514,30 @@ fn reorder_persists_order_and_keeps_selected_identity() {
 }
 
 #[test]
+fn enter_in_the_apps_search_focuses_the_first_result() {
+    let mut state = ready();
+    state.open(1);
+    state.focus = Target::Search;
+    state.activate();
+    state.text("netflix");
+    state.submit_text_input();
+    assert!(!state.text_input_active());
+    assert_eq!(state.query, "netflix");
+    assert_eq!(state.focus, Target::App("netflix".into()));
+    // Back steps to the field, keeping the query and the Apps tab.
+    state.back();
+    assert_eq!(state.page, Page::Apps);
+    assert_eq!(state.focus, Target::Search);
+    assert_eq!(state.query, "netflix");
+    // Nothing found: focus stays on the field.
+    state.focus = Target::Search;
+    state.activate();
+    state.text("zzzz");
+    state.submit_text_input();
+    assert_eq!(state.focus, Target::Search);
+}
+
+#[test]
 fn keyboard_is_modal_and_back_preserves_then_clears_search() {
     let mut state = ready();
     state.open(1);

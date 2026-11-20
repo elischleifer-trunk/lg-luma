@@ -1459,7 +1459,7 @@ fn run() -> Result<(), String> {
                 home_assistant::Event::Typed { text, submit } => {
                     state.set_editing_text(&text);
                     if submit {
-                        let pending = state.finish_text_input();
+                        let pending = state.submit_text_input();
                         running &= effects(
                             pending,
                             &mut state,
@@ -1783,7 +1783,7 @@ fn run() -> Result<(), String> {
                             if matches!(state.overlay, Some(Overlay::SystemKeyboard)) =>
                         {
                             press = None;
-                            pending = state.finish_text_input();
+                            pending = state.submit_text_input();
                         }
                         Keycode::Return | Keycode::KpEnter if !repeat => {
                             press = Some(Press {

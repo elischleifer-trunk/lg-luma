@@ -330,6 +330,9 @@ pub struct State {
     pub streaming_keys: crate::streaming_keys::Status,
     /// What is typed in the Search tab's field.
     pub title_query: String,
+    /// Enter closed the Search tab's keyboard before its results were in: focus the first
+    /// result when they arrive, unless the user moved on first.
+    title_focus_pending: bool,
     /// Movies and shows matching `title_query`, once a Movie of the Night key is stored.
     pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
     /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
@@ -402,6 +405,7 @@ impl State {
             key_editor: None,
             streaming_keys: Default::default(),
             title_query: String::new(),
+            title_focus_pending: false,
             titles: Default::default(),
             posters: Default::default(),
             scores: Default::default(),
@@ -2236,6 +2240,66 @@ impl State {
         vec![]
     }
 
+    /// Enter (or Done, or a phone's submit) closes the keyboard like any other route, and on a
+    /// search field moves focus to the first result rather than back to the field.
+    pub fn submit_text_input(&mut self) -> Vec<Effect> {
+        if !self.text_input_active() {
+            return vec![];
+        }
+        let effects = self.finish_text_input();
+        self.focus_first_result();
+        effects
+    }
+
+    fn focus_first_result(&mut self) {
+        match self.keyboard_field {
+            TextField::Apps => {
+                if let Some(app) = self.apps().first() {
+                    self.focus = Target::App(app.id.clone());
+                }
+            }
+            TextField::Titles => {
+                self.title_focus_pending = true;
+                self.focus_pending_title();
+            }
+            _ => {}
+        }
+    }
+
+    /// Moves focus to the first title once the submitted search has settled, if focus is still
+    /// where the keyboard left it.
+    fn focus_pending_title(&mut self) {
+        if !self.title_focus_pending {
+            return;
+        }
+        if self.page != Page::Search
+            || self.overlay.is_some()
+            || self.focus != Target::Nav(SEARCH_TAB)
+        {
+            self.title_focus_pending = false;
+            return;
+        }
+        let typed = if self.streaming_keys.motn {
+            self.title_query.as_str()
+        } else {
+            ""
+        };
+        let titles = &self.titles;
+        let settled = crate::streaming::normalize(typed) == titles.query()
+            && titles.deadline().is_none()
+            && !titles.searching
+            // A failed reply leaves quick-filtered results provisional; it still settles.
+            && (!titles.provisional || titles.error.is_some());
+        if settled && !titles.results.is_empty() {
+            self.focus = Target::Title(0);
+            self.title_focus_pending = false;
+            self.dirty = true;
+        } else if settled {
+            // Nothing found: stay on the field.
+            self.title_focus_pending = false;
+        }
+    }
+
     fn commit_text_input(&mut self) -> Vec<Effect> {
         if self.keyboard_field == TextField::Name {
             let name = std::mem::take(&mut self.greeting_name_draft);
@@ -2477,6 +2541,7 @@ impl State {
             self.reconcile_title_focus();
             self.dirty = true;
         }
+        self.focus_pending_title();
         let request = self.titles.due(now)?;
         self.dirty = true;
         Some(request)
@@ -2492,6 +2557,7 @@ impl State {
             self.reconcile_title_focus();
             self.dirty = true;
         }
+        self.focus_pending_title();
     }
 
     /// Posters to fetch for the current results, or None when nothing changed. Posters of shows
@@ -3201,7 +3267,9 @@ impl State {
                     self.overlay = None;
                     self.panel_started = None;
                     self.focus = self.keyboard_return();
-                    return self.commit_text_input();
+                    let effects = self.commit_text_input();
+                    self.focus_first_result();
+                    return effects;
                 }
                 key => self.text(key),
             },
@@ -3310,6 +3378,13 @@ impl State {
         if self.page == Page::Apps && matches!(self.focus, Target::Search | Target::ClearSearch) {
             self.query.clear();
             self.focus = Target::Nav(1);
+            self.scroll = 0.;
+            return vec![];
+        }
+        // A filtered app, reached from the field by Enter or Down, steps back to the field.
+        if self.page == Page::Apps && !self.query.is_empty() && matches!(self.focus, Target::App(_))
+        {
+            self.focus = Target::Search;
             self.scroll = 0.;
             return vec![];
         }
