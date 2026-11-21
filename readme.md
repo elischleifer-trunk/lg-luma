@@ -326,7 +326,8 @@ The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows fil
 Channel in a full-screen grid: Popular, Top Rated, Recently Released and a row per genre. OK
 plays the film in a small player app that Luma installs the first time it is needed: the
 Channel's web player, full screen, with the remote's play, pause and skip keys. Back returns to
-the grid.
+the grid. While the film loads, a black screen with the Channel's mark hides its web pages; it
+lifts when the film plays, or after 20 seconds, or when the Channel needs you to sign in by hand.
 
 The rows come from TMDB's streaming data when a TMDB token is stored (see
 [Search: movies and shows](#search-movies-and-shows)),

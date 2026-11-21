@@ -73,6 +73,19 @@
     };
   }
 
+  // Whether Luma asked to play a film (its page with `?play=1`), rather than show a page such as
+  // the Channel's search. Only then does a cover hide the Channel's pages until the film plays.
+  function playsFilm(params) {
+    var url = new URL(target(params));
+    return url.pathname.indexOf('/films/') === 0 && url.searchParams.get('play') === '1';
+  }
+
+  // One launch of a film: its one-time sign-in code, else its page.
+  function launchKey(params) {
+    var code = params && params.code;
+    return typeof code === 'string' && code ? code : target(params);
+  }
+
   var SKIP = 10;
   root.LumaCriterion = {
     ORIGIN: ORIGIN,
@@ -82,10 +95,108 @@
     parse: parse,
     action: action,
     signInRequest: signInRequest,
+    playsFilm: playsFilm,
+    launchKey: launchKey,
   };
   if (typeof document === 'undefined') return;
 
   var palm = root.PalmSystem;
+
+  // ---- Loading cover --------------------------------------------------------------------------
+
+  // While a film loads, the Channel's pages (and its sign-in, when the account fills it in) stay
+  // behind a black cover with the Channel's mark, which lifts when the film plays. It lifts
+  // early wherever the viewer has something to do: a sign-in by hand, or a page that never plays.
+  var COVER_ID = 'luma-criterion-cover';
+  var COVER_LIMIT = 20000;
+  var COVER_STYLE =
+    'html{background:#000!important}' +
+    '#' +
+    COVER_ID +
+    '{position:fixed;left:0;top:0;width:100vw;height:100vh;margin:0;' +
+    'z-index:2147483647;background:#000;display:flex;align-items:center;' +
+    'justify-content:center;opacity:1;transition:opacity .3s ease-out;cursor:none}' +
+    '#' +
+    COVER_ID +
+    ' svg{width:120px;height:120px;color:#fff;' +
+    'animation:luma-criterion-breathe 1.6s ease-in-out infinite alternate}' +
+    '@keyframes luma-criterion-breathe{from{opacity:.35}to{opacity:.9}}';
+  var MARK =
+    '<svg viewBox="0 0 60 60" fill="currentColor" aria-hidden="true"><path d="M4.14577 14.847C-4.25441 29.1014 0.50232 47.4716 14.8737 55.8034C14.9749 55.8034 14.9749 55.9038 15.0761 55.9038C21.1486 59.4172 28.3343 60.7222 35.2163 59.618L32.9898 46.267C32.1801 46.3674 31.4717 46.4678 30.662 46.4678C27.6258 46.4678 24.5896 45.6647 21.9582 44.1589C14.0641 39.6417 11.3315 29.6034 15.8858 21.7735C15.8858 21.7735 15.8858 21.6731 15.987 21.6731C20.6425 13.8432 30.9656 11.2332 38.8598 15.8508C42.1996 17.7581 44.7298 20.7696 46.0455 24.3834L59 19.7658C53.2312 4.10599 35.7224 -3.92468 19.9341 1.89755C13.2544 4.30675 7.78923 8.824 4.14577 14.847Z"/></svg>';
+  var DONE = 'luma-cover-done';
+  var NEXT = 'luma-cover-next';
+  var cover = null;
+  var coverTimer = 0;
+
+  function session(name, value) {
+    try {
+      if (value === undefined) return sessionStorage.getItem(name);
+      if (value === null) sessionStorage.removeItem(name);
+      else sessionStorage.setItem(name, value);
+    } catch (_error) {
+      // No storage: the cover shows, and lifts on its timer.
+    }
+    return null;
+  }
+
+  // The launch this page belongs to: a relaunch leaves its film here before navigating, since
+  // webOS may still report the first launch's parameters.
+  function launchParams() {
+    var next = session(NEXT);
+    if (next) {
+      session(NEXT, null);
+      return parse(next);
+    }
+    return parse(palm && palm.launchParams);
+  }
+
+  function uncover(played) {
+    clearTimeout(coverTimer);
+    if (played && cover) session(DONE, cover.getAttribute('data-launch'));
+    var leaving = cover;
+    cover = null;
+    if (!leaving) return;
+    leaving.style.opacity = '0';
+    setTimeout(function () {
+      if (leaving.parentNode) leaving.parentNode.removeChild(leaving);
+    }, 350);
+  }
+
+  function coverUp(params) {
+    if (!playsFilm(params)) return;
+    var key = launchKey(params);
+    // This launch's film already played: the viewer is browsing the Channel now.
+    if (session(DONE) === key) return;
+    if (location.origin === SIGN_IN_ORIGIN && !signInRequest(params)) return;
+    var style = document.createElement('style');
+    style.textContent = COVER_STYLE;
+    cover = document.createElement('div');
+    cover.id = COVER_ID;
+    cover.setAttribute('data-launch', key);
+    cover.innerHTML = MARK;
+    cover.appendChild(style);
+    // At the very start of a page the document has no root yet: add the cover once it does.
+    if (document.documentElement) document.documentElement.appendChild(cover);
+    else {
+      var watch = new MutationObserver(function () {
+        if (!document.documentElement) return;
+        watch.disconnect();
+        if (cover) document.documentElement.appendChild(cover);
+      });
+      watch.observe(document, { childList: true });
+    }
+    // Above whatever the page adds: kept last in the document once its body is there.
+    document.addEventListener('DOMContentLoaded', function () {
+      if (cover) document.documentElement.appendChild(cover);
+    });
+    // Never a black screen for good: a page that does not play, or plays only on a press.
+    coverTimer = setTimeout(function () {
+      uncover(true);
+    }, COVER_LIMIT);
+  }
+
+  var launch = launchParams();
+  coverUp(launch);
 
   function film() {
     var videos = document.getElementsByTagName('video');
@@ -147,7 +258,10 @@
   document.addEventListener(
     'playing',
     function (event) {
-      if (event.target && event.target.tagName === 'VIDEO') fill(event.target);
+      if (event.target && event.target.tagName === 'VIDEO') {
+        fill(event.target);
+        uncover(true);
+      }
     },
     true
   );
@@ -209,7 +323,11 @@
     var submit =
       (form && form.querySelector('button[type="submit"][name="action"], button[type="submit"]')) ||
       document.querySelector('button[type="submit"]');
-    if (!mayTry()) return true;
+    if (!mayTry()) {
+      // A wrong password, most likely: show the page and its message.
+      uncover(false);
+      return true;
+    }
     if (submit) submit.click();
     else if (form) form.submit();
     return true;
@@ -217,7 +335,7 @@
 
   function signIn() {
     if (location.origin !== SIGN_IN_ORIGIN || asked) return;
-    var request = signInRequest(parse(palm && palm.launchParams));
+    var request = signInRequest(launch);
     if (!request) return;
     asked = true;
     fetch(request.url, {
@@ -230,16 +348,22 @@
         return response.ok ? response.json() : null;
       })
       .then(function (reply) {
-        if (!reply || typeof reply.email !== 'string' || typeof reply.password !== 'string') return;
+        if (!reply || typeof reply.email !== 'string' || typeof reply.password !== 'string') {
+          return uncover(false);
+        }
         account = reply;
         // The form may still be rendering: try until it appears, for a little while.
         var attempts = 0;
         var timer = setInterval(function () {
-          if (fillIn() || ++attempts > 40) clearInterval(timer);
+          var done = fillIn();
+          if (done || ++attempts > 40) clearInterval(timer);
+          // No form to fill (or the tries ran out): the viewer signs in by hand.
+          if (!done && attempts > 40) uncover(false);
         }, 250);
       })
       .catch(function () {
         // No account in Home Assistant, or an older Luma: the page is signed in by hand.
+        uncover(false);
       });
   }
 
@@ -250,7 +374,10 @@
   document.addEventListener('webOSRelaunch', function (event) {
     var params = parse((event && event.detail) || (palm && palm.launchParams));
     var next = target(params);
+    // The next page covers itself for this film (see `launchParams`).
+    session(NEXT, JSON.stringify(params));
     if (next !== location.href) location.href = next;
+    else session(NEXT, null);
     if (palm && typeof palm.activate === 'function') palm.activate();
   });
 })(typeof window === 'undefined' ? this : window);

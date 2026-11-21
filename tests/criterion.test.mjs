@@ -66,3 +66,15 @@ test('the sign-in code goes only to Luma on the TV itself', () => {
     assert.equal(signInRequest(params), null, JSON.stringify(params));
   }
 });
+
+test('only a launch that plays a film is covered while it loads', () => {
+  const { playsFilm, launchKey } = context.window.LumaCriterion;
+  assert.equal(playsFilm({ target: `${ORIGIN}/films/oZkRW7X1/laura?play=1` }), true);
+  assert.equal(playsFilm({ target: `${ORIGIN}/films/oZkRW7X1/laura` }), false);
+  assert.equal(playsFilm({ target: `${ORIGIN}/search?q=laura` }), false);
+  assert.equal(playsFilm({ target: 'https://evil.example/films/x?play=1' }), false);
+  assert.equal(playsFilm({}), false);
+  const code = '0123456789abcdef0123456789abcdef';
+  assert.equal(launchKey({ code, target: `${ORIGIN}/films/x?play=1` }), code);
+  assert.equal(launchKey({ target: `${ORIGIN}/films/x?play=1` }), `${ORIGIN}/films/x?play=1`);
+});
