@@ -1370,14 +1370,19 @@ with the full commit hash, workflow run and artifact download link. Failed or ca
 update the same comment with their status; superseded commits cannot overwrite the latest head's
 comment. Downloads are GitHub artifact ZIPs, require signing in and expire after 14 days.
 
-The workflow uses only the `opened`, `synchronize` and `reopened` PR events, without a deployment
-environment or required reviewers. Each new commit cancels the previous run. It becomes active
-after it is merged into the PR's base branch; reopen an existing PR to request its first build,
-or rerun a workflow to rebuild the same commit.
+The build uses only the `opened`, `synchronize` and `reopened` `pull_request` events, without a
+deployment environment or required reviewers. Each new commit cancels the previous run. Fork PRs
+from first-time contributors wait for GitHub's usual approval before running. GitHub does not run
+`pull_request` workflows while a PR has merge conflicts, so resolve them to get a build. Reopen an existing
+PR to request its first build, or rerun a workflow to rebuild the same commit.
 
-Only the build job checks out PR code. It has read-only repository access, no persisted
-checkout credentials and no shared build caches. A separate job with comment-writing permission
-uses the trusted base-branch workflow and GitHub's artifact API without checking out PR code.
+Only the build checks out PR code. Because it runs on `pull_request` rather than
+`pull_request_target`, it gets no secrets, a read-only token, no persisted checkout credentials
+and the PR's own cache scope, so it cannot write the base branch's caches. The comment comes
+from `.github/workflows/pr-test-ipk-comment.yml`, a `workflow_run` workflow that runs the
+default branch's copy after each build. It has comment-writing permission, so it only reads
+GitHub's run, artifact and pull request metadata: it never checks out, downloads or executes
+anything from the PR. It takes effect once it is on the default branch.
 The package keeps the normal `com.ecklf.luma` identity and version, so installing it replaces
 the existing Luma app. These builds are for manual TV verification; the ordinary CI checks still
 run independently.
@@ -1428,7 +1433,8 @@ The workflow then:
    so the IPK is always rebuilt. "Already passed" means a CI run whose commit has exactly the same
    tree as `main` (merge-queue runs and up-to-date PR runs test the code that lands under another
    commit ID) and in which every job ran and passed, or a `main` tip that is a previous release
-   commit. Otherwise (for example, after a PR merged without the queue), or with
+   commit. A pull request run counts only when its base is an ancestor of its head, because it
+   tests the pull request merged into its base. Otherwise (for example, after a PR merged without the queue), or with
    **full_validation**, it calls `ci.yml` on the release commit: checks, unit tests, the four
    desktop smoke suites and the package. The run summary says which path it took and why.
 3. **Publish GitHub release.** Writes the [release notes](#release-notes), fast-forwards `main` to

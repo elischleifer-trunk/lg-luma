@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Builds the Trunk runners image for .github/workflows/ci.yml (template: ci.yaml).
 # Trunk sources this file into one bash shell during the image build. Do not use `exit 0`.
-# Each section reads its version from the same file that the workflow reads, and is idempotent.
+# Each section reads its version from the same files that the workflows read, and is idempotent.
+# ci.yml calls package.yml for the ARM build, so both must pin the same toolchains as this image.
 set -euo pipefail
 
 REPO_DIR=/workspace/lg-luma
-WORKFLOW=.github/workflows/ci.yml
+WORKFLOWS=(.github/workflows/ci.yml .github/workflows/package.yml)
 # These come from the template env (ci.yaml).
 : "${RUSTUP_HOME:?RUSTUP_HOME must be set in ci.yaml env}"
 : "${CARGO_HOME:?CARGO_HOME must be set in ci.yaml env}"
@@ -13,14 +14,14 @@ WORKFLOW=.github/workflows/ci.yml
 cd "$REPO_DIR"
 
 # --- Node.js: the base image already has Node 24. Only verify the major version. ---
-node_wanted=$(sed -nE "s/^[[:space:]]*node-version:[[:space:]]*'?\"?([0-9]+)'?\"?[[:space:]]*$/\1/p" "$WORKFLOW" | sort -u)
+node_wanted=$(sed -nE "s/^[[:space:]]*node-version:[[:space:]]*'?\"?([0-9]+)'?\"?[[:space:]]*$/\1/p" "${WORKFLOWS[@]}" | sort -u)
 if [[ $(wc -l <<<"$node_wanted") -ne 1 || -z $node_wanted ]]; then
-  echo "Expected exactly one node-version in $WORKFLOW, found: ${node_wanted:-none}" >&2
+  echo "Expected exactly one node-version in ${WORKFLOWS[*]}, found: ${node_wanted:-none}" >&2
   exit 1
 fi
 node_have=$(node -p 'process.versions.node.split(".")[0]')
 if [[ $node_have != "$node_wanted" ]]; then
-  echo "Base image has Node $node_have; $WORKFLOW wants Node $node_wanted." >&2
+  echo "Base image has Node $node_have; ${WORKFLOWS[*]} want Node $node_wanted." >&2
   exit 1
 fi
 
@@ -45,9 +46,9 @@ if [[ $(pnpm --version 2>/dev/null || true) != "$pnpm_wanted" ]]; then
 fi
 
 # --- Rust: the version pinned by dtolnay/rust-toolchain@<version> in the workflow. ---
-rust_wanted=$(grep -oE 'dtolnay/rust-toolchain@[0-9]+\.[0-9]+\.[0-9]+' "$WORKFLOW" | cut -d@ -f2 | sort -u)
+rust_wanted=$(grep -hoE 'dtolnay/rust-toolchain@[0-9]+\.[0-9]+\.[0-9]+' "${WORKFLOWS[@]}" | cut -d@ -f2 | sort -u)
 if [[ $(wc -l <<<"$rust_wanted") -ne 1 || -z $rust_wanted ]]; then
-  echo "Expected exactly one dtolnay/rust-toolchain version in $WORKFLOW, found: ${rust_wanted:-none}" >&2
+  echo "Expected exactly one dtolnay/rust-toolchain version in ${WORKFLOWS[*]}, found: ${rust_wanted:-none}" >&2
   exit 1
 fi
 sudo mkdir -p "$RUSTUP_HOME" "$CARGO_HOME"
