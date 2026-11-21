@@ -422,7 +422,20 @@ pub fn prepare(path: &Path, devtools: &mut crate::devtools::DevTools) -> Result<
 ///   before the relaunch takes it to the new film.
 /// - Otherwise Luma waits (up to three seconds) for the player's start page, gives it the
 ///   sign-in, and tells the page to go on (`lumaReady`); without that the page goes on by itself.
-pub fn launch_player(launch: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
+///
+/// Then Luma presses the film's Play button once its page shows it (`start_film`).
+pub fn launch_player(
+    film: Option<String>,
+    launch: impl FnOnce() -> Result<(), String>,
+) -> Result<(), String> {
+    ready_player(launch)?;
+    if let Some(film) = film {
+        start_film(film);
+    }
+    Ok(())
+}
+
+fn ready_player(launch: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
     let Some(path) = stored_path() else {
         return launch();
     };
@@ -446,6 +459,64 @@ pub fn launch_player(launch: impl FnOnce() -> Result<(), String>) -> Result<(), 
     }
     crate::telemetry::log_warn!("criterion", "the player's start page never opened DevTools");
     Ok(())
+}
+
+/// How long Luma watches for a film's Play button after opening the player: the page, and a
+/// sign-in on the way, take 5–15 s on the TV.
+const START_WITHIN: Duration = Duration::from_secs(40);
+const START_POLL: Duration = Duration::from_millis(400);
+
+/// The script that presses `film`'s Play button on the player's page, when that page shows it.
+fn start_expression(film: &str) -> String {
+    format!(
+        "window.LumaCriterion && window.LumaCriterion.startFilm ? window.LumaCriterion.startFilm({}) : 'wait'",
+        Value::String(film.into())
+    )
+}
+
+/// Starts `film` (its page on the Channel) in the player. The TV lets a page play a film with
+/// sound only after a press on that page, and each film opens a new page, so the Channel's
+/// player waits at its Play button. A DevTools evaluation marked as a user gesture counts as that
+/// press: Luma asks the page (`LumaCriterion.startFilm` in the player's script) until it has pressed
+/// Play, or the film plays, or a while has passed. On its own thread: the launch is done.
+fn start_film(film: String) {
+    let spawned = std::thread::Builder::new()
+        .name("criterion-start".into())
+        .spawn(move || {
+            let started = std::time::Instant::now();
+            let expression = start_expression(&film);
+            while started.elapsed() < START_WITHIN {
+                std::thread::sleep(START_POLL);
+                let Ok(mut devtools) = crate::devtools::DevTools::page(crate::criterion::PLAYER)
+                else {
+                    continue;
+                };
+                let reply = devtools.call(
+                    "Runtime.evaluate",
+                    json!({
+                        "expression": expression,
+                        "userGesture": true,
+                        "returnByValue": true,
+                    }),
+                );
+                let answer = reply
+                    .as_ref()
+                    .ok()
+                    .and_then(|reply| reply["result"]["value"].as_str());
+                if let Some(answer @ ("pressed" | "playing")) = answer {
+                    crate::telemetry::log_info!(
+                        "criterion",
+                        "film {answer} after {} ms",
+                        started.elapsed().as_millis()
+                    );
+                    return;
+                }
+            }
+            crate::telemetry::log_info!("criterion", "the film's Play button never showed");
+        });
+    if let Err(error) = spawned {
+        crate::telemetry::log_warn!("criterion", "could not start the film: {error}");
+    }
 }
 
 fn report(result: Result<Prepared, String>, started: std::time::Instant, which: &str) {

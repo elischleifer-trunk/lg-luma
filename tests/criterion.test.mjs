@@ -10,8 +10,19 @@ const source = await readFile(
 // No document: only the shared helpers load, as on the start page before it navigates.
 const context = { URL, window: {} };
 vm.runInNewContext(source, context);
-const { ORIGIN, target, parse, action, signInRequest, loginUrl, isLogIn } =
-  context.window.LumaCriterion;
+const {
+  ORIGIN,
+  target,
+  parse,
+  action,
+  signInRequest,
+  loginUrl,
+  isLogIn,
+  breathDelay,
+  isPlayReady,
+  widevineConfigs,
+  samePage,
+} = context.window.LumaCriterion;
 
 test('only Criterion Channel pages are opened', () => {
   const film = `${ORIGIN}/films/oZkRW7X1/laura?play=1`;
@@ -94,4 +105,41 @@ test('a signed-out film goes to the sign-in and comes back to the film', () => {
   assert.ok(!isLogIn('Learn more'));
   assert.ok(!isLogIn('Close'));
   assert.ok(!isLogIn('Logout'));
+});
+
+test("each page's cover carries on the mark's breath where the clock says", () => {
+  assert.equal(breathDelay(0, 3200), '0ms');
+  assert.equal(breathDelay(1000, 3200), '-1000ms');
+  assert.equal(breathDelay(3200 * 5 + 250.7, 3200), '-250ms');
+});
+
+test('PlayReady is recognised so Widevine can play instead', () => {
+  assert.ok(isPlayReady('com.microsoft.playready'));
+  assert.ok(isPlayReady('com.microsoft.playready.recommendation'));
+  assert.ok(!isPlayReady('com.widevine.alpha'));
+  const configs = [
+    {
+      initDataTypes: ['cenc'],
+      videoCapabilities: [{ contentType: 'video/mp4; codecs="hvc1"', robustness: '3000' }],
+      audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"', robustness: '150' }],
+    },
+  ];
+  const widevine = widevineConfigs(configs);
+  assert.deepEqual(JSON.parse(JSON.stringify(widevine)), [
+    {
+      initDataTypes: ['cenc'],
+      videoCapabilities: [{ contentType: 'video/mp4; codecs="hvc1"', robustness: '' }],
+      audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"', robustness: '' }],
+    },
+  ]);
+  assert.equal(configs[0].videoCapabilities[0].robustness, '3000', 'the original is kept');
+  assert.equal(widevineConfigs(undefined).length, 0);
+});
+
+test('Luma presses Play only on the film it opened', () => {
+  const film = `${ORIGIN}/films/oZkRW7X1/laura?play=1`;
+  assert.ok(samePage(film, film));
+  assert.ok(samePage(`${film}#top`, film));
+  assert.ok(!samePage(`${ORIGIN}/films/oeGmAher/city-lights?play=1`, film));
+  assert.ok(!samePage('file:///media/developer/apps/index.html', film));
 });
