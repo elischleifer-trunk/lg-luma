@@ -121,9 +121,11 @@
   }
 
   function leave() {
-    // Back to Luma, which webOS brings to the front when this app closes.
-    if (palm && typeof palm.platformBack === 'function') palm.platformBack();
-    else root.close();
+    // Back to Luma's Criterion screen: Luma is Home, which webOS brings to the front when this
+    // app closes. Not platformBack(), which asks whether to exit the app.
+    var video = film();
+    if (video) video.pause();
+    root.close();
   }
 
   document.addEventListener(
