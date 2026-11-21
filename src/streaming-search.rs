@@ -9,7 +9,8 @@
 //!    If it ends in a whole word of some titles, TMDB lists only those, so its keyword search
 //!    suggests longer words, each with its own free search; one far better known is searched
 //!    as well ([`relevance::longer_word`]): "kin" is also "king".
-//! 2. Movie of the Night title search (metered: one call, two with a longer word).
+//! 2. Movie of the Night title search (metered: one call, two with a longer word). The one
+//!    for the text starts at once, beside the longer-word checks.
 //! 3. TMDB details for results the search summary did not already rule out (foreign or
 //!    little-seen titles are skipped), a few at a time over connections that stay open. TMDB
 //!    has no batch endpoint; details are cached for a month, so each title costs one call.
@@ -110,39 +111,48 @@ pub fn search_while(
         completed = true;
     }
     let query = query.as_str();
-    let longer = match &tmdb {
-        Some(Ok(results)) if !completed => longer_word(source, query, results),
-        _ => None,
+    if !wanted() {
+        return None;
+    }
+    // The title search for the text runs whatever the longer-word checks decide, so it starts
+    // at once and they run beside it; a longer word's search starts as soon as it is chosen.
+    let (first, longer, second) = std::thread::scope(|scope| {
+        let first = scope.spawn(|| source.search(query, country));
+        let longer = match &tmdb {
+            Some(Ok(results)) if !completed => longer_word(source, query, results, wanted),
+            _ => None,
+        };
+        let second = longer
+            .as_ref()
+            .filter(|_| wanted())
+            .map(|(text, _)| source.search(text, country));
+        (first.join(), longer, second)
+    });
+    let mut shows = match first {
+        Ok(Ok(shows)) => shows,
+        Ok(Err(error)) => return Some(Err(error)),
+        Err(_) => return Some(Err(Error::Network("search failed".into()))),
     };
     if !wanted() {
         return None;
     }
-    let texts: Vec<&str> = std::iter::once(query)
-        .chain(longer.as_ref().map(|(text, _)| text.as_str()))
-        .collect();
-    let mut replies = parallel(&texts, texts.len(), |text| source.search(text, country))
-        .into_iter()
-        .map(|reply| reply.unwrap_or_else(|| Err(Error::Network("search failed".into()))));
-    let mut shows = match replies.next() {
-        Some(Ok(shows)) => shows,
-        Some(Err(error)) => return Some(Err(error)),
-        None => Vec::new(),
-    };
-    // Each text searched, its TMDB results, and whether Movie of the Night's reply was full.
+    // Each text searched, and whether Movie of the Night's reply was full.
     let mut searched = vec![(query.to_owned(), shows.len() >= SEARCH_PAGE)];
-    if let Some((text, _)) = &longer {
-        match replies.next() {
-            Some(Ok(more)) => {
-                searched.push((text.clone(), more.len() >= SEARCH_PAGE));
-                shows.extend(more);
-            }
-            Some(Err(error)) => crate::telemetry::log_warn!(
+    let longer = match (longer, second) {
+        (Some((text, results)), Some(Ok(more))) => {
+            searched.push((text, more.len() >= SEARCH_PAGE));
+            shows.extend(more);
+            Some(results)
+        }
+        (Some((text, _)), Some(Err(error))) => {
+            crate::telemetry::log_warn!(
                 "streaming",
                 "search: longer word \"{text}\" failed: {error}"
-            ),
-            None => {}
+            );
+            None
         }
-    }
+        _ => None,
+    };
     let mut seen = HashSet::new();
     shows.retain(|show| seen.insert(show.tmdb_id.clone()));
     let results = match tmdb {
@@ -159,7 +169,7 @@ pub fn search_while(
     let mut enrichment = Enrichment::default();
     enrichment.add_search(&results);
     let mut tmdb_results = vec![results];
-    if let Some((_, more)) = longer {
+    if let Some(more) = longer {
         enrichment.add_search(&more);
         tmdb_results.push(more);
     }
@@ -230,12 +240,16 @@ fn longer_word(
     source: &impl Source,
     query: &str,
     results: &[SearchMultiResponseResult],
+    wanted: &dyn Fn() -> bool,
 ) -> Option<(String, Vec<SearchMultiResponseResult>)> {
     if relevance::word_votes(query, results) == 0 {
         return None;
     }
     let keywords = source.tmdb_keywords(&relevance::last_word(query)?)?.ok()?;
     let texts = relevance::longer_words(query, &keywords);
+    if texts.is_empty() || !wanted() {
+        return None;
+    }
     let candidates: Vec<(String, Vec<SearchMultiResponseResult>)> =
         parallel(&texts, CONNECTIONS, |text| source.tmdb_search(text))
             .into_iter()
@@ -480,6 +494,32 @@ impl Live {
     }
 }
 
+/// [`cached`] that also remembers, for `max_age`, that the API has no such item (HTTP 404):
+/// asking again would spend a metered call on the same answer. Other errors (network, rate
+/// limits) are not remembered, so the next search retries them.
+pub fn cached_or_missing<T: Serialize + DeserializeOwned>(
+    cache: &DiskCache,
+    key: &str,
+    max_age: std::time::Duration,
+    fetch: impl FnOnce() -> Result<T, Error>,
+) -> Result<T, Error> {
+    let missing = format!("{key}:missing");
+    if cache
+        .get::<bool>(&missing, max_age, SystemTime::now())
+        .is_some()
+    {
+        return Err(Error::Status {
+            status: 404,
+            message: "not found (remembered)".into(),
+        });
+    }
+    let reply = cached(cache, key, max_age, fetch);
+    if let Err(Error::Status { status: 404, .. }) = &reply {
+        cache.put(&missing, &true, SystemTime::now());
+    }
+    reply
+}
+
 /// A cached reply, or a fresh one that is then cached. Errors are never cached.
 pub fn cached<T: Serialize + DeserializeOwned>(
     cache: &DiskCache,
@@ -515,7 +555,9 @@ impl Source for Live {
     }
 
     fn show(&self, id: &str, country: &str) -> Result<Show, Error> {
-        cached(
+        // Titles are looked up by the TMDB ID that TMDB's search gave, and Movie of the Night
+        // does not have every one; each repeat of the search would ask again.
+        cached_or_missing(
             &self.cache,
             &format!("motn:show:{country}:{id}"),
             ttl::STREAMING,
