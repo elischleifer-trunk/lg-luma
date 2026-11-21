@@ -239,21 +239,86 @@
   }
 
   // The player's own box (JW Player's root) fills the screen, over the rest of the page.
+  // The remote's highlight: whichever button or link the arrows reached.
   var STYLE =
     '.luma-criterion-fill{position:fixed!important;left:0!important;top:0!important;' +
     'width:100vw!important;height:100vh!important;max-width:none!important;' +
     'max-height:none!important;margin:0!important;z-index:2147483647!important;' +
     'background:#000!important}' +
-    '.luma-criterion-fill video{object-fit:contain!important}';
+    '.luma-criterion-fill video{object-fit:contain!important}' +
+    ':focus-visible,.luma-criterion-focus{outline:4px solid #fff!important;' +
+    'outline-offset:3px!important}';
+
+  function addStyle() {
+    if (document.getElementById('luma-criterion-style')) return;
+    var style = document.createElement('style');
+    style.id = 'luma-criterion-style';
+    style.textContent = STYLE;
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  // The Channel's player: a full-screen panel holding the video's frame and, beside it, the
+  // Channel's own controls (progress, skip, captions), drawn while the mouse moves. The panel,
+  // not the video's frame, fills the screen, so the controls stay above the picture.
+  function playerBox(video) {
+    for (var box = video.parentElement; box && box !== document.body; box = box.parentElement) {
+      if (box.querySelector('[class*="_controls"]')) return box;
+    }
+    return video.closest('.jwplayer') || video.parentElement || video;
+  }
+
+  // The Channel shows its controls on mouse movement; a remote press counts as movement.
+  function wake(video) {
+    var box = playerBox(video);
+    var x = Math.round(innerWidth / 2);
+    var y = Math.round(innerHeight / 2);
+    ['pointermove', 'mousemove'].forEach(function (type) {
+      var init = { bubbles: true, cancelable: true, clientX: x, clientY: y, view: root };
+      var event =
+        type === 'pointermove' && typeof PointerEvent === 'function'
+          ? new PointerEvent(type, init)
+          : new MouseEvent(type, init);
+      box.dispatchEvent(event);
+    });
+  }
+
+  // Arrows move the highlight between the page's buttons and links while no film plays, in
+  // reading order, staying inside an open dialog ("Unable to play video": Try again, Close).
+  // OK presses the highlighted one, as Enter does.
+  function focusables() {
+    var scope = document;
+    var dialogs = document.querySelectorAll(
+      '[role="dialog"], [role="alertdialog"], [aria-modal="true"]'
+    );
+    for (var i = dialogs.length - 1; i >= 0; i--) {
+      if (visible(dialogs[i])) {
+        scope = dialogs[i];
+        break;
+      }
+    }
+    var all = scope.querySelectorAll(
+      'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    var out = [];
+    for (var j = 0; j < all.length; j++) {
+      var rect = all[j].getBoundingClientRect();
+      if (visible(all[j]) && rect.width > 0 && rect.height > 0) out.push(all[j]);
+    }
+    return out;
+  }
+
+  function moveFocus(step) {
+    var items = focusables();
+    if (!items.length) return;
+    var at = items.indexOf(document.activeElement);
+    var next = items[at < 0 ? 0 : (at + step + items.length) % items.length];
+    next.focus();
+    if (next.scrollIntoView) next.scrollIntoView({ block: 'nearest' });
+  }
 
   function fill(video) {
-    if (!document.getElementById('luma-criterion-style')) {
-      var style = document.createElement('style');
-      style.id = 'luma-criterion-style';
-      style.textContent = STYLE;
-      (document.head || document.documentElement).appendChild(style);
-    }
-    var box = video.closest('.jwplayer') || video.parentElement || video;
+    addStyle();
+    var box = playerBox(video);
     if (box.classList.contains('luma-criterion-fill')) return;
     box.classList.add('luma-criterion-fill');
     if (box.requestFullscreen && !document.fullscreenElement) {
@@ -274,7 +339,15 @@
     function (event) {
       var video = film();
       var name = action(event.keyCode, Boolean(video));
-      if (!name) return;
+      if (!name) {
+        var step = { 37: -1, 38: -1, 39: 1, 40: 1 }[event.keyCode];
+        if (!video && step && location.origin === ORIGIN) {
+          event.preventDefault();
+          addStyle();
+          moveFocus(step);
+        }
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
       if (name === 'back') return leave();
@@ -283,6 +356,8 @@
       else if (name === 'pause' || name === 'toggle') video.pause();
       else if (name === 'forward') video.currentTime = video.currentTime + SKIP;
       else if (name === 'rewind') video.currentTime = Math.max(0, video.currentTime - SKIP);
+      // Show the progress bar for whatever the press did.
+      wake(video);
     },
     true
   );
