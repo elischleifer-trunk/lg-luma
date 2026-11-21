@@ -280,20 +280,60 @@
     return element && element.offsetParent !== null && !element.disabled;
   }
 
-  // At most a few tries per few minutes, so a wrong password never loops.
-  function mayTry() {
+  // A wrong password must never become many: Auth0 blocks an account after a run of failed
+  // sign-ins. The password is entered at most twice an hour, counted across launches, and an
+  // error on the page pauses signing in for an hour; the viewer then sees the page and its message.
+  var TRIES = 'luma-sign-in';
+  var PAUSED = 'luma-sign-in-paused';
+  var HOUR = 60 * 60 * 1000;
+
+  function stored(name) {
     try {
-      var now = Date.now();
-      var tries = JSON.parse(sessionStorage.getItem('luma-sign-in') || '[]').filter(function (t) {
-        return now - t < 5 * 60 * 1000;
-      });
-      if (tries.length >= 2) return false;
-      tries.push(now);
-      sessionStorage.setItem('luma-sign-in', JSON.stringify(tries));
-      return true;
+      return JSON.parse(localStorage.getItem(name) || 'null');
     } catch (_error) {
-      return true;
+      return null;
     }
+  }
+
+  function store(name, value) {
+    try {
+      localStorage.setItem(name, JSON.stringify(value));
+    } catch (_error) {
+      // No storage: a page with an error still stops this page from trying again.
+    }
+  }
+
+  function paused() {
+    var until = stored(PAUSED);
+    return typeof until === 'number' && Date.now() < until;
+  }
+
+  // Whether another password may be entered now, counting this one.
+  function mayTry() {
+    var now = Date.now();
+    var tries = (stored(TRIES) || []).filter(function (t) {
+      return typeof t === 'number' && now - t < HOUR;
+    });
+    if (tries.length >= 2) return false;
+    tries.push(now);
+    store(TRIES, tries);
+    return true;
+  }
+
+  // The sign-in page reports a problem: a wrong password, a blocked account, too many tries.
+  function refused() {
+    var errors = document.querySelectorAll(
+      '[id^="error-element"], .ulp-input-error-message, .ulp-error-info, [role="alert"]'
+    );
+    for (var i = 0; i < errors.length; i++) {
+      if (visible(errors[i]) && errors[i].textContent.trim()) return true;
+    }
+    return false;
+  }
+
+  function stop() {
+    store(PAUSED, Date.now() + HOUR);
+    uncover(false);
   }
 
   var account = null;
@@ -320,12 +360,13 @@
     }
     if (!filled) return false;
     var form = (visible(password) ? password : email).form;
+    // Only the password counts: entering the email alone cannot lock the account.
     var submit =
       (form && form.querySelector('button[type="submit"][name="action"], button[type="submit"]')) ||
       document.querySelector('button[type="submit"]');
-    if (!mayTry()) {
-      // A wrong password, most likely: show the page and its message.
-      uncover(false);
+    if (visible(password) && !mayTry()) {
+      // Twice already this hour: show the page and let the viewer sign in.
+      stop();
       return true;
     }
     if (submit) submit.click();
@@ -338,6 +379,7 @@
     var request = signInRequest(launch);
     if (!request) return;
     asked = true;
+    if (paused()) return uncover(false);
     fetch(request.url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
@@ -355,6 +397,11 @@
         // The form may still be rendering: try until it appears, for a little while.
         var attempts = 0;
         var timer = setInterval(function () {
+          // An error on the page: never enter the account again over it.
+          if (refused()) {
+            clearInterval(timer);
+            return stop();
+          }
           var done = fillIn();
           if (done || ++attempts > 40) clearInterval(timer);
           // No form to fill (or the tries ran out): the viewer signs in by hand.
