@@ -73,8 +73,12 @@ fn the_longest_lasting_usable_sign_in_wins() {
         ..Session::new(signed_in(25.))
     };
     assert!(
-        better(&signed_in(5.), Some(&turned_away), NOW),
-        "a sign-in the Channel turned away is replaced by any usable one"
+        better(&signed_in(30.), Some(&turned_away), NOW),
+        "a sign-in the Channel turned away is replaced by a newer one"
+    );
+    assert!(
+        !better(&signed_in(25.), Some(&turned_away), NOW),
+        "but not by another copy of itself, which would look usable again"
     );
     assert!(!turned_away.usable(NOW));
     assert!(!Session::new(signed_in(-1.)).usable(NOW));
@@ -226,4 +230,49 @@ fn http_dates_parse() {
         Some(784_111_777.)
     );
     assert_eq!(http_date("garbage"), None);
+}
+
+#[test]
+fn an_empty_sign_in_is_no_sign_in() {
+    let mut blank = signed_in(30.);
+    blank[0].value.clear();
+    assert_eq!(expires(&blank), None);
+    assert!(validate(blank).is_err());
+}
+
+#[test]
+fn the_web_browsers_cookies_keep_only_the_channels_sign_in_first() {
+    let mut cookies = vec![cookie("x", "criterion.example.com", None)];
+    cookies.extend((0..70).map(|i| cookie(&format!("t{i}"), ".criterionchannel.com", None)));
+    cookies.extend(signed_in(30.));
+    let kept = channel_cookies(cookies);
+    assert_eq!(kept.len(), 64);
+    assert!(kept.iter().all(|c| allowed_domain(&c.domain)));
+    assert!(
+        validate(kept.clone()).is_ok(),
+        "the sign-in survives the trim"
+    );
+    assert!(kept.iter().any(|c| c.name == "auth0"));
+}
+
+#[test]
+fn forgetting_marks_the_players_sign_in_for_removal_until_a_new_one_is_kept() {
+    let dir = std::env::temp_dir().join(format!("luma-session-forget-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = path(&dir.join("home-assistant.json"));
+    let now = now();
+    let mut cookies = signed_in(0.);
+    cookies[0].expires = Some(now + 10. * DAY);
+    offer(&file, cookies.clone(), now).unwrap();
+    forget(&file).unwrap();
+    assert_eq!(load(&file), None);
+    assert!(
+        forgotten(&file).exists(),
+        "the player is signed out at its next film"
+    );
+    cookies[0].expires = Some(now + 20. * DAY);
+    assert!(offer(&file, cookies, now).unwrap().0);
+    assert!(!forgotten(&file).exists(), "signing in again is wanted");
+    let _ = std::fs::remove_dir_all(&dir);
 }

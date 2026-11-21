@@ -179,7 +179,7 @@ pub fn validate(cookies: Vec<Cookie>) -> Result<Vec<Cookie>, &'static str> {
 pub fn expires(cookies: &[Cookie]) -> Option<f64> {
     cookies
         .iter()
-        .filter(|cookie| cookie.is_session())
+        .filter(|cookie| cookie.is_session() && !cookie.value.is_empty())
         .filter_map(|cookie| cookie.expires)
         .reduce(f64::max)
 }
@@ -233,16 +233,16 @@ impl Session {
     }
 }
 
-/// Whether `candidate` should replace `current`: it is usable and lasts longer, or `current` is
-/// missing or no longer usable.
+/// Whether `candidate` should replace `current`: it has not expired and lasts longer than
+/// `current`, or there is no `current`. A sign-in the Channel turned away is replaced only by a
+/// newer one, never by another copy of itself (which would make it look usable again).
 pub fn better(candidate: &[Cookie], current: Option<&Session>, now: f64) -> bool {
     let Some(ends) = expires(candidate).filter(|at| *at > now) else {
         return false;
     };
-    match current {
-        Some(current) if current.usable(now) => current.expires().is_none_or(|at| ends > at),
-        _ => true,
-    }
+    current
+        .and_then(Session::expires)
+        .is_none_or(|at| ends > at)
 }
 
 // ---- Storage --------------------------------------------------------------------------------
@@ -305,16 +305,26 @@ pub fn offer(
     }
     let session = Session::new(cookies);
     write(path, &session)?;
+    // A sign-in kept after a forget (signing in again) is wanted.
+    let _ = std::fs::remove_file(forgotten(path));
     Ok((true, Some(session)))
 }
 
+/// Set by `forget`: the player still holds the sign-in in its own cookies, so the next time Luma
+/// readies it, it signs the player out rather than keeping that sign-in again.
+fn forgotten(path: &Path) -> PathBuf {
+    path.with_extension("forget")
+}
+
+/// Forgets the sign-in: the stored copy now, the player's own at its next film (see `prepare`).
 pub fn forget(path: &Path) -> Result<(), String> {
     let _guard = file();
     match std::fs::remove_file(path) {
-        Ok(()) => Ok(()),
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
-        Err(error) => Err(error.to_string()),
+        Ok(()) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => return Err(error.to_string()),
     }
+    std::fs::write(forgotten(path), b"").map_err(|e| e.to_string())
 }
 
 // ---- Getting the player ready ---------------------------------------------------------------
@@ -330,6 +340,8 @@ pub enum Prepared {
     FromBrowser,
     /// No sign-in anywhere: the player signs in on the Channel's page.
     None,
+    /// The sign-in was forgotten: the player's own was removed too.
+    SignedOut,
 }
 
 /// Before a film: the longest-lasting sign-in among the player's, the stored one and the Web
@@ -353,6 +365,16 @@ pub fn prepare(path: &Path, devtools: &mut crate::devtools::DevTools) -> Result<
         .into_iter()
         .filter(|cookie| allowed_domain(&cookie.domain))
         .collect::<Vec<_>>();
+    if forgotten(path).exists() {
+        for cookie in &player {
+            devtools.call(
+                "Network.deleteCookies",
+                json!({"name": cookie.name, "domain": cookie.domain, "path": cookie.path}),
+            )?;
+        }
+        let _ = std::fs::remove_file(forgotten(path));
+        return Ok(Prepared::SignedOut);
+    }
     // The player's own sign-in, renewed as it was used, is kept when it lasts longest.
     if let Ok(cookies) = validate(player.clone())
         && offer(path, cookies, now)?.0
@@ -457,6 +479,8 @@ try:
     for host, name, value, path, expires, secure, http, persistent, samesite in db.execute(
         "select host_key, name, value, path, expires_utc, is_secure, is_httponly, is_persistent, samesite "
         "from cookies where host_key like '%criterion%'"):
+        if not value:
+            continue  # encrypted (another firmware's profile): not one Luma can give the player
         out.append({"name": name, "value": value, "domain": host, "path": path or "/",
                     "expires": expires / 1e6 - 11644473600 if persistent and expires else None,
                     "secure": bool(secure), "httpOnly": bool(http), "sameSite": same.get(samesite)})
@@ -469,16 +493,40 @@ fn browser_cookies() -> Result<Vec<Cookie>, String> {
     if !Path::new(BROWSER_COOKIES).exists() {
         return Err("no Web Browser cookies on this TV (or no access to them)".into());
     }
-    let output = std::process::Command::new("python3")
+    let mut child = std::process::Command::new("python3")
         .args(["-c", BROWSER_EXPORT, BROWSER_COOKIES])
         .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null())
-        .output()
+        .spawn()
         .map_err(|e| format!("python3: {e}"))?;
+    // A film is waiting: a stuck read is given up after a few seconds.
+    let deadline = std::time::Instant::now() + Duration::from_secs(4);
+    while child.try_wait().map_err(|e| e.to_string())?.is_none() {
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err("reading them took too long".into());
+        }
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    let output = child.wait_with_output().map_err(|e| e.to_string())?;
     if !output.status.success() {
         return Err(format!("reading them failed ({})", output.status));
     }
-    serde_json::from_slice(&output.stdout).map_err(|e| e.to_string())
+    let cookies: Vec<Cookie> = serde_json::from_slice(&output.stdout).map_err(|e| e.to_string())?;
+    Ok(channel_cookies(cookies))
+}
+
+/// The Channel's own cookies among `cookies`, the sign-in first, within the number Luma keeps.
+fn channel_cookies(cookies: Vec<Cookie>) -> Vec<Cookie> {
+    let mut cookies: Vec<Cookie> = cookies
+        .into_iter()
+        .filter(|cookie| allowed_domain(&cookie.domain))
+        .collect();
+    cookies.sort_by_key(|cookie| !(cookie.is_session() || cookie.host() == "login.criterion.com"));
+    cookies.truncate(MAX_COOKIES);
+    cookies
 }
 
 // ---- Keeping it alive -----------------------------------------------------------------------
@@ -591,6 +639,7 @@ pub fn renew(path: &Path, agent: &ureq::Agent) -> Result<Session, String> {
     let Some(mut session) = load(path) else {
         return Err("no sign-in stored".into());
     };
+    let loaded = session.clone();
     let mut signed_in = false;
     for endpoint in ["/auth/access-token", "/auth/profile"] {
         let header = cookie_header(&session.cookies, SITE, endpoint, now);
@@ -611,15 +660,22 @@ pub fn renew(path: &Path, agent: &ureq::Agent) -> Result<Session, String> {
             }
         }
         if endpoint == "/auth/profile" {
-            signed_in = response.status().as_u16() == 200;
+            // Only a definite answer counts: an outage, a rate limit or a redirect is tried
+            // again at the next wake, never taken for a sign-in that ended.
+            signed_in = match response.status().as_u16() {
+                200 => true,
+                401 | 403 => false,
+                status => return Err(format!("the Channel answered HTTP {status}")),
+            };
         }
     }
     let _guard = file();
-    // A sign-in the player or Home Assistant stored meanwhile wins over this one.
-    if let Some(current) = read(path)
-        && current.expires() > session.expires()
-    {
-        return Ok(current);
+    // A sign-in the player or Home Assistant stored meanwhile wins over this one, and one
+    // forgotten meanwhile stays forgotten.
+    match read(path) {
+        None => return Err("the sign-in was forgotten meanwhile".into()),
+        Some(current) if current != loaded => return Ok(current),
+        Some(_) => {}
     }
     session.valid = signed_in && session.expires().is_some_and(|at| at > now);
     if session.valid {

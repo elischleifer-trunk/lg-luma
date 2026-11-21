@@ -715,9 +715,15 @@ the account) and:
   Auth0's from reaching `127.0.0.1`, which also keeps the player's own form filling below from
   fetching the account on this firmware. Reading the cookies takes ~20 ms.
 - A background thread uses the stored sign-in every three days (`RENEW_EVERY`): `GET
-  /auth/access-token` and `/auth/profile` with its cookies, applying any `Set-Cookie`. A profile
-  that does not answer 200 marks the sign-in invalid; an invalid sign-in is never given to the
-  player. A sign-in stored meanwhile by the player or Home Assistant wins over the renewed one.
+  /auth/access-token` and `/auth/profile` with its cookies, applying any `Set-Cookie`. Only a
+  401/403 from the profile marks the sign-in invalid (any other answer is tried again at the next
+  hourly wake); an invalid sign-in is never given to the player, and is replaced only by one that
+  lasts longer, never by another copy of itself. A sign-in stored or forgotten meanwhile wins.
+- Forgetting (Home Assistant clearing the account, or the last server unpairing) removes the file
+  and leaves `criterion-session.forget`: at the next film Luma deletes the player's Channel
+  cookies (`Network.deleteCookies`) instead of keeping them again.
+- The Web Browser import skips encrypted values (another firmware's profile) and keeps only the
+  Channel's cookies, its sign-in first, up to 64.
 - Home Assistant keeps a copy: `/api/status` reports `criterion_session` (`expires`, `checked`,
   `valid`, never the cookies), `GET /api/criterion-session` returns them, and `PUT` stores a copy
   only when it lasts longer than the TV's (or the TV's is missing or invalid). The last server

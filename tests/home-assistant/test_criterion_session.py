@@ -136,6 +136,10 @@ def test_only_a_cookie_list_the_tv_would_take_counts() -> None:
     assert expiry(cookies(expires)) == expires
     dotted = [{**cookies(expires)[0], "domain": ".criterionchannel.com"}]
     assert expiry(dotted) == expires
+    # Counted the way the TV counts it: any spelling of the Channel's hosts, never an empty one.
+    for domain in (".www.criterionchannel.com", "criterionchannel.com"):
+        assert expiry([{**cookies(expires)[0], "domain": domain}]) == expires
+    assert expiry([{**cookies(expires)[0], "value": ""}]) is None
     assert expiry([]) is None
     assert expiry("cookies") is None
     assert expiry(cookies(expires) * 33) is None

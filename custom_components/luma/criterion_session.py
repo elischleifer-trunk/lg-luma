@@ -48,7 +48,8 @@ MAX_NAME = 256
 MAX_VALUE = 8192
 DOMAINS = ("criterionchannel.com", "criterion.com")
 SESSION_COOKIE = "__session"
-SESSION_DOMAINS = ("www.criterionchannel.com", ".criterionchannel.com")
+# Counted as the TV counts them: either host, written with or without a leading dot.
+SESSION_HOSTS = ("www.criterionchannel.com", "criterionchannel.com")
 # The copy saved while a clearing waits for the TV to drop its session.
 FORGET = {"forget": True}
 
@@ -90,7 +91,7 @@ def expiry(cookies: Any) -> float | None:
             return None
         if not (isinstance(domain, str) and _criterion_domain(domain)):
             return None
-        if name == SESSION_COOKIE and domain.lower() in SESSION_DOMAINS:
+        if name == SESSION_COOKIE and value and domain.lower().lstrip(".") in SESSION_HOSTS:
             moment = _number(cookie.get("expires"))
             if moment is not None and (expires is None or moment > expires):
                 expires = moment
