@@ -1,7 +1,8 @@
-//! The Criterion Channel screen: the Channel's rows of films as 16:9 cards, the focused row at
-//! the top. State and navigation live in [`crate::criterion`].
+//! The Criterion Channel screen: the Channel's rows of films as 16:9 cards, gliding to keep the
+//! focused card on screen, and a film's detail page with Play. State and navigation live in
+//! [`crate::criterion`].
 use super::*;
-use crate::criterion::{IMAGE_SIZE, VISIBLE_CARDS};
+use crate::criterion::{Detail, IMAGE_SIZE, VISIBLE_CARDS};
 
 const BACKDROP: u32 = 0x0d1013;
 const RADIUS: f32 = 14.;
@@ -15,9 +16,9 @@ const HEADING: f32 = 48.;
 const CAPTION: f32 = 72.;
 const ROW_H: f32 = HEADING + CARD_H + CAPTION;
 
-/// Where a card is drawn, given the first card on screen in its row and the row's top.
-fn card_rect(card: usize, first_card: usize, top: f32) -> Rect {
-    let place = card as f32 - first_card as f32;
+/// Where a card is drawn, given where its row is scrolled to (in cards) and the row's top.
+fn card_rect(card: usize, scroll: f32, top: f32) -> Rect {
+    let place = card as f32 - scroll;
     Rect::new(LEFT + place * (CARD_W + GAP), top + HEADING, CARD_W, CARD_H)
 }
 
@@ -25,6 +26,10 @@ pub fn render(out: &mut Scene, state: &State, assets: &Assets) {
     let language = state.preferences.language;
     let browser = &state.criterion;
     out.shape(Rect::new(0., 0., 1920., 1080.), 0., c(BACKDROP, 1.));
+    if let Some(detail) = &browser.detail {
+        detail_page(out, state, assets, detail);
+        return;
+    }
     out.text(
         "Criterion Channel",
         Rect::new(LEFT, 58., 900., 52.),
@@ -93,10 +98,15 @@ fn rows(out: &mut Scene, state: &State) {
         1920.,
         1080. - TOP + 12.,
     ))));
-    for (index, row) in browser.rows.iter().enumerate().skip(browser.first_row) {
-        let top = TOP + (index - browser.first_row) as f32 * ROW_H;
+    // The row above the top one may still be sliding off.
+    let from = browser.scroll_row.floor().max(0.) as usize;
+    for (index, row) in browser.rows.iter().enumerate().skip(from) {
+        let top = TOP + (index as f32 - browser.scroll_row) * ROW_H;
         if top >= 1080. {
             break;
+        }
+        if top + ROW_H <= TOP - 12. {
+            continue;
         }
         out.text(
             row.title.as_str(),
@@ -105,12 +115,13 @@ fn rows(out: &mut Scene, state: &State) {
             c(0xffffff, 0.9),
             false,
         );
-        let first = browser.first_card(index);
+        let scroll = browser.scroll_card(index);
+        let first = scroll.floor().max(0.) as usize;
         // One card past the last full one shows the row goes on.
-        let shown = first.saturating_sub(1)..(first + VISIBLE_CARDS + 1).min(row.films.len());
+        let shown = first.saturating_sub(1)..(first + VISIBLE_CARDS + 2).min(row.films.len());
         for card in shown {
             let film = &row.films[card];
-            let rect = card_rect(card, first, top);
+            let rect = card_rect(card, scroll, top);
             if rect.x + rect.w < 0. || rect.x > 1920. {
                 continue;
             }
@@ -168,4 +179,237 @@ fn rows(out: &mut Scene, state: &State) {
         }
     }
     out.draw.push(Draw::Clip(None));
+}
+
+// ---- Detail page ----------------------------------------------------------------------------
+
+/// The text column's width, over the backdrop's darkened left side.
+const DETAIL_W: f32 = 860.;
+
+/// A film's page, after the Channel's own (director above the title, year and running time,
+/// the synopsis, then who stars) laid out like HBO Max's and Netflix's title pages on TV: the
+/// film's still across the screen, darkened behind the text, and Play first.
+fn detail_page(out: &mut Scene, state: &State, assets: &Assets, detail: &Detail) {
+    let language = state.preferences.language;
+    let from = out.draw.len();
+    let film = &detail.film;
+    let screen = Rect::new(0., 0., 1920., 1080.);
+    // The backdrop, or the card's smaller artwork until it arrives.
+    let still = detail
+        .hero
+        .as_ref()
+        .or_else(|| state.criterion.images.get(&film.id));
+    if let Some(image) = still {
+        out.draw.push(Draw::Camera(
+            image.clone(),
+            screen,
+            0.,
+            false,
+            [0.9, 0.9, 0.9, 1.],
+        ));
+    }
+    // Shade the left side for the text, and the bottom edge into the backdrop colour.
+    side_scrim(out, 0., 1340., 0.96, 0.);
+    out.draw.push(Draw::RoundedGradient(
+        Rect::new(0., 620., 1920., 460.),
+        0.,
+        c(BACKDROP, 0.),
+        c(BACKDROP, 0.94),
+    ));
+    out.draw.push(Draw::RoundedGradient(
+        Rect::new(0., 0., 1920., 220.),
+        0.,
+        c(BACKDROP, 0.55),
+        c(BACKDROP, 0.),
+    ));
+    out.draw.push(Draw::TintedImage(
+        assets.path("logos/criterion.lvec"),
+        Rect::new(LEFT, 60., 46., 46.),
+        0.,
+        true,
+        c(0xffffff, 0.92),
+    ));
+
+    let details = detail.details.as_ref();
+    let x = LEFT;
+    let title_style = text(76., 650, -0.025).leading(1.05);
+    let title_lines = assets.lines(&film.title, title_style, DETAIL_W).min(2);
+    let title_h = title_lines as f32 * title_style.size * title_style.line_height;
+    // The block ends near the bottom; the title sits higher when it takes two lines.
+    let mut y = 330. - (title_h - 80.).max(0.);
+
+    // Director, small and spaced, above the title as on the Channel.
+    if let Some(director) = details.filter(|d| !d.directors.is_empty()) {
+        out.text(
+            director.directors.join(", ").to_uppercase(),
+            Rect::new(x, y, DETAIL_W, 30.),
+            text(21., 600, 0.14),
+            c(0xffffff, 0.72),
+            false,
+        );
+    }
+    y += 44.;
+    out.text(
+        clamp_lines(assets, &film.title, title_style, DETAIL_W, 2),
+        Rect::new(x, y, DETAIL_W, title_h + 8.),
+        title_style,
+        WHITE,
+        false,
+    );
+    y += title_h + 22.;
+
+    // Year · running time · genres · country.
+    let year = Some(film.year.as_str())
+        .filter(|year| !year.is_empty())
+        .or(details.map(|d| d.year.as_str()));
+    let length = Some(film.length.as_str())
+        .filter(|length| !length.is_empty())
+        .or(details.map(|d| d.length.as_str()));
+    let mut facts: Vec<String> = [year, length]
+        .into_iter()
+        .flatten()
+        .filter(|fact| !fact.is_empty())
+        .map(str::to_owned)
+        .collect();
+    if let Some(details) = details {
+        if !details.genres.is_empty() {
+            facts.push(
+                details
+                    .genres
+                    .iter()
+                    .take(2)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            );
+        }
+        if let Some(country) = details.countries.first() {
+            facts.push(country.clone());
+        }
+    }
+    out.text(
+        facts.join("  ·  "),
+        Rect::new(x, y, DETAIL_W, 32.),
+        text(23., 500, 0.),
+        c(0xffffff, 0.78),
+        false,
+    );
+    y += 64.;
+
+    // Play: the white button streaming services lead with.
+    let label = language.t("play");
+    let style = text(24., 650, -0.01);
+    let width = assets.width(label, style) + 128.;
+    let play = Rect::new(x, y, width.max(210.), 68.);
+    let focused = state.focus == Target::CriterionPlay;
+    if focused {
+        out.shadow(play, 14., 30., 8., 0.45);
+    }
+    out.shape(
+        play,
+        14.,
+        if focused {
+            c(0xffffff, 1.)
+        } else {
+            c(0xffffff, 0.16)
+        },
+    );
+    if focused {
+        out.ring(play, 14.);
+    }
+    let ink = if focused { c(0x111317, 1.) } else { WHITE };
+    out.icon(
+        assets,
+        "play",
+        Rect::new(play.x + 34., play.y + 20., 28., 28.),
+        ink,
+    );
+    out.text(
+        label,
+        Rect::new(play.x + 76., play.y + 18., play.w - 96., 34.),
+        style,
+        ink,
+        false,
+    );
+    out.control(Target::CriterionPlay, play, false);
+    y += play.h + 44.;
+
+    // The synopsis, then who stars in it.
+    let body = text(24., 450, 0.).leading(1.42);
+    match details {
+        Some(details) if !details.synopsis.is_empty() => {
+            let lines = if details.cast.is_empty() { 6 } else { 5 };
+            let synopsis = clamp_lines(assets, &details.synopsis, body, DETAIL_W, lines);
+            let shown = assets.lines(&synopsis, body, DETAIL_W).min(lines);
+            let h = shown as f32 * body.size * body.line_height;
+            out.text(
+                synopsis,
+                Rect::new(x, y, DETAIL_W, h + 4.),
+                body,
+                c(0xffffff, 0.84),
+                false,
+            );
+            y += h + 22.;
+        }
+        _ if detail.details.is_none() && !detail.failed => {
+            // Loading: faint lines where the synopsis will be.
+            for (line, w) in [1., 0.94, 0.62].into_iter().enumerate() {
+                out.shape(
+                    Rect::new(x, y + 8. + line as f32 * 34., DETAIL_W * w, 16.),
+                    8.,
+                    c(0xffffff, 0.07),
+                );
+            }
+        }
+        _ => {}
+    }
+    if let Some(details) = details.filter(|d| !d.cast.is_empty()) {
+        let label = language.t("starring");
+        let label_style = text(21., 600, 0.);
+        let label_w = assets.width(label, label_style) + 12.;
+        out.text(
+            label,
+            Rect::new(x, y + 1., label_w, 30.),
+            label_style,
+            c(0xffffff, 0.5),
+            false,
+        );
+        out.text(
+            clamp_lines(
+                assets,
+                &details.cast.join(", "),
+                text(21., 500, 0.),
+                DETAIL_W - label_w,
+                1,
+            ),
+            Rect::new(x + label_w, y + 1., DETAIL_W - label_w, 30.),
+            text(21., 500, 0.),
+            c(0xffffff, 0.78),
+            false,
+        );
+    }
+    if detail.shown < 1. {
+        // Ease out: quick at first, settling gently.
+        let t = 1. - (1. - detail.shown).powi(3);
+        out.fade(from, t, 1.);
+    }
+}
+
+/// A horizontal fade in the backdrop colour from `alpha_from` at `x0` to `alpha_to` at `x1`,
+/// drawn as narrow bands: the renderer's gradients run top to bottom.
+fn side_scrim(out: &mut Scene, x0: f32, x1: f32, alpha_from: f32, alpha_to: f32) {
+    // Whole-pixel bands that neither overlap nor leave gaps once snapped.
+    const BAND: f32 = 20.;
+    let bands = ((x1 - x0) / BAND).ceil() as usize;
+    for index in 0..bands {
+        let t = (index as f32 + 0.5) / bands as f32;
+        // Smoothstep, so the fade has no visible edge at either end.
+        let eased = t * t * (3. - 2. * t);
+        let alpha = alpha_from + (alpha_to - alpha_from) * eased;
+        out.shape(
+            Rect::new(x0 + index as f32 * BAND, 0., BAND, 1080.),
+            0.,
+            c(BACKDROP, alpha),
+        );
+    }
 }
