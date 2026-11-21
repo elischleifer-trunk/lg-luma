@@ -336,9 +336,15 @@ Channel; without a Movie of the Night key, or when it does not know the film, th
 the Channel's search for the title. Without a TMDB token, the rows are read from the Channel's
 public home page instead, so a redesign of that page can empty the grid until Luma is updated.
 
-The player signs in with the account kept in Home Assistant (see
-[Criterion Channel account](home-assistant.md#criterion-channel-account)); without one, the first
-film asks you to sign in with the remote, and the player remembers it.
+Once signed in, the player stays signed in. Luma keeps the Channel's sign-in (its cookies) in a
+private file and gives it back to the player before each film when the player's own copy is
+missing or older. Every three days it uses the sign-in once in the background, which keeps it
+from running out (the Channel's lasts 30 days from its last use). Home Assistant keeps a copy and
+restores it after a reset. The first sign-in can come from any of: the TV's Web Browser, if you
+signed in to the Channel there; the account kept in Home Assistant (see
+[Criterion Channel account](home-assistant.md#criterion-channel-account)), which the player types
+in for you; or signing in with the remote. A wrong password is tried at most twice an hour, so it
+cannot get the account blocked.
 
 ## Development
 

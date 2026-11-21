@@ -692,6 +692,38 @@ inverted drawing (`view::qr_code`).
 Desktop builds serve the same API and print overlay launches and toasts instead of calling webOS.
 Verify overlay stacking, key focus, pausing and the overlay install on TV hardware.
 
+## Criterion player sign-in
+
+The Channel keeps its sign-in in cookies: `__session` on `www.criterionchannel.com` (HttpOnly,
+30 days from its last renewal) and Auth0's on `login.criterion.com`. No page script can set
+HttpOnly cookies, so Luma uses the TV web engine's DevTools: WAM runs every web app in one Chromium
+and, on the TVs tested (webOS 11, root), listens on loopback with its port in
+`/var/lib/wam/DevToolsActivePort`. `src/devtools.rs` is a minimal WebSocket client for it (no
+dependency); WAM refuses browser-wide cookie calls, so calls go to the player's own page.
+`src/criterion-session.rs` keeps the latest sign-in in `criterion-session.json` (mode 0600, beside
+the account) and:
+
+- `POST /api/criterion/prepare`, from the player's start page (origin `null`) or a Channel page
+  when Luma relaunches it with another film, loopback only, proven by the launch's one-time code
+  without using it up. Luma reads the player's cookies (`Network.getCookies`), keeps whichever
+  `__session` lasts longest, and gives the player the stored one (`Network.setCookies`) when it is
+  newer. With neither, it imports the TV Web Browser's sign-in from its own Chromium profile
+  (`/var/palm/jail/com.webos.app.browser/mnt/lg/cache/webbrowser/chrome/Cookies`, SQLite, read
+  with the TV's `python3`, which needs Luma to run as root). The page waits at most four seconds,
+  then opens the Channel whatever happened. Measured on the TV: reading the cookies takes ~20 ms.
+- A background thread uses the stored sign-in every three days (`RENEW_EVERY`): `GET
+  /auth/access-token` and `/auth/profile` with its cookies, applying any `Set-Cookie`. A profile
+  that does not answer 200 marks the sign-in invalid; an invalid sign-in is never given to the
+  player. A sign-in stored meanwhile by the player or Home Assistant wins over the renewed one.
+- Home Assistant keeps a copy: `/api/status` reports `criterion_session` (`expires`, `checked`,
+  `valid`, never the cookies), `GET /api/criterion-session` returns them, and `PUT` stores a copy
+  only when it lasts longer than the TV's (or the TV's is missing or invalid). The last server
+  unpairing removes it with the account.
+
+The player's own sign-in form filling (`userScript.js`) is the last resort: it enters the
+password at most twice an hour across launches and stops for an hour at any error on the page,
+because Auth0 blocks an account after a run of failed sign-ins.
+
 ## Splash images
 
 `pnpm assets` renders one 1920×1080 PNG per background into `.build/assets/splash/` from the shaded

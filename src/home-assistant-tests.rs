@@ -1776,3 +1776,135 @@ fn home_assistant_sets_the_criterion_account_and_only_the_player_reads_it() {
     assert!(!file.exists());
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn home_assistant_keeps_a_copy_of_the_criterion_sign_in_and_restores_only_a_better_one() {
+    let dir = std::env::temp_dir().join(format!("luma-ha-session-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let file = dir.join("criterion-session.json");
+    let mut h = Harness::new();
+    let (sender, events) = mpsc::channel();
+    h.api = Api::new(h.tv.clone(), Some(dir.join("home-assistant.json")), sender).unwrap();
+    h.events = events;
+    let now = crate::criterion_session::now();
+    let cookies = |days: f64| {
+        json!({"cookies": [
+            {"name": "__session", "value": "secret-session", "domain": "www.criterionchannel.com",
+             "path": "/", "expires": now + days * 86_400., "secure": true, "httpOnly": true,
+             "sameSite": "Lax"},
+            {"name": "did", "value": "device", "domain": "login.criterion.com", "path": "/",
+             "expires": now + 365. * 86_400., "secure": true, "httpOnly": true, "sameSite": "None"}
+        ]})
+    };
+
+    assert_eq!(
+        h.call("PUT", "/api/criterion-session", None, cookies(10.))
+            .status,
+        401
+    );
+    let token = h.pair();
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(status.body["criterion_session"], Value::Null);
+    assert_eq!(
+        h.call("GET", "/api/criterion-session", Some(&token), json!({}))
+            .status,
+        404
+    );
+    let foreign = json!({"cookies": [{"name": "__session", "value": "x",
+        "domain": "evil.example", "path": "/", "expires": now + 86_400.}]});
+    assert_eq!(
+        h.call("PUT", "/api/criterion-session", Some(&token), foreign)
+            .status,
+        400
+    );
+
+    let stored = h.call("PUT", "/api/criterion-session", Some(&token), cookies(10.));
+    assert_eq!(stored.status, 200, "{:?}", stored.body);
+    assert_eq!(stored.body["stored"], true);
+    assert!(file.exists());
+    // An older copy does not replace a newer sign-in.
+    let older = h.call("PUT", "/api/criterion-session", Some(&token), cookies(5.));
+    assert_eq!(older.body["stored"], false);
+    let status = h.call("GET", "/api/status", Some(&token), json!({}));
+    assert_eq!(status.body["criterion_session"]["valid"], true);
+    assert!(
+        status.body["criterion_session"]["expires"]
+            .as_f64()
+            .unwrap()
+            > now + 9. * 86_400.
+    );
+    assert!(!status.body.to_string().contains("secret-session"));
+    let copy = h.call("GET", "/api/criterion-session", Some(&token), json!({}));
+    assert_eq!(copy.status, 200);
+    assert_eq!(copy.body["cookies"][0]["value"], "secret-session");
+
+    let forgotten = h.call("DELETE", "/api/criterion-session", Some(&token), json!({}));
+    assert_eq!(forgotten.status, 200);
+    assert!(!file.exists());
+
+    // The last server unpairing takes the sign-in with it.
+    h.call("PUT", "/api/criterion-session", Some(&token), cookies(10.));
+    assert!(file.exists());
+    h.call("DELETE", "/api/pair", Some(&token), json!({}));
+    assert!(!file.exists());
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn only_the_criterion_player_asks_luma_to_ready_its_sign_in() {
+    let mut h = Harness::new();
+    let prepare = |h: &mut Harness, method: &str, origin: Option<&str>, peer, body: Value| {
+        let body = body.to_string();
+        h.api.handle(
+            &Request {
+                method,
+                path: "/api/criterion/prepare",
+                query: "",
+                authorization: None,
+                origin,
+                integration: None,
+                peer,
+                body: body.as_bytes(),
+            },
+            Instant::now(),
+        )
+    };
+    let code = crate::criterion_account::issue(Instant::now()).unwrap();
+    for (origin, peer) in [
+        (Some("https://evil.example"), LOOPBACK),
+        (None, LOOPBACK),
+        (Some("null"), LAN),
+    ] {
+        let refused = prepare(&mut h, "POST", origin, peer, json!({"code": code}));
+        assert_eq!(refused.status, 403);
+    }
+    // The start page (a local file) and the Channel's pages, each allowed by its own origin.
+    let preflight = prepare(&mut h, "OPTIONS", Some("null"), LOOPBACK, json!({}));
+    assert_eq!(
+        (preflight.status, preflight.allow_origin),
+        (200, Some("null"))
+    );
+    let channel = Some(crate::criterion::ORIGIN);
+    let preflight = prepare(&mut h, "OPTIONS", channel, LOOPBACK, json!({}));
+    assert_eq!((preflight.status, preflight.allow_origin), (200, channel));
+    let wrong = prepare(
+        &mut h,
+        "POST",
+        Some("null"),
+        LOOPBACK,
+        json!({"code": "0".repeat(32)}),
+    );
+    assert_eq!(wrong.status, 403);
+    // Asking does not use the code up: the sign-in page can still trade it.
+    for _ in 0..5 {
+        prepare(
+            &mut h,
+            "POST",
+            Some("null"),
+            LOOPBACK,
+            json!({"code": code}),
+        );
+    }
+    assert!(crate::criterion_account::valid(&code, Instant::now()));
+}

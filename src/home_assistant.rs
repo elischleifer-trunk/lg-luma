@@ -814,6 +814,10 @@ impl<T: Tv> Api<T> {
         if request.path == "/api/criterion/sign-in" {
             return self.criterion_sign_in(request, now);
         }
+        // The player's start page asks Luma to get its sign-in ready, from the TV only.
+        if request.path == "/api/criterion/prepare" {
+            return self.criterion_prepare(request, now);
+        }
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
         if request.origin.is_some() && !(closed && request.peer.is_loopback()) {
@@ -1010,6 +1014,12 @@ impl<T: Tv> Api<T> {
                                     None => json!(false),
                                 }
                             }),
+                            // When the Criterion player's stored sign-in ends, so Home
+                            // Assistant keeps a copy and restores it. Never the cookies.
+                            "criterion_session": self.criterion_session_path().map(|path| {
+                                crate::criterion_session::load(&path)
+                                    .map_or(Value::Null, |session| session.status())
+                            }),
                             // Whether this server's keyboard webhook is registered, so it
                             // registers again after Luma restarts.
                             "keyboard_hook": self.keyboard_hooks.iter()
@@ -1022,6 +1032,9 @@ impl<T: Tv> Api<T> {
                     ("PUT", "/api/streaming-keys") => self.set_streaming_keys(&body),
                     ("PUT", "/api/criterion-account") => self.set_criterion(&body),
                     ("DELETE", "/api/criterion-account") => self.forget_criterion(),
+                    ("GET", "/api/criterion-session") => self.criterion_session(),
+                    ("PUT", "/api/criterion-session") => self.set_criterion_session(&body),
+                    ("DELETE", "/api/criterion-session") => self.forget_criterion_session(),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         // Dismissing closes a doorbell card, never a camera the owner is
@@ -1370,7 +1383,7 @@ impl<T: Tv> Api<T> {
         reply(200, json!({"criterion_account": true}))
     }
 
-    /// Removes the account file, logging (never failing on) an error.
+    /// Removes the account file and the stored sign-in, logging (never failing on) an error.
     fn forget_criterion_file(&self) {
         if let Some(path) = self.criterion_account_path()
             && let Err(message) = crate::criterion_account::forget(&path)
@@ -1378,6 +1391,14 @@ impl<T: Tv> Api<T> {
             crate::telemetry::log_error!(
                 "home-assistant",
                 "could not remove the Criterion account: {message}"
+            );
+        }
+        if let Some(path) = self.criterion_session_path()
+            && let Err(message) = crate::criterion_session::forget(&path)
+        {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion sign-in: {message}"
             );
         }
     }
@@ -1394,6 +1415,130 @@ impl<T: Tv> Api<T> {
             return error(500, "Could not remove the account");
         }
         reply(200, json!({"criterion_account": false}))
+    }
+
+    fn criterion_session_path(&self) -> Option<PathBuf> {
+        self.store_path
+            .as_deref()
+            .map(crate::criterion_session::path)
+    }
+
+    /// Home Assistant's copy of the player's sign-in, which it sends back after a reset.
+    fn criterion_session(&self) -> Reply {
+        match self
+            .criterion_session_path()
+            .and_then(|path| crate::criterion_session::load(&path))
+        {
+            Some(session) => reply(
+                200,
+                json!({"cookies": session.cookies, "expires": session.expires()}),
+            ),
+            None => error(404, "No Criterion sign-in on this TV"),
+        }
+    }
+
+    /// A sign-in Home Assistant kept: taken only when it lasts longer than the TV's, or the TV's
+    /// is missing or no longer accepted.
+    fn set_criterion_session(&mut self, body: &Value) -> Reply {
+        let Some(path) = self.criterion_session_path() else {
+            return error(503, "This TV has no storage for the sign-in");
+        };
+        let cookies = body
+            .get("cookies")
+            .cloned()
+            .and_then(|cookies| serde_json::from_value(cookies).ok())
+            .ok_or("cookies must be a list of cookies")
+            .and_then(crate::criterion_session::validate);
+        let cookies = match cookies {
+            Ok(cookies) => cookies,
+            Err(message) => return error(400, message),
+        };
+        match crate::criterion_session::offer(&path, cookies, crate::criterion_session::now()) {
+            Ok((stored, session)) => {
+                if stored {
+                    crate::telemetry::log_info!("criterion", "Home Assistant restored the sign-in");
+                }
+                reply(
+                    200,
+                    json!({
+                        "stored": stored,
+                        "criterion_session": session.map_or(Value::Null, |s| s.status()),
+                    }),
+                )
+            }
+            Err(message) => {
+                crate::telemetry::log_error!(
+                    "home-assistant",
+                    "could not save the Criterion sign-in: {message}"
+                );
+                error(500, "Could not save the sign-in")
+            }
+        }
+    }
+
+    fn forget_criterion_session(&mut self) -> Reply {
+        let Some(path) = self.criterion_session_path() else {
+            return error(503, "This TV has no storage for the sign-in");
+        };
+        if let Err(message) = crate::criterion_session::forget(&path) {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion sign-in: {message}"
+            );
+            return error(500, "Could not remove the sign-in");
+        }
+        reply(200, json!({"criterion_session": null}))
+    }
+
+    /// The player, before it opens the Channel: Luma gives the player the longest-lasting sign-in it knows of (see
+    /// `criterion_session::prepare`). It proves it is the player with its one-time code, which
+    /// this does not use up. Answers within a few seconds whatever happens; the page goes on to
+    /// the Channel either way.
+    fn criterion_prepare(&mut self, request: &Request, now: Instant) -> Reply {
+        // Its start page (a local file, origin "null"), or a Channel page when Luma opens another
+        // film while the player is open.
+        let origin = match request.origin {
+            Some("null") => "null",
+            Some(crate::criterion::ORIGIN) => crate::criterion::ORIGIN,
+            _ => return error(403, "Only the Criterion player asks"),
+        };
+        let allowed = |reply: Reply| Reply {
+            allow_origin: Some(origin),
+            ..reply
+        };
+        if !request.peer.is_loopback() {
+            return error(403, "Only the Criterion player asks");
+        }
+        match request.method {
+            "OPTIONS" => return allowed(reply(200, json!({}))),
+            "POST" => {}
+            _ => return allowed(error(404, "Not found")),
+        }
+        let code = serde_json::from_slice::<Value>(request.body)
+            .ok()
+            .and_then(|body| body.get("code")?.as_str().map(str::to_owned));
+        if !code.is_some_and(|code| crate::criterion_account::valid(&code, now)) {
+            return allowed(error(403, "Open the film from Luma again"));
+        }
+        let Some(path) = self.criterion_session_path() else {
+            return allowed(error(503, "This TV has no storage for the sign-in"));
+        };
+        let started = Instant::now();
+        let outcome = match crate::criterion_session::prepare(&path) {
+            Ok(prepared) => {
+                crate::telemetry::log_info!(
+                    "criterion",
+                    "player ready in {} ms: {prepared:?}",
+                    started.elapsed().as_millis()
+                );
+                format!("{prepared:?}")
+            }
+            Err(message) => {
+                crate::telemetry::log_warn!("criterion", "could not ready the player: {message}");
+                "Failed".into()
+            }
+        };
+        allowed(reply(200, json!({ "prepared": outcome })))
     }
 
     /// The Criterion player's script, on the Channel's sign-in page, trades the one-time code

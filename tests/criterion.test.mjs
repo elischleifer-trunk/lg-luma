@@ -78,3 +78,30 @@ test('only a launch that plays a film is covered while it loads', () => {
   assert.equal(launchKey({ code, target: `${ORIGIN}/films/x?play=1` }), code);
   assert.equal(launchKey({ target: `${ORIGIN}/films/x?play=1` }), `${ORIGIN}/films/x?play=1`);
 });
+
+test('the start page asks Luma to ready the sign-in, and never waits long', async () => {
+  const { prepareRequest } = context.window.LumaCriterion;
+  const code = '0123456789abcdef0123456789abcdef';
+  assert.equal(
+    prepareRequest({ code, port: 5862 }).url,
+    'http://127.0.0.1:5862/api/criterion/prepare',
+  );
+  assert.equal(prepareRequest({ port: 5862 }), null);
+  // With a fetch that never answers, `then` still runs once, after the wait.
+  const ctx = { URL, window: {}, setTimeout, fetch: () => new Promise(() => {}) };
+  vm.runInNewContext(source, ctx);
+  let calls = 0;
+  const started = Date.now();
+  await new Promise((resolve) =>
+    ctx.window.LumaCriterion.prepare({ code, port: 1 }, 50, () => {
+      calls++;
+      resolve();
+    }),
+  );
+  assert.equal(calls, 1);
+  assert.ok(Date.now() - started >= 45);
+  // Without a code (an older Luma), straight on.
+  let direct = 0;
+  ctx.window.LumaCriterion.prepare({}, 5000, () => direct++);
+  assert.equal(direct, 1);
+});

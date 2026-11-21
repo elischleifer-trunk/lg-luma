@@ -61,16 +61,46 @@
   // pages it is traded for the account Home Assistant holds, at Luma's API on the TV itself.
   var SIGN_IN_ORIGIN = 'https://login.criterion.com';
 
-  function signInRequest(params) {
+  // A request to Luma's API on the TV, proven with the launch's one-time code.
+  function lumaRequest(params, path) {
     var code = params && params.code;
     var port = Number(params && params.port);
     if (typeof code !== 'string' || !/^[0-9a-f]{32}$/.test(code)) return null;
     if (!(port >= 1 && port <= 65535 && Math.floor(port) === port)) return null;
     return {
-      url: 'http://127.0.0.1:' + port + '/api/criterion/sign-in',
+      url: 'http://127.0.0.1:' + port + path,
       // Plain text, so the browser sends it without asking Luma first.
       body: JSON.stringify({ code: code }),
     };
+  }
+
+  function signInRequest(params) {
+    return lumaRequest(params, '/api/criterion/sign-in');
+  }
+
+  // Before the Channel opens: Luma gives the player the longest-lasting sign-in it keeps.
+  function prepareRequest(params) {
+    return lumaRequest(params, '/api/criterion/prepare');
+  }
+
+  // Asks Luma to get the sign-in ready, then calls `then` once: on Luma's answer, on any
+  // failure, or after `wait` ms, so a slow or older Luma never holds the film up.
+  function prepare(params, wait, then) {
+    var done = false;
+    function go() {
+      if (done) return;
+      done = true;
+      then();
+    }
+    var request = prepareRequest(params);
+    if (!request || typeof fetch !== 'function') return go();
+    setTimeout(go, wait);
+    fetch(request.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: request.body,
+      cache: 'no-store',
+    }).then(go, go);
   }
 
   // Whether Luma asked to play a film (its page with `?play=1`), rather than show a page such as
@@ -95,6 +125,8 @@
     parse: parse,
     action: action,
     signInRequest: signInRequest,
+    prepareRequest: prepareRequest,
+    prepare: prepare,
     playsFilm: playsFilm,
     launchKey: launchKey,
   };
@@ -423,8 +455,11 @@
     var next = target(params);
     // The next page covers itself for this film (see `launchParams`).
     session(NEXT, JSON.stringify(params));
-    if (next !== location.href) location.href = next;
-    else session(NEXT, null);
+    if (next === location.href) session(NEXT, null);
+    else
+      prepare(params, 4000, function () {
+        location.href = next;
+      });
     if (palm && typeof palm.activate === 'function') palm.activate();
   });
 })(typeof window === 'undefined' ? this : window);

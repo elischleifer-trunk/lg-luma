@@ -137,6 +137,22 @@ pub fn issue(now: Instant) -> Result<String, String> {
     Ok(value)
 }
 
+/// Whether `value` is a current code, without counting a use: the player's start page proves
+/// it is the player this way before Luma gets its sign-in ready.
+pub fn valid(value: &str, now: Instant) -> bool {
+    value.len() == 32
+        && codes().iter().any(|code| {
+            now.duration_since(code.issued) < CODE_LIFETIME
+                && code.uses < CODE_USES
+                && same(code.value.as_bytes(), value.as_bytes())
+        })
+}
+
+/// Compared without stopping at the first difference, so timing says nothing about a code.
+fn same(a: &[u8], b: &[u8]) -> bool {
+    a.len() == b.len() && a.iter().zip(b).fold(0, |d, (x, y)| d | (x ^ y)) == 0
+}
+
 /// Whether `value` is a current code, counting this use.
 pub fn redeem(value: &str, now: Instant) -> bool {
     if value.len() != 32 {
@@ -144,10 +160,6 @@ pub fn redeem(value: &str, now: Instant) -> bool {
     }
     let mut codes = codes();
     codes.retain(|code| now.duration_since(code.issued) < CODE_LIFETIME && code.uses < CODE_USES);
-    // Compared without stopping at the first difference, so timing says nothing about a code.
-    let same = |a: &[u8], b: &[u8]| {
-        a.len() == b.len() && a.iter().zip(b).fold(0, |d, (x, y)| d | (x ^ y)) == 0
-    };
     let Some(code) = codes
         .iter_mut()
         .find(|code| same(code.value.as_bytes(), value.as_bytes()))
