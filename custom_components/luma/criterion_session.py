@@ -19,6 +19,12 @@ options, the logs, diagnostics or entity attributes). At each status check:
 
 Clearing the Criterion account in the options also forgets the session: the copy goes, and the
 TV is told to drop its own. If the TV is off then, that waits for the next status check.
+
+The TV holds one sign-in, and with several servers paired only one may look after it: the server
+whose account the TV holds (by fingerprint, as for the account itself), or, when the TV holds no
+account and this server has none set, any server (a sign-in typed in the player). A server whose
+account the TV does not hold leaves the sign-in alone, and drops its copy once the TV holds
+another server's account, so it never restores or removes a sign-in that is not its own.
 """
 
 from __future__ import annotations
@@ -34,8 +40,9 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 
+from . import criterion_account
 from .api import LumaApiError, LumaClient, LumaError
-from .const import DOMAIN
+from .const import CONF_CRITERION_CLEARED, CONF_CRITERION_EARLIER, DOMAIN
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -112,6 +119,9 @@ class State:
     notified: tuple[float | None] | None = None
     # Whether the Criterion account was set in the options, to notice it being cleared.
     account: bool = False
+    # The TV's latest `criterion_account` status: the fingerprint of the account it holds, True
+    # for one sent without, or False for none.
+    holder: Any = False
     _copy: dict[str, Any] | None = None
     _loaded: bool = False
 
@@ -153,6 +163,23 @@ def _held(copy: dict[str, Any] | None) -> float | None:
     return _number(copy.get("expires"))
 
 
+def _ours(options: dict[str, Any], holder: Any) -> bool:
+    """Whether this server looks after the TV's sign-in: the TV holds this server's account,
+    or neither holds one."""
+    mark = criterion_account.fingerprint(options)
+    return holder == mark if mark is not None else holder is False
+
+
+def _another(options: dict[str, Any], holder: Any) -> bool:
+    """Whether the TV holds an account another server sent."""
+    sent = [
+        criterion_account.fingerprint(options),
+        options.get(CONF_CRITERION_CLEARED),
+        *options.get(CONF_CRITERION_EARLIER, []),
+    ]
+    return isinstance(holder, str) and holder not in sent
+
+
 @callback
 def _reported(hass: HomeAssistant, entry: ConfigEntry, state: State, value: Any) -> None:
     state.known = True
@@ -168,11 +195,20 @@ async def sync(
     if "criterion_session" not in status:
         return
     state = _state(entry)
+    state.holder = status.get("criterion_account", False)
     _reported(hass, entry, state, status["criterion_session"])
     reported = state.reported
     copy = await state.copy(hass, entry.entry_id)
     if copy and copy.get("forget"):
         await _forget_on_tv(hass, entry, client, state)
+        return
+    options = dict(entry.options)
+    if not _ours(options, state.holder):
+        if copy is not None and _another(options, state.holder):
+            # Another server's account, and with it its sign-in: this copy is not to restore.
+            await state.save(hass, entry.entry_id, None)
+            state.refused = None
+        _notice(hass, entry, state, restored=False, ours=False)
         return
     held = _held(copy)
     on_tv = _number(reported.get("expires")) if reported else None
@@ -243,11 +279,14 @@ async def _restore(
 
 
 @callback
-def _notice(hass: HomeAssistant, entry: ConfigEntry, state: State, restored: bool) -> None:
-    """Tell the owner once per signed-out session, when nothing newer could replace it."""
+def _notice(
+    hass: HomeAssistant, entry: ConfigEntry, state: State, restored: bool, *, ours: bool = True
+) -> None:
+    """Tell the owner once per signed-out session, when nothing newer could replace it; never
+    about a sign-in another server looks after."""
     reported = state.reported
     notice_id = f"{DOMAIN}_criterion_session_{entry.entry_id}"
-    if reported is None or reported.get("valid") is not False or restored:
+    if not ours or reported is None or reported.get("valid") is not False or restored:
         if state.notified is not None:
             state.notified = None
             persistent_notification.async_dismiss(hass, notice_id)
@@ -269,8 +308,10 @@ def _notice(hass: HomeAssistant, entry: ConfigEntry, state: State, restored: boo
 async def _forget_on_tv(
     hass: HomeAssistant, entry: ConfigEntry, client: LumaClient, state: State
 ) -> None:
-    """Drop the TV's sign-in after the account was cleared; the copy is already gone."""
-    if state.reported is not None:
+    """Drop the TV's sign-in after the account was cleared, when it still holds an account this
+    server sent; the copy is already gone."""
+    holder = {"criterion_account": state.holder}
+    if state.reported is not None and criterion_account.needs_forget(dict(entry.options), holder):
         try:
             reply = await client.forget_criterion_session()
         except LumaError as err:
@@ -282,7 +323,8 @@ async def _forget_on_tv(
 
 async def forget(hass: HomeAssistant, entry: ConfigEntry, client: LumaClient) -> None:
     """The Criterion account was cleared: drop the copy, and the TV's sign-in when it reports
-    one. A TV that is off, or has not reported yet, drops it at a later status check."""
+    one and still holds this server's account. A TV that is off, or has not reported yet, is
+    asked at a later status check."""
     state = _state(entry)
     await state.save(hass, entry.entry_id, dict(FORGET))
     state.refused = None

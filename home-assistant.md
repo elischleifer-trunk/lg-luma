@@ -328,7 +328,9 @@ older one, Home Assistant gives the backup back at the next status check, so you
 sign in again. The diagnostic sensor **Criterion sign-in expires** shows when the TV's sign-in
 runs out. If the TV finds itself signed out and the backup is no newer, Home Assistant shows a
 notification asking you to sign in again in the Criterion player. Clearing the account also
-removes the backup and the TV's sign-in.
+removes the backup and the TV's sign-in. With several Home Assistant servers paired, only the one
+whose account the TV holds looks after its sign-in, so none restores or removes a sign-in that
+came with another's account.
 
 ## Developer access
 

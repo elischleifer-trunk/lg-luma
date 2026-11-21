@@ -728,8 +728,11 @@ the account) and:
   Channel's cookies, its sign-in first, up to 64.
 - Home Assistant keeps a copy: `/api/status` reports `criterion_session` (`expires`, `checked`,
   `valid`, never the cookies), `GET /api/criterion-session` returns them, and `PUT` stores a copy
-  only when it lasts longer than the TV's (or the TV's is missing or invalid). The last server
-  unpairing removes it with the account.
+  only when it lasts longer than the TV's (or the TV has none), even if the TV's is invalid. The
+  last server unpairing removes it with the account. With several servers paired, only the one
+  whose account the TV holds (by the `criterion_account` fingerprint), or any when neither the TV
+  nor that server has an account, backs up, restores or clears it
+  (`custom_components/luma/criterion_session.py`).
 
 The player's own sign-in form filling (`userScript.js`) is the last resort: it enters the
 password at most twice an hour across launches and stops for an hour at any error on the page,

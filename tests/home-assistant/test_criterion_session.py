@@ -88,13 +88,16 @@ def tv(
     *,
     held: float | None = None,
     stored: bool = True,
+    account: Any = False,
 ) -> None:
     """The TV reporting `reported` ("absent": an older Luma), holding a session that expires at
-    `held`, and answering an offered one with `stored`."""
+    `held`, answering an offered one with `stored`, and holding the Criterion account with
+    fingerprint `account` (False: none)."""
     aioclient_mock.clear_requests()
     status: dict[str, Any] = {"overlay": None, "overlay_ready": True, "cameras": 0}
     if reported != "absent":
         status["criterion_session"] = reported
+        status["criterion_account"] = account
     aioclient_mock.get(f"{TV}/api/status", json=status)
     aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
     aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
@@ -300,11 +303,11 @@ async def test_clearing_the_account_forgets_the_sign_in(
     )
     expires = NOW + 20 * DAY
     back_up(hass_storage, config, expires)
-    tv(aioclient_mock, reports(expires), held=expires)
+    tv(aioclient_mock, reports(expires), held=expires, account="f00d")
     await start(hass, config)
     assert session_calls(aioclient_mock) == []
 
-    tv(aioclient_mock, reports(expires), held=expires)
+    tv(aioclient_mock, reports(expires), held=expires, account="f00d")
     aioclient_mock.delete(f"{TV}/api/criterion-account", json={"criterion_account": False})
     result = await hass.config_entries.options.async_init(config.entry_id)
     result = await hass.config_entries.options.async_configure(
@@ -343,15 +346,92 @@ async def test_a_tv_off_while_cleared_forgets_the_sign_in_when_it_answers(
     aioclient_mock.put(f"{TV}/api/criterion-account", exc=TimeoutError)
     aioclient_mock.post(f"{TV}/api/cameras", exc=TimeoutError)
     await start(hass, config)
+    # As the options form saves a clearing: with the cleared account's fingerprint.
     hass.config_entries.async_update_entry(
-        config, options={"criterion_email": "", "criterion_password": ""}
+        config,
+        options={"criterion_email": "", "criterion_password": "", "criterion_cleared": "f00d"},
     )
     await hass.async_block_till_done()
     # The cookies are gone at once; the TV is told when it answers.
     assert "cookies" not in hass_storage[storage_key(config)]["data"]
-    tv(aioclient_mock, reports(expires), held=expires)
+    tv(aioclient_mock, reports(expires), held=expires, account="f00d")
+    aioclient_mock.delete(f"{TV}/api/criterion-account", json={"criterion_account": False})
     await check(hass)
     assert session_calls(aioclient_mock) == [("DELETE", None)]
+    assert storage_key(config) not in hass_storage
+
+
+ACCOUNT = {
+    "criterion_email": "me@example.com",
+    "criterion_password": "pw",
+    "criterion_fingerprint": "f00d",
+}
+
+
+async def test_a_sign_in_with_this_servers_account_is_looked_after(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, hass_storage: dict[str, Any]
+) -> None:
+    config = entry(hass)
+    hass.config_entries.async_update_entry(config, options=ACCOUNT)
+    newer = NOW + 30 * DAY
+    tv(aioclient_mock, reports(newer), held=newer, account="f00d")
+    await start(hass, config)
+    assert session_calls(aioclient_mock) == [("GET", None)]
+    assert hass_storage[storage_key(config)]["data"]["expires"] == newer
+
+
+async def test_a_backup_waits_until_the_tv_holds_this_servers_account(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, hass_storage: dict[str, Any]
+) -> None:
+    # Not yet sent to the TV: the sign-in there is not this account's.
+    config = entry(hass)
+    hass.config_entries.async_update_entry(config, options=ACCOUNT)
+    back_up(hass_storage, config, NOW + 20 * DAY)
+    tv(aioclient_mock, None, account=False)
+    await start(hass, config)
+    assert session_calls(aioclient_mock) == []
+
+
+@pytest.mark.parametrize("options", [{}, ACCOUNT])
+async def test_another_servers_sign_in_is_left_alone(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    hass_storage: dict[str, Any],
+    options: dict[str, Any],
+) -> None:
+    config = entry(hass)
+    hass.config_entries.async_update_entry(config, options=options)
+    back_up(hass_storage, config, NOW + 20 * DAY)
+    # The TV holds another server's account, and a sign-in this server's copy would replace.
+    tv(aioclient_mock, reports(NOW + 30 * DAY, valid=False), held=NOW + 30 * DAY, account="beef")
+    await start(hass, config)
+    await check(hass)
+    assert session_calls(aioclient_mock) == []
+    # Its copy is dropped, so it is not restored once the other account is cleared.
+    assert storage_key(config) not in hass_storage
+    notices = hass.data.get("persistent_notification", {})
+    assert f"luma_criterion_session_{config.entry_id}" not in notices
+    tv(aioclient_mock, None, account=False if not options else "beef")
+    await check(hass)
+    assert session_calls(aioclient_mock) == []
+
+
+async def test_clearing_the_account_leaves_another_servers_sign_in(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, hass_storage: dict[str, Any]
+) -> None:
+    config = entry(hass)
+    hass.config_entries.async_update_entry(config, options=ACCOUNT)
+    expires = NOW + 20 * DAY
+    tv(aioclient_mock, reports(expires), held=expires, account="beef")
+    await start(hass, config)
+    hass.config_entries.async_update_entry(
+        config,
+        options={"criterion_email": "", "criterion_password": "", "criterion_cleared": "f00d"},
+    )
+    await hass.async_block_till_done()
+    tv(aioclient_mock, reports(expires), held=expires, account="beef")
+    await check(hass)
+    assert session_calls(aioclient_mock) == []
     assert storage_key(config) not in hass_storage
 
 
