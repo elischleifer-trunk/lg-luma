@@ -1,0 +1,482 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "king",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:00.126Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/mNHRGO1gFpR2CYZdANe72kcKq7G.jpg",
+        "genre_ids": [
+          80,
+          18,
+          35
+        ],
+        "id": 153312,
+        "name": "Tulsa King",
+        "original_language": "en",
+        "original_name": "Tulsa King",
+        "overview": "New York mafia capo Dwight \"The General\" Manfredi is released from prison after 25 years and exiled by his boss to set up shop in Tulsa, Oklahoma. Realizing that his mob family may not have his best interests in mind, Dwight slowly builds a crew.",
+        "popularity": 277.1089,
+        "poster_path": "/y13WOeZ2rz2Ezpws0RJ0I8sQpG4.jpg",
+        "first_air_date": "2022-11-13",
+        "softcore": false,
+        "vote_average": 8.321,
+        "vote_count": 2973,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/g3brCzb5D9hE7StLiA69rt6pUeW.jpg",
+        "genre_ids": [
+          16,
+          35
+        ],
+        "id": 2122,
+        "name": "King of the Hill",
+        "original_language": "en",
+        "original_name": "King of the Hill",
+        "overview": "Set in Texas, this animated series follows the life of propane salesman Hank Hill, who lives with his overly confident substitute Spanish teacher wife Peggy, wannabe comedian son Bobby, and naive niece Luanne. Hank has conservative views about God, family, and country, but his values and ethics are often challenged by the situations he, his family, and his beer-drinking neighbors/buddies find themselves in.",
+        "popularity": 87.2621,
+        "poster_path": "/lvf0q6kX0NCjFp7VxEuC6ArBa42.jpg",
+        "first_air_date": "1997-01-12",
+        "softcore": false,
+        "vote_average": 7.4,
+        "vote_count": 727,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/xF4zSVyrOBO60Lwu2wDN0dBjEgk.jpg",
+        "genre_ids": [
+          35
+        ],
+        "id": 4238,
+        "name": "The King of Queens",
+        "original_language": "en",
+        "original_name": "The King of Queens",
+        "overview": "Life’s good for deliveryman Doug Heffernan, until his newly widowed father-in-law, Arthur, moves in with him and his wife Carrie. Doug is no longer the king of his domain, and instead of having a big screen television in his recently renovated basement, he now has a crazy old man.",
+        "popularity": 60.2231,
+        "poster_path": "/vXs300Yvjy4Kr0iHgBtajHkYbAt.jpg",
+        "first_air_date": "1998-09-21",
+        "softcore": false,
+        "vote_average": 7.141,
+        "vote_count": 795,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/AjmUQ7aP58ovQ0kBfWfIRHowRch.jpg",
+        "genre_ids": [
+          16,
+          35,
+          10765,
+          10759
+        ],
+        "id": 104699,
+        "name": "SHAMAN KING",
+        "original_language": "ja",
+        "original_name": "SHAMAN KING",
+        "overview": "Medium Yoh Asakura enters a battle tournament held every 500 years, competing with other shamans in a bid to become the all-powerful Shaman King.",
+        "popularity": 22.1727,
+        "poster_path": "/my6AEDKL6NfJYOLZg5g71D3PBe2.jpg",
+        "first_air_date": "2021-04-01",
+        "softcore": false,
+        "vote_average": 8.2,
+        "vote_count": 321,
+        "media_type": "tv",
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/wXsQvli6tWqja51pYxXNG1LFIGV.jpg",
+        "genre_ids": [
+          16,
+          10751,
+          18
+        ],
+        "id": 8587,
+        "title": "The Lion King",
+        "original_language": "en",
+        "original_title": "The Lion King",
+        "overview": "Young lion prince Simba, eager to one day become king of the Pride Lands, grows up under the watchful eye of his father Mufasa; all the while his villainous uncle Scar conspires to take the throne for himself. Amid betrayal and tragedy, Simba must confront his past and find his rightful place in the Circle of Life.",
+        "popularity": 23.145,
+        "poster_path": "/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg",
+        "release_date": "1994-06-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.25,
+        "vote_count": 20443,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/A3AEKSTwNGsnYOHnBmI8ZAe3TWR.jpg",
+        "genre_ids": [
+          10759,
+          18,
+          80
+        ],
+        "id": 3414,
+        "name": "Scarecrow and Mrs. King",
+        "original_language": "en",
+        "original_name": "Scarecrow and Mrs. King",
+        "overview": "Scarecrow and Mrs. King is an American television series that aired from October 3, 1983, to May 28, 1987 on CBS. The show stars Kate Jackson and Bruce Boxleitner as divorced housewife Amanda King and top-level \"Agency\" operative Lee Stetson who begin a strange association, and eventual romance, after encountering one another in a train station.",
+        "popularity": 23.1812,
+        "poster_path": "/36oUFRNJQORpL9fmnrSXdFqEGty.jpg",
+        "first_air_date": "1983-10-03",
+        "softcore": false,
+        "vote_average": 6.574,
+        "vote_count": 47,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/dODynuJvFtLSmyTiiMqRxEKf7t1.jpg",
+        "genre_ids": [
+          10751,
+          16,
+          35,
+          10762
+        ],
+        "id": 61751,
+        "name": "All Hail King Julien",
+        "original_language": "en",
+        "original_name": "All Hail King Julien",
+        "overview": "King Julien is back and shaking his booty harder than ever! Discover the wild world of Madagascar as the king takes on the jungle’s craziest adventures in this comedy series. With his loyal sidekicks Maurice and Mort, they meet a whole new cast of colorful animals, including ambitious head of security Clover and the villainous Foosa. No one can stop this king from ruling with an iron fist...in the air...wavin' like he just doesn't care.",
+        "popularity": 23.4503,
+        "poster_path": "/tsE6Dbx7aejDDmAy4DX55YxE8pT.jpg",
+        "first_air_date": "2014-12-19",
+        "softcore": false,
+        "vote_average": 6.793,
+        "vote_count": 104,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/mRM2NB0i3wv4HqxXvwIjEVi4Qqq.jpg",
+        "genre_ids": [
+          12,
+          18,
+          28
+        ],
+        "id": 254,
+        "title": "King Kong",
+        "original_language": "en",
+        "original_title": "King Kong",
+        "overview": "In 1933 New York, an overly ambitious movie producer coerces his cast and hired ship crew to travel to mysterious Skull Island, where they encounter Kong, a giant ape who is immediately smitten with the leading lady.",
+        "popularity": 10.7843,
+        "poster_path": "/6a2HY6UmD7XiDD3NokgaBAXEsD2.jpg",
+        "release_date": "2005-12-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.908,
+        "vote_count": 8872,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/ctiw6FZK4N36LmkjSklWEbuvlq9.jpg",
+        "genre_ids": [
+          12,
+          14,
+          28
+        ],
+        "id": 122,
+        "title": "The Lord of the Rings: The Return of the King",
+        "original_language": "en",
+        "original_title": "The Lord of the Rings: The Return of the King",
+        "overview": "As armies mass for a final battle that will decide the fate of the world--and powerful, ancient forces of Light and Dark compete to determine the outcome--one member of the Fellowship of the Ring is revealed as the noble heir to the throne of the Kings of Men. Yet, the sole hope for triumph over evil lies with a brave hobbit, Frodo, who, accompanied by his loyal friend Sam and the hideous, wretched Gollum, ventures deep into the very dark heart of Mordor on his seemingly impossible quest to destroy the Ring of Power.​",
+        "popularity": 34.0033,
+        "poster_path": "/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
+        "release_date": "2003-12-17",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.508,
+        "vote_count": 27881,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/l4AchTa5W0F9W3PUVRGWyqUthyf.jpg",
+        "genre_ids": [
+          16,
+          10765,
+          10762
+        ],
+        "id": 3499,
+        "name": "King",
+        "original_language": "en",
+        "original_name": "King",
+        "overview": "When the Wright family moves into their new home, Russel is surprised to find a secret passage under his bed. This passage leads him and his dog Gus to the world of Under, where he discovers he is the new King and that Gus can talk! Russel and Gus quickly befriend the people and creatures of this mysterious land. Bob Wire and his evil team are continually conspiring to steal Russel's crown and become all-powerful rulers of the land.",
+        "popularity": 4.8734,
+        "poster_path": "/keg1VePx4dgNywxgYwWmroOigC9.jpg",
+        "first_air_date": "2003-08-15",
+        "softcore": false,
+        "vote_average": 5.7,
+        "vote_count": 6,
+        "media_type": "tv",
+        "origin_country": [
+          "CA"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/1TUg5pO1VZ4B0Q1amk3OlXvlpXV.jpg",
+        "genre_ids": [
+          12,
+          18,
+          10751,
+          16
+        ],
+        "id": 420818,
+        "title": "The Lion King",
+        "original_language": "en",
+        "original_title": "The Lion King",
+        "overview": "Simba idolizes his father, King Mufasa, and takes to heart his own royal destiny. But not everyone in the kingdom celebrates the new cub's arrival. Scar, Mufasa's brother—and former heir to the throne—has plans of his own. The battle for Pride Rock is ravaged with betrayal, tragedy and drama, ultimately resulting in Simba's exile. With help from a curious pair of newfound friends, Simba will have to figure out how to grow up and take back what is rightfully his.",
+        "popularity": 13.7339,
+        "poster_path": "/dzBtMocZuJbjLOXvrl4zGYigDzh.jpg",
+        "release_date": "2019-07-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.089,
+        "vote_count": 11022,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/mzRJpkWPjXdXak0WCc8ZxVH4hug.jpg",
+        "genre_ids": [
+          878,
+          28
+        ],
+        "id": 373571,
+        "title": "Godzilla: King of the Monsters",
+        "original_language": "en",
+        "original_title": "Godzilla: King of the Monsters",
+        "overview": "Follows the heroic efforts of the crypto-zoological agency Monarch as its members face off against a battery of god-sized monsters, including the mighty Godzilla, who collides with Mothra, Rodan, and his ultimate nemesis, the three-headed King Ghidorah. When these ancient super-species, thought to be mere myths, rise again, they all vie for supremacy, leaving humanity's very existence hanging in the balance.",
+        "popularity": 23.7692,
+        "poster_path": "/mzOHg7Q5q9yUmY0b9Esu8Qe6Nnm.jpg",
+        "release_date": "2019-05-29",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.677,
+        "vote_count": 7035,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/72bio5vnz6H0JVNHZQDWY5J7tQX.jpg",
+        "genre_ids": [
+          18,
+          80
+        ],
+        "id": 38910,
+        "name": "King",
+        "original_language": "en",
+        "original_name": "King",
+        "overview": "King is a Canadian police drama which premiered April 17, 2011 on Showcase. The series stars Amy Price-Francis as Jessica King, a veteran police officer who gets promoted to head of the Major Crimes Task Force in Toronto after her predecessor has a breakdown on television. Season 2 began production in September 2011 and premiered 29 February 2012.\n\nOn June 2, 2012, it was reported that King had been cancelled after 2 seasons.",
+        "popularity": 6.0074,
+        "poster_path": "/m67PLNDRRKqbPMUADd7XlUJ1pb3.jpg",
+        "first_air_date": "2011-04-17",
+        "softcore": false,
+        "vote_average": 6.9,
+        "vote_count": 11,
+        "media_type": "tv",
+        "origin_country": [
+          "CA"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/f7DC5Qu0MJBtbAK9zCOU2rzz6NG.jpg",
+        "genre_ids": [
+          16,
+          10759,
+          10765
+        ],
+        "id": 40143,
+        "name": "Shaman King",
+        "original_language": "ja",
+        "original_name": "シャーマンキング",
+        "overview": "Asakura Yoh is a shaman, a person who communicates with ghosts. He enters the Shaman Fight, for whoever wins the tournament gets to commune with the Great Spirit, God... that and his fiance Anna wants to be the wife of the Shaman King. Helping him are his friends Manta, Horo Horo, Ryu, and his samurai ghost partner, Amidamaru.",
+        "popularity": 19.1627,
+        "poster_path": "/35KDiG56R1CRqGsq2aVvasdSBdG.jpg",
+        "first_air_date": "2001-07-04",
+        "softcore": false,
+        "vote_average": 8.473,
+        "vote_count": 459,
+        "media_type": "tv",
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/bIGu2VZXA6HNXBxQllbPqlR5mGO.jpg",
+        "genre_ids": [
+          10759
+        ],
+        "id": 2853,
+        "name": "Jason King",
+        "original_language": "en",
+        "original_name": "Jason King",
+        "overview": "Jason King - a suavely sophisticated former secret agent turned novelist - travels the world searching for material to fill his books, encountering an endless parade of glamorous women, exotic locales, menacing villains and daring intrigue! Before Austin Powers swung into action, Jason King set the standard for the hip crime-fighting international playboy! ",
+        "popularity": 6.2415,
+        "poster_path": "/d9qiJnwS88s7VqxpMObaA4whgC.jpg",
+        "first_air_date": "1971-09-15",
+        "softcore": false,
+        "vote_average": 7.8,
+        "vote_count": 12,
+        "media_type": "tv",
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/xDXaptzkHFHGyQ2QGZ3aGnEE1dK.jpg",
+        "genre_ids": [
+          10764
+        ],
+        "id": 66046,
+        "name": "Mystery Music Show: King of Mask Singer",
+        "original_language": "ko",
+        "original_name": "미스터리 음악쇼 복면가왕",
+        "overview": "Competitors are given elaborate masks to wear in order to conceal their identity, thus removing factors such as popularity, career and age that could lead to prejudiced voting. In the first round, a pair of competitors sing the same song, while in the second and third rounds they each sing a solo song. After the First Generation, the winner of the Third Round goes on to challenge the Mask King, and is either eliminated or replaces the previous Mask King through live voting. The identities of the singers are not revealed unless they have been eliminated.",
+        "popularity": 92.2863,
+        "poster_path": "/vlnAfmirzYx1TSxXuaPhHjkPPmK.jpg",
+        "first_air_date": "2015-04-05",
+        "softcore": false,
+        "vote_average": 5.6,
+        "vote_count": 11,
+        "media_type": "tv",
+        "origin_country": [
+          "KR"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/8GGD7djS6oqTWcKwJb3uT833xeA.jpg",
+        "genre_ids": [
+          99,
+          80
+        ],
+        "id": 100698,
+        "name": "Tiger King",
+        "original_language": "en",
+        "original_name": "Tiger King",
+        "overview": "A zoo owner spirals out of control amid a cast of eccentric characters in this true murder-for-hire story from the underworld of big cat breeding.",
+        "popularity": 5.5575,
+        "poster_path": "/dXQCEjVth8P8L47XIsoRt0oL8Gw.jpg",
+        "first_air_date": "2020-03-20",
+        "softcore": false,
+        "vote_average": 6.904,
+        "vote_count": 628,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/bEhOXB2Pmda0tgRya5tLEaDr1qY.jpg",
+        "genre_ids": [
+          18,
+          10759,
+          10768
+        ],
+        "id": 240558,
+        "name": "King & Conqueror",
+        "original_language": "en",
+        "original_name": "King & Conqueror",
+        "overview": "Harold of Wessex and William of Normandy are two men destined to face each other at the Battle of Hastings in 1066. Two former allies, neither of whom had aspired to the British throne, are forced, by circumstances and their personal obsession, to wage war over possession of the crown.",
+        "popularity": 5.8263,
+        "poster_path": "/8SW0c0tUFWjpWBz2UYr0U57a8kB.jpg",
+        "first_air_date": "2025-08-24",
+        "softcore": false,
+        "vote_average": 7.2,
+        "vote_count": 86,
+        "media_type": "tv",
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/pzxTnjc3IyVEjISyu3WyyHM0QI6.jpg",
+        "genre_ids": [
+          12,
+          10752,
+          36,
+          28,
+          18
+        ],
+        "id": 9477,
+        "title": "King Arthur",
+        "original_language": "en",
+        "original_title": "King Arthur",
+        "overview": "The story of the Arthurian legend, based on the 'Sarmatian hypothesis' which contends that the legend has a historical nucleus in the Sarmatian heavy cavalry troops stationed in Britain, and that the Roman-British military commander, Lucius Artorius Castus is the historical person behind the legend.",
+        "popularity": 6.5036,
+        "poster_path": "/iKLZEAnjzr51Ij7TJtNejc5CN3i.jpg",
+        "release_date": "2004-07-07",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.3,
+        "vote_count": 3059,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/4rBugdmBu7ZgrWnh5Gp5qgwvdQ.jpg",
+        "genre_ids": [
+          80,
+          18,
+          35
+        ],
+        "id": 296244,
+        "name": "Frisco King",
+        "original_language": "en",
+        "original_name": "Frisco King",
+        "overview": "New Orleans gangster Russell Lee Washington Jr. lands in Frisco, Texas, where he transforms small hustles into big business, with the help of an ambitious protégé, a loyal driver, and a growing network of eccentric partners.",
+        "popularity": 5.5487,
+        "poster_path": "/9wNdTWthGpTZZaOBKlO07pK77pU.jpg",
+        "first_air_date": "2026-12-18",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      }
+    ],
+    "total_pages": 500,
+    "total_results": 10000
+  }
+}

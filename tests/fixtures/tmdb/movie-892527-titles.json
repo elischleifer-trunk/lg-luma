@@ -1,0 +1,57 @@
+{
+  "request": {
+    "path": "/3/movie/892527/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:44.241Z",
+  "response": {
+    "id": 892527,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Король-львенок",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "Mo Jin Zhi Gui Guan Fu Jun",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "King. Mój przyjaciel lew",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Lõvi nimega Kuningas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "King: Regreso A Casa",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מלך",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "King - min venn løven",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "King - Návrat domů",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "我的小狮王",
+        "type": ""
+      }
+    ]
+  }
+}

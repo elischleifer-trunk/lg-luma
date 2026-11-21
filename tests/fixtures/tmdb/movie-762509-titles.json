@@ -1,0 +1,117 @@
+{
+  "request": {
+    "path": "/3/movie/762509/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:47.173Z",
+  "response": {
+    "id": 762509,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Lion King 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Vua Sư Tử 2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "狮子王前传：木法沙",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "狮子王前传",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "狮子王：穆法沙",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "狮子王真狮版2",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "מופסה: מלך האריות",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Mufasa: Aslanlar kralı",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "獅子王：木法沙",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Mufasa: O Rei Leão",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Մուֆասա",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Mufasa Le Roi lion",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Mufasa, Le Roi lion",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Mufasa - Le Roi lion",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Mufasa - Der König der Löwen",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Der König der Löwen 2 - Mufasa",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "Mufasa : Le Roi Lion",
+        "type": "Titre VFQ"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Mufasa - The Lion King",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Mufasa: Lõvikuningas",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Mufasa: Aslan Kral",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Mufasa: Şirlər Kralı",
+        "type": ""
+      }
+    ]
+  }
+}

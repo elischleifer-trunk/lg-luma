@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/874948/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:48.433Z",
+  "response": {
+    "id": 874948,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "Grudge",
+        "type": "resentimiento"
+      }
+    ]
+  }
+}

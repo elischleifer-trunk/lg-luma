@@ -1,0 +1,106 @@
+{
+  "request": {
+    "path": "/3/movie/980026",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:47.486Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/pERcOAR1Teg4sLDDqRXj1TBjVsn.jpg",
+    "belongs_to_collection": null,
+    "budget": 8500000,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 36,
+        "name": "History"
+      }
+    ],
+    "homepage": "",
+    "id": 980026,
+    "imdb_id": "tt20561198",
+    "origin_country": [
+      "DK"
+    ],
+    "original_language": "da",
+    "original_title": "Bastarden",
+    "overview": "Denmark, 1755. Captain Ludvig Kahlen sets out to conquer a Danish heath reputed to be uncultivable, with an impossible goal: to establish a colony in the name of the king, in exchange for a royal title. A single-minded ambition that the ruthless lord of the region will relentlessly seek to put down. Kahlen's fate hangs in the balance: will his endevours bring him wealth and honour, or cost him his life...?",
+    "popularity": 4.7701,
+    "poster_path": "/okVwls2laPGOsLKKhXQCEiTBwpw.jpg",
+    "production_companies": [
+      {
+        "id": 118001,
+        "logo_path": null,
+        "name": "Zentropa International Berlin",
+        "origin_country": "DE"
+      },
+      {
+        "id": 8288,
+        "logo_path": "/5THcBZP0ad7hXPjtPTxld5sVJQp.png",
+        "name": "Zentropa International Sweden",
+        "origin_country": "SE"
+      },
+      {
+        "id": 76,
+        "logo_path": "/nebkQYtQKhZyHJfh5v0oGpNbPzu.png",
+        "name": "Zentropa Entertainments",
+        "origin_country": "DK"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "DK",
+        "name": "Denmark"
+      },
+      {
+        "iso_3166_1": "DE",
+        "name": "Germany"
+      },
+      {
+        "iso_3166_1": "SE",
+        "name": "Sweden"
+      }
+    ],
+    "release_date": "2023-10-05",
+    "revenue": 2246680,
+    "runtime": 127,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Danish",
+        "iso_639_1": "da",
+        "name": "Dansk"
+      },
+      {
+        "english_name": "German",
+        "iso_639_1": "de",
+        "name": "Deutsch"
+      },
+      {
+        "english_name": "Norwegian",
+        "iso_639_1": "no",
+        "name": "Norsk"
+      },
+      {
+        "english_name": "Swedish",
+        "iso_639_1": "sv",
+        "name": "svenska"
+      }
+    ],
+    "status": "Released",
+    "tagline": "A captain’s ambition, a ruthless rival, and a land that defies them both.",
+    "title": "The Promised Land",
+    "video": false,
+    "vote_average": 7.657,
+    "vote_count": 681
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "request": {
+    "path": "/3/tv/112693",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:48.770Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/ggAS074NNNiYMc83Ms25pB87iy0.jpg",
+    "created_by": [
+      {
+        "id": 1429044,
+        "credit_id": "61257aacad59b5008a41ad38",
+        "name": "Peter McKenna",
+        "original_name": "Peter McKenna",
+        "gender": 2,
+        "profile_path": "/gJFyoyTQapoYQmhytLd9O034gjq.jpg"
+      },
+      {
+        "id": 1233099,
+        "credit_id": "61257ab70ff15a0028b94e01",
+        "name": "Ciarán Donnelly",
+        "original_name": "Ciarán Donnelly",
+        "gender": 2,
+        "profile_path": "/60Ti8EPFVmFMEe38Vb2L7JtSt8b.jpg"
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2021-09-09",
+    "genres": [
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 112693,
+    "in_production": true,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2023-05-07",
+    "last_episode_to_air": {
+      "id": 4292668,
+      "name": "Episode 8",
+      "overview": "The conflict is put into overdrive as Michael and Jimmy find common ground. Amanda proposes an unexpected partnership for mutual survival. Anthony and Nikita try to come to terms with the consequences of their actions.",
+      "vote_average": 8.75,
+      "vote_count": 4,
+      "air_date": "2023-05-07",
+      "episode_number": 8,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 50,
+      "season_number": 2,
+      "show_id": 112693,
+      "still_path": "/7SAk27J9BxikZxIFFKkGdNBq3XM.jpg"
+    },
+    "name": "Kin",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 155,
+        "logo_path": "/2kjTvhfxtXLnHspCUZQ9cv9gToV.png",
+        "name": "RTÉ One",
+        "origin_country": "IE"
+      }
+    ],
+    "number_of_episodes": 16,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "IE"
+    ],
+    "original_language": "en",
+    "original_name": "Kin",
+    "overview": "The lives of a Dublin family embroiled in a gangland war and the consequences of their choices.",
+    "popularity": 11.9901,
+    "poster_path": "/2wTsgQQBruGQcjM0PjFr5l5MjEw.jpg",
+    "production_companies": [
+      {
+        "id": 13240,
+        "logo_path": "/aTc07YaNHo8WNgkQSnvLmG6w4nW.png",
+        "name": "Bron Studios",
+        "origin_country": "CA"
+      },
+      {
+        "id": 13151,
+        "logo_path": null,
+        "name": "Headline Pictures",
+        "origin_country": "GB"
+      },
+      {
+        "id": 108472,
+        "logo_path": "/tFVfsfRFv8sGpX6SvoDvw2nGoeO.png",
+        "name": "Viaplay Group",
+        "origin_country": "SE"
+      },
+      {
+        "id": 86504,
+        "logo_path": "/7ppNVcvDg0ZXSR1bZi397hLD206.png",
+        "name": "Metropolitan Pictures",
+        "origin_country": "IE"
+      },
+      {
+        "id": 1898,
+        "logo_path": "/8ix6SGlJiyuUDxLBtY8E0PY2G7w.png",
+        "name": "Fís Éireann/Screen Ireland",
+        "origin_country": "IE"
+      },
+      {
+        "id": 53152,
+        "logo_path": "/dbzRlKx3HesH6CkTwZkhpJVRvIg.png",
+        "name": "Creative Wealth Media Finance",
+        "origin_country": "CA"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      },
+      {
+        "iso_3166_1": "IE",
+        "name": "Ireland"
+      },
+      {
+        "iso_3166_1": "SE",
+        "name": "Sweden"
+      },
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2021-09-09",
+        "episode_count": 8,
+        "id": 167872,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/2wTsgQQBruGQcjM0PjFr5l5MjEw.jpg",
+        "season_number": 1,
+        "vote_average": 6.9
+      },
+      {
+        "air_date": "2023-03-19",
+        "episode_count": 8,
+        "id": 332168,
+        "name": "Season 2",
+        "overview": "The Kinsellas are at the top of the game in Dublin, but killing Eamon Cunningham has created as many problems as it solved. They have incurred the wrath of an enemy even more dangerous than him. And where once there were unbreakable bonds of blood and family, now there is only suspicion, distrust, and resentment. But the greatest threat to the family emerges from within: in the shape of a ruthless, bullying, agent of chaos. Fortunately, from positions of great adversity the boldest plans are often forged. And so it is with the Kinsellas.",
+        "poster_path": "/vjGXm7jRHBZutLoFEyiOr6s8VXh.jpg",
+        "season_number": 2,
+        "vote_average": 7.4
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "Family is a deadly business.",
+    "type": "Scripted",
+    "vote_average": 7.643,
+    "vote_count": 84
+  }
+}

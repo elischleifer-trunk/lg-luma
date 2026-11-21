@@ -1,0 +1,37 @@
+{
+  "request": {
+    "path": "/3/tv/280095/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:45.609Z",
+  "response": {
+    "id": 280095,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "Yu Ling Shi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "정령사:나타르 전기",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Tamers",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Spirit Master",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "BKing",
+        "type": ""
+      }
+    ]
+  }
+}

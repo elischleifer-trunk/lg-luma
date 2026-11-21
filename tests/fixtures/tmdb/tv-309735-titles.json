@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/tv/309735/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:46.281Z",
+  "response": {
+    "id": 309735,
+    "results": [
+      {
+        "iso_3166_1": "DK",
+        "title": "King 2026",
+        "type": ""
+      }
+    ]
+  }
+}

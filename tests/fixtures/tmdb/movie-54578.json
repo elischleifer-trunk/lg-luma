@@ -1,0 +1,60 @@
+{
+  "request": {
+    "path": "/3/movie/54578",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:51.734Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/a4SGhrsg8Kzwe8vEdUmlGEQjmhC.jpg",
+    "belongs_to_collection": null,
+    "budget": 500000,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10749,
+        "name": "Romance"
+      }
+    ],
+    "homepage": "",
+    "id": 54578,
+    "imdb_id": "tt0195857",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Kin",
+    "overview": "While on a hunt for elephant poachers in Namibia, a white female conservationist and a black lawyer fall for each other despite the condemnation by the local community.",
+    "popularity": 0.8214,
+    "poster_path": "/fpOyvuWwzMIIIWxS1i46oVcqVvJ.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "ZA",
+        "name": "South Africa"
+      }
+    ],
+    "release_date": "2000-07-05",
+    "revenue": 0,
+    "runtime": 89,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Kin",
+    "video": false,
+    "vote_average": 3.8,
+    "vote_count": 6
+  }
+}

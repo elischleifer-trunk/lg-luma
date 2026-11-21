@@ -53,8 +53,6 @@ pub enum Page {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum Target {
     Nav(usize),
-    /// The header's search button, right of the tabs: hands off to LG's own search app.
-    LgSearch,
     TvSettings,
     InstallUpdate,
     CheckUpdates,
@@ -952,10 +950,6 @@ impl State {
             // Remembered movie and show results chose among the old apps.
             self.titles.refresh(Instant::now());
         }
-        self.inventory.search = next.search;
-        if self.focus == Target::LgSearch && self.inventory.search.is_none() {
-            self.focus = Target::Nav(self.page_index());
-        }
         self.sync_custom_tiles();
         let mut remembered = false;
         if let Some(warning) = warning {
@@ -1124,7 +1118,6 @@ impl State {
             if matches!(
                 self.focus,
                 Target::Nav(_)
-                    | Target::LgSearch
                     | Target::Filter(_)
                     | Target::ClearFilter
                     | Target::Search
@@ -1751,27 +1744,6 @@ impl State {
                     _ => {}
                 }
             }
-            if self.focus == Target::LgSearch {
-                match direction {
-                    Direction::Left => self.focus(Target::Nav(self.page_index()), controls),
-                    Direction::Down => {
-                        if self.page == Page::Settings {
-                            self.subpage = None;
-                            self.section = 0;
-                        }
-                        self.focus(self.first_content(), controls);
-                    }
-                    _ => {}
-                }
-                return vec![];
-            }
-            if let Target::Nav(2) = self.focus
-                && matches!(direction, Direction::Right)
-                && self.inventory.search.is_some()
-            {
-                self.focus(Target::LgSearch, controls);
-                return vec![];
-            }
             if let Target::Nav(index) = self.focus {
                 // Tabs in drawn order: Search, Home, Apps, Settings.
                 let position = TAB_ORDER.iter().position(|&tab| tab == index).unwrap_or(0);
@@ -1936,10 +1908,6 @@ impl State {
             .iter()
             .filter(|candidate| candidate.target != self.focus)
             .filter_map(|candidate| {
-                // The header search button is reached only by Right from the last tab.
-                if candidate.target == Target::LgSearch {
-                    return None;
-                }
                 // Header controls never steal an Up route from the active tab.
                 if self.overlay.is_none()
                     && matches!(direction, Direction::Up)
@@ -2288,6 +2256,16 @@ impl State {
         let effects = self.finish_text_input();
         self.focus_first_result();
         effects
+    }
+
+    /// LG's keyboard went away without Back or Enter reaching Luma, as when Up leaves its top
+    /// row. That move heads for the results above it, so land on the first one when there
+    /// are results (as Enter does), and on the field otherwise.
+    pub fn dismiss_system_keyboard(&mut self) -> Vec<Effect> {
+        if !matches!(self.overlay, Some(Overlay::SystemKeyboard)) {
+            return vec![];
+        }
+        self.submit_text_input()
     }
 
     fn focus_first_result(&mut self) {
@@ -2780,11 +2758,6 @@ impl State {
                 self.pressed = None;
             }
             Target::TvSettings => return vec![Effect::Launch("com.palm.app.settings".into())],
-            Target::LgSearch if !self.launching => {
-                if let Some(id) = self.inventory.search.clone() {
-                    return vec![Effect::Launch(id)];
-                }
-            }
             Target::Title(index) if !self.launching => return self.launch_title(index),
             Target::App(id) if !self.launching => {
                 return vec![Effect::Launch(id)];
@@ -3429,10 +3402,6 @@ impl State {
         }
         if self.page == Page::Settings && self.subpage.is_some() {
             self.close_subpage();
-            return vec![];
-        }
-        if self.focus == Target::LgSearch {
-            self.focus = Target::Nav(self.page_index());
             return vec![];
         }
         if self.page == Page::Settings && !matches!(self.focus, Target::Nav(_)) {

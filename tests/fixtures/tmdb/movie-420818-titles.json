@@ -1,0 +1,62 @@
+{
+  "request": {
+    "path": "/3/movie/420818/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:22:39.524Z",
+  "response": {
+    "id": 420818,
+    "titles": [
+      {
+        "iso_3166_1": "GR",
+        "title": "O Vasiliás Ton Liontarión",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Król Lew",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SI",
+        "title": "Levji kralj",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "獅子王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Realistic Lion King",
+        "type": "Distinguishing Title"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "狮子王3D重拍版",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "El Rey Leon",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CL",
+        "title": "El Rey Leon",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "El Rey Leon",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Kral Aslan",
+        "type": ""
+      }
+    ]
+  }
+}

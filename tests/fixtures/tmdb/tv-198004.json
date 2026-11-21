@@ -1,0 +1,124 @@
+{
+  "request": {
+    "path": "/3/tv/198004",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:47.688Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/rHiz6GHA2bUPEtTDZvhbTmzlNm6.jpg",
+    "created_by": [
+      {
+        "id": 1108065,
+        "credit_id": "62c1375822e4800fa5c2b2b4",
+        "name": "Chun Sung-il",
+        "original_name": "천성일",
+        "gender": 2,
+        "profile_path": "/2rDOOw6nJTy7CR8ujL0lYjEvrKw.jpg"
+      }
+    ],
+    "episode_run_time": [
+      71
+    ],
+    "first_air_date": "2023-06-17",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      }
+    ],
+    "homepage": "https://tv.jtbc.co.kr/kingtheland",
+    "id": 198004,
+    "in_production": false,
+    "languages": [
+      "ko"
+    ],
+    "last_air_date": "2023-08-06",
+    "last_episode_to_air": {
+      "id": 4171295,
+      "name": "Episode 16",
+      "overview": "Sa-rang finally makes a decisive choice about her future. After delaying his plans to make room for Sa-rang's, Won approaches her with a question.",
+      "vote_average": 9,
+      "vote_count": 3,
+      "air_date": "2023-08-06",
+      "episode_number": 16,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 73,
+      "season_number": 1,
+      "show_id": 198004,
+      "still_path": "/s12b0oaBgpFkOjFZAolV2ILn1gQ.jpg"
+    },
+    "name": "King the Land",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 885,
+        "logo_path": "/44I4aVlasm8Blb8WPGXTkMYuZJF.png",
+        "name": "JTBC",
+        "origin_country": "KR"
+      }
+    ],
+    "number_of_episodes": 16,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "KR"
+    ],
+    "original_language": "ko",
+    "original_name": "킹더랜드",
+    "overview": "Amid a tense inheritance fight, a charming heir clashes with his hardworking employee who's known for her irresistible smile — which he cannot stand.",
+    "popularity": 10.4165,
+    "poster_path": "/tW8BMRCYSe6nySvZ749pzc31x2m.jpg",
+    "production_companies": [
+      {
+        "id": 168320,
+        "logo_path": "/jEvTJupqEeo4yYLhDV5HO0oQgsl.png",
+        "name": "npio Entertainment",
+        "origin_country": "KR"
+      },
+      {
+        "id": 164046,
+        "logo_path": "/q7SpPvg2sJGRMZ5X4ba123eU4Qf.png",
+        "name": "SLL",
+        "origin_country": "KR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "KR",
+        "name": "South Korea"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2023-06-17",
+        "episode_count": 16,
+        "id": 288415,
+        "name": "Season 1",
+        "overview": "Heir Gu Won cannot stand fake smiles. When he meets Cheon Sa-rang, her sincere smile is at the ready. The pair seek to create happy moments where they can smile brightly at each other. King the Land is a VVIP business lounge, a paradise catering to wealthy hoteliers. It is owned by King Group, with hotels, distribution companies, and an airline in its portfolio. Now, Won has been thrown into an inheritance tug-of-war.  With his brilliant mind, innate grace, and captivating charm, he has everything but lacks common sense when dating. Sa-rang makes the world brighter with just her smile. She is thrilled to land a job at the King Hotel, where she had some of her happiest times as a child. She must now put those sweet memories away and mature quickly to face the frequent workplace prejudices and misunderstandings that come her way.",
+        "poster_path": "/cyk3mrnj4iLdmKbgo0Qzo46laS0.jpg",
+        "season_number": 1,
+        "vote_average": 8.5
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Korean",
+        "iso_639_1": "ko",
+        "name": "한국어/조선말"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "A 7-star sweet romance.",
+    "type": "Scripted",
+    "vote_average": 8.2,
+    "vote_count": 654
+  }
+}

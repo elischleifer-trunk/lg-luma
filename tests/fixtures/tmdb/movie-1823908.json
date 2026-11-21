@@ -1,0 +1,73 @@
+{
+  "request": {
+    "path": "/3/movie/1823908",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:49.599Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/idy9SfuW0aGUD9qFKyxa73OaF4f.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 80,
+        "name": "Crime"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 1823908,
+    "imdb_id": "tt44922683",
+    "origin_country": [
+      "NZ"
+    ],
+    "original_language": "en",
+    "original_title": "Trace",
+    "overview": "A young detective travels deep into the rural countryside pursuing a lead in the murder of the police chief’s daughter. What begins as a routine investigation soon takes an unsettling turn as strange encounters and disturbing clues lead him towards an unexpected truth.",
+    "popularity": 0.3035,
+    "poster_path": "/q6ykr2cb6yfyzoHNDQwbOHVdqSg.jpg",
+    "production_companies": [
+      {
+        "id": 317788,
+        "logo_path": null,
+        "name": "Comica Pictures",
+        "origin_country": ""
+      },
+      {
+        "id": 290913,
+        "logo_path": null,
+        "name": "Rippit Studios",
+        "origin_country": "NZ"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "NZ",
+        "name": "New Zealand"
+      }
+    ],
+    "release_date": "2026-09-20",
+    "revenue": 0,
+    "runtime": 13,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Trace",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

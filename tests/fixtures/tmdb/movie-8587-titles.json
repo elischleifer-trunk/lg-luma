@@ -1,0 +1,47 @@
+{
+  "request": {
+    "path": "/3/movie/8587/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:58.866Z",
+  "response": {
+    "id": 8587,
+    "titles": [
+      {
+        "iso_3166_1": "UA",
+        "title": "Король Лев",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Ο Βασιλιάς των Λιονταριών",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "狮子王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "獅子王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "獅子王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Kralj lavova",
+        "type": "Latin script"
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Kral Aslan",
+        "type": ""
+      }
+    ]
+  }
+}

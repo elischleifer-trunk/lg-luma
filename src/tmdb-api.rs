@@ -66,6 +66,22 @@ impl Client {
         self.http.get(&path, &query)
     }
 
+    /// Keyword
+    ///
+    /// `GET /3/search/keyword`
+    pub fn search_keyword(
+        &self,
+        params: &SearchKeywordParams,
+    ) -> Result<SearchKeywordResponse, Error> {
+        let path = "/3/search/keyword".to_owned();
+        let mut query = Query::default();
+        query.add("query", &params.query);
+        if let Some(value) = &params.page {
+            query.add("page", value);
+        }
+        self.http.get(&path, &query)
+    }
+
     /// Multi
     ///
     /// `GET /3/search/multi`
@@ -325,6 +341,27 @@ pub struct MovieDetailsResponseAlternativeTitles {
 pub struct MovieDetailsResponseAlternativeTitlesTitle {
     pub iso_3166_1: Option<String>,
     pub title: Option<String>,
+}
+
+/// Parameters of [`Client::search_keyword`].
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct SearchKeywordParams {
+    pub query: String,
+    pub page: Option<i64>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct SearchKeywordResponse {
+    pub page: Option<i64>,
+    pub results: Option<Vec<SearchKeywordResponseResult>>,
+    pub total_pages: Option<i64>,
+    pub total_results: Option<i64>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct SearchKeywordResponseResult {
+    pub id: Option<i64>,
+    pub name: Option<String>,
 }
 
 /// Parameters of [`Client::search_multi`].

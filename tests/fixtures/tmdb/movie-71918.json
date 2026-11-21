@@ -1,0 +1,71 @@
+{
+  "request": {
+    "path": "/3/movie/71918",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:44.592Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/vfA9CvDECVYD5RwBDDOeZ6Lt8MP.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "",
+    "id": 71918,
+    "imdb_id": "tt1305803",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "te",
+    "original_title": "కింగ్",
+    "overview": "After Coimbatore-based Ravichandra Verma passes away, his young son, Raja, assumes the responsibility of running the family business as well as ensuring that his brother, Ajay, gets a good education - much to the chagrin of three of his uncles. Years later, while on a trip to Uttaranchal, despite of warnings from a Pandit, he gets killed by a female assassin, but his family is informed that he is missing. Shortly thereafter, Gyaneshwar Kale and his sister, Sravani/Shivani, will inform the family that Raja is still alive but is handicapped and suffers from memory loss. The family is overjoyed but are not aware that Raja is actually a hoodlum/extortionist known as Bottu Seenu/Raghu Rokda.",
+    "popularity": 0.6643,
+    "poster_path": "/u84c4qumExsXiV1PPS2ljpC6MSB.jpg",
+    "production_companies": [
+      {
+        "id": 99292,
+        "logo_path": null,
+        "name": "Kamakshi Movies",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2008-12-25",
+    "revenue": 0,
+    "runtime": 173,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Telugu",
+        "iso_639_1": "te",
+        "name": "తెలుగు"
+      }
+    ],
+    "status": "Released",
+    "tagline": "A hoodlum look-alike assumes the identity of a noble man.",
+    "title": "King",
+    "video": false,
+    "vote_average": 5.4,
+    "vote_count": 26
+  }
+}

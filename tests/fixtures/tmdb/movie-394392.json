@@ -1,0 +1,45 @@
+{
+  "request": {
+    "path": "/3/movie/394392",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:47.899Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 394392,
+    "imdb_id": "tt4574704",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "King",
+    "overview": "",
+    "popularity": 0.2179,
+    "poster_path": null,
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2015-04-22",
+    "revenue": 0,
+    "runtime": 24,
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Released",
+    "tagline": "",
+    "title": "King",
+    "video": false,
+    "vote_average": 7,
+    "vote_count": 1
+  }
+}
