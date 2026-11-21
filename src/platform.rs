@@ -667,15 +667,21 @@ fn launch_title(
     }
     Some(match resolved {
         Some(mut launch) if id == crate::criterion::PLAYER => {
-            // A one-time code (never the account itself) for signing in on the Channel's page.
-            match crate::criterion_account::issue(std::time::Instant::now()) {
-                Ok(code) => {
-                    launch.params["code"] = json!(code);
-                    launch.params["port"] = json!(crate::home_assistant::PORT);
+            // A one-time code (never the account itself) for signing in on the Channel's page,
+            // only when there is an account to sign in with.
+            if crate::criterion_account::stored() {
+                match crate::criterion_account::issue(std::time::Instant::now()) {
+                    Ok(code) => {
+                        launch.params["code"] = json!(code);
+                        launch.params["port"] = json!(crate::home_assistant::PORT);
+                    }
+                    Err(error) => {
+                        crate::telemetry::log_warn!("criterion", "no sign-in code: {error}")
+                    }
                 }
-                Err(error) => crate::telemetry::log_warn!("criterion", "no sign-in code: {error}"),
             }
-            launch_with_params(id, &launch.params)
+            // Luma gives the player its kept sign-in as it opens it (see `criterion_session`).
+            crate::criterion_session::launch_player(|| launch_with_params(id, &launch.params))
         }
         Some(launch) => launch_with_params(id, &launch.params),
         None if valid_app_id(id) => call(

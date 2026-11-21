@@ -5,10 +5,10 @@
 //! `login.criterion.com`. Luma keeps the latest set in a file only Luma can read, beside the
 //! Criterion account, and:
 //!
-//! - **before each film**, the player's start page asks Luma to get it ready
-//!   (`POST /api/criterion/prepare`). Luma reads the player's cookies through the web engine's
-//!   DevTools (`devtools`), keeps whichever sign-in lasts longer, and gives the player the stored
-//!   one when it is newer. With neither, it takes the TV's Web Browser's sign-in, if any.
+//! - **before each film**, as Luma opens the player (`launch_player`), it reads the player's
+//!   cookies through the web engine's DevTools (`devtools`), keeps whichever sign-in lasts
+//!   longer, and gives the player the stored one when it is newer. With neither, it takes the
+//!   TV's Web Browser's sign-in, if any.
 //! - **in the background**, every few days, it uses the stored sign-in once over HTTPS, which
 //!   keeps it alive, and keeps whatever the Channel renews. A sign-in the Channel no longer
 //!   accepts is marked invalid and never given to the player.
@@ -260,6 +260,18 @@ pub fn path(store: &Path) -> PathBuf {
     store.with_file_name("criterion-session.json")
 }
 
+/// Where this run of Luma keeps the sign-in, set once at startup so the platform worker can ready
+/// the player when it launches a film.
+static STORE: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+
+pub fn set_store(store: &Path) {
+    let _ = STORE.set(path(store));
+}
+
+pub fn stored_path() -> Option<&'static Path> {
+    STORE.get().map(PathBuf::as_path)
+}
+
 pub fn load(path: &Path) -> Option<Session> {
     let _guard = file();
     read(path)
@@ -321,10 +333,9 @@ pub enum Prepared {
 }
 
 /// Before a film: the longest-lasting sign-in among the player's, the stored one and the Web
-/// Browser's goes to the player, and Luma keeps it. Blocking, a second or so at most.
-pub fn prepare(path: &Path) -> Result<Prepared, String> {
+/// Browser's goes to the player (through `devtools`, a page of the player), and Luma keeps it.
+pub fn prepare(path: &Path, devtools: &mut crate::devtools::DevTools) -> Result<Prepared, String> {
     let now = now();
-    let mut devtools = crate::devtools::DevTools::page(crate::criterion::PLAYER)?;
     let reply = devtools.call(
         "Network.getCookies",
         json!({"urls": [
@@ -354,7 +365,7 @@ pub fn prepare(path: &Path) -> Result<Prepared, String> {
         if player_ends.is_some_and(|at| Some(at) >= stored.expires()) {
             return Ok(Prepared::PlayerCurrent);
         }
-        give(&mut devtools, &stored.cookies)?;
+        give(devtools, &stored.cookies)?;
         return Ok(Prepared::Restored);
     }
     if player_ends.is_some() {
@@ -363,7 +374,7 @@ pub fn prepare(path: &Path) -> Result<Prepared, String> {
     match browser_cookies() {
         Ok(cookies) => match validate(cookies) {
             Ok(cookies) if expires(&cookies).is_some_and(|at| at > now) => {
-                give(&mut devtools, &cookies)?;
+                give(devtools, &cookies)?;
                 offer(path, cookies, now)?;
                 Ok(Prepared::FromBrowser)
             }
@@ -372,6 +383,53 @@ pub fn prepare(path: &Path) -> Result<Prepared, String> {
         Err(error) => {
             crate::telemetry::log_info!("criterion", "no Web Browser sign-in to use: {error}");
             Ok(Prepared::None)
+        }
+    }
+}
+
+/// Readies the player before Luma opens a film in it, logging what happened; never fails the
+/// launch. The Channel's pages do not let scripts reach Luma (their Content-Security-Policy), so
+/// Luma acts on the player itself:
+///
+/// - `launch` opens or relaunches the player. If the player is already open, it gets its sign-in
+///   before the relaunch takes it to the new film.
+/// - Otherwise Luma waits (up to three seconds) for the player's start page, gives it the
+///   sign-in, and tells the page to go on (`lumaReady`); without that the page goes on by itself.
+pub fn launch_player(launch: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
+    let Some(path) = stored_path() else {
+        return launch();
+    };
+    let started = std::time::Instant::now();
+    if let Ok(mut devtools) = crate::devtools::DevTools::page(crate::criterion::PLAYER) {
+        report(prepare(path, &mut devtools), started, "open player");
+        return launch();
+    }
+    launch()?;
+    let deadline = started + Duration::from_secs(3);
+    while std::time::Instant::now() < deadline {
+        if let Ok(mut devtools) = crate::devtools::DevTools::start_page(crate::criterion::PLAYER) {
+            report(prepare(path, &mut devtools), started, "new player");
+            let _ = devtools.call(
+                "Runtime.evaluate",
+                json!({"expression": "window.lumaReady && window.lumaReady()"}),
+            );
+            return Ok(());
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    crate::telemetry::log_warn!("criterion", "the player's start page never opened DevTools");
+    Ok(())
+}
+
+fn report(result: Result<Prepared, String>, started: std::time::Instant, which: &str) {
+    match result {
+        Ok(prepared) => crate::telemetry::log_info!(
+            "criterion",
+            "{which} ready in {} ms: {prepared:?}",
+            started.elapsed().as_millis()
+        ),
+        Err(message) => {
+            crate::telemetry::log_warn!("criterion", "could not ready the {which}: {message}")
         }
     }
 }

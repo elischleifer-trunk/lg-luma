@@ -857,6 +857,8 @@ fn run() -> Result<(), String> {
     // The enlarged camera's own video on the TV's decoder, and the camera it is for.
     let mut camera_live: Option<(String, live::Live)> = None;
     state.cameras.decoder = webos && live::available();
+    criterion_account::set_store(&preferences_path.with_file_name("home-assistant.json"));
+    criterion_session::set_store(&preferences_path.with_file_name("home-assistant.json"));
     let mut home_assistant = home_assistant::Service::new(
         home_assistant::Live { webos },
         Some(preferences_path.with_file_name("home-assistant.json")),

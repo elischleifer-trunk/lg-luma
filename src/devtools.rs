@@ -41,6 +41,15 @@ fn address(port: u16) -> SocketAddr {
 impl DevTools {
     /// Connects to the open page of web app `app_id`.
     pub fn page(app_id: &str) -> Result<Self, String> {
+        Self::find(app_id, |_| true)
+    }
+
+    /// Connects to `app_id`'s own start page (a local file), once it has opened.
+    pub fn start_page(app_id: &str) -> Result<Self, String> {
+        Self::find(app_id, |url| url.starts_with("file:"))
+    }
+
+    fn find(app_id: &str, wanted: impl Fn(&str) -> bool) -> Result<Self, String> {
         let port = port()?;
         let (status, body) = http_get(port, "/json/list")?;
         if status != 200 {
@@ -54,6 +63,7 @@ impl DevTools {
             .find(|page| {
                 page.get("type").and_then(Value::as_str) == Some("page")
                     && page.get("description").and_then(Value::as_str) == Some(app_id)
+                    && wanted(page.get("url").and_then(Value::as_str).unwrap_or(""))
             })
             .and_then(|page| page.get("webSocketDebuggerUrl")?.as_str())
             .ok_or_else(|| format!("{app_id} has no open page"))?;

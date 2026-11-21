@@ -10,7 +10,8 @@ const source = await readFile(
 // No document: only the shared helpers load, as on the start page before it navigates.
 const context = { URL, window: {} };
 vm.runInNewContext(source, context);
-const { ORIGIN, target, parse, action, signInRequest } = context.window.LumaCriterion;
+const { ORIGIN, target, parse, action, signInRequest, loginUrl, isLogIn } =
+  context.window.LumaCriterion;
 
 test('only Criterion Channel pages are opened', () => {
   const film = `${ORIGIN}/films/oZkRW7X1/laura?play=1`;
@@ -79,29 +80,18 @@ test('only a launch that plays a film is covered while it loads', () => {
   assert.equal(launchKey({ target: `${ORIGIN}/films/x?play=1` }), `${ORIGIN}/films/x?play=1`);
 });
 
-test('the start page asks Luma to ready the sign-in, and never waits long', async () => {
-  const { prepareRequest } = context.window.LumaCriterion;
-  const code = '0123456789abcdef0123456789abcdef';
+test('a signed-out film goes to the sign-in and comes back to the film', () => {
   assert.equal(
-    prepareRequest({ code, port: 5862 }).url,
-    'http://127.0.0.1:5862/api/criterion/prepare',
+    loginUrl('/films/oZkRW7X1/laura?play=1'),
+    `${ORIGIN}/login?returnTo=%2Ffilms%2FoZkRW7X1%2Flaura%3Fplay%3D1`,
   );
-  assert.equal(prepareRequest({ port: 5862 }), null);
-  // With a fetch that never answers, `then` still runs once, after the wait.
-  const ctx = { URL, window: {}, setTimeout, fetch: () => new Promise(() => {}) };
-  vm.runInNewContext(source, ctx);
-  let calls = 0;
-  const started = Date.now();
-  await new Promise((resolve) =>
-    ctx.window.LumaCriterion.prepare({ code, port: 1 }, 50, () => {
-      calls++;
-      resolve();
-    }),
-  );
-  assert.equal(calls, 1);
-  assert.ok(Date.now() - started >= 45);
-  // Without a code (an older Luma), straight on.
-  let direct = 0;
-  ctx.window.LumaCriterion.prepare({}, 5000, () => direct++);
-  assert.equal(direct, 1);
+  // Only paths on the Channel itself come back.
+  for (const page of ['//evil.example/x', 'https://evil.example/', undefined]) {
+    assert.equal(loginUrl(page), `${ORIGIN}/login?returnTo=%2F`, String(page));
+  }
+  assert.ok(isLogIn('Log In'));
+  assert.ok(isLogIn('  LOG IN OR SUBSCRIBE '));
+  assert.ok(!isLogIn('Learn more'));
+  assert.ok(!isLogIn('Close'));
+  assert.ok(!isLogIn('Logout'));
 });

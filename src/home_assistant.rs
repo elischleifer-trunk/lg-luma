@@ -814,10 +814,6 @@ impl<T: Tv> Api<T> {
         if request.path == "/api/criterion/sign-in" {
             return self.criterion_sign_in(request, now);
         }
-        // The player's start page asks Luma to get its sign-in ready, from the TV only.
-        if request.path == "/api/criterion/prepare" {
-            return self.criterion_prepare(request, now);
-        }
         // Browsers send Origin; Home Assistant does not. Only the overlay page itself, a local
         // file with the opaque "null" origin, reports back, and only from the TV.
         if request.origin.is_some() && !(closed && request.peer.is_loopback()) {
@@ -1488,57 +1484,6 @@ impl<T: Tv> Api<T> {
             return error(500, "Could not remove the sign-in");
         }
         reply(200, json!({"criterion_session": null}))
-    }
-
-    /// The player, before it opens the Channel: Luma gives the player the longest-lasting sign-in it knows of (see
-    /// `criterion_session::prepare`). It proves it is the player with its one-time code, which
-    /// this does not use up. Answers within a few seconds whatever happens; the page goes on to
-    /// the Channel either way.
-    fn criterion_prepare(&mut self, request: &Request, now: Instant) -> Reply {
-        // Its start page (a local file, origin "null"), or a Channel page when Luma opens another
-        // film while the player is open.
-        let origin = match request.origin {
-            Some("null") => "null",
-            Some(crate::criterion::ORIGIN) => crate::criterion::ORIGIN,
-            _ => return error(403, "Only the Criterion player asks"),
-        };
-        let allowed = |reply: Reply| Reply {
-            allow_origin: Some(origin),
-            ..reply
-        };
-        if !request.peer.is_loopback() {
-            return error(403, "Only the Criterion player asks");
-        }
-        match request.method {
-            "OPTIONS" => return allowed(reply(200, json!({}))),
-            "POST" => {}
-            _ => return allowed(error(404, "Not found")),
-        }
-        let code = serde_json::from_slice::<Value>(request.body)
-            .ok()
-            .and_then(|body| body.get("code")?.as_str().map(str::to_owned));
-        if !code.is_some_and(|code| crate::criterion_account::valid(&code, now)) {
-            return allowed(error(403, "Open the film from Luma again"));
-        }
-        let Some(path) = self.criterion_session_path() else {
-            return allowed(error(503, "This TV has no storage for the sign-in"));
-        };
-        let started = Instant::now();
-        let outcome = match crate::criterion_session::prepare(&path) {
-            Ok(prepared) => {
-                crate::telemetry::log_info!(
-                    "criterion",
-                    "player ready in {} ms: {prepared:?}",
-                    started.elapsed().as_millis()
-                );
-                format!("{prepared:?}")
-            }
-            Err(message) => {
-                crate::telemetry::log_warn!("criterion", "could not ready the player: {message}");
-                "Failed".into()
-            }
-        };
-        allowed(reply(200, json!({ "prepared": outcome })))
     }
 
     /// The Criterion player's script, on the Channel's sign-in page, trades the one-time code

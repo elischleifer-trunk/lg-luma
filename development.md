@@ -703,14 +703,17 @@ dependency); WAM refuses browser-wide cookie calls, so calls go to the player's 
 `src/criterion-session.rs` keeps the latest sign-in in `criterion-session.json` (mode 0600, beside
 the account) and:
 
-- `POST /api/criterion/prepare`, from the player's start page (origin `null`) or a Channel page
-  when Luma relaunches it with another film, loopback only, proven by the launch's one-time code
-  without using it up. Luma reads the player's cookies (`Network.getCookies`), keeps whichever
-  `__session` lasts longest, and gives the player the stored one (`Network.setCookies`) when it is
-  newer. With neither, it imports the TV Web Browser's sign-in from its own Chromium profile
+- As Luma opens a film (`criterion_session::launch_player`, on the platform worker), it reads the
+  player's cookies (`Network.getCookies`), keeps whichever `__session` lasts longest, and gives the
+  player the stored one (`Network.setCookies`) when it is newer. With neither, it imports the TV
+  Web Browser's sign-in from its own Chromium profile
   (`/var/palm/jail/com.webos.app.browser/mnt/lg/cache/webbrowser/chrome/Cookies`, SQLite, read
-  with the TV's `python3`, which needs Luma to run as root). The page waits at most four seconds,
-  then opens the Channel whatever happened. Measured on the TV: reading the cookies takes ~20 ms.
+  with the TV's `python3`, which needs Luma to run as root). An open player is readied before the
+  relaunch takes it to the new film; a new one is readied on its start page (`index.html`), which
+  waits for Luma to call `lumaReady` and opens the film after 2.5 s without it. Pages never call
+  Luma: the Channel's Content-Security-Policy (`connect-src`) blocks scripts on its pages and on
+  Auth0's from reaching `127.0.0.1`, which also keeps the player's own form filling below from
+  fetching the account on this firmware. Reading the cookies takes ~20 ms.
 - A background thread uses the stored sign-in every three days (`RENEW_EVERY`): `GET
   /auth/access-token` and `/auth/profile` with its cookies, applying any `Set-Cookie`. A profile
   that does not answer 200 marks the sign-in invalid; an invalid sign-in is never given to the
