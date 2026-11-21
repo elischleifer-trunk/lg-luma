@@ -97,13 +97,7 @@ It does not execute the test suites. A desktop display is required; on headless 
 Backspace deletes while editing. Native Back uses SDL's webOS-specific keycode. Back dismisses
 the keyboard first; Weather Location then returns to its parent Location row, HDMI choices to
 that HDMI row, and the Background gallery to Background in the sidebar. Back from the sidebar
-focuses the Settings tab, then returns Home. The header holds Search, Home, Apps and Settings, and at
-the right margin a search button (`Target::LgSearch`) that launches LG's own search app. It is
-shown only when `listApps` reports one: `platform::lg_search_app` takes the first known ID
-(`com.webos.app.search`, `…searchapp`, `…lgsearch`, `…searchviewer`), else any LG system app
-with "search" in its ID, else `com.webos.app.voice`; the inventory log names the choice and
-every search/voice app seen. Only Right from the Settings tab focuses it (geometric moves skip
-it); Left and Back return to the current tab, Down to the page's content.
+focuses the Settings tab, then returns Home. The header holds Search, Home, Apps and Settings.
 **General** holds a single update row: the installed version and when it was last checked
 (`State::update_checked`), with **Check now** (or **Install**) as a button on the right.
 **System** lists **TV settings** (`Target::TvSettings`, which launches `com.palm.app.settings`),
