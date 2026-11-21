@@ -503,6 +503,92 @@ pub fn complete(query: &str, results: &[SearchMultiResponseResult]) -> Option<St
     Some(format!("{query}{rest}"))
 }
 
+/// A longer word is searched as well only when its titles have been seen at least this many
+/// times as much as those of the word typed.
+pub const LONGER_WORD_FACTOR: f64 = 2.;
+/// Longer words compared per search, at one free TMDB search each.
+pub const LONGER_WORD_CANDIDATES: usize = 3;
+
+/// The last word of the text, unless punctuation after it says it is finished.
+pub fn last_word(query: &str) -> Option<String> {
+    query.chars().next_back().and_then(fold)?;
+    words(query).pop()
+}
+
+/// The votes of the titles worth listing (English or American, seen enough) that have the
+/// query's words as whole words: how well known the text is as typed.
+pub fn word_votes(query: &str, results: &[SearchMultiResponseResult]) -> i64 {
+    results
+        .iter()
+        .filter_map(|result| {
+            let kind = match result.media_type.as_deref() {
+                Some("movie") => Kind::Movie,
+                Some("tv") => Kind::Series,
+                _ => return None,
+            };
+            let title = result.title.as_deref().or(result.name.as_deref())?;
+            let signals = Signals::from_search(result);
+            // Whole words only (0 and 2): "gho" is not a word of *Ghostbusters*.
+            let whole = matches!(match_tier(query, title), 0 | 2);
+            (whole && signals.keep(kind, false)).then_some(signals.votes)
+        })
+        .sum()
+}
+
+/// The text with its last word lengthened to each of `keywords` that begins with it: "kin"
+/// with the keywords "king", "kink" and "skin" gives "king" and "kink". At most
+/// [`LONGER_WORD_CANDIDATES`], in the keywords' order.
+pub fn longer_words(query: &str, keywords: &[String]) -> Vec<String> {
+    let Some(last) = last_word(query) else {
+        return Vec::new();
+    };
+    let mut longer: Vec<String> = Vec::new();
+    for keyword in keywords {
+        let tokens = tokens(keyword);
+        let [(folded, written)] = tokens.as_slice() else {
+            continue;
+        };
+        if folded.len() <= last.len() || !folded.starts_with(last.as_str()) {
+            continue;
+        }
+        let rest: String = written.chars().skip(last.chars().count()).collect();
+        let text = format!("{query}{rest}");
+        if !longer.contains(&text) {
+            longer.push(text);
+        }
+        if longer.len() == LONGER_WORD_CANDIDATES {
+            break;
+        }
+    }
+    longer
+}
+
+/// The longer text to search as well, when the typed word is a whole word of some titles but
+/// a longer word is far better known: "kin" is *Kin* (2018), but most people typing it want
+/// *King Kong* or *The Lion King*. TMDB lists only the exact word's titles then, so the longer
+/// words come from its keyword search ([`longer_words`]), each with its own free search.
+pub fn longer_word<'a>(
+    query: &str,
+    results: &[SearchMultiResponseResult],
+    candidates: &'a [(String, Vec<SearchMultiResponseResult>)],
+) -> Option<&'a (String, Vec<SearchMultiResponseResult>)> {
+    // Not a whole word of any title worth listing: TMDB already lists titles that begin with
+    // it, and the search as typed finds them.
+    let typed = word_votes(query, results);
+    if typed == 0 {
+        return None;
+    }
+    let mut best: Option<(&(String, Vec<SearchMultiResponseResult>), i64)> = None;
+    for candidate in candidates {
+        let votes = word_votes(&candidate.0, &candidate.1);
+        if best.is_none_or(|(_, most)| votes > most) {
+            best = Some((candidate, votes));
+        }
+    }
+    let (best, votes) = best?;
+    (votes as f64 >= LONGER_WORD_FACTOR * typed as f64).then_some(best)
+}
+
 /// How a title matches the query; lower is better.
 pub fn match_tier(query: &str, title: &str) -> u8 {
     let query = words(query);

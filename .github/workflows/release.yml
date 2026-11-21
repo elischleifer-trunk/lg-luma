@@ -2,8 +2,13 @@ name: Release
 run-name: 'Release Luma (${{ inputs.bump }})'
 
 # The only way to publish Luma. Run it from Actions → Release → Run workflow on main:
-#   1. Bump the version (minor by default, or major) on a release/vX.Y.Z branch.
-#   2. Run the full CI validation (checks, smoke suites, verified ARM IPK) on that commit.
+#   1. Bump the version (minor by default, or major) on a release/vX.Y.Z branch, and look for a
+#      complete, passing CI run on main's exact code (a tree match: merge-queue and up-to-date PR
+#      runs test the code that lands under another commit ID).
+#   2. If one exists, only build the verified ARM IPK and Homebrew feed for the release commit
+#      (package.yml): the bump changes nothing but version strings, so checks and smoke suites
+#      would re-test code that already passed. Otherwise, or when asked, run the full CI
+#      validation (ci.yml: checks, smoke suites, verified ARM IPK) on the release commit.
 #   3. Fast-forward main to the release commit, publish the GitHub release (a "What's new"
 #      section from the merged pull requests' summaries over the list of them;
 #      tools/release-notes.mjs), mirror it to R2.
@@ -17,6 +22,10 @@ on:
         type: choice
         options: [auto, major]
         default: auto
+      full_validation:
+        description: Run the full CI validation even when main's code already passed CI.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -33,15 +42,63 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      # To find the CI run that already passed on main's code.
+      actions: read
+      statuses: read
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
       tag: ${{ steps.commit.outputs.tag }}
       base: ${{ steps.commit.outputs.base }}
+      validated: ${{ steps.tested.outputs.validated }}
+      evidence: ${{ steps.tested.outputs.evidence }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
+      # main's code counts as validated when a CI run tested exactly this tree and every job in it
+      # ran and passed (a PR run may have had smoke or package skipped by Dynamic CI, which does not
+      # count), or when main's tip is a previous release commit, which carries the required status.
+      - name: Find a passing CI run on main's code
+        id: tested
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          FULL: ${{ inputs.full_validation }}
+          CHECK: Rust checks, rendering, and native package
+        run: |
+          validated=false
+          evidence=''
+          base="$(git rev-parse HEAD)"
+          tree="$(git rev-parse 'HEAD^{tree}')"
+          if [ "$FULL" = true ]; then
+            evidence='full validation requested'
+          elif [ -n "$(gh api "repos/$GH_REPO/commits/$base/status" \
+              --jq ".statuses[] | select(.context == env.CHECK and .state == \"success\") | .state")" ]; then
+            validated=true
+            evidence="main's tip ${base:0:12} carries a successful \"$CHECK\" status"
+          else
+            while read -r id sha url; do
+              [ -n "$id" ] || continue
+              [ "$(gh api "repos/$GH_REPO/git/commits/$sha" --jq .tree.sha 2>/dev/null)" = "$tree" ] || continue
+              incomplete="$(gh api "repos/$GH_REPO/actions/runs/$id/jobs?per_page=100" \
+                --jq '[.jobs[] | select(.name != "Dynamic CI" and .conclusion != "success")] | length')"
+              if [ "$incomplete" = 0 ]; then
+                validated=true
+                evidence="CI run $url passed every job on main's code"
+                break
+              fi
+            done < <(gh api "repos/$GH_REPO/actions/workflows/ci.yml/runs?status=success&per_page=100" \
+              --jq '.workflow_runs[] | "\(.id) \(.head_sha) \(.html_url)"')
+            [ "$validated" = true ] || evidence="no complete, passing CI run tested main's code"
+          fi
+          echo "validated=$validated" >> "$GITHUB_OUTPUT"
+          echo "evidence=$evidence" >> "$GITHUB_OUTPUT"
+          if [ "$validated" = true ]; then
+            echo "Already validated: $evidence. Packaging only." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Running the full CI validation: $evidence." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Apply the version bump
         env:
           BUMP: ${{ inputs.bump }}
@@ -73,9 +130,23 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "### Releasing $tag" >> "$GITHUB_STEP_SUMMARY"
 
+  # main's code already passed CI: build the release commit's package only.
+  package:
+    name: Package
+    needs: version
+    if: needs.version.outputs.validated == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/package.yml
+    with:
+      ref: ${{ needs.version.outputs.sha }}
+
+  # main's code has not passed a complete CI run (for example, a PR merged without the queue), or a
+  # full validation was requested: validate the release commit, which also packages it.
   validate:
     name: Validate
     needs: version
+    if: needs.version.outputs.validated != 'true'
     permissions:
       contents: read
       # ci.yml's Trunk Dynamic CI job declares this. It only runs on pull requests, so a release
@@ -87,7 +158,12 @@ jobs:
 
   publish:
     name: Publish GitHub release
-    needs: [version, validate]
+    needs: [version, package, validate]
+    # Exactly one of package and validate runs; it must have passed.
+    if: >-
+      !cancelled() && needs.version.result == 'success' &&
+      ((needs.package.result == 'success' && needs.validate.result == 'skipped') ||
+       (needs.validate.result == 'success' && needs.package.result == 'skipped'))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -124,6 +200,7 @@ jobs:
           TAG: ${{ needs.version.outputs.tag }}
           SHA: ${{ needs.version.outputs.sha }}
           BASE: ${{ needs.version.outputs.base }}
+          VALIDATED: ${{ needs.version.outputs.validated }}
         run: |
           packaged="$(basename release/*_arm.ipk)"
           if [[ "$packaged" != *"_${TAG#v}_arm.ipk" ]]; then
@@ -135,11 +212,17 @@ jobs:
             echo "::error::main moved during the release ($BASE → $main). Run Release again."
             exit 1
           fi
-          # The validate job ran the full CI on this exact commit; record that under the check
+          # Either the validate job ran the full CI on this exact commit, or CI already passed on
+          # main's code and this commit only changes version strings. Record that under the check
           # name the main-branch ruleset requires so the fast-forward is accepted.
+          if [ "$VALIDATED" = true ]; then
+            description="Code passed CI before the bump; packaged by Release run $GITHUB_RUN_ID"
+          else
+            description="Validated by Release run $GITHUB_RUN_ID"
+          fi
           gh api "repos/$GH_REPO/statuses/$SHA" -f state=success \
             -f context='Rust checks, rendering, and native package' \
-            -f description="Validated by Release run $GITHUB_RUN_ID" \
+            -f description="$description" \
             -f target_url="$GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID" > /dev/null
           # Not forced: GitHub rejects anything but a fast-forward.
           gh api -X PATCH "repos/$GH_REPO/git/refs/heads/main" -f sha="$SHA" -F force=false > /dev/null
@@ -152,6 +235,8 @@ jobs:
   mirror:
     name: Publish to Cloudflare R2
     needs: [version, publish]
+    # publish has a skipped ancestor (package or validate), which would skip this job by default.
+    if: ${{ !cancelled() && needs.publish.result == 'success' }}
     permissions:
       contents: read
     uses: ./.github/workflows/publish-r2.yml

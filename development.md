@@ -1258,7 +1258,10 @@ clients, and so their open connections, are kept until the keys change, and open
 tab connects to both services without credentials (`Http::warm`, no quota) so the first search
 does not wait for TLS. A search asks TMDB first (free): text that ends mid-word and can only
 become one word is completed (`relevance::complete`) and searched as that word, so the
-keystrokes that follow reuse one Movie of the Night reply. Details are fetched six at a time,
+keystrokes that follow reuse one Movie of the Night reply. Text ending in a whole word is also
+searched as a far better-known longer word from TMDB's keyword search ("kin" → "king",
+`relevance::longer_word`), and a full Movie of the Night reply is topped up with the most-seen
+TMDB matches it left out (`look_up_missed`, at most four). Details are fetched six at a time,
 and a search the user has typed past gives up between steps. OK launches the
 picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Every
 poster says whether that costs money (`view::cost_badge`: a check when included, else "$");
@@ -1357,8 +1360,9 @@ to avoid compiling the same executable again. Local smoke commands still build b
 The ARM package job runs alongside these suites using the shared assets, cross-links with a
 pinned Linux SDK, inspects/normalizes the actual IPK and generates checksums/feed. The existing
 **Rust checks, rendering, and native package** check remains as an aggregate that requires every
-preparation, smoke and package job to succeed. It uploads release/rendering artifacts on PRs,
-manual runs and Release runs. CI does not run again after a merge: PRs are the gate. `pnpm check` also validates synchronized release versions,
+preparation, smoke and package job to succeed. The package job is the reusable `package.yml`, which the Release
+workflow also calls on its own. It uploads release/rendering artifacts on PRs, manual runs and
+Release runs. CI does not run again after a merge: PRs are the gate. `pnpm check` also validates synchronized release versions,
 and `pnpm test:release` covers version synchronization, the minor/major release bump and the R2
 feed mirror in an isolated fixture. Host CI cannot prove hardware compatibility,
 small-text quality or presentation frame rate.
@@ -1405,9 +1409,9 @@ untested: **Settings → Rules → Rulesets → New ruleset → New branch rules
 - **Block force pushes** and **Restrict deletions**.
 
 Leave **Require a pull request before merging** off: the Release workflow fast-forwards `main` to
-its version commit directly. Before doing so it validates that exact commit with `ci.yml` and marks
-it with a successful **Rust checks, rendering, and native package** commit status, so the ruleset
-accepts it. Any other push to `main` without that passing check is rejected.
+its version commit directly. Before doing so it makes sure the code passed CI (step 2 below) and
+marks the commit with a successful **Rust checks, rendering, and native package** commit status, so
+the ruleset accepts it. Any other push to `main` without that passing check is rejected.
 
 ### Publishing a release
 
@@ -1415,6 +1419,8 @@ Run **Actions → Release → Run workflow** on `main` (`.github/workflows/relea
 
 - **bump**: `auto` (the default) releases the next minor version, for example 2.19.0 → 2.20.0.
   `major` releases the next major version, for example 2.19.0 → 3.0.0.
+- **full_validation**: off by default. Turn it on to run the full `ci.yml` validation even when
+  `main`'s code already passed CI.
 
 The workflow then:
 
@@ -1422,14 +1428,21 @@ The workflow then:
    `appinfo.json`, the root `Cargo.toml`, the `luma` entry in `Cargo.lock` and the versioned IPK
    examples in `readme.md`. The result is committed as `Release vX.Y.Z` on a temporary
    `release/vX.Y.Z` branch. An existing tag stops the run.
-2. **Validate.** Calls `ci.yml` on that commit: checks, unit tests, the four desktop smoke suites and
-   the verified ARM IPK and Homebrew feed.
+2. **Package, or validate.** The bump changes only version strings, so when `main`'s code already
+   passed CI the release only builds the verified ARM IPK and Homebrew feed for its commit
+   (`package.yml`). The version is compiled into the binary and written into the package and feed,
+   so the IPK is always rebuilt. "Already passed" means a CI run whose commit has exactly the same
+   tree as `main` (merge-queue runs and up-to-date PR runs test the code that lands under another
+   commit ID) and in which every job ran and passed, or a `main` tip that is a previous release
+   commit. Otherwise (for example, after a PR merged without the queue), or with
+   **full_validation**, it calls `ci.yml` on the release commit: checks, unit tests, the four
+   desktop smoke suites and the package. The run summary says which path it took and why.
 3. **Publish GitHub release.** Writes the [release notes](#release-notes), fast-forwards `main` to
    the release commit (refusing if `main` moved meanwhile), creates the `vX.Y.Z` GitHub release from
    that run's artifacts and deletes the temporary branch.
 4. **Publish to Cloudflare R2.** See [Release hosting](#release-hosting-cloudflare-r2).
 
-If bumping or validation fails, `main`, tags and the published feed are untouched: fix the problem
+If bumping, packaging or validation fails, `main`, tags and the published feed are untouched: fix the problem
 and run Release again. If only the R2 step fails, re-run that job or run **Publish to Cloudflare R2**
 manually with the tag. `ci.yml` on its own (PRs, manual dispatch) only validates.
 No additional token is needed; the built-in token pushes the release commit.

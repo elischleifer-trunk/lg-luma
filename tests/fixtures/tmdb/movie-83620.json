@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/83620",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:49.392Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/aLCEyxpDyQMRSfbGK1omr0kQrKi.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 83620,
+    "imdb_id": "tt0083004",
+    "origin_country": [
+      "SU"
+    ],
+    "original_language": "ru",
+    "original_title": "Родня",
+    "overview": "The story follows Maria Konovalova who travels from her rural village to visit her daughter Nina in the city. Maria's arrival exposes the stark contrasts between rural and urban lifestyles and reveals deep-seated family tensions. Interestingly, Родня (Rodnya) in Russian sounds very similar to the word Родина (Rodina), which means \"Motherland.\" The film features three generations of women — Maria, her daughter Nina, and her granddaughter Irina — symbolizing three different Russias: one from the past, one modern, and one representing the future.",
+    "popularity": 0.8489,
+    "poster_path": "/nzWA2iamMrWuoifTNQoxGIyYO6a.jpg",
+    "production_companies": [
+      {
+        "id": 344,
+        "logo_path": "/xenuUvcunUNpbaDOYGhWZERaym7.png",
+        "name": "Mosfilm",
+        "origin_country": "SU"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "SU",
+        "name": "Soviet Union"
+      }
+    ],
+    "release_date": "1982-03-01",
+    "revenue": 0,
+    "runtime": 98,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Russian",
+        "iso_639_1": "ru",
+        "name": "Pусский"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Kin",
+    "video": false,
+    "vote_average": 6.4,
+    "vote_count": 38
+  }
+}

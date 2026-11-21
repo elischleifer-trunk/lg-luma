@@ -1,0 +1,166 @@
+{
+  "request": {
+    "path": "/3/tv/3414",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:00.549Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/A3AEKSTwNGsnYOHnBmI8ZAe3TWR.jpg",
+    "created_by": [
+      {
+        "id": 1225929,
+        "credit_id": "55921d28c3a36808040026d1",
+        "name": "Brad Buckner",
+        "original_name": "Brad Buckner",
+        "gender": 2,
+        "profile_path": null
+      },
+      {
+        "id": 1225927,
+        "credit_id": "55921d3392514155e6000d85",
+        "name": "Eugenie Ross-Leming",
+        "original_name": "Eugenie Ross-Leming",
+        "gender": 1,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [
+      60
+    ],
+    "first_air_date": "1983-10-03",
+    "genres": [
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "",
+    "id": 3414,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1987-05-28",
+    "last_episode_to_air": {
+      "id": 248231,
+      "name": "The Khrushchev List",
+      "overview": "Lee suspects that retired Agency founder Harry Thornton (Howard Duff) and former Soviet Embassy courier Christina Golitsyn (Barbara Bain) are on an impossible mission: to obtain Khrushchev's spy list implicating American Government officials.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "1987-05-28",
+      "episode_number": 22,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 60,
+      "season_number": 4,
+      "show_id": 3414,
+      "still_path": "/F4ccs6QIb50l7LmqAqFwR6nJLx.jpg"
+    },
+    "name": "Scarecrow and Mrs. King",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 16,
+        "logo_path": "/wju8KhOUsR5y4bH9p3Jc50hhaLO.png",
+        "name": "CBS",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 88,
+    "number_of_seasons": 4,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "Scarecrow and Mrs. King",
+    "overview": "Scarecrow and Mrs. King is an American television series that aired from October 3, 1983, to May 28, 1987 on CBS. The show stars Kate Jackson and Bruce Boxleitner as divorced housewife Amanda King and top-level \"Agency\" operative Lee Stetson who begin a strange association, and eventual romance, after encountering one another in a train station.",
+    "popularity": 23.1812,
+    "poster_path": "/36oUFRNJQORpL9fmnrSXdFqEGty.jpg",
+    "production_companies": [
+      {
+        "id": 1957,
+        "logo_path": "/pJJw98MtNFC9cHn3o15G7vaUnnX.png",
+        "name": "Warner Bros. Television",
+        "origin_country": "US"
+      },
+      {
+        "id": 56851,
+        "logo_path": null,
+        "name": "Shoot the Moon Enterprises",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1983-10-03",
+        "episode_count": 21,
+        "id": 10473,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/b26rJm99VFSR6p3PXy5L2q9NsBj.jpg",
+        "season_number": 1,
+        "vote_average": 8
+      },
+      {
+        "air_date": "1984-10-01",
+        "episode_count": 23,
+        "id": 10475,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/98P6enStX8i4JJV6Q5GMWmlOSd6.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1985-09-23",
+        "episode_count": 22,
+        "id": 10476,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/j216Xu0d2ArChjMj0WDbt4X9KlG.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1986-09-19",
+        "episode_count": 22,
+        "id": 10474,
+        "name": "Season 4",
+        "overview": "",
+        "poster_path": "/q4ADcbdXTpovf0NfqDT8mtoT89i.jpg",
+        "season_number": 4,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "One everyday housewife who put some spies in her life!",
+    "type": "Scripted",
+    "vote_average": 6.574,
+    "vote_count": 47
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "request": {
+    "path": "/3/search/keyword",
+    "query": {
+      "query": "kin",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:01.438Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "id": 315999,
+        "name": "ken kin"
+      },
+      {
+        "id": 374394,
+        "name": "kin ship"
+      },
+      {
+        "id": 281825,
+        "name": "kön"
+      },
+      {
+        "id": 327730,
+        "name": "cheung kin-ching's story"
+      },
+      {
+        "id": 13084,
+        "name": "king"
+      },
+      {
+        "id": 301117,
+        "name": "kink"
+      },
+      {
+        "id": 332361,
+        "name": "kino"
+      },
+      {
+        "id": 47024,
+        "name": "pin"
+      },
+      {
+        "id": 2518,
+        "name": "gin"
+      },
+      {
+        "id": 316780,
+        "name": "tin"
+      },
+      {
+        "id": 290470,
+        "name": "kan"
+      },
+      {
+        "id": 7412,
+        "name": "sin"
+      },
+      {
+        "id": 266991,
+        "name": "kcn"
+      },
+      {
+        "id": 287120,
+        "name": "kim"
+      },
+      {
+        "id": 343500,
+        "name": "kie"
+      },
+      {
+        "id": 17973,
+        "name": "skin"
+      },
+      {
+        "id": 272392,
+        "name": "ken"
+      },
+      {
+        "id": 281581,
+        "name": "din"
+      },
+      {
+        "id": 244621,
+        "name": "kid"
+      },
+      {
+        "id": 299960,
+        "name": "kiu"
+      }
+    ],
+    "total_pages": 15,
+    "total_results": 289
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/4771/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:58.449Z",
+  "response": {
+    "id": 4771,
+    "titles": [
+      {
+        "iso_3166_1": "CN",
+        "title": "失踪人口",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "宝贝失踪了",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "Desapareció una noche",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "EE",
+        "title": "Kui lapsuke kaob...",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GR",
+        "title": "Horis ihni",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LT",
+        "title": "Dingusioji",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RO",
+        "title": "Disparuta fara urma",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Kizimi kurtarin",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "VE",
+        "title": "Desapareció una noche",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "가라 아이야 가라",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Medo da Verdade",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "사라진 아이의 실종",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Zbohom, baby",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "失踪的宝贝",
+        "type": ""
+      }
+    ]
+  }
+}

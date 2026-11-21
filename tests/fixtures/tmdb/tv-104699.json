@@ -1,0 +1,181 @@
+{
+  "request": {
+    "path": "/3/tv/104699",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:00.445Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/AjmUQ7aP58ovQ0kBfWfIRHowRch.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      23
+    ],
+    "first_air_date": "2021-04-01",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      }
+    ],
+    "homepage": "https://shamanking-project.com/shamanking",
+    "id": 104699,
+    "in_production": false,
+    "languages": [
+      "ja"
+    ],
+    "last_air_date": "2022-04-21",
+    "last_episode_to_air": {
+      "id": 3535247,
+      "name": "Shaman King: God End",
+      "overview": "Hao releases the might of his newly acquired powers against Yoh and the others, but the scrappy crew refuses to give up hope.",
+      "vote_average": 5.3,
+      "vote_count": 3,
+      "air_date": "2022-04-21",
+      "episode_number": 52,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 23,
+      "season_number": 1,
+      "show_id": 104699,
+      "still_path": "/uHcyjroCbVBvqVrWUawrzwpbwbw.jpg"
+    },
+    "name": "SHAMAN KING",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 98,
+        "logo_path": "/jnuO8pZNEBLEq5YaOP1f5OkmG91.png",
+        "name": "TV Tokyo",
+        "origin_country": "JP"
+      },
+      {
+        "id": 252,
+        "logo_path": "/zFZ5KCuvx7K0vP9XgGcidfXjuUd.png",
+        "name": "TV Aichi",
+        "origin_country": "JP"
+      },
+      {
+        "id": 822,
+        "logo_path": "/gOlBe3BMo5WJHeUlWBBfKawgdiO.png",
+        "name": "TVQ",
+        "origin_country": "JP"
+      },
+      {
+        "id": 824,
+        "logo_path": "/6foQmoPac7WCDnDuDbuCZklmDuA.png",
+        "name": "TV Osaka",
+        "origin_country": "JP"
+      },
+      {
+        "id": 938,
+        "logo_path": "/f12LLqBVFnDVIY8HidhWEitI77c.png",
+        "name": "TVh",
+        "origin_country": "JP"
+      },
+      {
+        "id": 2064,
+        "logo_path": "/qi4L1ffRabF5LJqVimCaaUYpeSj.png",
+        "name": "TSC",
+        "origin_country": "JP"
+      }
+    ],
+    "number_of_episodes": 52,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "JP"
+    ],
+    "original_language": "ja",
+    "original_name": "SHAMAN KING",
+    "overview": "Medium Yoh Asakura enters a battle tournament held every 500 years, competing with other shamans in a bid to become the all-powerful Shaman King.",
+    "popularity": 22.1727,
+    "poster_path": "/my6AEDKL6NfJYOLZg5g71D3PBe2.jpg",
+    "production_companies": [
+      {
+        "id": 43693,
+        "logo_path": "/aO5hWIoTnGjMnVQF7JrlnJgIEvD.png",
+        "name": "Bridge",
+        "origin_country": "JP"
+      },
+      {
+        "id": 3034,
+        "logo_path": "/jnuO8pZNEBLEq5YaOP1f5OkmG91.png",
+        "name": "TV Tokyo",
+        "origin_country": "JP"
+      },
+      {
+        "id": 1778,
+        "logo_path": "/b5rT6VbYza3LyfltCmz1OcqzWJM.png",
+        "name": "dentsu",
+        "origin_country": "JP"
+      },
+      {
+        "id": 59118,
+        "logo_path": "/9nTCEBgGaaI5swkv8gy2vny0Mb5.png",
+        "name": "Kodansha",
+        "origin_country": "JP"
+      },
+      {
+        "id": 4673,
+        "logo_path": "/tXMheRYcKXCK1a90NRESqO1ibhQ.png",
+        "name": "King Records",
+        "origin_country": "JP"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "JP",
+        "name": "Japan"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2021-08-02",
+        "episode_count": 10,
+        "id": 380583,
+        "name": "Specials",
+        "overview": "",
+        "poster_path": "/aYE7NJ2WqoWC3yzs3ohhQ6IzjuM.jpg",
+        "season_number": 0,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-04-01",
+        "episode_count": 52,
+        "id": 153295,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/498r7J8c9TpspMWuoSvY5gUwy1N.jpg",
+        "season_number": 1,
+        "vote_average": 5.9
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 8.2,
+    "vote_count": 321
+  }
+}

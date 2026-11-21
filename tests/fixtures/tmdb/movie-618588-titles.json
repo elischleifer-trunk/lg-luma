@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/618588/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:47.389Z",
+  "response": {
+    "id": 618588,
+    "titles": [
+      {
+        "iso_3166_1": "MX",
+        "title": "Arthur",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "冠军亚瑟",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "Arthur",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Kral Artur",
+        "type": ""
+      }
+    ]
+  }
+}

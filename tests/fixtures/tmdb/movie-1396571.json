@@ -1,0 +1,72 @@
+{
+  "request": {
+    "path": "/3/movie/1396571",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:46.860Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/wjg6ZKLrR3y4QB56dwP6pdEeR3v.jpg",
+    "belongs_to_collection": null,
+    "budget": 1000,
+    "genres": [
+      {
+        "id": 10751,
+        "name": "Family"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1396571,
+    "imdb_id": "tt27203606",
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "en",
+    "original_title": "King",
+    "overview": "“King” delves into the intimate realm of men’s mental health through a poignant exchange between a young man and his barber in a vibrant Dominican barbershop. Through candid conversations and mutual support, the film explores the complexities of masculinity, identity, and emotional well-being within the context of a culturally rich community. “King” offers a compelling portrayal of the power of dialogue and fellowship in navigating the challenges of modern life.",
+    "popularity": 0.2159,
+    "poster_path": "/h9tLxOzegExwGF6mqVL9dsaVnWu.jpg",
+    "production_companies": [
+      {
+        "id": 246215,
+        "logo_path": null,
+        "name": "Take 95 TV",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "release_date": "2024-09-04",
+    "revenue": 0,
+    "runtime": 12,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Live your life like a King.",
+    "title": "King",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

@@ -85,6 +85,28 @@ impl Source for Fixtures {
             .map(|reply| reply.results.unwrap_or_default()),
         )
     }
+    fn tmdb_keywords(&self, query: &str) -> Option<Result<Vec<String>, Error>> {
+        if self.no_tmdb {
+            return None;
+        }
+        if self.tmdb_down {
+            return Some(Err(Error::Network("timeout".into())));
+        }
+        Some(
+            self.read::<tmdb_api::SearchKeywordResponse>(
+                "tmdb",
+                &format!("search-keyword-{}", slug(query)),
+            )
+            .map(|reply| {
+                reply
+                    .results
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|keyword| keyword.name)
+                    .collect()
+            }),
+        )
+    }
     fn movie(&self, id: i64) -> Result<MovieDetailsResponse, Error> {
         self.read("tmdb", &format!("movie-{id}"))
     }
@@ -168,13 +190,16 @@ fn half_a_franchise_title_lists_all_its_films() {
         ],
         "{all:?}"
     );
-    // One metered call for each film the title search missed.
+    // One metered call for each film the title search missed, and for the two well-known
+    // series TMDB lists that it left out (not captured, so skipped).
     assert_eq!(
         source.calls("streaming/show-"),
         [
             "streaming/show-movie-2978",
             "streaming/show-movie-425909",
-            "streaming/show-movie-43074"
+            "streaming/show-movie-43074",
+            "streaming/show-tv-1606",
+            "streaming/show-tv-17937"
         ]
     );
 }
@@ -194,7 +219,7 @@ fn franchise_films_the_title_search_missed_are_looked_up() {
     );
     let shows = source.calls("streaming/show-");
     assert!(
-        !shows.is_empty() && shows.len() <= EXPANSION_LIMIT,
+        !shows.is_empty() && shows.len() <= MISSED_LIMIT + EXPANSION_LIMIT,
         "{shows:?}"
     );
 }
@@ -323,16 +348,18 @@ fn star_wars_keeps_the_franchise_titles_that_do_not_say_star_wars() {
     ] {
         assert!(titles.contains(&kept), "{kept}: {titles:#?}");
     }
-    // Return of the Jedi came with the title search, so expanding the franchise does not
-    // fetch it again: the four lookups go to the films the search missed, The Force Awakens
-    // among them.
+    // Return of the Jedi came with the title search, so it is not fetched again: the lookups
+    // go to the well-known titles and franchise films the search missed, The Force Awakens
+    // among them, and none twice.
     assert_eq!(
         source.calls("streaming/show-"),
         [
+            "streaming/show-movie-12180",
             "streaming/show-movie-140607",
             "streaming/show-movie-1891",
             "streaming/show-movie-1893",
             "streaming/show-movie-1895",
+            "streaming/show-tv-60554",
         ]
     );
 }
@@ -465,4 +492,86 @@ fn work_runs_on_a_few_threads_and_keeps_its_order() {
     );
     assert!(most.load(Ordering::SeqCst) <= 3);
     assert!(parallel(&[] as &[usize], 3, |&item| item).is_empty());
+}
+
+#[test]
+fn well_known_titles_a_full_title_search_left_out_are_looked_up() {
+    let source = Fixtures::default();
+    let results = search(&source, "king", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    // Movie of the Night fills its 20 results with films called *King*. TMDB's free search
+    // names the best-known titles it left out, and each is looked up, most seen first.
+    for kept in [
+        "King Kong",
+        "The Lion King",
+        "The Lord of the Rings: The Return of the King",
+    ] {
+        assert!(titles.contains(&kept), "{kept}: {titles:#?}");
+    }
+    assert_eq!(titles[0], "King Kong");
+    assert_eq!(
+        source.calls("streaming/show-"),
+        [
+            "streaming/show-movie-122",
+            "streaming/show-movie-254",
+            "streaming/show-movie-420818",
+            "streaming/show-movie-8587",
+        ]
+    );
+    // One title search: "king" is the word people mean.
+    assert_eq!(
+        source.calls("streaming/search-"),
+        ["streaming/search-title-king"]
+    );
+}
+
+#[test]
+fn a_whole_word_is_also_searched_as_the_better_known_word_it_begins() {
+    let source = Fixtures::default();
+    let results = search(&source, "kin", "us", &Services::default()).unwrap();
+    let titles = titles(&results);
+    // *Kin* (2018) is what was typed, so it comes first; *King Kong* and *The Lion King* are
+    // what most people typing it are after.
+    assert_eq!(titles[0], "Kin");
+    for kept in ["King Kong", "The Lion King", "Tulsa King"] {
+        assert!(titles.contains(&kept), "{kept}: {titles:#?}");
+    }
+    assert_eq!(
+        source.calls("streaming/search-"),
+        ["streaming/search-title-kin", "streaming/search-title-king"]
+    );
+    assert!(source.calls("streaming/show-").len() <= MISSED_LIMIT);
+}
+
+#[test]
+fn a_longer_word_is_searched_only_when_far_better_known() {
+    let tmdb = |query: &str| Fixtures::default().tmdb_search(query).unwrap().unwrap();
+    let keywords = |query: &str| Fixtures::default().tmdb_keywords(query).unwrap().unwrap();
+    // TMDB's keyword search for "kin" suggests words like "king", "kink" and "kino".
+    let longer = relevance::longer_words("kin", &keywords("kin"));
+    assert_eq!(longer[0], "king", "{longer:?}");
+    assert!(
+        longer
+            .iter()
+            .all(|text| text.starts_with("kin") && text.len() > 3)
+    );
+    let candidates = vec![("king".to_owned(), tmdb("king"))];
+    assert_eq!(
+        relevance::longer_word("kin", &tmdb("kin"), &candidates).map(|(text, _)| text.as_str()),
+        Some("king")
+    );
+    // The other way round, "king" is far better known than anything "kin" could become.
+    let candidates = vec![("kin".to_owned(), tmdb("kin"))];
+    assert_eq!(
+        relevance::longer_word("king", &tmdb("king"), &candidates),
+        None
+    );
+    // Not a whole word of any title worth listing: TMDB already lists what it begins.
+    let candidates = vec![("ghostbusters".to_owned(), tmdb("ghostbusters"))];
+    assert_eq!(
+        relevance::longer_word("gho", &tmdb("gho"), &candidates),
+        None
+    );
+    // Punctuation ends the word.
+    assert!(relevance::longer_words("kin.", &keywords("kin")).is_empty());
 }

@@ -1,0 +1,119 @@
+{
+  "request": {
+    "path": "/3/tv/38910",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:44.347Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/72bio5vnz6H0JVNHZQDWY5J7tQX.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      43
+    ],
+    "first_air_date": "2011-04-17",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "http://www.showcase.ca/shows/showspage.aspx?root_title_id=261044",
+    "id": 38910,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2012-05-25",
+    "last_episode_to_air": {
+      "id": 863690,
+      "name": "Wendy Stetler",
+      "overview": "Jess and the gang continue to try and figure out the Spivak case. Meanwhile Danny gets into more gambling trouble.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2012-05-25",
+      "episode_number": 13,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 43,
+      "season_number": 2,
+      "show_id": 38910,
+      "still_path": null
+    },
+    "name": "King",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 105,
+        "logo_path": "/upKEJsOBq13zQGL9kGKi7btn5rc.png",
+        "name": "Showcase",
+        "origin_country": "CA"
+      }
+    ],
+    "number_of_episodes": 21,
+    "number_of_seasons": 2,
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "en",
+    "original_name": "King",
+    "overview": "King is a Canadian police drama which premiered April 17, 2011 on Showcase. The series stars Amy Price-Francis as Jessica King, a veteran police officer who gets promoted to head of the Major Crimes Task Force in Toronto after her predecessor has a breakdown on television. Season 2 began production in September 2011 and premiered 29 February 2012.\n\nOn June 2, 2012, it was reported that King had been cancelled after 2 seasons.",
+    "popularity": 6.0074,
+    "poster_path": "/m67PLNDRRKqbPMUADd7XlUJ1pb3.jpg",
+    "production_companies": [
+      {
+        "id": 38000,
+        "logo_path": null,
+        "name": "Indian Grove Productions",
+        "origin_country": "CA"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2011-04-17",
+        "episode_count": 8,
+        "id": 50474,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2012-02-29",
+        "episode_count": 13,
+        "id": 50475,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": null,
+        "season_number": 2,
+        "vote_average": 1
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 6.9,
+    "vote_count": 11
+  }
+}

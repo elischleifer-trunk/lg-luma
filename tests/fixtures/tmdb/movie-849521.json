@@ -1,0 +1,51 @@
+{
+  "request": {
+    "path": "/3/movie/849521",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:50.012Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 849521,
+    "imdb_id": "tt9292422",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Kin",
+    "overview": "A depressed girl seeks companionship when her cousin comes into town for a funeral.",
+    "popularity": 0.3236,
+    "poster_path": "/8EssS9IAREgkqYWL9OGixyf4GV7.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2018-12-10",
+    "revenue": 0,
+    "runtime": 6,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Kin",
+    "video": false,
+    "vote_average": 1,
+    "vote_count": 2
+  }
+}

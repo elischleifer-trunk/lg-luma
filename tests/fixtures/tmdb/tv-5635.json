@@ -1,0 +1,127 @@
+{
+  "request": {
+    "path": "/3/tv/5635",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:01.221Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/ss7xcQKTifaDkDyQyYCMAQyUuZT.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      30
+    ],
+    "first_air_date": "1995-05-15",
+    "genres": [
+      {
+        "id": 35,
+        "name": "Comedy"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 5635,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "2002-01-09",
+    "last_episode_to_air": {
+      "id": 364386,
+      "name": "Pollution",
+      "overview": "Jake is having nightmares about global pollution, and Georgia needs persuading to wear a tooth brace. Meanwhile, Philip blames himself for his parents' fatal car crash.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2002-01-09",
+      "episode_number": 2,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 30,
+      "season_number": 2,
+      "show_id": 5635,
+      "still_path": null
+    },
+    "name": "Next of Kin",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 4,
+        "logo_path": "/uJjcCg3O4DMEjM0xtno9OWFciRP.png",
+        "name": "BBC One",
+        "origin_country": "GB"
+      }
+    ],
+    "number_of_episodes": 22,
+    "number_of_seasons": 3,
+    "origin_country": [
+      "FI",
+      "GB"
+    ],
+    "original_language": "en",
+    "original_name": "Next of Kin",
+    "overview": "Andrew and Maggie Prentice have taken early retirement and plan to move to France, however when tragedy strikes they are left to care for their three grandchildren: Georgia, Jake and Michael and are going nowhere fast.",
+    "popularity": 2.2361,
+    "poster_path": "/3CucKJkLTvnzOKcwj2TSg9Vr8wu.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      },
+      {
+        "iso_3166_1": "FI",
+        "name": "Finland"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1995-05-15",
+        "episode_count": 7,
+        "id": 15714,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/3CucKJkLTvnzOKcwj2TSg9Vr8wu.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1996-01-02",
+        "episode_count": 7,
+        "id": 15716,
+        "name": "Season 2",
+        "overview": "",
+        "poster_path": "/3CucKJkLTvnzOKcwj2TSg9Vr8wu.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "1997-01-02",
+        "episode_count": 8,
+        "id": 15715,
+        "name": "Season 3",
+        "overview": "",
+        "poster_path": "/3CucKJkLTvnzOKcwj2TSg9Vr8wu.jpg",
+        "season_number": 3,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 7.3,
+    "vote_count": 3
+  }
+}

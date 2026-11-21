@@ -1,0 +1,45 @@
+{
+  "request": {
+    "path": "/3/movie/1162264",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:50.645Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 8000,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      }
+    ],
+    "homepage": "",
+    "id": 1162264,
+    "imdb_id": "tt28529428",
+    "origin_country": [
+      "GB"
+    ],
+    "original_language": "en",
+    "original_title": "KIN",
+    "overview": "A mother and her baby must fight for survival in a scorched dystopian future.",
+    "popularity": 0.1212,
+    "poster_path": "/92DC7FOJbAXXe6ANinLs1OaPxku.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "release_date": "2023-03-15",
+    "revenue": 0,
+    "runtime": 8,
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Released",
+    "tagline": "",
+    "title": "KIN",
+    "video": false,
+    "vote_average": 7.5,
+    "vote_count": 2
+  }
+}

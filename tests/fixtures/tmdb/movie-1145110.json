@@ -1,0 +1,73 @@
+{
+  "request": {
+    "path": "/3/movie/1145110",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:45.959Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/mjiDUz5idO9LrJC40JphKmSqjfF.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "",
+    "id": 1145110,
+    "imdb_id": "tt28228084",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "hi",
+    "original_title": "किंग",
+    "overview": "Mentor and disciple embark on a perilous journey, pushing their survival skills to the limit against overwhelming odds and unforgiving environments.",
+    "popularity": 3.8536,
+    "poster_path": "/Aq5J3pzesN7WJLIzEkWD2b4FqV9.jpg",
+    "production_companies": [
+      {
+        "id": 2343,
+        "logo_path": "/fkrlAFxgAtIHgYJGIQcDggeucKV.png",
+        "name": "Red Chillies Entertainment",
+        "origin_country": "IN"
+      },
+      {
+        "id": 147147,
+        "logo_path": null,
+        "name": "Marflix Pictures",
+        "origin_country": "IN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "2026-12-24",
+    "revenue": 0,
+    "runtime": 0,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Hindi",
+        "iso_639_1": "hi",
+        "name": "हिन्दी"
+      }
+    ],
+    "status": "In Production",
+    "tagline": "",
+    "title": "King",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

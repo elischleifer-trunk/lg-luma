@@ -1,0 +1,98 @@
+{
+  "request": {
+    "path": "/3/movie/425505",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:48.538Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/7oZR0oaFOPrzGkg3ZntEKwMCLTe.jpg",
+    "belongs_to_collection": null,
+    "budget": 30000000,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 12,
+        "name": "Adventure"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "https://www.lionsgate.com/movies/kin",
+    "id": 425505,
+    "imdb_id": "tt6017942",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Kin",
+    "overview": "A young boy finds a powerful otherworldly weapon, which he uses to save his older adoptive brother from a crew of thugs. Before long, the two of them are also pursued by federal agents and mysterious mercenaries aiming to reclaim their asset.",
+    "popularity": 3.3138,
+    "poster_path": "/oPE5GXHaTlu5eRcd4USuOX3A1mf.jpg",
+    "production_companies": [
+      {
+        "id": 2575,
+        "logo_path": "/9YJrHYlcfHtwtulkFMAies3aFEl.png",
+        "name": "21 Laps Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 35846,
+        "logo_path": "/tOJlsgZNRdMurnJgSiuRFIUz0te.png",
+        "name": "No Trace Camping",
+        "origin_country": "US"
+      },
+      {
+        "id": 491,
+        "logo_path": "/5LvDUt3KmvRnXQ4NrdWJYHeuA8J.png",
+        "name": "Summit Entertainment",
+        "origin_country": "US"
+      },
+      {
+        "id": 72441,
+        "logo_path": null,
+        "name": "TIK Films",
+        "origin_country": "HK"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "release_date": "2018-08-29",
+    "revenue": 10023153,
+    "runtime": 102,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "Spanish",
+        "iso_639_1": "es",
+        "name": "Español"
+      }
+    ],
+    "status": "Released",
+    "tagline": "All he needed was a way out.",
+    "title": "Kin",
+    "video": false,
+    "vote_average": 6.1,
+    "vote_count": 914
+  }
+}
