@@ -20,6 +20,7 @@
 //! (schema.org data and the synopsis) when that is known, else from TMDB; Play opens the player.
 use crate::cameras::Frame;
 use crate::openapi::{Http, Query};
+use crate::relevance::Words;
 use crate::search_cache::DiskCache;
 use crate::state::{Direction, Effect, Overlay, State, Target};
 use serde::{Deserialize, Serialize};
@@ -66,6 +67,13 @@ const DETAILS_AGE: Duration = Duration::from_secs(7 * 24 * 3600);
 const SYNOPSIS_LIMIT: usize = 1200;
 const ROW_LIMIT: usize = 40;
 const FILM_LIMIT: usize = 100;
+const CATALOG_KEY: &str = "criterion:catalog";
+/// The whole catalog is 160-odd TMDB pages, so it is fetched at most once a day.
+const CATALOG_FRESH: Duration = Duration::from_secs(24 * 3600);
+/// TMDB serves no page past 500.
+const CATALOG_PAGES: u64 = 500;
+/// Search results shown, best first.
+pub const RESULT_LIMIT: usize = 48;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Film {
@@ -597,16 +605,22 @@ pub fn tmdb_rows(get: &TmdbGet) -> Result<Vec<Row>, String> {
 
 /// A discover result with a title and a 16:9 image.
 fn tmdb_film(movie: &Value) -> Option<Film> {
+    tmdb_listed_film(movie).filter(|film| !film.image.is_empty())
+}
+
+/// A discover result with a title; its image is empty when TMDB has no usable 16:9 one, and
+/// the card then shows the title.
+fn tmdb_listed_film(movie: &Value) -> Option<Film> {
     let id = movie["id"].as_u64()?;
     let title = clean(movie["title"].as_str()?);
-    let backdrop = movie["backdrop_path"].as_str()?;
     // Image paths are `/` and a file name; anything else is not fetched.
-    if title.is_empty()
-        || !backdrop.starts_with('/')
-        || !backdrop[1..]
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
-    {
+    let backdrop = movie["backdrop_path"].as_str().filter(|backdrop| {
+        backdrop.starts_with('/')
+            && backdrop[1..]
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+    });
+    if title.is_empty() {
         return None;
     }
     let year = movie["release_date"]
@@ -621,8 +635,143 @@ fn tmdb_film(movie: &Value) -> Option<Film> {
         length: String::new(),
         link: None,
         tmdb: Some(id),
-        image: format!("{TMDB_IMAGES}{backdrop}"),
+        image: backdrop
+            .map(|backdrop| format!("{TMDB_IMAGES}{backdrop}"))
+            .unwrap_or_default(),
     })
+}
+
+// ---- Search ---------------------------------------------------------------------------------
+
+/// A film in the Channel's whole catalog, as search matches it.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Listed {
+    pub film: Film,
+    /// The title in its own language: "Shichinin no samurai" finds *Seven Samurai*.
+    pub original: String,
+    pub popularity: f64,
+}
+
+/// Every film TMDB lists on the Channel, most popular first: about 3,200 films, 20 to a page.
+/// A page that fails ends the list there; the films before it are still worth searching.
+pub fn tmdb_catalog(get: &TmdbGet) -> Result<Vec<Listed>, String> {
+    let provider = provider(get)?.to_string();
+    let mut films: Vec<Listed> = Vec::new();
+    let mut seen = HashSet::new();
+    let mut page = 1;
+    let mut pages = 1;
+    while page <= pages.min(CATALOG_PAGES) {
+        let query = vec![
+            ("watch_region", COUNTRY.to_uppercase()),
+            ("with_watch_providers", provider.clone()),
+            ("with_watch_monetization_types", "flatrate".to_owned()),
+            ("include_adult", "false".to_owned()),
+            ("sort_by", "popularity.desc".to_owned()),
+            ("page", page.to_string()),
+        ];
+        let reply = match get("/3/discover/movie", &query) {
+            Ok(reply) => reply,
+            Err(error) if films.is_empty() => return Err(error),
+            Err(error) => {
+                crate::telemetry::log_warn!(
+                    "criterion",
+                    "catalog: stopped at page {page} of {pages}: {error}"
+                );
+                break;
+            }
+        };
+        pages = reply["total_pages"].as_u64().unwrap_or(0);
+        for movie in reply["results"].as_array().into_iter().flatten() {
+            let Some(film) = tmdb_listed_film(movie) else {
+                continue;
+            };
+            // Popularity shifts while the pages are read: a film can appear on two.
+            if !seen.insert(film.id.clone()) {
+                continue;
+            }
+            films.push(Listed {
+                original: movie["original_title"]
+                    .as_str()
+                    .map(clean)
+                    .unwrap_or_default(),
+                popularity: movie["popularity"].as_f64().unwrap_or(0.),
+                film,
+            });
+        }
+        page += 1;
+    }
+    if films.is_empty() {
+        Err("TMDB lists no films on the Criterion Channel".into())
+    } else {
+        Ok(films)
+    }
+}
+
+/// A catalog film with its titles split into words once, not at every keystroke: matching
+/// the whole catalog then takes a few milliseconds even on the TV.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Indexed {
+    pub listed: Listed,
+    title: Words,
+    /// Empty when it is the title again.
+    original: Words,
+}
+
+/// Films ready for [`search`].
+pub fn index(films: impl IntoIterator<Item = Listed>) -> Vec<Indexed> {
+    films
+        .into_iter()
+        .map(|listed| Indexed {
+            title: Words::new(&listed.film.title),
+            original: if listed.original == listed.film.title {
+                Words::default()
+            } else {
+                Words::new(&listed.original)
+            },
+            listed,
+        })
+        .collect()
+}
+
+/// The films in `rows`, once each, in their order: what search covers without a catalog.
+fn index_rows(rows: &[Row]) -> Vec<Indexed> {
+    let mut seen = HashSet::new();
+    index(
+        rows.iter()
+            .flat_map(|row| &row.films)
+            .filter(|film| seen.insert(film.id.clone()))
+            .map(|film| Listed {
+                film: film.clone(),
+                original: String::new(),
+                popularity: 0.,
+            }),
+    )
+}
+
+/// Films whose title (or original title) matches `query`, best first: titles that start with
+/// it, then those with a word starting with it, then whole words, then anywhere, as Luma's
+/// Search tab ranks them ([`crate::relevance::match_tier`]); within each, the most popular.
+/// Accents, punctuation and spacing do not matter.
+pub fn search(query: &str, films: &[Indexed]) -> Vec<Film> {
+    use crate::relevance::match_words;
+    let query = Words::new(query);
+    let mut found: Vec<(u8, f64, usize)> = films
+        .iter()
+        .enumerate()
+        .filter_map(|(index, film)| {
+            let mut tier = match_words(&query, &film.title);
+            if tier > 0 && !film.original.is_empty() {
+                tier = tier.min(match_words(&query, &film.original));
+            }
+            (tier < 4).then_some((tier, film.listed.popularity, index))
+        })
+        .collect();
+    found.sort_by(|a, b| a.0.cmp(&b.0).then(b.1.total_cmp(&a.1)).then(a.2.cmp(&b.2)));
+    found
+        .into_iter()
+        .take(RESULT_LIMIT)
+        .map(|(_, _, index)| films[index].listed.film.clone())
+        .collect()
 }
 
 // ---- Finding a film's page ------------------------------------------------------------------
@@ -681,14 +830,21 @@ enum Request {
 
 pub struct Service {
     sender: mpsc::Sender<Request>,
+    catalog: mpsc::Sender<()>,
     pub receiver: mpsc::Receiver<Reply>,
+    /// The whole catalog for search; empty when it cannot be had.
+    pub indexed: mpsc::Receiver<Vec<Listed>>,
     pub resolved: mpsc::Receiver<Resolved>,
     pub described: mpsc::Receiver<Described>,
 }
 
 /// Where the worker gets rows and links: the network, or a test's fixtures.
-pub trait Source: Send + 'static {
+pub trait Source: Send + Sync + 'static {
     fn rows(&self) -> Result<Vec<Row>, String>;
+    /// Every film on the Channel, for search. Fails without a TMDB token.
+    fn catalog(&self) -> Result<Vec<Listed>, String> {
+        Err("No catalog".into())
+    }
     /// None when no Movie of the Night key is stored.
     fn link(&self, tmdb: u64) -> Option<Result<Option<String>, String>>;
     fn details(&self, film: &Film) -> Result<Details, String>;
@@ -727,6 +883,18 @@ impl Source for Network {
         } else {
             Ok(rows)
         }
+    }
+
+    fn catalog(&self) -> Result<Vec<Listed>, String> {
+        let http = self
+            .keys()
+            .tmdb_http()
+            .ok_or("No TMDB token: search covers the rows on screen")?;
+        let get = |path: &str, query: &[(&'static str, String)]| {
+            http.get::<Value>(path, &Query(query.to_vec()))
+                .map_err(|e| format!("TMDB: {e}"))
+        };
+        tmdb_catalog(&get)
     }
 
     fn link(&self, tmdb: u64) -> Option<Result<Option<String>, String>> {
@@ -783,10 +951,29 @@ impl Service {
     }
 
     fn with_source(cache: DiskCache, source: impl Source) -> Self {
+        let source = Arc::new(source);
         let (sender, requests) = mpsc::channel::<Request>();
         let (replies, receiver) = mpsc::channel();
         let (links, resolved) = mpsc::channel();
         let (descriptions, described) = mpsc::channel();
+        // The catalog takes a minute to read on the TV: its own thread, so Play is not kept
+        // waiting behind it.
+        let (catalog, catalog_requests) = mpsc::channel::<()>();
+        let (catalogs, indexed) = mpsc::channel();
+        {
+            let (source, cache) = (source.clone(), cache.clone());
+            std::thread::spawn(move || {
+                while catalog_requests.recv().is_ok() {
+                    // Requests made while one was read are answered by it.
+                    while catalog_requests.try_recv().is_ok() {}
+                    for films in load_catalog(&cache, &|| source.catalog(), SystemTime::now()) {
+                        if catalogs.send(films).is_err() {
+                            return;
+                        }
+                    }
+                }
+            });
+        }
         std::thread::spawn(move || {
             while let Ok(request) = requests.recv() {
                 match request {
@@ -798,13 +985,13 @@ impl Service {
                         }
                     }
                     Request::Link { id, tmdb, title } => {
-                        let link = link(&cache, &source, tmdb, &title, SystemTime::now());
+                        let link = link(&cache, &*source, tmdb, &title, SystemTime::now());
                         if links.send((id, link)).is_err() {
                             return;
                         }
                     }
                     Request::Details(film) => {
-                        let details = details(&cache, &source, &film, SystemTime::now());
+                        let details = details(&cache, &*source, &film, SystemTime::now());
                         if descriptions.send((film.id, details)).is_err() {
                             return;
                         }
@@ -814,7 +1001,9 @@ impl Service {
         });
         Self {
             sender,
+            catalog,
             receiver,
+            indexed,
             resolved,
             described,
         }
@@ -822,6 +1011,11 @@ impl Service {
 
     pub fn load(&self) {
         let _ = self.sender.send(Request::Rows);
+    }
+
+    /// Asks for the whole catalog, for search; it arrives on `indexed`.
+    pub fn load_catalog(&self) {
+        let _ = self.catalog.send(());
     }
 
     /// Finds the page of a film TMDB listed; the answer arrives on `resolved`.
@@ -925,6 +1119,35 @@ fn load(
     replies
 }
 
+/// The catalog: a copy from disk less than a day old; else any copy from disk at once, then a
+/// new one from TMDB. Empty when there is none, so search covers the rows on screen.
+fn load_catalog(
+    cache: &DiskCache,
+    fetch: &dyn Fn() -> Result<Vec<Listed>, String>,
+    now: SystemTime,
+) -> Vec<Vec<Listed>> {
+    if let Some(films) = cache.get::<Vec<Listed>>(CATALOG_KEY, CATALOG_FRESH, now) {
+        return vec![films];
+    }
+    let mut replies = Vec::new();
+    let stale = cache.get::<Vec<Listed>>(CATALOG_KEY, STALE, now);
+    let had_stale = stale.is_some();
+    replies.extend(stale);
+    match fetch() {
+        Ok(films) => {
+            cache.put(CATALOG_KEY, &films, now);
+            replies.push(films);
+        }
+        Err(error) => {
+            crate::telemetry::log_info!("criterion", "catalog: {error}");
+            if !had_stale {
+                replies.push(Vec::new());
+            }
+        }
+    }
+    replies
+}
+
 fn fetch(agent: &ureq::Agent, url: &str) -> Result<String, String> {
     let mut response = agent
         .get(url)
@@ -996,6 +1219,28 @@ pub struct Browser {
     described: HashMap<String, Details>,
     /// Films whose details the catalog worker has been asked for and not yet answered.
     describing: HashSet<String>,
+    /// What is typed in the search field. While it holds anything, `rows` are its results.
+    pub query: String,
+    /// Every film on the Channel, for search; empty until loaded, or without a TMDB token.
+    pub catalog: Vec<Indexed>,
+    /// The main loop asks the catalog worker for the whole catalog.
+    catalog_requested: bool,
+    /// The Channel's rows, where they were scrolled and what was focused, put aside while
+    /// search results take their place.
+    channel: Option<Channel>,
+    /// The keyboard is open over the screen, which comes back with focus `restore` (Back's
+    /// target for the whole screen) when it closes.
+    pub typing: Option<Target>,
+    /// The card Up left for the search field, which Down returns to.
+    above: Option<(usize, usize)>,
+}
+
+/// The Channel's rows as they were when a search began.
+struct Channel {
+    rows: Vec<Row>,
+    first_row: usize,
+    first_card: Vec<usize>,
+    focus: Target,
 }
 
 /// A film's page: its backdrop, details and Play, like a streaming service's title page.
@@ -1021,6 +1266,18 @@ const ROWS_BELOW: usize = 5;
 const CARDS_AROUND: usize = 2;
 
 impl Browser {
+    /// Search results are on screen in place of the Channel's rows.
+    pub fn searching(&self) -> bool {
+        self.channel.is_some()
+    }
+
+    /// The Channel's own rows, whether on screen or put aside for search results.
+    fn channel_rows(&self) -> &[Row] {
+        self.channel
+            .as_ref()
+            .map_or(&self.rows, |channel| &channel.rows)
+    }
+
     /// Films whose artwork should be loaded: cards on screen and just beyond it, top row first.
     fn nearby(&self) -> Vec<&Film> {
         let rows = self.first_row.saturating_sub(ROWS_ABOVE)
@@ -1151,6 +1408,7 @@ impl State {
         self.pressed = None;
         let browser = &mut self.criterion;
         browser.requested = true;
+        browser.catalog_requested = true;
         browser.error = None;
         browser.loading = browser.rows.is_empty();
         browser.failed.clear();
@@ -1166,12 +1424,25 @@ impl State {
         self.dirty = true;
     }
 
+    /// The screen is on screen: open, or behind the keyboard typing a search.
+    pub fn criterion_visible(&self) -> bool {
+        self.criterion_open() || self.criterion.typing.is_some()
+    }
+
     pub fn close_criterion(&mut self) {
         // A lookup answered after this only keeps the film's page; it opens nothing.
         self.criterion.resolving = None;
         self.criterion.resolve_request = None;
         self.criterion.detail = None;
         self.criterion.cancel_details_request();
+        if let Some(restore) = self.criterion.typing.take() {
+            // The keyboard took the screen's place; it goes with it.
+            self.overlay = Some(Overlay::Criterion { restore });
+            self.panel_started = None;
+        }
+        // The next visit starts on the Channel's rows.
+        self.criterion.query.clear();
+        self.end_criterion_search();
         if let Some(Overlay::Criterion { restore }) = self.overlay.take() {
             self.focus = restore;
             self.reconcile_focus();
@@ -1184,6 +1455,31 @@ impl State {
     pub fn accept_criterion(&mut self, reply: Reply) {
         let open = self.criterion_open();
         let browser = &mut self.criterion;
+        // Search results are on screen: the new rows wait behind them, scrolled to the top.
+        if let Some(channel) = &mut browser.channel {
+            match reply.rows {
+                Ok(rows) => {
+                    if rows != channel.rows {
+                        channel.first_card = vec![0; rows.len()];
+                        channel.first_row = 0;
+                        channel.focus = Target::Film(0, 0);
+                        channel.rows = rows;
+                    }
+                    browser.loading = false;
+                    browser.error = None;
+                }
+                Err(error) => {
+                    browser.loading = false;
+                    browser.error = Some(error);
+                }
+            }
+            if browser.catalog.is_empty() {
+                // Without a catalog, search covers these rows.
+                self.criterion_search_changed();
+            }
+            self.dirty = true;
+            return;
+        }
         match reply.rows {
             Ok(rows) => {
                 if rows != browser.rows {
@@ -1235,12 +1531,15 @@ impl State {
         let valid = match self.focus {
             _ if browser.detail.is_some() => self.focus == Target::CriterionPlay,
             Target::Film(row, card) => browser.film(row, card).is_some(),
-            Target::CriterionRetry => browser.rows.is_empty(),
+            Target::CriterionRetry => browser.rows.is_empty() && !browser.searching(),
+            Target::CriterionSearch => !browser.rows.is_empty() || browser.searching(),
             _ => false,
         };
         if !valid {
             self.focus = if browser.detail.is_some() {
                 Target::CriterionPlay
+            } else if browser.searching() {
+                Target::CriterionSearch
             } else if browser.rows.is_empty() {
                 Target::CriterionRetry
             } else {
@@ -1251,10 +1550,38 @@ impl State {
 
     pub fn criterion_direction(&mut self, direction: Direction) -> Vec<Effect> {
         self.criterion.playing = false;
+        if self.focus == Target::CriterionSearch {
+            // Down from the search field: the top row on screen, where it is scrolled to.
+            let browser = &mut self.criterion;
+            if matches!(direction, Direction::Down) && !browser.rows.is_empty() {
+                let (row, card) = browser
+                    .above
+                    .filter(|&(row, card)| browser.film(row, card).is_some())
+                    .unwrap_or_else(|| {
+                        let row = browser.first_row.min(browser.rows.len() - 1);
+                        (
+                            row,
+                            browser
+                                .first_card(row)
+                                .min(browser.rows[row].films.len() - 1),
+                        )
+                    });
+                browser.reveal(row, card);
+                self.focus = Target::Film(row, card);
+                self.dirty = true;
+            }
+            return vec![];
+        }
         // The detail page has only Play.
         let Target::Film(row, card) = self.focus else {
             return vec![];
         };
+        if row == 0 && matches!(direction, Direction::Up) {
+            self.criterion.above = Some((row, card));
+            self.focus = Target::CriterionSearch;
+            self.dirty = true;
+            return vec![];
+        }
         let browser = &mut self.criterion;
         let (row, card) = match direction {
             Direction::Left => (row, card.saturating_sub(1)),
@@ -1293,6 +1620,10 @@ impl State {
                 Some(film) => self.play(film),
                 None => vec![],
             },
+            Target::CriterionSearch => {
+                self.open_criterion_search();
+                vec![]
+            }
             Target::CriterionRetry => {
                 let browser = &mut self.criterion;
                 browser.requested = true;
@@ -1423,10 +1754,18 @@ impl State {
         let browser = &mut self.criterion;
         if film_page(&link) {
             let detail = browser.detail.as_mut().map(|detail| &mut detail.film);
+            let channel = browser
+                .channel
+                .as_mut()
+                .map(|channel| &mut channel.rows)
+                .into_iter()
+                .flatten();
             for film in browser
                 .rows
                 .iter_mut()
+                .chain(channel)
                 .flat_map(|row| &mut row.films)
+                .chain(browser.catalog.iter_mut().map(|film| &mut film.listed.film))
                 .chain(detail)
             {
                 if film.id == id {
@@ -1455,8 +1794,142 @@ impl State {
             self.close_film();
             return vec![];
         }
+        if self.criterion.searching() {
+            if self.focus == Target::CriterionSearch {
+                // Back from the field ends the search: the Channel's rows, as they were left.
+                self.criterion.query.clear();
+                self.end_criterion_search();
+            } else {
+                // Back from a result returns to the field, which keeps the search.
+                self.focus = Target::CriterionSearch;
+            }
+            self.reconcile_criterion_focus();
+            self.dirty = true;
+            return vec![];
+        }
         self.close_criterion();
         vec![]
+    }
+
+    /// OK on the search field: the keyboard comes up over the screen, which stays drawn
+    /// behind it, its results following what is typed.
+    pub fn open_criterion_search(&mut self) {
+        let Some(Overlay::Criterion { restore }) = self.overlay.clone() else {
+            return;
+        };
+        self.criterion.typing = Some(restore);
+        self.open_keyboard(crate::state::TextField::Criterion);
+    }
+
+    /// The keyboard closed by any route: the screen comes back, focused on the search field.
+    pub(crate) fn commit_criterion_search(&mut self) {
+        let Some(restore) = self.criterion.typing.take() else {
+            return;
+        };
+        self.overlay = Some(Overlay::Criterion { restore });
+        self.panel_started = None;
+        self.focus = Target::CriterionSearch;
+        self.reconcile_criterion_focus();
+        self.dirty = true;
+    }
+
+    /// Enter on the keyboard: the first result, when there is one.
+    pub(crate) fn focus_first_criterion_result(&mut self) {
+        if self.criterion_open() && self.criterion.searching() && !self.criterion.rows.is_empty() {
+            self.focus = Target::Film(0, 0);
+            self.criterion.reveal(0, 0);
+            self.criterion.settle();
+        }
+    }
+
+    /// The search text changed: its results replace the rows, or, once it is empty again,
+    /// the Channel's rows come back as they were left.
+    pub(crate) fn criterion_search_changed(&mut self) {
+        let browser = &mut self.criterion;
+        if browser.query.trim().is_empty() {
+            self.end_criterion_search();
+            return;
+        }
+        let films = if browser.catalog.is_empty() {
+            search(&browser.query, &index_rows(browser.channel_rows()))
+        } else {
+            search(&browser.query, &browser.catalog)
+        };
+        let language = self.preferences.language;
+        let heading = if films.is_empty() {
+            String::new()
+        } else {
+            language.format("criterionResults", &[("query", browser.query.trim())])
+        };
+        let rows: Vec<Row> = films
+            .chunks(VISIBLE_CARDS)
+            .enumerate()
+            .map(|(index, films)| Row {
+                title: if index == 0 {
+                    heading.clone()
+                } else {
+                    String::new()
+                },
+                films: films.to_vec(),
+            })
+            .collect();
+        if browser.channel.is_none() {
+            browser.channel = Some(Channel {
+                rows: std::mem::take(&mut browser.rows),
+                first_row: browser.first_row,
+                first_card: std::mem::take(&mut browser.first_card),
+                focus: match (&self.focus, browser.above) {
+                    (focus @ Target::Film(..), _) => focus.clone(),
+                    (_, Some((row, card))) => Target::Film(row, card),
+                    _ => Target::Film(browser.first_row, browser.first_card(browser.first_row)),
+                },
+            });
+        }
+        browser.above = None;
+        browser.first_row = 0;
+        browser.first_card = vec![0; rows.len()];
+        browser.rows = rows;
+        browser.settle();
+        // Results replace each other as typing goes on: a focused one may no longer exist.
+        if self.criterion_open() {
+            self.reconcile_criterion_focus();
+        }
+        self.dirty = true;
+    }
+
+    /// Puts the Channel's rows back where they were before the search.
+    fn end_criterion_search(&mut self) {
+        let browser = &mut self.criterion;
+        let Some(channel) = browser.channel.take() else {
+            return;
+        };
+        browser.above = None;
+        browser.rows = channel.rows;
+        browser.first_row = channel.first_row;
+        browser.first_card = channel.first_card;
+        browser.settle();
+        if self.criterion_open() && self.criterion.detail.is_none() {
+            self.focus = channel.focus;
+            self.reconcile_criterion_focus();
+        }
+        self.dirty = true;
+    }
+
+    /// Whether to ask the catalog worker for the whole catalog now.
+    pub fn criterion_catalog_requested(&mut self) -> bool {
+        std::mem::take(&mut self.criterion.catalog_requested)
+    }
+
+    /// The whole catalog from the catalog worker. An empty one (no TMDB token, or TMDB away)
+    /// does not replace one already had.
+    pub fn accept_criterion_catalog(&mut self, films: Vec<Listed>) {
+        if films.is_empty() && !self.criterion.catalog.is_empty() {
+            return;
+        }
+        self.criterion.catalog = index(films);
+        if self.criterion.searching() {
+            self.criterion_search_changed();
+        }
     }
 
     /// Whether to ask the catalog worker for rows now.
@@ -1470,7 +1943,7 @@ impl State {
     pub fn criterion_image_requests(
         &mut self,
     ) -> Option<(Vec<String>, Vec<crate::posters::Request>)> {
-        if !self.criterion_open() {
+        if !self.criterion_visible() {
             return None;
         }
         let browser = &mut self.criterion;
@@ -1485,6 +1958,11 @@ impl State {
                 || browser.pending.contains(&film.id)
                 || browser.failed.contains(&film.id)
             {
+                continue;
+            }
+            // TMDB has no 16:9 image for some films: their cards show the title.
+            if film.image.is_empty() {
+                browser.failed.insert(film.id.clone());
                 continue;
             }
             browser.pending.insert(film.id.clone());
@@ -1502,6 +1980,9 @@ impl State {
         let mut hero_changed = false;
         if let Some(detail) = &mut browser.detail {
             wanted.push(hero_key(&detail.film.id));
+            if detail.film.image.is_empty() {
+                detail.hero_failed = true;
+            }
             if detail.hero.is_none() && !detail.hero_pending && !detail.hero_failed {
                 detail.hero_pending = true;
                 hero_changed = true;

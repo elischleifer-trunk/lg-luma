@@ -52,6 +52,7 @@ PROMPTS = {
     "greeting_name": "Your name",
     "input_name": "Input name",
     "camera_name": "Camera name",
+    "criterion_search": "Criterion Channel",
 }
 
 

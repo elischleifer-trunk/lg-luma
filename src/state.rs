@@ -127,6 +127,8 @@ pub enum Target {
     CriterionRetry,
     /// Play on a film's detail page.
     CriterionPlay,
+    /// The Criterion screen's search field, in its header.
+    CriterionSearch,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -225,6 +227,8 @@ pub enum TextField {
     Name,
     InputName,
     CameraName,
+    /// The Criterion screen's search: films on the Channel.
+    Criterion,
 }
 
 impl TextField {
@@ -237,6 +241,7 @@ impl TextField {
             Self::InputName => "input_name",
             Self::CameraName => "camera_name",
             Self::Titles => "titles",
+            Self::Criterion => "criterion_search",
         }
     }
 }
@@ -2159,6 +2164,17 @@ impl State {
                 self.dirty = true;
                 return;
             }
+            if self.keyboard_field == TextField::Criterion {
+                let query = &mut self.criterion.query;
+                let length = query.chars().count();
+                query.extend(
+                    text.chars()
+                        .filter(|c| !c.is_control())
+                        .take(120usize.saturating_sub(length)),
+                );
+                self.criterion_search_changed();
+                return;
+            }
             if self.keyboard_field == TextField::Titles {
                 if std::mem::take(&mut self.title_replace_pending) {
                     self.title_query.clear();
@@ -2195,6 +2211,9 @@ impl State {
                 self.input_name.pop();
             } else if self.keyboard_field == TextField::CameraName {
                 self.cameras.name_draft.pop();
+            } else if self.keyboard_field == TextField::Criterion {
+                self.criterion.query.pop();
+                self.criterion_search_changed();
             } else if self.keyboard_field == TextField::Titles {
                 if std::mem::take(&mut self.title_replace_pending) {
                     // LG's keyboard is empty, so its Backspace clears the kept search.
@@ -2260,6 +2279,7 @@ impl State {
                 self.title_focus_pending = true;
                 self.focus_pending_title();
             }
+            TextField::Criterion => self.focus_first_criterion_result(),
             _ => {}
         }
     }
@@ -2311,6 +2331,10 @@ impl State {
         }
         if self.keyboard_field == TextField::CameraName {
             return self.commit_camera_name();
+        }
+        if self.keyboard_field == TextField::Criterion {
+            self.commit_criterion_search();
+            return vec![];
         }
         self.commit_input_name()
     }
@@ -2422,6 +2446,9 @@ impl State {
             self.input_name = query;
         } else if self.keyboard_field == TextField::CameraName {
             self.cameras.name_draft = query;
+        } else if self.keyboard_field == TextField::Criterion {
+            self.criterion.query = query;
+            self.criterion_search_changed();
         } else if self.keyboard_field == TextField::Titles {
             self.title_query = query;
             self.scroll = 0.;
@@ -2445,6 +2472,7 @@ impl State {
             TextField::CameraName => self.cameras.name_draft.clear(),
             TextField::Apps => self.query.clear(),
             TextField::Titles => self.title_query.clear(),
+            TextField::Criterion => self.criterion.query.clear(),
         }
         self.text(text);
     }
@@ -2457,6 +2485,7 @@ impl State {
             TextField::CameraName => &self.cameras.name_draft,
             TextField::Apps => &self.query,
             TextField::Titles => &self.title_query,
+            TextField::Criterion => &self.criterion.query,
         }
     }
     pub fn open_keyboard(&mut self, field: TextField) {
@@ -2501,6 +2530,7 @@ impl State {
             TextField::CameraName => Target::CameraRename,
             TextField::Apps => Target::Search,
             TextField::Titles => Target::Nav(SEARCH_TAB),
+            TextField::Criterion => Target::CriterionSearch,
         };
         self.panel_started = None;
         self.dirty = true;
@@ -2527,6 +2557,7 @@ impl State {
                 .map_or(Target::CameraGear, |(id, _)| Target::Camera(id.clone())),
             TextField::Apps => Target::Search,
             TextField::Titles => Target::Nav(SEARCH_TAB),
+            TextField::Criterion => Target::CriterionSearch,
         }
     }
 
@@ -3269,6 +3300,10 @@ impl State {
                     TextField::CameraName => self.cameras.name_draft.clear(),
                     TextField::Apps => self.query.clear(),
                     TextField::Titles => self.title_query.clear(),
+                    TextField::Criterion => {
+                        self.criterion.query.clear();
+                        self.criterion_search_changed();
+                    }
                 },
                 "Done" => {
                     self.overlay = None;

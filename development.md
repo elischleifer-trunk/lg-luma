@@ -686,6 +686,25 @@ inverted drawing (`view::qr_code`).
 Desktop builds serve the same API and print overlay launches and toasts instead of calling webOS.
 Verify overlay stacking, key focus, pausing and the overlay install on TV hardware.
 
+## Criterion search
+
+The Criterion screen's search (`criterion::search`, `Target::CriterionSearch`,
+`TextField::Criterion`) matches a local index, not Luma's Search tab pipeline: that pipeline
+drops foreign and little-seen titles (`relevance::Signals::keep`), which is most of the
+Channel, and its Movie of the Night search spans every service on a metered quota. The index is
+every film TMDB lists for the Channel's watch provider in the US (`criterion::tmdb_catalog`,
+about 160 discover pages, most popular first), read on its own worker thread so a Play lookup
+is not kept waiting, and kept in `criterion-cache` for a day (an older copy fills in while a
+new one loads). Matching reuses `relevance::match_tier` on the title and original title,
+ranked by tier and then TMDB popularity, capped at `RESULT_LIMIT`, and runs on the SDL thread
+at each keystroke. Without a TMDB token the films in the rows are searched instead.
+
+While a search is typed, its results replace `Browser::rows`, chunked four to a row, and the
+Channel's rows wait in `Browser::channel` with their scroll and focus; new rows from the worker
+update that copy. Like renaming a camera, the keyboard takes the screen's overlay
+(`Browser::typing` holds the screen's Back target) and the screen stays drawn behind it, so on
+the TV the results show above LG's keyboard as they change.
+
 ## Criterion player sign-in
 
 The Channel keeps its sign-in in cookies: `__session` on `www.criterionchannel.com` (HttpOnly,

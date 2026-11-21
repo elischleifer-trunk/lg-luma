@@ -589,14 +589,42 @@ pub fn longer_word<'a>(
     (votes as f64 >= LONGER_WORD_FACTOR * typed as f64).then_some(best)
 }
 
+/// A text split into words as [`match_tier`] compares them, kept for matching many times.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Words {
+    words: Vec<String>,
+    spaced: String,
+    joined: String,
+}
+
+impl Words {
+    pub fn new(text: &str) -> Self {
+        let words = words(text);
+        Self {
+            spaced: words.join(" "),
+            joined: words.concat(),
+            words,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.words.is_empty()
+    }
+}
+
 /// How a title matches the query; lower is better.
 pub fn match_tier(query: &str, title: &str) -> u8 {
-    let query = words(query);
-    let title = words(title);
+    match_words(&Words::new(query), &Words::new(title))
+}
+
+/// [`match_tier`] for texts already split into words.
+pub fn match_words(query: &Words, title: &Words) -> u8 {
+    let (query_text, title_text) = (query, title);
+    let (query, title) = (&query.words, &title.words);
     if query.is_empty() {
         return 4;
     }
-    if title.starts_with(&query) {
+    if title.starts_with(query) {
         return 0;
     }
     let (last, whole) = query.split_last().unwrap();
@@ -606,12 +634,17 @@ pub fn match_tier(query: &str, title: &str) -> u8 {
     if leading {
         return 1;
     }
-    if title.windows(query.len()).any(|window| window == query) {
+    if title
+        .windows(query.len())
+        .any(|window| window == query.as_slice())
+    {
         return 2;
     }
     // Punctuation counts as nothing as well as a space: "oceans" finds "Ocean's Eleven",
     // "spiderman" finds "Spider-Man".
-    if title.join(" ").contains(&query.join(" ")) || title.concat().contains(&query.concat()) {
+    if title_text.spaced.contains(&query_text.spaced)
+        || title_text.joined.contains(&query_text.joined)
+    {
         return 3;
     }
     4
