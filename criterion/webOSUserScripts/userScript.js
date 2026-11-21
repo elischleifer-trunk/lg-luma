@@ -103,6 +103,41 @@
     return /^\s*log\s*in\b/i.test(String(text || ''));
   }
 
+  // How far into the breath (`BREATH` ms, out and back) the clock is, as an animation delay.
+  function breathDelay(now, breath) {
+    var period = breath || 3200;
+    return -(Math.floor(now) % period) + 'ms';
+  }
+
+  var WIDEVINE = 'com.widevine.alpha';
+
+  function isPlayReady(system) {
+    return String(system).indexOf('com.microsoft.playready') === 0;
+  }
+
+  // The same media configurations without PlayReady's robustness levels, for asking whether
+  // Widevine could play them.
+  function widevineConfigs(configs) {
+    return (configs || []).map(function (config) {
+      var copy = {};
+      Object.keys(config).forEach(function (key) {
+        copy[key] = config[key];
+      });
+      ['videoCapabilities', 'audioCapabilities'].forEach(function (key) {
+        if (!config[key]) return;
+        copy[key] = config[key].map(function (capability) {
+          return { contentType: capability.contentType, robustness: '' };
+        });
+      });
+      return copy;
+    });
+  }
+
+  // Whether `here` is the page `wanted`, ignoring any fragment.
+  function samePage(here, wanted) {
+    return String(here).split('#')[0] === String(wanted).split('#')[0];
+  }
+
   var SKIP = 10;
   root.LumaCriterion = {
     ORIGIN: ORIGIN,
@@ -116,10 +151,37 @@
     launchKey: launchKey,
     loginUrl: loginUrl,
     isLogIn: isLogIn,
+    breathDelay: breathDelay,
+    isPlayReady: isPlayReady,
+    widevineConfigs: widevineConfigs,
+    samePage: samePage,
   };
   if (typeof document === 'undefined') return;
 
   var palm = root.PalmSystem;
+
+  // ---- DRM ----------------------------------------------------------------------------------
+
+  // The Channel's player offers each film with PlayReady first and Widevine second. On the TVs
+  // tested (webOS 11), PlayReady fails most films a second into playback (the key turns
+  // "internal-error"; the Channel shows "Unable to play video", error 242635), while Widevine
+  // plays the same stream every time. Where the TV has Widevine, the page is told PlayReady is
+  // missing, so the player picks Widevine.
+  var keySystems = root.navigator && root.navigator.requestMediaKeySystemAccess;
+  if (keySystems && location.origin === ORIGIN) {
+    var askKeySystem = keySystems.bind(root.navigator);
+    root.navigator.requestMediaKeySystemAccess = function (system, configs) {
+      if (!isPlayReady(system)) return askKeySystem(system, configs);
+      return askKeySystem(WIDEVINE, widevineConfigs(configs)).then(
+        function () {
+          return Promise.reject(new DOMException('Widevine is used instead', 'NotSupportedError'));
+        },
+        function () {
+          return askKeySystem(system, configs);
+        }
+      );
+    };
+  }
 
   // ---- Loading cover --------------------------------------------------------------------------
 
@@ -128,6 +190,13 @@
   // early wherever the viewer has something to do: a sign-in by hand, or a page that never plays.
   var COVER_ID = 'luma-criterion-cover';
   var COVER_LIMIT = 20000;
+  // One slow breath of the mark, in and out. A film passes through several pages (the start
+  // page, the film's page, perhaps the sign-in), and each draws its own cover: every one starts
+  // its breath where the clock says, so the mark carries on smoothly instead of restarting.
+  // The mark is its own compositor layer, so a busy page cannot stall it.
+  var BREATH = 3200;
+  // Half-second checks of the player sitting at its Play button before the cover lifts.
+  var IDLE_CHECKS = 8;
   var COVER_STYLE =
     'html{background:#000!important}' +
     '#' +
@@ -137,9 +206,11 @@
     'justify-content:center;opacity:1;transition:opacity .3s ease-out;cursor:none}' +
     '#' +
     COVER_ID +
-    ' svg{width:120px;height:120px;color:#fff;' +
-    'animation:luma-criterion-breathe 1.6s ease-in-out infinite alternate}' +
-    '@keyframes luma-criterion-breathe{from{opacity:.35}to{opacity:.9}}';
+    ' svg{width:120px;height:120px;color:#fff;will-change:opacity;transform:translateZ(0);' +
+    'animation:luma-criterion-breathe ' +
+    BREATH / 2 +
+    'ms ease-in-out infinite alternate}' +
+    '@keyframes luma-criterion-breathe{from{opacity:.4}to{opacity:.9}}';
   var MARK =
     '<svg viewBox="0 0 60 60" fill="currentColor" aria-hidden="true"><path d="M4.14577 14.847C-4.25441 29.1014 0.50232 47.4716 14.8737 55.8034C14.9749 55.8034 14.9749 55.9038 15.0761 55.9038C21.1486 59.4172 28.3343 60.7222 35.2163 59.618L32.9898 46.267C32.1801 46.3674 31.4717 46.4678 30.662 46.4678C27.6258 46.4678 24.5896 45.6647 21.9582 44.1589C14.0641 39.6417 11.3315 29.6034 15.8858 21.7735C15.8858 21.7735 15.8858 21.6731 15.987 21.6731C20.6425 13.8432 30.9656 11.2332 38.8598 15.8508C42.1996 17.7581 44.7298 20.7696 46.0455 24.3834L59 19.7658C53.2312 4.10599 35.7224 -3.92468 19.9341 1.89755C13.2544 4.30675 7.78923 8.824 4.14577 14.847Z"/></svg>';
   var DONE = 'luma-cover-done';
@@ -193,6 +264,7 @@
     cover.id = COVER_ID;
     cover.setAttribute('data-launch', key);
     cover.innerHTML = MARK;
+    cover.firstChild.style.animationDelay = breathDelay(Date.now(), BREATH);
     cover.appendChild(style);
     // At the very start of a page the document has no root yet: add the cover once it does.
     if (document.documentElement) document.documentElement.appendChild(cover);
@@ -212,6 +284,17 @@
     coverTimer = setTimeout(function () {
       uncover(true);
     }, COVER_LIMIT);
+    // The player waiting at its Play button (Luma could not press it): show it, so the viewer
+    // presses OK, rather than breathing until the limit.
+    var waiting = 0;
+    var idle = setInterval(function () {
+      if (!cover) return clearInterval(idle);
+      waiting = playButton() ? waiting + 1 : 0;
+      if (waiting >= IDLE_CHECKS) {
+        clearInterval(idle);
+        uncover(true);
+      }
+    }, 500);
   }
 
   var launch = launchParams();
@@ -303,6 +386,39 @@
     if (next.scrollIntoView) next.scrollIntoView({ block: 'nearest' });
   }
 
+  // The Channel's player, open but not playing, shows a large Play button.
+  function playButton() {
+    var plays = document.querySelectorAll('button[aria-label="Play"]');
+    for (var i = 0; i < plays.length; i++) {
+      if (visible(plays[i])) return plays[i];
+    }
+    return null;
+  }
+
+  // What OK presses while nothing is highlighted: the player's Play button, which starts the
+  // film through the Channel's own player.
+  function startButton() {
+    var active = document.activeElement;
+    if (active && active !== document.body && active.matches('button, a[href], input')) {
+      return null;
+    }
+    return playButton();
+  }
+
+  // Luma starts the film it opened: the TV lets a page play sound only after a press on that
+  // page, and a film's page is new, so Luma presses Play through the web engine's DevTools,
+  // which count as the viewer's press (see `criterion_session::start_film`). `wanted` is the
+  // film's page; until this page is that one, with its Play button showing, Luma asks again.
+  function startFilm(wanted) {
+    if (!samePage(location.href, wanted)) return 'wait';
+    if (film() && !film().paused) return 'playing';
+    var play = playButton();
+    if (!play) return 'wait';
+    play.click();
+    return 'pressed';
+  }
+  root.LumaCriterion.startFilm = startFilm;
+
   function fill(video) {
     addStyle();
     var box = playerBox(video);
@@ -328,6 +444,18 @@
     function (event) {
       var video = film();
       var name = action(event.keyCode, Boolean(video));
+      // OK or Play while the player shows its Play button (before the film has started, its
+      // video has no data, so it is not `film()`): press the button, as a click would. The
+      // press is the viewer's, so the TV lets the film start with sound.
+      if ((event.keyCode === 13 || name === 'play') && location.origin === ORIGIN) {
+        var button = startButton();
+        if (button) {
+          event.preventDefault();
+          event.stopPropagation();
+          button.click();
+          return;
+        }
+      }
       if (!name) {
         var step = { 37: -1, 38: -1, 39: 1, 40: 1 }[event.keyCode];
         if (!video && step && location.origin === ORIGIN) {
