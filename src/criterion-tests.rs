@@ -729,3 +729,53 @@ fn artwork_cached_at_the_old_video_host_address_is_fetched_from_the_new_one() {
     film.image = "https://image.tmdb.org/t/p/w780/abc.jpg".into();
     assert_eq!(film.hero(), "https://image.tmdb.org/t/p/w1280/abc.jpg");
 }
+
+#[test]
+fn back_from_a_film_page_cancels_its_play_lookup() {
+    let page = "https://www.criterionchannel.com/films/3sWhDjsA/la-haine";
+    let mut state = opened(&[2]);
+    let film = &mut state.criterion.rows[0].films[0];
+    film.link = None;
+    film.tmdb = Some(406);
+    let id = film.id.clone();
+    assert_eq!(state.activate(), vec![]);
+    assert_eq!(state.activate(), vec![], "Play looks up the page");
+    assert!(state.criterion_resolve_request().is_some());
+    state.back();
+    assert!(state.criterion.detail.is_none());
+    // The answer only keeps the film's page.
+    assert_eq!(state.criterion_resolved(&id, page.into()), vec![]);
+    assert_eq!(state.criterion.rows[0].films[0].link.as_deref(), Some(page));
+}
+
+#[test]
+fn a_film_page_asks_for_its_details_once_while_they_load() {
+    let mut state = opened(&[2]);
+    state.activate();
+    let film = state.criterion_details_request().unwrap();
+    state.back();
+    state.activate();
+    assert_eq!(state.criterion_details_request(), None, "still loading");
+    state.accept_criterion_details((film.id.clone(), Err("offline".into())));
+    assert!(state.criterion.detail.as_ref().unwrap().failed);
+    // After a failure, the next visit asks again.
+    state.back();
+    state.activate();
+    let again = state.criterion_details_request().unwrap();
+    state.accept_criterion_details((again.id, Err("offline".into())));
+    // A request Back cancels before it was sent does not block the next visit.
+    state.back();
+    state.activate();
+    state.back();
+    state.activate();
+    assert!(state.criterion_details_request().is_some());
+}
+
+#[test]
+fn odd_durations_are_rejected_without_panicking() {
+    assert_eq!(iso_minutes("PT90分"), None);
+    assert_eq!(iso_minutes("PT4294967295H"), None);
+    assert_eq!(iso_minutes("PT99999999999M"), None);
+    assert_eq!(iso_minutes("PT"), None);
+    assert_eq!(iso_minutes("PT1H"), Some(60));
+}

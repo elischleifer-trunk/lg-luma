@@ -395,17 +395,20 @@ fn element_text(html: &str, marker: &str, end: &str) -> Option<String> {
 /// Whole minutes in an ISO 8601 duration such as `PT1H38M20S`.
 fn iso_minutes(duration: &str) -> Option<u32> {
     let mut rest = duration.strip_prefix("PT")?;
-    let mut minutes = 0;
+    let mut minutes: u32 = 0;
     while !rest.is_empty() {
         let digits = rest.find(|c: char| !c.is_ascii_digit())?;
         let value: u32 = rest[..digits].parse().ok()?;
-        minutes += match &rest[digits..digits + 1] {
-            "H" => value * 60,
-            "M" => value,
-            "S" => 0,
+        // The page is remote: a unit may be any character, and numbers any size.
+        let unit = rest[digits..].chars().next()?;
+        let add = match unit {
+            'H' => value.checked_mul(60)?,
+            'M' => value,
+            'S' => 0,
             _ => return None,
         };
-        rest = &rest[digits + 1..];
+        minutes = minutes.checked_add(add)?;
+        rest = &rest[digits + unit.len_utf8()..];
     }
     (minutes > 0).then_some(minutes)
 }
@@ -991,6 +994,8 @@ pub struct Browser {
     details_request: Option<Film>,
     /// Details found this run, by film ID.
     described: HashMap<String, Details>,
+    /// Films whose details the catalog worker has been asked for and not yet answered.
+    describing: HashSet<String>,
 }
 
 /// A film's page: its backdrop, details and Play, like a streaming service's title page.
@@ -1066,6 +1071,13 @@ impl Browser {
             } else if card >= *first + VISIBLE_CARDS {
                 *first = card + 1 - VISIBLE_CARDS;
             }
+        }
+    }
+
+    /// Drops a details request the main loop has not sent yet.
+    fn cancel_details_request(&mut self) {
+        if let Some(film) = self.details_request.take() {
+            self.describing.remove(&film.id);
         }
     }
 
@@ -1159,7 +1171,7 @@ impl State {
         self.criterion.resolving = None;
         self.criterion.resolve_request = None;
         self.criterion.detail = None;
-        self.criterion.details_request = None;
+        self.criterion.cancel_details_request();
         if let Some(Overlay::Criterion { restore }) = self.overlay.take() {
             self.focus = restore;
             self.reconcile_focus();
@@ -1300,7 +1312,8 @@ impl State {
             return;
         };
         let details = browser.described.get(&film.id).cloned();
-        if details.is_none() {
+        // One request per film at a time: reopening a page still loading asks again for nothing.
+        if details.is_none() && browser.describing.insert(film.id.clone()) {
             browser.details_request = Some(film.clone());
         }
         browser.detail = Some(Detail {
@@ -1330,7 +1343,10 @@ impl State {
         let Some(detail) = self.criterion.detail.take() else {
             return;
         };
-        self.criterion.details_request = None;
+        self.criterion.cancel_details_request();
+        // A lookup for Play answered after this only keeps the film's page; it opens nothing.
+        self.criterion.resolving = None;
+        self.criterion.resolve_request = None;
         self.focus = Target::Film(detail.row, detail.card);
         self.criterion.reveal(detail.row, detail.card);
         self.reconcile_criterion_focus();
@@ -1370,6 +1386,7 @@ impl State {
     /// A film's details from the catalog worker.
     pub fn accept_criterion_details(&mut self, (id, details): Described) {
         let browser = &mut self.criterion;
+        browser.describing.remove(&id);
         if let Ok(details) = &details {
             browser.described.insert(id.clone(), details.clone());
         }
