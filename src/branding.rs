@@ -26,6 +26,8 @@ impl Brand {
             "nrk-tv" => (0.62, 56.),
             "tv2-play" => (0.56, 80.),
             "plex" => (0.62, 52.),
+            // A square mark, sized to sit level with Crunchyroll's.
+            "criterion" => (0.40, 80.),
             "filmin" => (0.62, 46.),
             "hbo-max" | "bbc-iplayer" | "crunchyroll" | "twitch" | "dazn" | "paramount-plus"
             | "channel-4" | "wavve" => (0.70, 64.),
@@ -139,6 +141,8 @@ pub const BRANDS: &[Brand] = &[
     video("filmin", "Filmin", &["filmin"]),
     video("nrk-tv", "NRK TV", &["no.nrk.webos.smarttv"]),
     video("tv2-play", "TV 2 Play", &["tv2sumo"]),
+    // Luma's own Criterion screen (`criterion::APP`); the Channel has no LG app.
+    video("criterion", "Criterion Channel", &["luma.criterion"]),
 ];
 
 pub fn for_app(id: &str) -> Option<&'static Brand> {

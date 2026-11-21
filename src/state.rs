@@ -1041,7 +1041,8 @@ impl State {
         self.inventory.apps.push(App {
             id: crate::criterion::APP.into(),
             title: "Criterion Channel".into(),
-            brand: "custom".into(),
+            // The Channel's "C" mark (`assets/logos/criterion.svg`) on its black surface.
+            brand: "criterion".into(),
             category: "Streaming".into(),
             icon: None,
             mark: "popcorn",

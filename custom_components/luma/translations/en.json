@@ -128,6 +128,7 @@
       "memory": { "name": "Memory" },
       "cpu": { "name": "CPU" },
       "last_problem": { "name": "Last problem" },
+      "criterion_session_expires": { "name": "Criterion sign-in expires" },
       "dev_access": {
         "name": "Developer access",
         "state": {

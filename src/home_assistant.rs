@@ -1010,6 +1010,12 @@ impl<T: Tv> Api<T> {
                                     None => json!(false),
                                 }
                             }),
+                            // When the Criterion player's stored sign-in ends, so Home
+                            // Assistant keeps a copy and restores it. Never the cookies.
+                            "criterion_session": self.criterion_session_path().map(|path| {
+                                crate::criterion_session::load(&path)
+                                    .map_or(Value::Null, |session| session.status())
+                            }),
                             // Whether this server's keyboard webhook is registered, so it
                             // registers again after Luma restarts.
                             "keyboard_hook": self.keyboard_hooks.iter()
@@ -1022,6 +1028,9 @@ impl<T: Tv> Api<T> {
                     ("PUT", "/api/streaming-keys") => self.set_streaming_keys(&body),
                     ("PUT", "/api/criterion-account") => self.set_criterion(&body),
                     ("DELETE", "/api/criterion-account") => self.forget_criterion(),
+                    ("GET", "/api/criterion-session") => self.criterion_session(),
+                    ("PUT", "/api/criterion-session") => self.set_criterion_session(&body),
+                    ("DELETE", "/api/criterion-session") => self.forget_criterion_session(),
                     ("POST", "/api/overlay") => self.show(&body, now),
                     ("DELETE", "/api/overlay") => {
                         // Dismissing closes a doorbell card, never a camera the owner is
@@ -1370,7 +1379,7 @@ impl<T: Tv> Api<T> {
         reply(200, json!({"criterion_account": true}))
     }
 
-    /// Removes the account file, logging (never failing on) an error.
+    /// Removes the account file and the stored sign-in, logging (never failing on) an error.
     fn forget_criterion_file(&self) {
         if let Some(path) = self.criterion_account_path()
             && let Err(message) = crate::criterion_account::forget(&path)
@@ -1378,6 +1387,14 @@ impl<T: Tv> Api<T> {
             crate::telemetry::log_error!(
                 "home-assistant",
                 "could not remove the Criterion account: {message}"
+            );
+        }
+        if let Some(path) = self.criterion_session_path()
+            && let Err(message) = crate::criterion_session::forget(&path, false)
+        {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion sign-in: {message}"
             );
         }
     }
@@ -1394,6 +1411,79 @@ impl<T: Tv> Api<T> {
             return error(500, "Could not remove the account");
         }
         reply(200, json!({"criterion_account": false}))
+    }
+
+    fn criterion_session_path(&self) -> Option<PathBuf> {
+        self.store_path
+            .as_deref()
+            .map(crate::criterion_session::path)
+    }
+
+    /// Home Assistant's copy of the player's sign-in, which it sends back after a reset.
+    fn criterion_session(&self) -> Reply {
+        match self
+            .criterion_session_path()
+            .and_then(|path| crate::criterion_session::load(&path))
+        {
+            Some(session) => reply(
+                200,
+                json!({"cookies": session.cookies, "expires": session.expires()}),
+            ),
+            None => error(404, "No Criterion sign-in on this TV"),
+        }
+    }
+
+    /// A sign-in Home Assistant kept: taken only when it lasts longer than the TV's, or the TV's
+    /// is missing or no longer accepted.
+    fn set_criterion_session(&mut self, body: &Value) -> Reply {
+        let Some(path) = self.criterion_session_path() else {
+            return error(503, "This TV has no storage for the sign-in");
+        };
+        let cookies = body
+            .get("cookies")
+            .cloned()
+            .and_then(|cookies| serde_json::from_value(cookies).ok())
+            .ok_or("cookies must be a list of cookies")
+            .and_then(crate::criterion_session::validate);
+        let cookies = match cookies {
+            Ok(cookies) => cookies,
+            Err(message) => return error(400, message),
+        };
+        match crate::criterion_session::offer(&path, cookies, crate::criterion_session::now()) {
+            Ok((stored, session)) => {
+                if stored {
+                    crate::telemetry::log_info!("criterion", "Home Assistant restored the sign-in");
+                }
+                reply(
+                    200,
+                    json!({
+                        "stored": stored,
+                        "criterion_session": session.map_or(Value::Null, |s| s.status()),
+                    }),
+                )
+            }
+            Err(message) => {
+                crate::telemetry::log_error!(
+                    "home-assistant",
+                    "could not save the Criterion sign-in: {message}"
+                );
+                error(500, "Could not save the sign-in")
+            }
+        }
+    }
+
+    fn forget_criterion_session(&mut self) -> Reply {
+        let Some(path) = self.criterion_session_path() else {
+            return error(503, "This TV has no storage for the sign-in");
+        };
+        if let Err(message) = crate::criterion_session::forget(&path, true) {
+            crate::telemetry::log_error!(
+                "home-assistant",
+                "could not remove the Criterion sign-in: {message}"
+            );
+            return error(500, "Could not remove the sign-in");
+        }
+        reply(200, json!({"criterion_session": null}))
     }
 
     /// The Criterion player's script, on the Channel's sign-in page, trades the one-time code

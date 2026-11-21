@@ -155,6 +155,25 @@ class LumaClient:
         """Remove the TV's Criterion account."""
         return await self._request("DELETE", "/api/criterion-account")
 
+    async def criterion_session(self) -> dict[str, Any] | None:
+        """The TV's Criterion Channel sign-in: `{"cookies": [...], "expires": ...}`, or None
+        when it holds none."""
+        try:
+            return await self._request("GET", "/api/criterion-session")
+        except LumaApiError as err:
+            if err.status == 404:
+                return None
+            raise
+
+    async def set_criterion_session(self, cookies: list[dict[str, Any]]) -> dict[str, Any]:
+        """Offer the TV a Criterion Channel sign-in. It keeps it only when it expires later than
+        its own (`stored`); returns that and the TV's `criterion_session` status."""
+        return await self._request("PUT", "/api/criterion-session", {"cookies": cookies})
+
+    async def forget_criterion_session(self) -> dict[str, Any]:
+        """Remove the TV's Criterion Channel sign-in."""
+        return await self._request("DELETE", "/api/criterion-session")
+
     async def diagnostics(self) -> dict[str, Any]:
         """Everything Luma has kept of its log, its latest performance summary and its state."""
         return await self._request("GET", "/api/diagnostics")

@@ -16,9 +16,18 @@
     <!-- webOS adds this script to the Channel's pages too; it runs once per page. -->
     <script src="webOSUserScripts/userScript.js"></script>
     <script>
-      // Straight on to the film Luma asked for; the Channel's own page does the rest.
+      // On to the film Luma asked for once Luma has given the player its sign-in: Luma calls
+      // `lumaReady` through the web engine's DevTools as soon as this page opens. An older Luma,
+      // or a TV without DevTools, never calls; the film then opens after a short wait.
       var palm = window.PalmSystem;
-      location.replace(LumaCriterion.target(LumaCriterion.parse(palm && palm.launchParams)));
+      var params = LumaCriterion.parse(palm && palm.launchParams);
+      var opened = false;
+      window.lumaReady = function () {
+        if (opened) return;
+        opened = true;
+        location.replace(LumaCriterion.target(params));
+      };
+      setTimeout(window.lumaReady, 2500);
     </script>
   </body>
 </html>
