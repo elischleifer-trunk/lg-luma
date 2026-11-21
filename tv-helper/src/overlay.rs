@@ -117,6 +117,32 @@ fn sha256(bytes: &[u8]) -> String {
         .collect()
 }
 
+/// Home's boot hook runs scripts from this directory as root, so one created here must not be
+/// writable by others whatever the helper's umask (`tv/home.sh` creates it with `mkdir -m 755`).
+fn state_directory(system: &impl System) -> Result<()> {
+    let path = system.path(Path::new(STATE));
+    match std::fs::symlink_metadata(&path) {
+        Ok(metadata) if metadata.is_dir() => return Ok(()),
+        Ok(_) => return Err("Expected a real directory".into()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+        Err(e) => return Err(e.to_string()),
+    }
+    let mut builder = std::fs::DirBuilder::new();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        builder.mode(0o700);
+    }
+    builder.create(&path).map_err(|e| e.to_string())?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755))
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 pub fn marker(id: &str) -> String {
     format!("{STATE}/{id}.sha256")
 }
@@ -163,11 +189,12 @@ pub fn install(system: &impl System, directory: &Path, app: &Bundle) -> Result<V
     // file to compare, the version alone has to do, as for any other install.
     let same_version = current(&before);
     let baseline = before.and_then(|i| i.stamp);
+    // A missing or unreadable appinfo.json mid-install is not a replaced one.
     let done = |now: &Option<Installed>| {
         current(now)
             && (!same_version
                 || baseline.is_none()
-                || now.as_ref().and_then(|i| i.stamp) != baseline)
+                || matches!(now.as_ref().and_then(|i| i.stamp), Some(s) if Some(s) != baseline))
     };
     system::mkdir(system, "/tmp")?;
     system::write(system, app.staged, &bytes, 0o644)?;
@@ -184,11 +211,9 @@ pub fn install(system: &impl System, directory: &Path, app: &Bundle) -> Result<V
             if done(&installed(system, app.id)?) {
                 // Without the record the next request installs the same package again, which
                 // is slower but harmless, so a failed write does not fail the install.
-                let _ = system::mkdir(system, "/var/lib")
-                    .and_then(|()| system::mkdir(system, STATE))
-                    .and_then(|()| {
-                        system::write(system, &marker, format!("{digest}\n").as_bytes(), 0o644)
-                    });
+                let _ = state_directory(system).and_then(|()| {
+                    system::write(system, &marker, format!("{digest}\n").as_bytes(), 0o644)
+                });
                 return Ok(json!({"returnValue":true,"version":expected,"changed":true}));
             }
         }

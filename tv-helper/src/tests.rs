@@ -207,10 +207,12 @@ impl System for Fixture {
         if method == "install"
             && let Some(dir) = self.reinstall.borrow().as_deref()
         {
+            // Written beside the old file and renamed over it, so the replacement never reuses
+            // its inode, whatever the filesystem's timestamp resolution.
             let manifest = self.p(&format!("{dir}/appinfo.json"));
-            let bytes = fs::read(&manifest).unwrap();
-            fs::remove_file(&manifest).unwrap();
-            fs::write(&manifest, bytes).unwrap();
+            let replacement = manifest.with_file_name("appinfo.json.new");
+            fs::copy(&manifest, &replacement).unwrap();
+            fs::rename(&replacement, &manifest).unwrap();
         }
         if let Some(reply) = self
             .replies
@@ -1143,6 +1145,31 @@ fn a_changed_package_at_the_same_version_is_installed_again() {
     let reply = overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
     assert_eq!(reply["changed"], false);
     assert_eq!(f.calls().len(), installs + 1);
+
+    // On a TV that never enabled Home, the record's directory is created 0755.
+    let f = Fixture::new();
+    fs::remove_dir_all(f.p("/var/lib/luma-home")).unwrap();
+    overlay_bundle(&f, "2.33.0");
+    f.reply(
+        "getAppInfo",
+        Ok(json!({"returnValue":false,"errorText":"not found"})),
+    );
+    f.reply(
+        "getAppInfo",
+        Ok(json!({"returnValue":true,"appInfo":{"version":"2.33.0"}})),
+    );
+    f.reply("install", Ok(json!({"returnValue":true})));
+    overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
+    assert!(marker(&f, overlay::OVERLAY).is_some());
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mode = fs::metadata(f.p("/var/lib/luma-home"))
+            .unwrap()
+            .permissions()
+            .mode();
+        assert_eq!(mode & 0o777, 0o755);
+    }
 
     // A reinstall that never replaces the files times out.
     let f = Fixture::new();
