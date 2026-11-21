@@ -82,15 +82,17 @@ jobs:
             # head. The head's tree is the tested tree only when the base is an ancestor of the
             # head, so other pull_request runs (or ones whose base can't be found) don't count.
             # The run lists its PR only while the PR is open; merge-queue test PRs are closed by
-            # now, so otherwise the base comes from the PRs associated with the head commit. Any
-            # failed lookup skips the run, which at worst means full validation.
-            while read -r id event sha base url; do
+            # now, so otherwise the base comes from the PR (open or closed) whose head is the run's
+            # branch and commit. Any failed lookup skips the run, which at worst means full
+            # validation.
+            while read -r id event sha base owner branch url; do
               [ -n "$id" ] || continue
               [ "$(gh api "repos/$GH_REPO/git/commits/$sha" --jq .tree.sha 2>/dev/null)" = "$tree" ] || continue
               if [ "$event" = pull_request ]; then
                 if [ "$base" = - ]; then
-                  base="$(gh api "repos/$GH_REPO/commits/$sha/pulls" \
-                    --jq '[.[] | select(.head.sha == "'"$sha"'")][0].base.sha // empty' 2>/dev/null || true)"
+                  base="$(gh api -X GET "repos/$GH_REPO/pulls" -f state=all -f "head=$owner:$branch" \
+                    -f per_page=100 --jq '[.[] | select(.head.sha == "'"$sha"'")][0].base.sha // empty' \
+                    2>/dev/null || true)"
                 fi
                 [ -n "$base" ] && [ "$base" != - ] || continue
                 case "$(gh api "repos/$GH_REPO/compare/$base...$sha" --jq .status 2>/dev/null || true)" in
@@ -107,7 +109,7 @@ jobs:
                 break
               fi
             done < <(gh api "repos/$GH_REPO/actions/workflows/ci.yml/runs?status=success&per_page=100" \
-              --jq '.workflow_runs[] | "\(.id) \(.event) \(.head_sha) \(.pull_requests[0].base.sha // "-") \(.html_url)"')
+              --jq '.workflow_runs[] | "\(.id) \(.event) \(.head_sha) \(.pull_requests[0].base.sha // "-") \(.head_repository.owner.login // "-") \(.head_branch // "-") \(.html_url)"')
             [ "$validated" = true ] || evidence="no complete, passing CI run tested main's code"
           fi
           echo "validated=$validated" >> "$GITHUB_OUTPUT"
