@@ -445,7 +445,12 @@ as its own IPK with Luma's version and stages it in Luma's package as `overlay/o
 containing `.ipk` from an app; the helper copies it to `/tmp/luma-overlay.ipk` to install it)
 with its `appinfo.json`, which `tools/ipk.mjs` verifies. `luma-helper overlay install` (root, in
 process for a root Home) installs it via `appInstallService/dev/install` when the installed
-version differs. The page is plain script for webOS 4's Chromium 53; `overlay/logic.js` holds the
+version differs or the bundled package's SHA-256 differs from the one recorded in
+`/var/lib/luma-home/<app id>.sha256` after the last successful install, so a pull request's test
+IPK (same version, new content) replaces the installed overlay. A same-version reinstall counts as
+finished once the app manager's `folderPath` holds a replaced `appinfo.json`. The Criterion
+player (`criterion/`, `com.ecklf.luma.criterion`) is bundled and installed the same way by
+`luma-helper overlay install-criterion`, once per Luma run before the first film. The page is plain script for webOS 4's Chromium 53; `overlay/logic.js` holds the
 testable helpers. Luma launches it with launch parameters; a second request relaunches it, which
 the page handles via `webOSRelaunch`. Back or its timer closes the page, which reports to Luma.
 

@@ -5,7 +5,7 @@ use crate::{
     system::{self, System},
 };
 use serde_json::{Value, json};
-use std::path::Path;
+use std::path::{Component, Path};
 
 pub const OVERLAY: &str = "com.ecklf.luma.overlay";
 /// Inside Luma's installation; `tools/package.mjs` builds and stages both files.
@@ -51,7 +51,19 @@ pub fn valid_media_id(id: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-' | b'.' | b':'))
 }
 
-fn installed_version(system: &impl System, id: &str) -> Result<Option<String>> {
+/// Root-owned record of the package each bundled app was last installed from, so a package whose
+/// content changed at the same version (a pull request's test build) is installed again.
+const STATE: &str = "/var/lib/luma-home";
+
+/// What the app manager reports for an installed app. `stamp` identifies the installed
+/// `appinfo.json` file, which a reinstall replaces even when the version stays the same.
+#[derive(PartialEq)]
+struct Installed {
+    version: Option<String>,
+    stamp: Option<(u64, u64, i64, i64)>,
+}
+
+fn installed(system: &impl System, id: &str) -> Result<Option<Installed>> {
     let reply = system::luna(
         system,
         "com.webos.applicationManager",
@@ -61,10 +73,56 @@ fn installed_version(system: &impl System, id: &str) -> Result<Option<String>> {
     if reply["returnValue"] != true {
         return Ok(None);
     }
-    Ok(reply["appInfo"]["version"].as_str().map(str::to_owned))
+    let info = &reply["appInfo"];
+    let stamp = info["folderPath"]
+        .as_str()
+        .map(Path::new)
+        .filter(|folder| {
+            crate::ROOTS.iter().any(|root| folder.starts_with(root))
+                && folder
+                    .components()
+                    .all(|c| matches!(c, Component::RootDir | Component::Normal(_)))
+        })
+        .and_then(|folder| stamp(system, &folder.join("appinfo.json")));
+    Ok(Some(Installed {
+        version: info["version"].as_str().map(str::to_owned),
+        stamp,
+    }))
 }
 
-/// Installs or updates a bundled web app when its version differs from the bundle.
+fn stamp(system: &impl System, path: &Path) -> Option<(u64, u64, i64, i64)> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let metadata = std::fs::metadata(system.path(path)).ok()?;
+        Some((
+            metadata.dev(),
+            metadata.ino(),
+            metadata.ctime(),
+            metadata.ctime_nsec(),
+        ))
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (system, path);
+        None
+    }
+}
+
+fn sha256(bytes: &[u8]) -> String {
+    ring::digest::digest(&ring::digest::SHA256, bytes)
+        .as_ref()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
+}
+
+pub fn marker(id: &str) -> String {
+    format!("{STATE}/{id}.sha256")
+}
+
+/// Installs or updates a bundled web app when the installed version differs from the bundle's,
+/// or when the bundled package is not the one it was last installed from.
 pub fn install(system: &impl System, directory: &Path, app: &Bundle) -> Result<Value> {
     let bundle = directory.join(app.directory);
     let manifest = system::json(system, bundle.join("appinfo.json"))?;
@@ -78,17 +136,39 @@ pub fn install(system: &impl System, directory: &Path, app: &Bundle) -> Result<V
         .as_str()
         .ok_or_else(|| format!("The bundled {} has no version", app.directory))?
         .to_owned();
-    if installed_version(system, app.id)?.as_deref() == Some(expected.as_str()) {
-        return Ok(json!({"returnValue":true,"version":expected,"changed":false}));
-    }
+    let current = |installed: &Option<Installed>| {
+        installed.as_ref().and_then(|i| i.version.as_deref()) == Some(expected.as_str())
+    };
+    let before = installed(system, app.id)?;
     let package = bundle.join(app.package);
     if !system::exists(system, &package) {
+        if current(&before) {
+            return Ok(json!({"returnValue":true,"version":expected,"changed":false}));
+        }
         return Err(format!(
             "The Luma package does not include the {} app",
             app.directory
         ));
     }
     let bytes = system::read(system, &package, 16 * 1024 * 1024)?;
+    let digest = sha256(&bytes);
+    let marker = marker(app.id);
+    let recorded = system::read(system, &marker, 128)
+        .ok()
+        .map(|bytes| String::from_utf8_lossy(&bytes).trim().to_owned());
+    if current(&before) && recorded.as_deref() == Some(digest.as_str()) {
+        return Ok(json!({"returnValue":true,"version":expected,"changed":false}));
+    }
+    // A same-version reinstall is seen as a replaced appinfo.json. Without a readable installed
+    // file to compare, the version alone has to do, as for any other install.
+    let same_version = current(&before);
+    let baseline = before.and_then(|i| i.stamp);
+    let done = |now: &Option<Installed>| {
+        current(now)
+            && (!same_version
+                || baseline.is_none()
+                || now.as_ref().and_then(|i| i.stamp) != baseline)
+    };
     system::mkdir(system, "/tmp")?;
     system::write(system, app.staged, &bytes, 0o644)?;
     let result = (|| {
@@ -101,7 +181,14 @@ pub fn install(system: &impl System, directory: &Path, app: &Bundle) -> Result<V
         // dev/install answers before installing; the app manager lists the result once done.
         for _ in 0..60 {
             system.pause();
-            if installed_version(system, app.id)?.as_deref() == Some(expected.as_str()) {
+            if done(&installed(system, app.id)?) {
+                // Without the record the next request installs the same package again, which
+                // is slower but harmless, so a failed write does not fail the install.
+                let _ = system::mkdir(system, "/var/lib")
+                    .and_then(|()| system::mkdir(system, STATE))
+                    .and_then(|()| {
+                        system::write(system, &marker, format!("{digest}\n").as_bytes(), 0o644)
+                    });
                 return Ok(json!({"returnValue":true,"version":expected,"changed":true}));
             }
         }

@@ -24,6 +24,8 @@ struct Fixture {
     pauses: Cell<usize>,
     fail_unmount: Cell<bool>,
     stuck: Cell<bool>,
+    /// An installed app directory whose appinfo.json `dev/install` replaces, as a reinstall does.
+    reinstall: RefCell<Option<String>>,
 }
 impl Fixture {
     fn new() -> Self {
@@ -53,6 +55,7 @@ impl Fixture {
             pauses: Cell::new(0),
             fail_unmount: Cell::new(false),
             stuck: Cell::new(false),
+            reinstall: RefCell::new(None),
         };
         for dir in [
             "/var/lib/luma-home/app",
@@ -201,6 +204,14 @@ impl System for Fixture {
         let uri = &args[args.len() - 2];
         let method = uri.rsplit('/').next().unwrap();
         let payload: Value = serde_json::from_str(args.last().unwrap()).unwrap();
+        if method == "install"
+            && let Some(dir) = self.reinstall.borrow().as_deref()
+        {
+            let manifest = self.p(&format!("{dir}/appinfo.json"));
+            let bytes = fs::read(&manifest).unwrap();
+            fs::remove_file(&manifest).unwrap();
+            fs::write(&manifest, bytes).unwrap();
+        }
         if let Some(reply) = self
             .replies
             .borrow_mut()
@@ -1041,10 +1052,24 @@ fn overlay_bundle(f: &Fixture, version: &str) {
     );
     f.put(&format!("{DIR}/overlay/overlay.package"), b"ipk");
 }
+fn sha256(bytes: &[u8]) -> String {
+    ring::digest::digest(&ring::digest::SHA256, bytes)
+        .as_ref()
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
+}
+fn marker(f: &Fixture, id: &str) -> Option<String> {
+    fs::read_to_string(f.p(&overlay::marker(id))).ok()
+}
 #[test]
-fn overlay_install_skips_the_current_version_and_waits_for_an_update() {
+fn overlay_install_skips_the_current_package_and_waits_for_an_update() {
     let f = Fixture::new();
     overlay_bundle(&f, "2.18.0");
+    f.put(
+        &overlay::marker(overlay::OVERLAY),
+        format!("{}\n", sha256(b"ipk")).as_bytes(),
+    );
     f.reply(
         "getAppInfo",
         Ok(json!({"returnValue":true,"appInfo":{"version":"2.18.0"}})),
@@ -1053,6 +1078,7 @@ fn overlay_install_skips_the_current_version_and_waits_for_an_update() {
     assert_eq!(reply["changed"], false);
     assert!(!f.calls().iter().any(|c| c.contains("appInstallService")));
 
+    fs::remove_file(f.p(&overlay::marker(overlay::OVERLAY))).unwrap();
     for value in [
         json!({"returnValue":false,"errorText":"not found"}),
         json!({"returnValue":false,"errorText":"not found"}),
@@ -1075,6 +1101,114 @@ fn overlay_install_skips_the_current_version_and_waits_for_an_update() {
     // The staged copy is removed once the install finished.
     assert!(!f.p("/tmp/luma-overlay.ipk").exists());
     assert_eq!(f.pauses.get(), 2);
+    assert_eq!(
+        marker(&f, overlay::OVERLAY).as_deref(),
+        Some(format!("{}\n", sha256(b"ipk")).as_str())
+    );
+}
+#[test]
+fn a_changed_package_at_the_same_version_is_installed_again() {
+    let f = Fixture::new();
+    overlay_bundle(&f, "2.33.0");
+    let installed = format!("{}/{}", ROOTS[0], overlay::OVERLAY);
+    f.put_json(
+        &format!("{installed}/appinfo.json"),
+        json!({"id":overlay::OVERLAY,"version":"2.33.0"}),
+    );
+    // Installed from another build of 2.33.0.
+    f.put(&overlay::marker(overlay::OVERLAY), b"0000\n");
+    let info = json!({"returnValue":true,"appInfo":{"version":"2.33.0","folderPath":installed}});
+    *f.reinstall.borrow_mut() = Some(installed.clone());
+    for _ in 0..3 {
+        f.reply("getAppInfo", Ok(info.clone()));
+    }
+    f.reply("install", Ok(json!({"returnValue":true})));
+    let reply = overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
+    assert_eq!(reply["changed"], true);
+    assert!(
+        f.calls()
+            .iter()
+            .any(|c| c.contains("appInstallService/dev/install"))
+    );
+    // The replaced appinfo.json, not the unchanged version, shows the reinstall finished.
+    assert_eq!(f.pauses.get(), 1);
+    assert_eq!(
+        marker(&f, overlay::OVERLAY).as_deref(),
+        Some(format!("{}\n", sha256(b"ipk")).as_str())
+    );
+
+    // The same package again is left alone.
+    let installs = f.calls().len();
+    f.reply("getAppInfo", Ok(info.clone()));
+    let reply = overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
+    assert_eq!(reply["changed"], false);
+    assert_eq!(f.calls().len(), installs + 1);
+
+    // A reinstall that never replaces the files times out.
+    let f = Fixture::new();
+    overlay_bundle(&f, "2.33.0");
+    f.put_json(
+        &format!("{installed}/appinfo.json"),
+        json!({"id":overlay::OVERLAY,"version":"2.33.0"}),
+    );
+    for _ in 0..61 {
+        f.reply("getAppInfo", Ok(info.clone()));
+    }
+    f.reply("install", Ok(json!({"returnValue":true})));
+    assert!(overlay::dispatch(&f, "install", None, Path::new(DIR)).is_err());
+    assert_eq!(f.pauses.get(), 60);
+    assert!(marker(&f, overlay::OVERLAY).is_none());
+    assert!(!f.p("/tmp/luma-overlay.ipk").exists());
+}
+#[test]
+fn a_missing_record_reinstalls_once_and_untraceable_files_fall_back_to_the_version() {
+    let f = Fixture::new();
+    overlay_bundle(&f, "2.33.0");
+    // An install from before records existed, with no installed folder to watch.
+    for _ in 0..2 {
+        f.reply(
+            "getAppInfo",
+            Ok(json!({"returnValue":true,"appInfo":{"version":"2.33.0"}})),
+        );
+    }
+    f.reply("install", Ok(json!({"returnValue":true})));
+    let reply = overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
+    assert_eq!(reply["changed"], true);
+    assert_eq!(f.pauses.get(), 1);
+    assert!(marker(&f, overlay::OVERLAY).is_some());
+
+    // A folderPath outside the app roots is not trusted for the comparison.
+    let f = Fixture::new();
+    overlay_bundle(&f, "2.33.0");
+    f.put_json("/etc/appinfo.json", json!({}));
+    for _ in 0..2 {
+        f.reply(
+            "getAppInfo",
+            Ok(json!({"returnValue":true,"appInfo":{"version":"2.33.0","folderPath":"/etc"}})),
+        );
+    }
+    f.reply("install", Ok(json!({"returnValue":true})));
+    let reply = overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
+    assert_eq!(reply["changed"], true);
+    assert_eq!(f.pauses.get(), 1);
+
+    // Without a package there is nothing to compare; the current version is kept.
+    let f = Fixture::new();
+    f.put_json(
+        &format!("{DIR}/overlay/appinfo.json"),
+        json!({"id":overlay::OVERLAY,"version":"2.33.0"}),
+    );
+    f.reply(
+        "getAppInfo",
+        Ok(json!({"returnValue":true,"appInfo":{"version":"2.33.0"}})),
+    );
+    let reply = overlay::dispatch(&f, "install", None, Path::new(DIR)).unwrap();
+    assert_eq!(reply["changed"], false);
+    f.reply(
+        "getAppInfo",
+        Ok(json!({"returnValue":true,"appInfo":{"version":"2.32.0"}})),
+    );
+    assert!(overlay::dispatch(&f, "install", None, Path::new(DIR)).is_err());
 }
 #[test]
 fn criterion_player_installs_from_its_own_bundle() {
