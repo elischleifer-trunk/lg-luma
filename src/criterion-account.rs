@@ -79,6 +79,20 @@ pub fn path(store: &Path) -> PathBuf {
     store.with_file_name("criterion-account.json")
 }
 
+/// Where this run of Luma keeps the account, set once at startup so the platform worker can tell
+/// whether there is one to sign in with before it hands the player a code.
+static STORE: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+
+pub fn set_store(store: &Path) {
+    let _ = STORE.set(path(store));
+}
+
+/// Whether an account is stored: without one, the player gets no code and leaves the Channel's
+/// sign-in to the viewer.
+pub fn stored() -> bool {
+    STORE.get().is_some_and(|file| load(file).is_some())
+}
+
 pub fn load(path: &Path) -> Option<Account> {
     let bytes = std::fs::read(path).ok()?;
     let account: Account = serde_json::from_slice(&bytes).ok()?;
@@ -209,6 +223,25 @@ mod tests {
         forget(&file).unwrap();
         assert_eq!(load(&file), None);
         forget(&file).unwrap();
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_player_gets_a_code_only_when_an_account_is_stored() {
+        let dir =
+            std::env::temp_dir().join(format!("luma-criterion-stored-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let store = dir.join("home-assistant.json");
+        // The only test that sets the store; Luma sets it once at startup.
+        set_store(&store);
+        assert!(
+            !stored(),
+            "no account: no code, so the viewer signs in by hand"
+        );
+        save(&path(&store), &Account::new("me@example.com", "x").unwrap()).unwrap();
+        assert!(stored());
+        forget(&path(&store)).unwrap();
+        assert!(!stored());
         let _ = std::fs::remove_dir_all(&dir);
     }
 
