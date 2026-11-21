@@ -1,0 +1,120 @@
+{
+  "request": {
+    "path": "/3/tv/17780",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:44.851Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/uCsKIN7aMUoYN3686E5W6iiOEjc.jpg",
+    "created_by": [
+      {
+        "id": 12140,
+        "credit_id": "6aaa49aad69fb7b6c5146426",
+        "name": "Abby Mann",
+        "original_name": "Abby Mann",
+        "gender": 2,
+        "profile_path": "/xttMMml2CXoTVl0nZjibkpBOF8U.jpg"
+      }
+    ],
+    "episode_run_time": [
+      120
+    ],
+    "first_air_date": "1978-02-12",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 17780,
+    "in_production": false,
+    "languages": [
+      "en"
+    ],
+    "last_air_date": "1978-02-14",
+    "last_episode_to_air": {
+      "id": 1373888,
+      "name": "Episode 3",
+      "overview": "",
+      "vote_average": 8.5,
+      "vote_count": 2,
+      "air_date": "1978-02-14",
+      "episode_number": 3,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 120,
+      "season_number": 1,
+      "show_id": 17780,
+      "still_path": "/9igU2L5mr24mfEOXGIMIutEZfLf.jpg"
+    },
+    "name": "King",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 6,
+        "logo_path": "/cm111bsDVlYaC1foL0itvEI4yLG.png",
+        "name": "NBC",
+        "origin_country": "US"
+      }
+    ],
+    "number_of_episodes": 3,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_name": "King",
+    "overview": "The story of Dr. Martin Luther King Jr., stretching from his days as a Southern Baptist minister in the South of the 1950s until his assassination in Memphis in 1968.",
+    "popularity": 2.6121,
+    "poster_path": "/tD71a5wWJqLFuCOXdnBP5uD5kFc.jpg",
+    "production_companies": [
+      {
+        "id": 58139,
+        "logo_path": null,
+        "name": "Abby Mann Productions",
+        "origin_country": ""
+      },
+      {
+        "id": 1138,
+        "logo_path": "/nFDryQEdl7eVjJuXoaT4Vw88xgz.png",
+        "name": "Filmways Pictures",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "1978-02-12",
+        "episode_count": 3,
+        "id": 93514,
+        "name": "Miniseries",
+        "overview": "",
+        "poster_path": "/m46d879nORViNviJ5CpWxwh0gUu.jpg",
+        "season_number": 1,
+        "vote_average": 8.2
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Miniseries",
+    "vote_average": 6.6,
+    "vote_count": 13
+  }
+}

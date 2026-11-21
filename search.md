@@ -29,7 +29,8 @@ title you are thinking of comes first, often before you finish typing it.
 6. **Type-ahead.** A partial word should find titles that start with it: "sup" → _Superman_,
    _Supergirl_, _Superbad_; "fan" → _Fantasia_, _Fantastic Four_. **Partly met**: a half-typed
    word that can only become one word is completed ("ghostb" → _Ghostbusters_, "star w" →
-   _Star Wars_); short, ambiguous text is not. See below.
+   _Star Wars_), and a whole word is also searched as a far better-known word it begins ("kin"
+   → _Kin_, then _King Kong_); short, ambiguous text is not. See below.
 7. **OK opens the title itself**, not the app's home screen, in an app the TV has. Where it
    streams is a tiebreaker for ranking, never a reason to rank an unrelated title higher.
 8. **Cheap.** Repeating a search costs nothing (disk cache). Movie of the Night calls are
@@ -55,6 +56,8 @@ more without re-fetching the rest).
 | amélie       | _Amélie_ first, though it is French                                       | `foreign_language_titles_from_abroad_are_filtered_out_…`    |
 | sup          | Nothing matches yet: keep the near misses rather than show nothing        | `when_nothing_matches_the_near_misses_stay`                 |
 | ghostb       | The "ghostbusters" results, from one metered search for the whole word    | `half_a_word_is_completed_before_the_metered_search`        |
+| king         | _King Kong_, _The Lion King_, _Return of the King_, not only films "King" | `well_known_titles_a_full_title_search_left_out_are_…`      |
+| kin          | _Kin_ first, then _King Kong_, _The Lion King_, _Tulsa King_              | `a_whole_word_is_also_searched_as_the_better_known_word_…`  |
 
 ## Opening a title (deep links)
 
@@ -85,6 +88,16 @@ TV" in [agents.md](agents.md).
 - Prime links with older ASIN-style IDs (`B0FV8FQK6M`) cannot be converted and open the app.
 
 ## Decisions
+
+- **2026-11:** "king" listed a dozen obscure films called _King_ and not _King Kong_: Movie of
+  the Night fills its 20 results with exact matches first, and has no popularity filter on its
+  title search (its filter search sorts by popularity but matches plot summaries: for "the
+  office" or "fan" only one or two of 20 results say the words, and "gho" finds no
+  _Ghostbusters_). TMDB's free search does list the well-known titles, so when a title search
+  comes back full, the most-seen TMDB matches it left out are looked up one by one (metered,
+  at most four a search, cached). "kin" found only films called _Kin_: TMDB lists only the
+  exact word then, so its free keyword search suggests longer words ("king"), and one whose
+  titles have at least twice the votes is searched too (one more metered call).
 
 - **2026-11:** "gho" listed _Ghostbusters_ (1984) and _Frozen Empire_ only: Movie of the Night
   returned those two, and missing franchise films were looked up only for a whole typed word.

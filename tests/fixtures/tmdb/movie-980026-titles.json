@@ -1,0 +1,82 @@
+{
+  "request": {
+    "path": "/3/movie/980026/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:47.583Z",
+  "response": {
+    "id": 980026,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Bastard",
+        "type": "Translated"
+      },
+      {
+        "iso_3166_1": "CH",
+        "title": "King's Land",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Promised Land",
+        "type": "English"
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "恶棍",
+        "type": "first translated&film festival name"
+      },
+      {
+        "iso_3166_1": "CA",
+        "title": "La terre promise",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Bękart",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "荒芜之地",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "应许之心",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "狠荒者",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "国王之地",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "A Terra Prometida",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "The King's Land",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "杂种",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Бастард",
+        "type": ""
+      }
+    ]
+  }
+}

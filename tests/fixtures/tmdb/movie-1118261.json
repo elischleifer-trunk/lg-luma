@@ -1,0 +1,56 @@
+{
+  "request": {
+    "path": "/3/movie/1118261",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:46.601Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/cMkTRZnA9KF26y9HRPN5Uy4PaLl.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "",
+    "id": 1118261,
+    "imdb_id": "tt14826396",
+    "origin_country": [
+      "IN"
+    ],
+    "original_language": "kn",
+    "original_title": "ಕಿಂಗ್",
+    "overview": "An old and ailing king decides to hand over the reins of the kingdom to his son. However, on the day of the coronation, several contenders appear and claim to be the rightful heir to the throne.",
+    "popularity": 0.2543,
+    "poster_path": "/6vmZoU0FGdQpuOvZ78D39M7PGsh.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "IN",
+        "name": "India"
+      }
+    ],
+    "release_date": "1998-10-30",
+    "revenue": 0,
+    "runtime": 126,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Kannada",
+        "iso_639_1": "kn",
+        "name": "?????"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "King",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

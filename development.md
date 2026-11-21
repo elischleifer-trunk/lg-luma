@@ -1258,7 +1258,10 @@ clients, and so their open connections, are kept until the keys change, and open
 tab connects to both services without credentials (`Http::warm`, no quota) so the first search
 does not wait for TLS. A search asks TMDB first (free): text that ends mid-word and can only
 become one word is completed (`relevance::complete`) and searched as that word, so the
-keystrokes that follow reuse one Movie of the Night reply. Details are fetched six at a time,
+keystrokes that follow reuse one Movie of the Night reply. Text ending in a whole word is also
+searched as a far better-known longer word from TMDB's keyword search ("kin" → "king",
+`relevance::longer_word`), and a full Movie of the Night reply is topped up with the most-seen
+TMDB matches it left out (`look_up_missed`, at most four). Details are fetched six at a time,
 and a search the user has typed past gives up between steps. OK launches the
 picked app with `deeplink` parameters through `com.webos.applicationManager/launch`. Every
 poster says whether that costs money (`view::cost_badge`: a check when included, else "$");

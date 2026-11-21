@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/1823908/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:49.706Z",
+  "response": {
+    "id": 1823908,
+    "titles": [
+      {
+        "iso_3166_1": "NZ",
+        "title": "Kin",
+        "type": "Title In-Development"
+      }
+    ]
+  }
+}

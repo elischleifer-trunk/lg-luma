@@ -6,11 +6,16 @@
 //! 1. TMDB `search/multi` (free). If the text ends mid-word, it is completed to the word the
 //!    best-known matching titles use ([`relevance::complete`]) and the search continues as if
 //!    that had been typed: "ghostb", "ghostbu" … are all the one search for "ghostbusters".
-//! 2. Movie of the Night title search (metered: one call).
+//!    If it ends in a whole word of some titles, TMDB lists only those, so its keyword search
+//!    suggests longer words, each with its own free search; one far better known is searched
+//!    as well ([`relevance::longer_word`]): "kin" is also "king".
+//! 2. Movie of the Night title search (metered: one call, two with a longer word).
 //! 3. TMDB details for results the search summary did not already rule out (foreign or
 //!    little-seen titles are skipped), a few at a time over connections that stay open. TMDB
 //!    has no batch endpoint; details are cached for a month, so each title costs one call.
-//! 4. For a franchise the query names or has begun to name ("gho" → *Ghostbusters*), the films
+//! 4. When a title search came back full, the best-known titles TMDB found that it left out:
+//!    "king" returns twenty films called *King* and not *King Kong* (metered, so capped).
+//! 5. For a franchise the query names or has begun to name ("gho" → *Ghostbusters*), the films
 //!    the title search missed: the TMDB collection and, for half-typed text, TMDB's free
 //!    search for the franchise's title, then Movie of the Night for each missing film
 //!    (metered, so capped).
@@ -24,8 +29,8 @@ use crate::streaming::{self, Ranked, Request, Services};
 use crate::streaming_keys::{self, Keys};
 use crate::tmdb_api::{
     self, CollectionDetailsParams, CollectionDetailsResponse, MovieDetailsParams,
-    MovieDetailsResponse, SearchMultiParams, SearchMultiResponseResult, TvSeriesDetailsParams,
-    TvSeriesDetailsResponse,
+    MovieDetailsResponse, SearchKeywordParams, SearchMultiParams, SearchMultiResponseResult,
+    TvSeriesDetailsParams, TvSeriesDetailsResponse,
 };
 use serde::{Serialize, de::DeserializeOwned};
 use std::{
@@ -39,8 +44,13 @@ use std::{
     time::{Instant, SystemTime},
 };
 
-/// Movie of the Night title search returns at most 20 shows; details for all of them.
-pub const DETAILS_LIMIT: usize = 20;
+/// Movie of the Night title search returns at most this many shows.
+pub const SEARCH_PAGE: usize = 20;
+/// Details for every show a title search returns.
+pub const DETAILS_LIMIT: usize = SEARCH_PAGE;
+/// Well-known titles a full title search left out, fetched from Movie of the Night per search
+/// at one metered call each.
+pub const MISSED_LIMIT: usize = 4;
 /// Franchise films fetched from Movie of the Night per search, at one metered call each.
 pub const EXPANSION_LIMIT: usize = 4;
 /// Franchise films fetched at once. A request on an open connection takes a tenth of the time
@@ -55,6 +65,9 @@ pub trait Source: Sync {
     fn search(&self, query: &str, country: &str) -> Result<Vec<Show>, Error>;
     /// One show by TMDB ID (`movie/2978`), for franchise films the title search missed.
     fn show(&self, id: &str, country: &str) -> Result<Show, Error>;
+    /// TMDB keywords like the text, for longer words it may be the start of. None without a
+    /// TMDB token.
+    fn tmdb_keywords(&self, query: &str) -> Option<Result<Vec<String>, Error>>;
     /// None without a TMDB token: results then keep Movie of the Night's order.
     fn tmdb_search(&self, query: &str) -> Option<Result<Vec<SearchMultiResponseResult>, Error>>;
     fn movie(&self, id: i64) -> Result<MovieDetailsResponse, Error>;
@@ -88,20 +101,50 @@ pub fn search_while(
     // text is worth a metered search as typed.
     let mut tmdb = source.tmdb_search(query);
     let mut query = query.to_owned();
+    let mut completed = false;
     if let Some(Ok(results)) = &tmdb
-        && let Some(completed) = relevance::complete(&query, results)
+        && let Some(text) = relevance::complete(&query, results)
     {
-        tmdb = source.tmdb_search(&completed);
-        query = completed;
+        tmdb = source.tmdb_search(&text);
+        query = text;
+        completed = true;
     }
     let query = query.as_str();
+    let longer = match &tmdb {
+        Some(Ok(results)) if !completed => longer_word(source, query, results),
+        _ => None,
+    };
     if !wanted() {
         return None;
     }
-    let mut shows = match source.search(query, country) {
-        Ok(shows) => shows,
-        Err(error) => return Some(Err(error)),
+    let texts: Vec<&str> = std::iter::once(query)
+        .chain(longer.as_ref().map(|(text, _)| text.as_str()))
+        .collect();
+    let mut replies = parallel(&texts, texts.len(), |text| source.search(text, country))
+        .into_iter()
+        .map(|reply| reply.unwrap_or_else(|| Err(Error::Network("search failed".into()))));
+    let mut shows = match replies.next() {
+        Some(Ok(shows)) => shows,
+        Some(Err(error)) => return Some(Err(error)),
+        None => Vec::new(),
     };
+    // Each text searched, its TMDB results, and whether Movie of the Night's reply was full.
+    let mut searched = vec![(query.to_owned(), shows.len() >= SEARCH_PAGE)];
+    if let Some((text, _)) = &longer {
+        match replies.next() {
+            Some(Ok(more)) => {
+                searched.push((text.clone(), more.len() >= SEARCH_PAGE));
+                shows.extend(more);
+            }
+            Some(Err(error)) => crate::telemetry::log_warn!(
+                "streaming",
+                "search: longer word \"{text}\" failed: {error}"
+            ),
+            None => {}
+        }
+    }
+    let mut seen = HashSet::new();
+    shows.retain(|show| seen.insert(show.tmdb_id.clone()));
     let results = match tmdb {
         Some(Ok(results)) => results,
         Some(Err(error)) => {
@@ -115,6 +158,11 @@ pub fn search_while(
     };
     let mut enrichment = Enrichment::default();
     enrichment.add_search(&results);
+    let mut tmdb_results = vec![results];
+    if let Some((_, more)) = longer {
+        enrichment.add_search(&more);
+        tmdb_results.push(more);
+    }
 
     let wanted_details: Vec<(Kind, i64)> = shows
         .iter()
@@ -127,7 +175,7 @@ pub fn search_while(
                 _ => Some(id),
             }
         })
-        .take(DETAILS_LIMIT)
+        .take(DETAILS_LIMIT * searched.len())
         .collect();
     if !wanted() {
         return None;
@@ -137,7 +185,34 @@ pub fn search_while(
     if !wanted() {
         return None;
     }
-    expand_franchises(source, query, country, &mut shows, &mut enrichment, wanted);
+    let searched: Vec<(&str, bool, &[SearchMultiResponseResult])> = searched
+        .iter()
+        .zip(&tmdb_results)
+        .map(|((text, full), results)| (text.as_str(), *full, results.as_slice()))
+        .collect();
+    // Titles already asked of Movie of the Night one by one, found or not.
+    let mut tried = HashSet::new();
+    look_up_missed(
+        source,
+        country,
+        &searched,
+        &mut shows,
+        &mut enrichment,
+        &mut tried,
+        wanted,
+    );
+    if !wanted() {
+        return None;
+    }
+    expand_franchises(
+        source,
+        query,
+        country,
+        &mut shows,
+        &mut enrichment,
+        &tried,
+        wanted,
+    );
     Some(Ok(relevance::rank(
         query,
         &shows,
@@ -145,6 +220,96 @@ pub fn search_while(
         services,
         Some(&enrichment),
     )))
+}
+
+/// The text with its last word lengthened, and that text's TMDB results, when the word typed
+/// names some titles but a longer one is far better known ([`relevance::longer_word`]):
+/// "kin" is also searched as "king". Free: TMDB's keyword search, then a TMDB search for each
+/// longer word it suggests.
+fn longer_word(
+    source: &impl Source,
+    query: &str,
+    results: &[SearchMultiResponseResult],
+) -> Option<(String, Vec<SearchMultiResponseResult>)> {
+    if relevance::word_votes(query, results) == 0 {
+        return None;
+    }
+    let keywords = source.tmdb_keywords(&relevance::last_word(query)?)?.ok()?;
+    let texts = relevance::longer_words(query, &keywords);
+    let candidates: Vec<(String, Vec<SearchMultiResponseResult>)> =
+        parallel(&texts, CONNECTIONS, |text| source.tmdb_search(text))
+            .into_iter()
+            .zip(&texts)
+            .filter_map(|(reply, text)| Some((text.clone(), reply??.ok()?)))
+            .collect();
+    relevance::longer_word(query, results, &candidates).cloned()
+}
+
+/// Adds the best-known titles TMDB found for a searched text that Movie of the Night's reply
+/// left out. It returns at most [`SEARCH_PAGE`] shows, and fills them with every exact match
+/// first: "king" brings back a dozen films called *King* and not *King Kong*. Only a full reply
+/// can have left a title out. The most seen first, one metered call each, at most
+/// [`MISSED_LIMIT`]; TMDB's summary has already ruled out foreign and little-seen titles, so
+/// no call is spent on them.
+fn look_up_missed(
+    source: &impl Source,
+    country: &str,
+    searched: &[(&str, bool, &[SearchMultiResponseResult])],
+    shows: &mut Vec<Show>,
+    enrichment: &mut Enrichment,
+    tried: &mut HashSet<String>,
+    wanted: &dyn Fn() -> bool,
+) {
+    let present: HashSet<String> = shows.iter().map(|show| show.tmdb_id.clone()).collect();
+    // (how it matches the query, votes, TMDB identity)
+    let mut missed: Vec<(i64, (Kind, i64), String)> = Vec::new();
+    for (text, _, results) in searched.iter().filter(|(_, full, _)| *full) {
+        for result in *results {
+            let (kind, prefix) = match result.media_type.as_deref() {
+                Some("movie") => (Kind::Movie, "movie"),
+                Some("tv") => (Kind::Series, "tv"),
+                _ => continue,
+            };
+            let (Some(id), Some(title)) = (
+                result.id,
+                result.title.as_deref().or(result.name.as_deref()),
+            ) else {
+                continue;
+            };
+            let signals = Signals::from_search(result);
+            let key = format!("{prefix}/{id}");
+            if present.contains(&key)
+                || missed.iter().any(|(_, _, known)| *known == key)
+                || match_tier(text, title) > 2
+                || !signals.keep(kind, false)
+            {
+                continue;
+            }
+            missed.push((signals.votes, (kind, id), key));
+        }
+    }
+    missed.sort_by_key(|(votes, _, _)| std::cmp::Reverse(*votes));
+    missed.truncate(MISSED_LIMIT);
+    // The metered step: not for a search nobody is waiting for.
+    if missed.is_empty() || !wanted() {
+        return;
+    }
+    tried.extend(missed.iter().map(|(_, _, key)| key.clone()));
+    let found = parallel(&missed, EXPANSION_CONNECTIONS, |(_, (kind, id), key)| {
+        let (kind, id) = (*kind, *id);
+        let show = source.show(key, country).ok()?;
+        let signals = match kind {
+            Kind::Movie => source.movie(id).ok().map(|d| Signals::movie(&d)),
+            Kind::Series => source.series(id).ok().map(|d| Signals::series(&d)),
+        };
+        Some((show, (kind, id), signals))
+    });
+    for (show, id, signals) in found.into_iter().flatten().flatten() {
+        if let Some(signals) = signals {
+            enrichment.signals.insert(id, signals);
+        }
+        shows.push(show);
+    }
 }
 
 /// `work` for each item on at most `limit` threads, in the items' order. Each thread keeps
@@ -207,9 +372,14 @@ fn expand_franchises(
     country: &str,
     shows: &mut Vec<Show>,
     enrichment: &mut Enrichment,
+    tried: &HashSet<String>,
     wanted: &dyn Fn() -> bool,
 ) {
-    let present: HashSet<String> = shows.iter().map(|show| show.tmdb_id.clone()).collect();
+    let present: HashSet<String> = shows
+        .iter()
+        .map(|show| show.tmdb_id.clone())
+        .chain(tried.iter().cloned())
+        .collect();
     // (how the lead matches, its collection, its base title), named franchises first.
     let mut franchises: Vec<(u8, i64, String)> = Vec::new();
     for show in shows.iter() {
@@ -374,6 +544,29 @@ impl Source for Live {
                     page: None,
                 })
                 .map(|reply| reply.results.unwrap_or_default())
+            },
+        ))
+    }
+
+    fn tmdb_keywords(&self, query: &str) -> Option<Result<Vec<String>, Error>> {
+        let tmdb = self.tmdb.as_ref()?;
+        Some(cached(
+            &self.cache,
+            &format!("tmdb:keywords:{query}"),
+            ttl::TMDB_SEARCH,
+            || {
+                tmdb.search_keyword(&SearchKeywordParams {
+                    query: query.into(),
+                    page: None,
+                })
+                .map(|reply| {
+                    reply
+                        .results
+                        .into_iter()
+                        .flatten()
+                        .filter_map(|keyword| keyword.name)
+                        .collect()
+                })
             },
         ))
     }

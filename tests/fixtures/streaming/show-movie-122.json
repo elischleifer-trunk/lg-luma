@@ -1,0 +1,688 @@
+{
+  "request": {
+    "path": "/shows/movie/122",
+    "query": {
+      "country": "us",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:43.587Z",
+  "response": {
+    "itemType": "show",
+    "showType": "movie",
+    "id": "84",
+    "imdbId": "tt0167260",
+    "tmdbId": "movie/122",
+    "title": "The Lord of the Rings: The Return of the King",
+    "overview": "Frodo and Sam march toward Mount Doom while Gandalf prepares for the final battle for Middle Earth.",
+    "releaseYear": 2003,
+    "originalTitle": "The Lord of the Rings: The Return of the King",
+    "genres": [
+      {
+        "id": "adventure",
+        "name": "Adventure"
+      },
+      {
+        "id": "fantasy",
+        "name": "Fantasy"
+      }
+    ],
+    "directors": [
+      "Peter Jackson"
+    ],
+    "cast": [
+      "Elijah Wood",
+      "Ian McKellen",
+      "Viggo Mortensen",
+      "Sean Astin",
+      "Andy Serkis",
+      "Dominic Monaghan",
+      "Billy Boyd"
+    ],
+    "rating": 88,
+    "runtime": 200,
+    "imageSet": {
+      "verticalPoster": {
+        "w240": "https://cdn.movieofthenight.com/show/84/poster/vertical/en/240.jpg?Expires=1821440872&Signature=ZA0KVEG~x8clHWE3liUvWasrEbJTEN~dFKVcyEbAez88V-64oTs5YPmvC3CkRTh20iFhJVtVOXq0cpwotccAcizqUPsnXGVexQ33F6ETQVoA4VbP5u0hC5GuFfrWxrxebLCf7FHrBSKq0MnyiL0Fks0edGS08OlHLWAYiKWBLm7tWUSyugH~Vg2v7GDt8ZMGQf8uJlPAxE0n3xMk7erYs3Y3WJdmvRijJpB5UYjRJoyKFIjkRzCqgDbxtOAGKODdQJNmfZP6~Dl-ZDVOl7AzYtylSPki3BRiON12k2sti0xYSWlYduOQZgBBHdQsh92UFh9OCC2jkjbDNKZad1RJLQ__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w360": "https://cdn.movieofthenight.com/show/84/poster/vertical/en/360.jpg?Expires=1821440872&Signature=gR098R97--MC7ZUk9NIgCbQLD32XU3rCbZWj7xJdGNTuhojKCMzAhJhigaEZmefv8AXzYcUCznvZAZxO-IvrITbNDe~7ZW34zJzeTJWPlLc7TGFRFNJuFDFtKM7r8DWFfyDi4kuVXNZpo6x8O2d08xWGe4AzscB3g~7YsdmLlNoW0q5w00u2-tiq-ssgWh~GdzAfdzJMke6pq-ltqjGV42NebgZVc7ehGuT-h7sxXUitf7BV~ki3WigQy2sf2yVlfQm1ZRlIp6HhunNYNRsU7Yf-IvvDjnmsdv4OR79ksHjh~tgjH5EKwQGYYZzspNZPCYncUKYRbYnV2CLCkJEZVQ__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/84/poster/vertical/en/480.jpg?Expires=1821440872&Signature=j60~-mxBwEvGAh59plPceCbMg0gQRSl7jD~S1HlrKdyr2JalZ4~gJ~gTRhVIC9BOm2i3qzyXnuM1aAfyFFsEtQPOFG-31LkHXn0lZrVSKYa1~Gob5ctg6ml7B2cAgf-KtBSE2GjZrXaz20Rcl61BQG3bkHQUvvY5kGzeTT2sCnHK7nqC9GO5Knp6HU22rb-hZjb8MLJuvS9sC5517jDW38Gz-SUr2Veq5Rqond5-O4OoQqIOTi0AJTuKKAnFJr-zBmBsjgIva8XgFV1wmKLdwlodDqhEBaaxwF8obPXIqgp66j6~ccoguVkO4VsPeBSDJ4qhLKlKgZqbI7AF1ydU-A__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w600": "https://cdn.movieofthenight.com/show/84/poster/vertical/en/600.jpg?Expires=1821440872&Signature=VQxpdgyfxnKJZvx64MbkDg25bL9UlzEv0vtHXTEgaQNgX1exj2~23mJYW7l5pSbW63oY9jKHPz3a7oy55kU3BT1HJ6E2G4HCxnk3jD9h5AZkFxZcDrQBIt9mvIqHJ0d6GUfckyE-R77riTmgDn7hlQ64CvOhCYL8LrOEwCCqq9VFecpg~PDXnJSBrhCvGdMyXG79RA8s00eDjE3DB-~BBzw4GRxsddnKSccQMlUltOqT02KzUyminIANdUY-I5zFke6xNqFlXiUVpbilGu9POdQG3QPzBZ1DCYVGS~-797e2Bkf~qpaaCA0deSWNjvuEWVYIrlzA0-0rKbJ0-WXwUg__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/84/poster/vertical/en/720.jpg?Expires=1821440872&Signature=exp3zNCqzWucw6FElRx14ziMo6vGfs~iKDQB8ZpzURBXbln5RCmoxEIkU02Injewq6psT3KRUZ3NHrTDeGb3psjAFcTsUCZ8bN0X~J4q5SwwzgIk2~-D5qxG3qKpKhEfOslN8RiAPfxQbwBrRuSy-7FxZm1kY7cYfK48PK-mzR6Be-9KPPjPap~5ieC0WrUYcDCrOd2z5mjuSU-M~NoGw3bv1CM9XS7PZ1FWoewcvavM9x2dnM~eQXYCHMNQY-srB4V3~ql-qMnyTn4szKdLSbo6LvwLF4h~uih-6XjIpBFf3zLhCoCk3e9BRpxntouUCvjDN2syJFNvt9MZFti3Pg__&Key-Pair-Id=KK4HN3OO4AT5R"
+      },
+      "horizontalPoster": {
+        "w360": "https://cdn.movieofthenight.com/show/84/poster/horizontal/en/360.jpg?Expires=1821440875&Signature=abTgoAXmJj~xso58zY2EXzYDrDJEAMp~kFZINVmGVb0zwFbO6rA3k-1hWCt8DxDLoe3~bknvXaYHIxjtxZ3W8rI2xsiMv5dhjv-bya77dsISMBXalyVxIhTUxmEnmSEJ~ALmcSOQlxfUK0XZM~taHXCENk0~VPeo4uBEQ761r54d7U-cGlijaQ7hSKx2dcY2kghN2hYphbs5oL-ztY2OJUubuP8YshOpClkESX2UgcPa-3K6Ma2S3cjI5637Y89XwPHGqXQ9T29ZxBLTGmMt7kFciZGvMZEevnhixLQzcQOfdy09Z~iRs0C-XVr7p48d4Vjk4RLCUZh5I9CC2Q8Llw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/84/poster/horizontal/en/480.jpg?Expires=1821440875&Signature=cFownE4i90y~81kSBAz3oK3QKyzaXuSG6PVS9LdMAsmPd6wKJiCTo1vK1JAK15eS0f67a9SgFUpLApiZjp1r05UhOxgJ~dB6f5CBmUzqwz7DaZOtIiSPP7P0f8rW4eebcx~vXoWURouZQsZDvDjtlBzG2zTyh4AlJSFENZHkenJj1tXl~xdS30Z2rjCeh2NF-6YsTLvwNvjLEoeRMOy1RFzLrzqMHcQ6vuRV7VZlkYvcdCVJmYH3hr-LqY-E4PppGFhVUY7xhQmFGMJZCiijXm~3z6wKFFRukAW~3hRujpH5SIz6q6i3HcyvsCqLwUt0ujQXUwKZOs6ooP0ddplc9Q__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/84/poster/horizontal/en/720.jpg?Expires=1821440875&Signature=PHNmEAOJNpKMcPpl~qk45eH5Q0PbJhmKvkMRPj2bUUPb9cr-jeZrhJrLoFUnjIE0MLO0fsybqHpm7b5m4UfezwQkXCAHpirzvRmXLuUY3vXJtMFWJ851l~Yf~FRbKfl0yv9qX1vfTHzEkhfbXCWdL0kwwqcvSVnDP7p5gNBwr5-LcmVVAYhziQtEmHN0LYM9qpjuzalck6L3KODZKhGqlpZ1sXjesYX7bQSLU18TK2KnpsfLovbGAvR0nL1Z4suBSaaG~up1Nk5KlUF3PZGm-na6AaxB-hVlD2YoGPJvrcJRxkJN2-cBxQlXZvEx2Q9O4sCbPD4jQ6MmW-rg9pGdrA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1080": "https://cdn.movieofthenight.com/show/84/poster/horizontal/en/1080.jpg?Expires=1821440875&Signature=RO8b2EVIt8TGxoPmEJtuay3BzsENy1LorW2D1nNk~79lLzSalAqRJPbbmL0LwSmtsR1msUwbN45Uy6WDwVH-dEYnZgltgunBUnk9RfXpcTh9ba8Bws0WRMulDvBQo7lQyVdh8K~hxpk0hItWBA~KMgxpQ-JEasV4K4yyN8THqYtvwJPjmsrX7LyydiI-gRdIvyMi-v1LR-6ODo1nqUofZER7faPLVSfX1ITS08s89TXZMMxQVFMue8Np4jU0PRSwAUCJSoWWwJm9GiR1ak-opxzbN43DvMgj6n2V95ungxglNcohbrTnk4LI3xaNJVd65h7Zuc1v9mHDusgJq9391w__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1440": "https://cdn.movieofthenight.com/show/84/poster/horizontal/en/1440.jpg?Expires=1821440875&Signature=Ay3HDnZXneJElFnNLxok7N1U8pHNmNOV~8j7MhBL09R~ZOqnx2ydPFKcDuAQgAy-t6K1xdx-0qggbU2ZUDmYxefp2IMatS2qJGKGG2ARnCFHjFcTnM23zsDbjcvp7oC2YWaXPaHP8hTcfl6~p3-BQDCgRb0tTZVS38wwUotiDKbe9eSYhf2d6nMn1wN4QY54mqYWqSCiDut8gvgdiQvQjVr1FYp-krAdZ9mggBmYhyXQVyanY6AbFzACr1Aopf4cAyXz6S~7c5yElUCBq8iG96WjxDSdGomInpy6O~FQQiYx-QpjPsg9R1ULRhD9oSHV6yraGlXRXOYVt5~8OFTtUg__&Key-Pair-Id=KK4HN3OO4AT5R"
+      },
+      "verticalBackdrop": {
+        "w240": "https://cdn.movieofthenight.com/show/84/backdrop/vertical/240.jpg?Expires=1821440854&Signature=hrU4kxWLemld2MckNTu-GQb9J7E8r1MFRqo4~ks5kkbDXPoCHBw1eiWfe~CI37hyr8kd14DI1iI46yUlhBXNQX03rLsqUHfdHAzrBRD298YzGnDNfUKSiG5A~pq6pdITlv3DhzKScAxjBIkkaK5WkkiJ-PcIm1rXv9CMgPzp1RC2Fu-e2YzqfewEWE8LDqjANwGrdvig3KjiqSELrmTMr1N5Nrp4lcBEWZ3-8vBqSORg~aCQhHABnze9uXfosVMw7uQll6X8R8TSMGqwRAj8iCGjcRuyb0PrM7MFjd2DZIhhxvdsLODGolfF6dJDArlD50bhn0YbMK8AAczijo7Nwg__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w360": "https://cdn.movieofthenight.com/show/84/backdrop/vertical/360.jpg?Expires=1821440854&Signature=keGQyD8Fc5~sjW6dxBN~JOCuzr8IWyYLrwoDDkhtoVbR8SabS3wje-hBfCkbgpX0OoHlpuLLULnh77a83A76LKpy6rL3hMWw5CnFeTfl6R7oytRlq~UCHAH8DyFI6EL8pVa0NzB-k0ofGlXPdep8oXT1Qr6hwJKRpSc-IPJx-JNrrYNy1JIRv6n~~keWyPXuLNKWeOA1~yxoY6IIZbasRp1DL25NgRD6sM4IPeA2scTjZP-wMDFe5XMoJ4jvxT~~uLFdGXrGc~ztu6qxKqM05z-wf77cq3ovWR2kgMSWHeMI7KCnR2zVjOArLAnPXXam9cdQ31kGqNXmofPaH5FCsw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/84/backdrop/vertical/480.jpg?Expires=1821440854&Signature=RgCas7eYm0IWxtsNVjvw4rq3zyGE1ZGqf3wrVoP3sbUiYtMuoWFXaguBj5UFqOYgEdM6r1tQEVtODZJnw8MKUEUObVEYgNYBQbMZJRfHrevL48lXbD87YIaXTSioSiGXzrrOC7LIdTuz9SZjzIdQyKuYSdk1aJSaolzwNCayhsBYKFqEi0cS-LbMUMnD~zuGEq-LJJ20VDmnqtYj1v8SEr5Xhp57SB6S7K1Fdx1UY36YIMxGvgfBjZl4l87ce7jxSgyFqCs1pArKOgvlEF1AvfQ6St2wvi2ngPIBNu8ethjjaRjBdeKsfneYAnQxxlFrbO86y4vonYp9VhPuAZmApA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w600": "https://cdn.movieofthenight.com/show/84/backdrop/vertical/600.jpg?Expires=1821440854&Signature=Jmmv7OoFWrtaF9ZDwFxdp9w4OAgDOEmOk2C7BnCvi7iZfRZTCSQYTH0iBcPuHtr0RZ4OHwihAhf1UbUVEUy9qWlJ-2yeopIhUcSYEZ6toUR2lPj4tmom6hyJcyhaav2RY-YV8KlZ9yQQeuX0EMiBzSv~2IsXXUSDzYMY3CARiitcMDyLARmXpYLjT8QxBNURXnoGiFMHpnxE2QMkVFCsJBnqMKG317ndCsKSzWwarePdLicK4HbrSV82QM9QXSsJhRDsH7-qbO8zBZt~NICZTbRYx04KDBDgldimRHe15z0Itilj7ZY6JD-gTtBH1bCaqR1UYc9iU-aUEkjH~HO6pA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/84/backdrop/vertical/720.jpg?Expires=1821440854&Signature=Tx9J2Gykex8gQI3u7ePvPBsMbGa3rVi-oQa7fvXUvcsC8Gj5O8y-4C7fq7X9vzTCuwtP9h5P7AUnUFPUEdtRxf7lst5iwjQQEWPVeNW8aZ-zgnDm~FTbTN5YF~4bgR7fShJPg0f2GEmsHQWiEKCIK-xssekSeRLpY5Q4Q9RLX2HYNXncb6vQsh~oiQxamszkQTV6VUfh6-3offYgFRZB4nhUC8EMVGB8t9fZ3rhxUbMPFgTTKh1Fv-h9vGdayRa5bftAfZK0Vs6v~7gruG8hTe-nIsMNrmRVJPjcY9X32G~A2M1nWMV-uldqfiR6KWtprZgBamdOc12uPy0BxDjn0g__&Key-Pair-Id=KK4HN3OO4AT5R"
+      },
+      "horizontalBackdrop": {
+        "w360": "https://cdn.movieofthenight.com/show/84/backdrop/horizontal/360.jpg?Expires=1821440857&Signature=a23ZO-B6QHDcByjIUxixngM6Dznsnmq1jcHz3nhuRDjgxypiN4~kHnWfB4B~b9Y6DPk6sXy5KUu3Qg3YlFCA5EqG-9IMPcrAiCSrdf3nb6b22PJ4RxCJhoIUbXVJP9p6VROh43fi77PUlKXhW-omzZVmDLRLq7l72JPNvv~z5PSrlq1TeK7CYeJDCPG1jWBK1UtB39TVbYG9T~KWkqKQDAABDm1OpRRlhtlphh8SWc0mGRm1hF0QXSVwP24GfJO2dxyqZUpMQqcjsySnYD04qKBsSH9gdcRIgBUEZxSmeVGVC3ymKCOdvWwX6ofNAA42-YKG5XujiaB1vZDVVWkFgQ__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/84/backdrop/horizontal/480.jpg?Expires=1821440857&Signature=R1vZB0L1jFCPtxzbCPgVG3EddTlVkGASY7Jr2k10MIKd7z50MvZzTgCTWvjJ0rb1tZwdssgxZaEknf4ex6x9QiQhZGBEEcDQML~TRmBaUCjG4PJy7ynngekJYnz5fgcs-rqrvlAgrwindeIiI4baUNZ5HZnx4WvdjysHOqRHVaof0L76Imk2tiq8sCICvrx1dZ~7-OIrje2bSR27ujsf6PzrR~-KeZiorY4qo1jwkW0Cdt2pep09~9e2FE7z1Dk7JJuA-Gk1WOJZwrP5gtrnmaeGleVdzCrlfknkiTlTGRgl2ACbRUJJrCWKMFxIJoxH0GCDK7YjyEwJKIRQh3h0dw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/84/backdrop/horizontal/720.jpg?Expires=1821440857&Signature=RTiGhZ~j3Up5s9ZpqQupRwH68CNUf9vExsJEKFJKSySjP43Tp6NfM2K154U~2~nX~RUoCayo0WpNtZP~4mdC5oMCsRvQwcwiyP~QeG7lWjkHQ25PGhxeVHlb2Ai8VOWLTKDoCa94jxkK-jIb7WPwuTjxn5sgIKJTRfzyg-bJx2LMFCll6-a7B3bAzap-cD1EEfR~uoUeC13T-Xb~a-jdsorEUjIW6E~IKQ4~Vin4cJydrXNpRVe12I51ExUuDv8b-3YRDcHQcO2gAwe2Wm34Kr7PSGZ2DZxUOimxZdN3e7E7xJdxbpjOu7KmcRbfhV9pI3B3wrw5MWIeFuuhV8KINw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1080": "https://cdn.movieofthenight.com/show/84/backdrop/horizontal/1080.jpg?Expires=1821440857&Signature=NnYrX3hbJEgQnRG8b4R0L9siMsNpoeRgVpHvyBbcqx73-LPpjI73YT4Me11nlN6bP3llomhMJkGSmy1vWmk44iD6N-RACibbLACGJSQjCbI3Ib94EQdSvWau49dWghMRjXHqpk47sFXgvve-SrZtvY5uoeVZrJFA8Bf8QoxPHa2pizs7ArVBM5L6V2wn6caHFFP3Jm9Sf--KRPHySHAWg3UvlpDJAZu09LyL7WfjUT9Gjs3IArkGuYVFplWRDeedqQGtqfapy-srsR4BdzgWtJi0wUwX96STTqai1dm99otdFbjS5HxgUHJeJhO1gVcmugWzu14hnPCk5MLPdVLerw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1440": "https://cdn.movieofthenight.com/show/84/backdrop/horizontal/1440.jpg?Expires=1821440857&Signature=BD~rUD9NUmQ7JlooccZ0GygNq5VwW5Oz81X~2PhezOTYtOFhW8hk5rLBcM86O79ZP5v3vBbKD4HvXwKuPDfGoNstkzMNo1lMxvMKRT4JvPqyNj~AnAjInz2LCBDH5DuFtXVAepmqkPeXRFN9fU1fCjGBqnvfaA5zfDOo5-iJ7DZOgtqlQKDZJ5ltIG70ECZpeoe4WTl4zRAU7Iv-hbd7YGhVWPjYg~9RrLIr1nMmpMdQk78pZUIb076-6HEsd08~dFAUfDhc4d3jzOPSBh73bWuutR7zRRJYNWuuDEOPuizVNAfSQx~JZn-6XLwUsWkYF22Rk15P6wIY3RiTcHAT-Q__&Key-Pair-Id=KK4HN3OO4AT5R"
+      }
+    },
+    "streamingOptions": {
+      "us": [
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "rent",
+          "link": "https://www.amazon.com/gp/video/detail/0NSGBFYAQDZQKEC8BBWKT8GILJ?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "price": {
+            "amount": "5.99",
+            "currency": "USD",
+            "formatted": "5.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1766761958
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://www.amazon.com/gp/video/detail/0NSGBFYAQDZQKEC8BBWKT8GILJ?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "price": {
+            "amount": "7.99",
+            "currency": "USD",
+            "formatted": "7.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1766761958
+        },
+        {
+          "service": {
+            "id": "roku",
+            "name": "The Roku Channel",
+            "homePage": "https://therokuchannel.roku.com/",
+            "themeColorCode": "#6120c1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/roku/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/roku/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/roku/logo-white.svg"
+            }
+          },
+          "type": "addon",
+          "addon": {
+            "id": "max",
+            "name": "HBO Max",
+            "homePage": "https://therokuchannel.roku.com/browse/w.PNWpxL1QRGHoYG8bljKgtM5rbogZD1SWkW9aY6NyU1VazwWDPYhwJo30mA70CQMdKYdzB7SzddqzQeL1UWgGWag1AKF7WVJKQQw3uk1rGQv77rSLeQ4jxMopFGJ5B70e4yF7BV26DNLof1JWom8ArJhmW485g0B1tZ6ve/max",
+            "themeColorCode": "",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/roku/us/addons/max/light-theme.png",
+              "darkThemeImage": "https://media.movieofthenight.com/services/roku/us/addons/max/dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/roku/us/addons/max/white.png"
+            }
+          },
+          "link": "https://therokuchannel.roku.com/details/10621cfa3f6d5d2aaefa70d1c6c3d962",
+          "quality": "hd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng",
+                "region": "USA"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa",
+                "region": "MEX"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "availableSince": 1780690322
+        },
+        {
+          "service": {
+            "id": "roku",
+            "name": "The Roku Channel",
+            "homePage": "https://therokuchannel.roku.com/",
+            "themeColorCode": "#6120c1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/roku/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/roku/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/roku/logo-white.svg"
+            }
+          },
+          "type": "addon",
+          "addon": {
+            "id": "max",
+            "name": "HBO Max",
+            "homePage": "https://therokuchannel.roku.com/browse/w.PNWpxL1QRGHoYG8bljKgtM5rbogZD1SWkW9aY6NyU1VazwWDPYhwJo30mA70CQMdKYdzB7SzddqzQeL1UWgGWag1AKF7WVJKQQw3uk1rGQv77rSLeQ4jxMopFGJ5B70e4yF7BV26DNLof1JWom8ArJhmW485g0B1tZ6ve/max",
+            "themeColorCode": "",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/roku/us/addons/max/light-theme.png",
+              "darkThemeImage": "https://media.movieofthenight.com/services/roku/us/addons/max/dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/roku/us/addons/max/white.png"
+            }
+          },
+          "link": "https://therokuchannel.roku.com/details/e0bc35a3da015bc69f744bcc17a7780e",
+          "quality": "hd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng",
+                "region": "USA"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa",
+                "region": "MEX"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "availableSince": 1780686283
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "addon",
+          "addon": {
+            "id": "hbomaxus",
+            "name": "HBO Max",
+            "homePage": "https://www.amazon.com/gp/video/storefront/subscription/hbomaxus",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/us/addons/hbomaxus/light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/us/addons/hbomaxus/dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/us/addons/hbomaxus/white.svg"
+            }
+          },
+          "link": "https://www.amazon.com/gp/video/detail/0FPODQ891XA22TWGCUKUCE7DVN?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "availableSince": 1766755989
+        },
+        {
+          "service": {
+            "id": "apple",
+            "name": "Apple TV",
+            "homePage": "https://tv.apple.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/apple/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/apple/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/apple/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://tv.apple.com/us/movie/the-lord-of-the-rings-the-return-of-the-king-extended-edition/umc.cmc.6zzj5v5pa8iqxujpxh3p7j97f?playableId=tvs.sbd.9001%3A431020315",
+          "quality": "hd",
+          "audios": [],
+          "subtitles": [],
+          "price": {
+            "amount": "7.99",
+            "currency": "USD",
+            "formatted": "7.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1780121708
+        },
+        {
+          "service": {
+            "id": "hulu",
+            "name": "Hulu",
+            "homePage": "https://www.hulu.com/",
+            "themeColorCode": "#1ce783",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/hulu/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/hulu/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/hulu/logo-white.svg"
+            }
+          },
+          "type": "addon",
+          "addon": {
+            "id": "max",
+            "name": "HBO Max",
+            "homePage": "https://www.hulu.com/network/hbo-max-1b3523c1-3090-4c27-a1e8-a04d33867c34",
+            "themeColorCode": "#002be7",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/hulu/us/addons/max/light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/hulu/us/addons/max/dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/hulu/us/addons/max/white.svg"
+            }
+          },
+          "link": "https://www.hulu.com/movie/the-lord-of-the-rings:-the-return-of-the-king-59cd97ff-5f9f-4b2f-9cdc-e803f7bb5ba9",
+          "videoLink": "https://www.hulu.com/watch/59cd97ff-5f9f-4b2f-9cdc-e803f7bb5ba9",
+          "quality": "hd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "expiresOn": 1830315540,
+          "availableSince": 1727447345
+        },
+        {
+          "service": {
+            "id": "hbo",
+            "name": "HBO Max",
+            "homePage": "https://play.hbomax.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/hbo/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/hbo/logo-dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/hbo/logo-white.svg"
+            }
+          },
+          "type": "subscription",
+          "link": "https://play.hbomax.com/movie/ad704585-6774-4d37-8c61-1bd41154173f",
+          "videoLink": "https://play.hbomax.com/video/watch/7b78e88c-4711-437b-ad8d-727adcbc35c6",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "expiresOn": 1830315540,
+          "availableSince": 1744739653
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "addon",
+          "addon": {
+            "id": "hbomaxus",
+            "name": "HBO Max",
+            "homePage": "https://www.amazon.com/gp/video/storefront/subscription/hbomaxus",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/us/addons/hbomaxus/light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/us/addons/hbomaxus/dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/us/addons/hbomaxus/white.svg"
+            }
+          },
+          "link": "https://www.amazon.com/gp/video/detail/0NSGBFYAQDZQKEC8BBWKT8GILJ?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "availableSince": 1768245575
+        },
+        {
+          "service": {
+            "id": "apple",
+            "name": "Apple TV",
+            "homePage": "https://tv.apple.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/apple/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/apple/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/apple/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://tv.apple.com/us/movie/the-lord-of-the-rings-return-of-the-king/umc.cmc.57s6i23z9ry0zsgwwc2mxjqi6?playableId=tvs.sbd.9001%3A297709333",
+          "quality": "hd",
+          "audios": [],
+          "subtitles": [],
+          "price": {
+            "amount": "7.99",
+            "currency": "USD",
+            "formatted": "7.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1758369821
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://www.amazon.com/gp/video/detail/0FPODQ891XA22TWGCUKUCE7DVN?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "price": {
+            "amount": "7.99",
+            "currency": "USD",
+            "formatted": "7.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1766755989
+        },
+        {
+          "service": {
+            "id": "hbo",
+            "name": "HBO Max",
+            "homePage": "https://play.hbomax.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/hbo/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/hbo/logo-dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/hbo/logo-white.svg"
+            }
+          },
+          "type": "subscription",
+          "link": "https://play.hbomax.com/movie/138a65ad-be35-4554-b57f-60d38c7ff0f0",
+          "videoLink": "https://play.hbomax.com/video/watch/cfcbf3f2-3d0c-499f-b46f-9747b70efbbb",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "expiresOn": 1830315540,
+          "availableSince": 1758559774
+        },
+        {
+          "service": {
+            "id": "apple",
+            "name": "Apple TV",
+            "homePage": "https://tv.apple.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/apple/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/apple/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/apple/logo-white.svg"
+            }
+          },
+          "type": "rent",
+          "link": "https://tv.apple.com/us/movie/the-lord-of-the-rings-return-of-the-king/umc.cmc.57s6i23z9ry0zsgwwc2mxjqi6?playableId=tvs.sbd.9001%3A297709333",
+          "quality": "hd",
+          "audios": [],
+          "subtitles": [],
+          "price": {
+            "amount": "5.99",
+            "currency": "USD",
+            "formatted": "5.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1758369821
+        },
+        {
+          "service": {
+            "id": "hulu",
+            "name": "Hulu",
+            "homePage": "https://www.hulu.com/",
+            "themeColorCode": "#1ce783",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/hulu/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/hulu/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/hulu/logo-white.svg"
+            }
+          },
+          "type": "addon",
+          "addon": {
+            "id": "max",
+            "name": "HBO Max",
+            "homePage": "https://www.hulu.com/network/hbo-max-1b3523c1-3090-4c27-a1e8-a04d33867c34",
+            "themeColorCode": "#002be7",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/hulu/us/addons/max/light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/hulu/us/addons/max/dark-theme.png",
+              "whiteImage": "https://media.movieofthenight.com/services/hulu/us/addons/max/white.svg"
+            }
+          },
+          "link": "https://www.hulu.com/movie/the-lord-of-the-rings:-the-return-of-the-king-%28extended-version%29-d11093cb-e249-4b61-ad4b-f1b494b78c2b",
+          "videoLink": "https://www.hulu.com/watch/d11093cb-e249-4b61-ad4b-f1b494b78c2b",
+          "quality": "hd",
+          "audios": [
+            {
+              "language": "eng"
+            },
+            {
+              "language": "spa"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "expiresOn": 1830315540,
+          "availableSince": 1755294845
+        }
+      ]
+    }
+  }
+}

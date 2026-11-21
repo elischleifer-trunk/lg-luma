@@ -50,6 +50,7 @@ const APIS = [
       'tv-series-details',
       'collection-details',
       'find-by-id',
+      'search-keyword',
     ],
     // Corrections where the upstream spec disagrees with what the API sends, found by
     // decoding captured fixtures. Each is a path into the spec and the value to put there;

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/tv/17780/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:45.000Z",
+  "response": {
+    "id": 17780,
+    "results": [
+      {
+        "iso_3166_1": "AZ",
+        "title": "Kral",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "King: The Martin Luther King Story",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "King",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "King 1978",
+        "type": ""
+      }
+    ]
+  }
+}

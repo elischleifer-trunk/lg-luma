@@ -1,0 +1,127 @@
+{
+  "request": {
+    "path": "/3/movie/238/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:59.947Z",
+  "response": {
+    "id": 238,
+    "titles": [
+      {
+        "iso_3166_1": "NL",
+        "title": "De Peetvader",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "教父",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Крёстный отец",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Крестный отец",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Baba",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Кум",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ゴッドファーザー",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Ojciec chrzestny",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "پدرخوانده",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PT",
+        "title": "O Padrinho",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "NO",
+        "title": "Gudfaren",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Il Padrino",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GE",
+        "title": "ნათლიმამა",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "教父",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Կնքահայրը",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AL",
+        "title": "Kumbari",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "XK",
+        "title": "Kumbari",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DK",
+        "title": "The Godfather Part I",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Godfather The Coppola Restoration",
+        "type": "Bluray Restoration"
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "O Poderoso Chefão",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SA",
+        "title": "العراب",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "KR",
+        "title": "대부",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "El Padrino",
+        "type": ""
+      }
+    ]
+  }
+}

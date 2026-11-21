@@ -1,0 +1,119 @@
+{
+  "request": {
+    "path": "/3/tv/236621",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:49.809Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/jq3JQ7SycdjEPYBBdI4ySbDauGH.jpg",
+    "created_by": [
+      {
+        "id": 4309590,
+        "credit_id": "65213f1874507d00c57bbeda",
+        "name": "Ong Kuo Sin",
+        "original_name": "Ong Kuo Sin",
+        "gender": 0,
+        "profile_path": null
+      }
+    ],
+    "episode_run_time": [],
+    "first_air_date": "2018-10-01",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 10751,
+        "name": "Family"
+      }
+    ],
+    "homepage": "",
+    "id": 236621,
+    "in_production": true,
+    "languages": [],
+    "last_air_date": "2022-10-10",
+    "last_episode_to_air": {
+      "id": 4932792,
+      "name": "EP 510",
+      "overview": "Dr Shen and Ella warm up to the idea of talking to each other again. Natasha tries to convince Rosnani to go public about her anosmia.",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2022-10-10",
+      "episode_number": 142,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 22,
+      "season_number": 3,
+      "show_id": 236621,
+      "still_path": null
+    },
+    "name": "Kin",
+    "next_episode_to_air": null,
+    "networks": [],
+    "number_of_episodes": 854,
+    "number_of_seasons": 4,
+    "origin_country": [
+      "SG"
+    ],
+    "original_language": "en",
+    "original_name": "Kin",
+    "overview": "Kin, is a Singaporean family daily tv series, about the complexities of life, love and family relationships.  Years have passed since Yoke and Ella had their lives turned upside-down when they returned to be with their rightful families after being swapped at birth. Years later, Yoke has seemingly embraced her role as a status-conscious, high-society Shelley, assuming a leadership role in the family business. Ella has accepted her fate as a member of the salt of the earth, working-class Loh family but struggles to make something of her life.  The Lohs, Shelleys, Hassans, and Balas have overcome personal loss, incarceration, as well as estrangement of their loved ones; yet lingering tensions remain. Mysteries continue to unfold as characters pursue their individual agendas, while emotional drama abounds as surprising twists are revealed that threaten the stability to which they have become accustomed..",
+    "popularity": 7.3527,
+    "poster_path": "/oy3Bq4aP1D0hThJrj5nFxMd2dIx.jpg",
+    "production_companies": [],
+    "production_countries": [],
+    "seasons": [
+      {
+        "air_date": "2018-10-01",
+        "episode_count": 121,
+        "id": 359988,
+        "name": "Season 1",
+        "overview": "23 years ago, two baby girls, Ella (Jasmine Sim) and Yoke (Rachel Wan) were switched at birth. It was not an accident. Their mothers Loh May Wan (Margaret Lim) and Jessica Shelley (Sue Tan), rivals from primary school, attempt to unravel the truth behind the baby swap as they grapple with their birth-daughters who are their polar opposites in every way.\n\nDeanna (Gayathri Segaren) finds out that she is terminally ill. She decides to entrust her husband, Kenneth (Ebi Shankara), to her best friend Ananya (Carla Dunareanu). Now, Ananya has to choose between James (Jason Godfrey), a man whom she has always admired, and Kenneth. Meanwhile, as dutiful wife Rosnani (Ariati Tyeb Papar) is tending to her boss and mother-in-law Adina's (Mastura Ahmad) orders at their family restaurant, her husband Zaryn (Hatta Said) is rendezvousing with his boss Syirah (Adlina Adil). Rosnani's life revolves around her family and now, her world is about to shatter.",
+        "poster_path": "/zqf28IT2jqJcpbkQZn7FmUo9dDb.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2019-04-04",
+        "episode_count": 247,
+        "id": 361139,
+        "name": "Season 2",
+        "overview": "The stories of the Lohs, Shellys, Balas, Hassams and their friends continue with old struggles and new relationships. Family dynamics and friendships in adversity are a common theme in this season.",
+        "poster_path": "/lGePQKJVIZpQCe4XBkkb2NRxnxl.jpg",
+        "season_number": 2,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2020-03-25",
+        "episode_count": 244,
+        "id": 364734,
+        "name": "Season 3",
+        "overview": "Season 3 continues with the events of season 2 such as Deena's death with a 5 year time jump",
+        "poster_path": null,
+        "season_number": 3,
+        "vote_average": 0
+      },
+      {
+        "air_date": "2021-03-15",
+        "episode_count": 242,
+        "id": 366823,
+        "name": "Season 4",
+        "overview": "The Final Season of Kin",
+        "poster_path": null,
+        "season_number": 4,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "request": {
+    "path": "/3/collection/94032",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:01.860Z",
+  "response": {
+    "id": 94032,
+    "name": "The Lion King Collection",
+    "original_language": "en",
+    "original_name": "The Lion King Collection",
+    "overview": "The film franchise mainly revolves about a pride of lions who oversee a large swath of African savanna as their «kingdom» known as the Pride Lands, with their leader Simba watching over it as «king». In the original film, Simba was tricked into thinking he killed his father, a guilt ridden lion cub flees into exile and abandons his identity as the future King.",
+    "poster_path": "/oG1heUs503GV6xBnFhgyYTGWm05.jpg",
+    "backdrop_path": "/A9IEaj9cPAwEgFnTmteB70oxgJY.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/3eQnD9CIUerbXbgtFE1zJNvEVVo.jpg",
+        "genre_ids": [
+          12,
+          16,
+          35,
+          10751
+        ],
+        "id": 11430,
+        "title": "The Lion King 1½",
+        "original_language": "en",
+        "original_title": "The Lion King 1½",
+        "overview": "Timon the meerkat and Pumbaa the warthog are best pals and the unsung heroes of the African savanna. This prequel to the smash Disney animated adventure takes you back -- way back -- before Simba's adventure began. You'll find out all about Timon and Pumbaa and tag along as they search for the perfect home and attempt to raise a rambunctious lion cub.",
+        "popularity": 6.5387,
+        "poster_path": "/u2hN0WT7Dz46HfhQbr6uzSYfVW4.jpg",
+        "release_date": "2004-10-28",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.591,
+        "vote_count": 3254,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/vyOFlV1afDHb9MMwJVyON4qXbvC.jpg",
+        "genre_ids": [
+          12,
+          16,
+          18,
+          10751,
+          10749
+        ],
+        "id": 9732,
+        "title": "The Lion King II: Simba's Pride",
+        "original_language": "en",
+        "original_title": "The Lion King II: Simba's Pride",
+        "overview": "The circle of life continues for Simba, now fully grown and in his rightful place as the king of Pride Rock. Simba and Nala have given birth to a daughter, Kiara who's as rebellious as her father was. But Kiara drives her parents to distraction when she catches the eye of Kovu, the son of the evil lioness, Zira. Will Kovu steal Kiara's heart?",
+        "popularity": 7.9706,
+        "poster_path": "/sWR1x6UCMCGN9xEf8RGhPS934X0.jpg",
+        "release_date": "1998-10-24",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.938,
+        "vote_count": 4809,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/wXsQvli6tWqja51pYxXNG1LFIGV.jpg",
+        "genre_ids": [
+          16,
+          10751,
+          18
+        ],
+        "id": 8587,
+        "title": "The Lion King",
+        "original_language": "en",
+        "original_title": "The Lion King",
+        "overview": "Young lion prince Simba, eager to one day become king of the Pride Lands, grows up under the watchful eye of his father Mufasa; all the while his villainous uncle Scar conspires to take the throne for himself. Amid betrayal and tragedy, Simba must confront his past and find his rightful place in the Circle of Life.",
+        "popularity": 23.145,
+        "poster_path": "/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg",
+        "release_date": "1994-06-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 8.25,
+        "vote_count": 20441,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

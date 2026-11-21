@@ -1,0 +1,42 @@
+{
+  "request": {
+    "path": "/3/movie/254/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:58.659Z",
+  "response": {
+    "id": 254,
+    "titles": [
+      {
+        "iso_3166_1": "HK",
+        "title": "金剛",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "کینگ کنگ",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "King Kong",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "キング・コング：2005",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "King Kong",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "King Kong",
+        "type": ""
+      }
+    ]
+  }
+}
