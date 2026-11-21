@@ -185,9 +185,11 @@ gallery to `.build/brands-gallery.png`; source restoration via `pnpm assets:bran
 
 `.github/workflows/ci.yml` is native-only: format/lint/workspace tests, asset generation and
 mocked desktop rendering, SDK setup, ARM cross-build, actual IPK verification/checksum/feed,
-and artifacts. It validates only; `.github/workflows/release.yml` calls it and publishes.
+and artifacts; its package job is the reusable `package.yml`. It validates only.
 `.github/workflows/release.yml` (manual dispatch on `main`) is the only publisher: it bumps the
-version (minor by default, or major) on a `release/vX.Y.Z` branch, validates it with `ci.yml`, fast-forwards `main`, creates the
+version (minor by default, or major) on a `release/vX.Y.Z` branch, then only packages it with
+`package.yml` when a complete CI run already passed on `main`'s exact tree (otherwise it runs
+`ci.yml`), fast-forwards `main`, creates the
 GitHub release and mirrors it to Cloudflare R2. PRs and merges never publish. See `development.md#releases` for setup and retries.
 When you finish the initial work for a request, commit it, push the branch and open a pull
 request without waiting to be asked. Later follow-ups on the same request go to that PR's branch.
