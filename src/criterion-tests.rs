@@ -779,3 +779,447 @@ fn odd_durations_are_rejected_without_panicking() {
     assert_eq!(iso_minutes("PT"), None);
     assert_eq!(iso_minutes("PT1H"), Some(60));
 }
+
+// ---- Search ---------------------------------------------------------------------------------
+
+fn listed(id: u64, title: &str, original: &str, popularity: f64) -> Listed {
+    Listed {
+        film: Film {
+            id: format!("tmdb{id}"),
+            title: title.into(),
+            year: String::new(),
+            length: String::new(),
+            link: None,
+            tmdb: Some(id),
+            image: format!("https://image.tmdb.org/t/p/w780/b{id}.jpg"),
+        },
+        original: original.into(),
+        popularity,
+    }
+}
+
+fn catalog() -> Vec<Listed> {
+    vec![
+        listed(1, "Se7en", "Se7en", 90.),
+        listed(2, "Seven Samurai", "七人の侍", 60.),
+        listed(3, "The Seventh Seal", "Det sjunde inseglet", 40.),
+        listed(4, "Amélie", "Le Fabuleux Destin d'Amélie Poulain", 50.),
+        listed(5, "Seven Chances", "Seven Chances", 5.),
+        listed(6, "Ran", "乱", 30.),
+        listed(
+            7,
+            "The Umbrellas of Cherbourg",
+            "Les Parapluies de Cherbourg",
+            20.,
+        ),
+        listed(8, "Eleven Men Out", "", 1.),
+    ]
+}
+
+fn titles(films: &[Film]) -> Vec<&str> {
+    films.iter().map(|film| film.title.as_str()).collect()
+}
+
+#[test]
+fn search_ranks_title_matches_before_popularity() {
+    let catalog = index(catalog());
+    // Titles starting with the text first, most popular first; then a word starting with it.
+    assert_eq!(
+        titles(&search("seven", &catalog)),
+        ["Seven Samurai", "Seven Chances", "The Seventh Seal"],
+    );
+    assert_eq!(
+        titles(&search("sev", &catalog)),
+        ["Seven Samurai", "Seven Chances", "The Seventh Seal"]
+    );
+    // Accents and punctuation do not matter; original titles count.
+    assert_eq!(titles(&search("amelie", &catalog)), ["Amélie"]);
+    assert_eq!(
+        titles(&search("parapluies", &catalog)),
+        ["The Umbrellas of Cherbourg"]
+    );
+    assert_eq!(titles(&search("sjunde", &catalog)), ["The Seventh Seal"]);
+    // One letter is already a search: titles starting with it first.
+    assert_eq!(search("r", &catalog)[0].title, "Ran");
+    assert!(search("zzz", &catalog).is_empty());
+    assert!(search("  ", &catalog).is_empty());
+}
+
+#[test]
+fn search_is_capped() {
+    let many: Vec<Listed> = (0..200)
+        .map(|n| listed(n, &format!("Film {n}"), "", n as f64))
+        .collect();
+    let many = index(many);
+    let found = search("film", &many);
+    assert_eq!(found.len(), RESULT_LIMIT);
+    assert_eq!(found[0].title, "Film 199", "the most popular first");
+}
+
+#[test]
+fn without_a_catalog_search_covers_the_rows_once_each() {
+    let rows = rows(&[3, 3]);
+    let mut shared = rows.clone();
+    shared[1].films.push(rows[0].films[1].clone());
+    assert_eq!(
+        titles(&search("film 0", &index_rows(&shared))),
+        ["Film 0 0", "Film 0 1", "Film 0 2"]
+    );
+}
+
+#[test]
+fn tmdb_catalog_reads_every_page_and_keeps_films_without_a_still() {
+    let providers = serde_json::json!({"results": [
+        {"provider_id": 258, "provider_name": "Criterion Channel"},
+    ]});
+    let pages = std::sync::Mutex::new(Vec::new());
+    let get = tmdb(providers.clone(), |query| {
+        let page: u64 = query
+            .iter()
+            .find(|(name, _)| *name == "page")
+            .unwrap()
+            .1
+            .parse()
+            .unwrap();
+        pages.lock().unwrap().push(page);
+        assert!(query.contains(&("with_watch_providers", "258".into())));
+        Ok(match page {
+            1 => serde_json::json!({"total_pages": 3, "results": [
+                {"id": 1, "title": "Seven Samurai", "original_title": "七人の侍",
+                 "popularity": 60.5, "release_date": "1954-04-26", "backdrop_path": "/a.jpg"},
+                {"id": 2, "title": "Short", "backdrop_path": null},
+            ]}),
+            // Popularity moved a film onto the next page too: listed once.
+            2 => serde_json::json!({"total_pages": 3, "results": [
+                {"id": 1, "title": "Seven Samurai", "backdrop_path": "/a.jpg"},
+                {"id": 3, "title": "", "backdrop_path": "/c.jpg"},
+            ]}),
+            _ => serde_json::json!({"total_pages": 3, "results": [
+                {"id": 4, "title": "Ran", "backdrop_path": "/../x.jpg"},
+            ]}),
+        })
+    });
+    let Catalog { films, complete } = tmdb_catalog(&get).unwrap();
+    assert!(complete);
+    assert_eq!(*pages.lock().unwrap(), [1, 2, 3]);
+    assert_eq!(
+        films
+            .iter()
+            .map(|l| (l.film.id.as_str(), l.film.image.as_str()))
+            .collect::<Vec<_>>(),
+        [
+            ("tmdb1", "https://image.tmdb.org/t/p/w780/a.jpg"),
+            ("tmdb2", ""),
+            ("tmdb4", ""),
+        ]
+    );
+    assert_eq!(films[0].original, "七人の侍");
+    assert_eq!(films[0].popularity, 60.5);
+    assert_eq!(films[0].film.year, "1954");
+
+    // A page failing part way keeps the pages before it; the first failing is an error.
+    let partial = tmdb(providers.clone(), |query| {
+        if query.contains(&("page", "1".into())) {
+            Ok(serde_json::json!({"total_pages": 9, "results": [movie(1, "One")]}))
+        } else {
+            Err("TMDB: offline".into())
+        }
+    });
+    let catalog = tmdb_catalog(&partial).unwrap();
+    assert_eq!((catalog.films.len(), catalog.complete), (1, false));
+    let failing = tmdb(providers, |_| Err("TMDB: offline".into()));
+    assert_eq!(tmdb_catalog(&failing), Err("TMDB: offline".into()));
+}
+
+#[test]
+fn the_catalog_is_read_once_a_day_and_none_means_the_rows() {
+    let cache = cache("catalog");
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
+    let offline = || Err("No TMDB token".to_owned());
+    let found = || {
+        Ok(Catalog {
+            films: catalog(),
+            complete: true,
+        })
+    };
+    assert_eq!(load_catalog(&cache, &offline, now), [(Vec::new(), false)]);
+    assert_eq!(load_catalog(&cache, &found, now), [(catalog(), true)]);
+    // Within a day: from disk.
+    let soon = now + Duration::from_secs(3600);
+    assert_eq!(load_catalog(&cache, &offline, soon), [(catalog(), true)]);
+    // Later: the old copy at once, then a new one; a failure keeps the old one.
+    let later = now + Duration::from_secs(2 * 24 * 3600);
+    assert_eq!(load_catalog(&cache, &offline, later), [(catalog(), false)]);
+    assert_eq!(
+        load_catalog(&cache, &found, later),
+        [(catalog(), false), (catalog(), true)]
+    );
+}
+
+#[test]
+fn a_partial_catalog_is_not_kept_and_does_not_replace_a_longer_one() {
+    let cache = cache("partial");
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
+    let partial = || {
+        Ok(Catalog {
+            films: catalog()[..2].to_vec(),
+            complete: false,
+        })
+    };
+    // Nothing better: searched this visit, not stored, so the next visit tries again.
+    assert_eq!(
+        load_catalog(&cache, &partial, now),
+        [(catalog()[..2].to_vec(), false)]
+    );
+    assert_eq!(
+        load_catalog(&cache, &partial, now).len(),
+        1,
+        "not from disk"
+    );
+    // A full copy, a day later: the shorter list is not offered and does not replace it.
+    let full = || {
+        Ok(Catalog {
+            films: catalog(),
+            complete: true,
+        })
+    };
+    load_catalog(&cache, &full, now);
+    let later = now + Duration::from_secs(2 * 24 * 3600);
+    assert_eq!(load_catalog(&cache, &partial, later), [(catalog(), false)]);
+    assert_eq!(load_catalog(&cache, &partial, later), [(catalog(), false)]);
+}
+
+/// The catalog as the worker sends it.
+fn indexing(films: Vec<Listed>, fresh: bool) -> Indexing {
+    Indexing {
+        films: index(films),
+        fresh,
+    }
+}
+
+#[test]
+fn a_fresh_catalog_is_not_asked_for_again_on_the_next_visit() {
+    let mut state = opened(&[3]);
+    assert!(state.criterion_catalog_requested());
+    // A stale or partial copy: the next visit asks again.
+    state.accept_criterion_catalog(indexing(catalog(), false));
+    state.back();
+    state.open_criterion();
+    assert!(state.criterion_catalog_requested());
+    state.accept_criterion_catalog(indexing(catalog(), true));
+    state.back();
+    state.open_criterion();
+    assert!(!state.criterion_catalog_requested());
+}
+
+#[test]
+fn lgs_keyboard_starts_a_new_search_over_a_kept_one() {
+    let mut state = searching(&[3]);
+    state.text("seven");
+    state.submit_text_input();
+    state.back();
+    assert_eq!(state.focus, Target::CriterionSearch);
+    // LG's keyboard opens empty: the first letter starts a new search.
+    state.criterion.typing = Some(Target::App(APP.into()));
+    state.open_system_keyboard(crate::state::TextField::Criterion);
+    state.text("r");
+    assert_eq!(state.criterion.query, "r");
+    // Backspace first clears the kept search, as does the text model's deletion.
+    for clear in [
+        (|state: &mut State| state.delete()) as fn(&mut State),
+        |state| state.delete_surrounding_text(-1, 1),
+    ] {
+        state.finish_text_input();
+        state.set_editing_text("seven");
+        state.finish_text_input();
+        state.criterion.typing = Some(Target::App(APP.into()));
+        state.open_system_keyboard(crate::state::TextField::Criterion);
+        clear(&mut state);
+        assert!(state.criterion.query.is_empty());
+        assert!(!state.criterion.searching());
+    }
+}
+
+#[test]
+fn a_word_begun_mid_title_ranks_above_text_inside_a_word() {
+    let films = index(vec![
+        listed(1, "Dumbrella", "", 90.),
+        listed(2, "The Umbrellas of Cherbourg", "", 10.),
+    ]);
+    assert_eq!(
+        titles(&search("umbr", &films)),
+        ["The Umbrellas of Cherbourg", "Dumbrella"]
+    );
+}
+
+/// The screen with the catalog loaded and the keyboard open over it from the search field.
+fn searching(sizes: &[usize]) -> State {
+    let mut state = opened(sizes);
+    assert!(state.criterion_catalog_requested());
+    assert!(!state.criterion_catalog_requested(), "asked once");
+    state.accept_criterion_catalog(indexing(catalog(), true));
+    state.direction(Direction::Up, &[]);
+    assert_eq!(state.focus, Target::CriterionSearch);
+    state.activate();
+    assert_eq!(state.criterion.typing, Some(Target::App(APP.into())));
+    assert!(!state.criterion_open() && state.criterion_visible());
+    state
+}
+
+#[test]
+fn typing_replaces_the_rows_with_results_and_back_restores_them() {
+    let mut state = opened(&[8, 3]);
+    state.accept_criterion_catalog(indexing(catalog(), true));
+    // Somewhere in the rows, to come back to.
+    for _ in 0..5 {
+        state.direction(Direction::Right, &[]);
+    }
+    for _ in 0..6 {
+        state.direction(Direction::Up, &[]);
+    }
+    assert_eq!(state.focus, Target::CriterionSearch);
+    state.activate();
+    state.text("sev");
+    assert!(state.criterion.searching());
+    assert_eq!(state.criterion.rows.len(), 1);
+    assert_eq!(state.criterion.rows[0].title, "Films matching “sev”");
+    assert_eq!(
+        titles(&state.criterion.rows[0].films),
+        ["Seven Samurai", "Seven Chances", "The Seventh Seal"]
+    );
+    // Enter: the first result.
+    state.submit_text_input();
+    assert!(state.criterion_open());
+    assert_eq!(state.focus, Target::Film(0, 0));
+    // OK opens its page; Back returns to it, then to the field, then to the rows as they were.
+    state.direction(Direction::Right, &[]);
+    state.activate();
+    assert_eq!(
+        state.criterion.detail.as_ref().unwrap().film.title,
+        "Seven Chances"
+    );
+    state.back();
+    assert_eq!(state.focus, Target::Film(0, 1));
+    state.back();
+    assert_eq!(state.focus, Target::CriterionSearch);
+    assert_eq!(state.criterion.query, "sev", "the field keeps the search");
+    state.back();
+    assert!(!state.criterion.searching());
+    assert!(state.criterion.query.is_empty());
+    assert_eq!(state.criterion.rows, rows(&[8, 3]));
+    assert_eq!(state.focus, Target::Film(0, 5));
+    assert_eq!(state.criterion.first_card(0), 2);
+    state.back();
+    assert!(!state.criterion_open());
+}
+
+#[test]
+fn results_follow_each_keystroke_and_nothing_found_says_so() {
+    let mut state = searching(&[3]);
+    // "seven" also finds what starts with it: *The Seventh Seal*.
+    state.text("seven");
+    assert_eq!(state.criterion.rows[0].films.len(), 3);
+    state.text(" s");
+    assert_eq!(titles(&state.criterion.rows[0].films), ["Seven Samurai"]);
+    state.text("x");
+    assert!(state.criterion.rows.is_empty());
+    assert!(state.criterion.searching());
+    state.delete();
+    assert_eq!(state.criterion.rows[0].films.len(), 1);
+    // Clearing the text brings the rows back while still typing.
+    state.set_editing_text("");
+    assert!(!state.criterion.searching());
+    assert_eq!(state.criterion.rows, rows(&[3]));
+    // Back closes the keyboard onto the field.
+    state.text("ran");
+    state.back();
+    assert!(state.criterion_open());
+    assert_eq!(state.focus, Target::CriterionSearch);
+    assert_eq!(titles(&state.criterion.rows[0].films)[0], "Ran");
+    // Down from the field: the results.
+    state.direction(Direction::Down, &[]);
+    assert_eq!(state.focus, Target::Film(0, 0));
+}
+
+#[test]
+fn many_results_wrap_four_to_a_row() {
+    let mut state = opened(&[3]);
+    let many: Vec<Listed> = (0..10)
+        .map(|n| listed(n, &format!("Seven {n}"), "", 10. - n as f64))
+        .collect();
+    state.accept_criterion_catalog(indexing(many, true));
+    state.direction(Direction::Up, &[]);
+    state.activate();
+    state.text("seven");
+    let sizes: Vec<_> = state.criterion.rows.iter().map(|r| r.films.len()).collect();
+    assert_eq!(sizes, [4, 4, 2]);
+    assert!(state.criterion.rows[1].title.is_empty());
+    state.submit_text_input();
+    state.direction(Direction::Down, &[]);
+    state.direction(Direction::Down, &[]);
+    assert_eq!(state.focus, Target::Film(2, 0));
+}
+
+#[test]
+fn a_catalog_or_rows_arriving_during_a_search_update_it_without_losing_it() {
+    let mut state = opened(&[3]);
+    state.direction(Direction::Up, &[]);
+    state.activate();
+    // No catalog yet: the rows on screen are searched.
+    state.text("film 0 2");
+    assert_eq!(titles(&state.criterion.rows[0].films), ["Film 0 2"]);
+    state.accept_criterion_catalog(indexing(catalog(), true));
+    assert!(
+        state.criterion.rows.is_empty(),
+        "the catalog has no such film"
+    );
+    // An empty catalog (TMDB away) does not replace the one had.
+    state.accept_criterion_catalog(indexing(Vec::new(), false));
+    state.set_editing_text("ran");
+    assert_eq!(titles(&state.criterion.rows[0].films), ["Ran"]);
+    // New rows wait behind the results.
+    state.accept_criterion(Reply {
+        rows: Ok(rows(&[5])),
+        stale: false,
+    });
+    assert_eq!(titles(&state.criterion.rows[0].films), ["Ran"]);
+    state.back();
+    state.back();
+    assert_eq!(state.criterion.rows, rows(&[5]));
+    assert_eq!(state.focus, Target::Film(0, 0));
+}
+
+#[test]
+fn the_home_key_while_typing_closes_the_keyboard_and_the_screen() {
+    let mut state = searching(&[3]);
+    state.text("ran");
+    state.return_home();
+    assert!(!state.criterion_visible());
+    assert!(state.overlay.is_none());
+    assert!(!state.criterion.searching());
+    assert!(state.criterion.query.is_empty());
+    // The next visit starts on the rows.
+    state.open_criterion();
+    assert_eq!(state.criterion.rows, rows(&[3]));
+}
+
+#[test]
+fn a_result_without_a_still_shows_its_title_and_fetches_nothing() {
+    let mut state = opened(&[1]);
+    let mut bare = listed(9, "Seven Shorts", "", 1.);
+    bare.film.image.clear();
+    state.accept_criterion_catalog(indexing(vec![bare], true));
+    state.direction(Direction::Up, &[]);
+    state.activate();
+    state.text("seven");
+    let (_, requests) = state.criterion_image_requests().unwrap_or_default();
+    assert!(requests.iter().all(|request| !request.url.is_empty()));
+    state.submit_text_input();
+    state.activate();
+    assert!(state.criterion.detail.is_some());
+    let requests = state
+        .criterion_image_requests()
+        .map(|(_, requests)| requests)
+        .unwrap_or_default();
+    assert!(requests.is_empty(), "no backdrop to fetch");
+}

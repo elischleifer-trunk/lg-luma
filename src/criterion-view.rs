@@ -30,22 +30,38 @@ pub fn render(out: &mut Scene, state: &State, assets: &Assets) {
         detail_page(out, state, assets, detail);
         return;
     }
+    let title_style = text(40., 600, -0.02);
     out.text(
         "Criterion Channel",
         Rect::new(LEFT, 58., 900., 52.),
-        text(40., 600, -0.02),
+        title_style,
         WHITE,
         false,
     );
-    if !browser.rows.is_empty() {
-        out.text(
-            language.t("criterionHint"),
-            Rect::new(900., 70., 1920. - LEFT - 900., 28.),
-            text(19.2, 500, 0.).right(),
-            c(0xf5f5f5, 0.56),
-            false,
+    if !browser.rows.is_empty() || browser.searching() {
+        let field = search_field(
+            out,
+            state,
+            assets,
+            LEFT + assets.width("Criterion Channel", title_style) + 48.,
         );
-        rows(out, state);
+        if !browser.rows.is_empty() {
+            let hint_x = field.x + field.w + 40.;
+            out.text(
+                language.t("criterionHint"),
+                Rect::new(hint_x, 70., 1920. - LEFT - hint_x, 28.),
+                text(19.2, 500, 0.).right(),
+                c(0xf5f5f5, 0.56),
+                false,
+            );
+            rows(out, state);
+        } else {
+            message(
+                out,
+                &language.format("criterionNoResults", &[("query", browser.query.trim())]),
+            );
+        }
+        typing(out, state, assets);
         return;
     }
     if browser.loading || browser.error.is_none() {
@@ -77,6 +93,65 @@ pub fn render(out: &mut Scene, state: &State, assets: &Assets) {
         false,
     );
     out.control(Target::CriterionRetry, rect, false);
+}
+
+/// The search field in the header, after the title: what is typed, or what it searches. OK
+/// brings up the keyboard. Returns where it is drawn.
+fn search_field(out: &mut Scene, state: &State, assets: &Assets, x: f32) -> Rect {
+    let browser = &state.criterion;
+    let rect = Rect::new(x, 54., 560., 60.);
+    let focused = state.focus == Target::CriterionSearch && browser.typing.is_none();
+    out.pill(rect, focused, browser.typing.is_some());
+    let ink = if focused {
+        c(0x20232a, 1.)
+    } else {
+        c(0xffffff, 0.8)
+    };
+    out.icon(
+        assets,
+        "search",
+        Rect::new(rect.x + 22., rect.y + 19., 22., 22.),
+        ink,
+    );
+    let style = text(22., 500, 0.);
+    let (label, color) = if browser.query.is_empty() && browser.typing.is_none() {
+        (
+            state.preferences.language.t("criterionSearch").to_owned(),
+            if focused {
+                c(0x20232a, 0.7)
+            } else {
+                c(0xffffff, 0.5)
+            },
+        )
+    } else if browser.typing.is_some() {
+        (format!("{}|", browser.query), WHITE)
+    } else {
+        (browser.query.clone(), ink)
+    };
+    let width = rect.w - 84.;
+    out.text(
+        clamp_lines(assets, &label, style, width, 1),
+        Rect::new(rect.x + 58., rect.y + 15., width, 32.),
+        style,
+        color,
+        false,
+    );
+    out.control(Target::CriterionSearch, rect, false);
+    rect
+}
+
+/// Luma's own keyboard over the screen, while typing a search off the TV. On the TV, LG's
+/// keyboard covers the bottom of the screen and the results show above it as they change.
+fn typing(out: &mut Scene, state: &State, assets: &Assets) {
+    if state.criterion.typing.is_none() {
+        return;
+    }
+    // The keyboard is modal: only its keys take the pointer.
+    out.controls.clear();
+    if matches!(state.overlay, Some(Overlay::Keyboard)) {
+        out.shape(Rect::new(0., 0., 1920., 1080.), 0., c(0x080b12, 0.6));
+        keyboard(out, state, assets);
+    }
 }
 
 fn message(out: &mut Scene, label: &str) {
