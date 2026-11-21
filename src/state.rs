@@ -2271,6 +2271,16 @@ impl State {
         effects
     }
 
+    /// LG's keyboard went away without Back or Enter reaching Luma, as when Up leaves its top
+    /// row. That move heads for the results above it, so land on the first one when there
+    /// are results (as Enter does), and on the field otherwise.
+    pub fn dismiss_system_keyboard(&mut self) -> Vec<Effect> {
+        if !matches!(self.overlay, Some(Overlay::SystemKeyboard)) {
+            return vec![];
+        }
+        self.submit_text_input()
+    }
+
     fn focus_first_result(&mut self) {
         match self.keyboard_field {
             TextField::Apps => {
