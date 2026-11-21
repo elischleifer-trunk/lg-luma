@@ -987,18 +987,21 @@ impl Service {
                 while catalog_requests.recv().is_ok() {
                     // Requests made while one was read are answered by it.
                     while catalog_requests.try_recv().is_ok() {}
-                    for (films, fresh) in
-                        load_catalog(&cache, &|| source.catalog(), SystemTime::now())
-                    {
-                        // Split into words here, not on the SDL thread.
-                        let reply = Indexing {
-                            films: index(films),
-                            fresh,
-                        };
-                        if catalogs.send(reply).is_err() {
-                            return;
-                        }
-                    }
+                    // Each copy goes as soon as it is had: an old one from disk is searched
+                    // while TMDB is read again, which takes a minute on the TV.
+                    load_catalog(
+                        &cache,
+                        &|| source.catalog(),
+                        SystemTime::now(),
+                        &mut |films, fresh| {
+                            // Split into words here, not on the SDL thread. Once Luma is
+                            // quitting, nothing receives the reply.
+                            let _ = catalogs.send(Indexing {
+                                films: index(films),
+                                fresh,
+                            });
+                        },
+                    );
                 }
             });
         }
@@ -1163,35 +1166,37 @@ fn load_catalog(
     cache: &DiskCache,
     fetch: &dyn Fn() -> Result<Catalog, String>,
     now: SystemTime,
-) -> Vec<(Vec<Listed>, bool)> {
+    reply: &mut dyn FnMut(Vec<Listed>, bool),
+) {
     if let Some(films) = cache.get::<Vec<Listed>>(CATALOG_KEY, CATALOG_FRESH, now) {
-        return vec![(films, true)];
+        reply(films, true);
+        return;
     }
-    let mut replies = Vec::new();
     let stale = cache.get::<Vec<Listed>>(CATALOG_KEY, STALE, now);
     let stale_len = stale.as_ref().map(Vec::len);
-    replies.extend(stale.map(|films| (films, false)));
+    if let Some(films) = stale {
+        reply(films, false);
+    }
     match fetch() {
         Ok(Catalog {
             films,
             complete: true,
         }) => {
             cache.put(CATALOG_KEY, &films, now);
-            replies.push((films, true));
+            reply(films, true);
         }
         Ok(Catalog { films, .. }) => {
             if stale_len.is_none_or(|stale| films.len() > stale) {
-                replies.push((films, false));
+                reply(films, false);
             }
         }
         Err(error) => {
             crate::telemetry::log_info!("criterion", "catalog: {error}");
             if stale_len.is_none() {
-                replies.push((Vec::new(), false));
+                reply(Vec::new(), false);
             }
         }
     }
-    replies
 }
 
 fn fetch(agent: &ureq::Agent, url: &str) -> Result<String, String> {

@@ -931,6 +931,43 @@ fn tmdb_catalog_reads_every_page_and_keeps_films_without_a_still() {
     assert_eq!(tmdb_catalog(&failing), Err("TMDB: offline".into()));
 }
 
+/// Every reply `load_catalog` gives, in order.
+fn loaded(
+    cache: &DiskCache,
+    fetch: &dyn Fn() -> Result<Catalog, String>,
+    now: SystemTime,
+) -> Vec<(Vec<Listed>, bool)> {
+    let mut replies = Vec::new();
+    load_catalog(cache, fetch, now, &mut |films, fresh| {
+        replies.push((films, fresh))
+    });
+    replies
+}
+
+#[test]
+fn an_old_catalog_is_searched_before_tmdb_is_read_again() {
+    let cache = cache("stale-first");
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
+    let full = || {
+        Ok(Catalog {
+            films: catalog(),
+            complete: true,
+        })
+    };
+    loaded(&cache, &full, now);
+    let later = now + Duration::from_secs(2 * 24 * 3600);
+    let replies = std::cell::RefCell::new(0);
+    // While TMDB is read, the old copy has already been handed over.
+    let fetch = || {
+        assert_eq!(*replies.borrow(), 1, "the old copy came first");
+        full()
+    };
+    load_catalog(&cache, &fetch, later, &mut |_, _| {
+        *replies.borrow_mut() += 1
+    });
+    assert_eq!(*replies.borrow(), 2);
+}
+
 #[test]
 fn the_catalog_is_read_once_a_day_and_none_means_the_rows() {
     let cache = cache("catalog");
@@ -942,16 +979,16 @@ fn the_catalog_is_read_once_a_day_and_none_means_the_rows() {
             complete: true,
         })
     };
-    assert_eq!(load_catalog(&cache, &offline, now), [(Vec::new(), false)]);
-    assert_eq!(load_catalog(&cache, &found, now), [(catalog(), true)]);
+    assert_eq!(loaded(&cache, &offline, now), [(Vec::new(), false)]);
+    assert_eq!(loaded(&cache, &found, now), [(catalog(), true)]);
     // Within a day: from disk.
     let soon = now + Duration::from_secs(3600);
-    assert_eq!(load_catalog(&cache, &offline, soon), [(catalog(), true)]);
+    assert_eq!(loaded(&cache, &offline, soon), [(catalog(), true)]);
     // Later: the old copy at once, then a new one; a failure keeps the old one.
     let later = now + Duration::from_secs(2 * 24 * 3600);
-    assert_eq!(load_catalog(&cache, &offline, later), [(catalog(), false)]);
+    assert_eq!(loaded(&cache, &offline, later), [(catalog(), false)]);
     assert_eq!(
-        load_catalog(&cache, &found, later),
+        loaded(&cache, &found, later),
         [(catalog(), false), (catalog(), true)]
     );
 }
@@ -968,14 +1005,10 @@ fn a_partial_catalog_is_not_kept_and_does_not_replace_a_longer_one() {
     };
     // Nothing better: searched this visit, not stored, so the next visit tries again.
     assert_eq!(
-        load_catalog(&cache, &partial, now),
+        loaded(&cache, &partial, now),
         [(catalog()[..2].to_vec(), false)]
     );
-    assert_eq!(
-        load_catalog(&cache, &partial, now).len(),
-        1,
-        "not from disk"
-    );
+    assert_eq!(loaded(&cache, &partial, now).len(), 1, "not from disk");
     // A full copy, a day later: the shorter list is not offered and does not replace it.
     let full = || {
         Ok(Catalog {
@@ -983,10 +1016,10 @@ fn a_partial_catalog_is_not_kept_and_does_not_replace_a_longer_one() {
             complete: true,
         })
     };
-    load_catalog(&cache, &full, now);
+    loaded(&cache, &full, now);
     let later = now + Duration::from_secs(2 * 24 * 3600);
-    assert_eq!(load_catalog(&cache, &partial, later), [(catalog(), false)]);
-    assert_eq!(load_catalog(&cache, &partial, later), [(catalog(), false)]);
+    assert_eq!(loaded(&cache, &partial, later), [(catalog(), false)]);
+    assert_eq!(loaded(&cache, &partial, later), [(catalog(), false)]);
 }
 
 /// The catalog as the worker sends it.
