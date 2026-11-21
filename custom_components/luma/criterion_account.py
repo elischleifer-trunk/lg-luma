@@ -104,21 +104,24 @@ async def push(
     missing_endpoint: Callable[[], None],
     *,
     forget: bool = False,
-) -> None:
-    """Send the account held here, or with `forget` remove the TV's. Best effort: the TV may be
-    off, and the next status check tries again. `missing_endpoint` is called when the TV's Luma
-    predates this."""
+) -> bool:
+    """Send the account held here, or with `forget` remove the TV's; whether the TV now holds
+    the account held here. Best effort: the TV may be off, and the next status check tries
+    again. `missing_endpoint` is called when the TV's Luma predates this."""
     held = account(options)
     if held is None and not forget:
-        return
+        return False
     try:
         if held is None:
             await client.forget_criterion_account()
-        else:
-            await client.criterion_account(*held, fingerprint(options) or "")
+            return False
+        await client.criterion_account(*held, fingerprint(options) or "")
     except LumaApiError as err:
         if err.status == 404:
             missing_endpoint()
         _LOGGER.debug("Could not send the Criterion account to %s: %s", client.host, err)
     except LumaError as err:
         _LOGGER.debug("Could not send the Criterion account to %s: %s", client.host, err)
+    else:
+        return True
+    return False

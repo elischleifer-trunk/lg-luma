@@ -188,14 +188,21 @@ def _reported(hass: HomeAssistant, entry: ConfigEntry, state: State, value: Any)
 
 
 async def sync(
-    hass: HomeAssistant, entry: ConfigEntry, client: LumaClient, status: dict[str, Any]
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    client: LumaClient,
+    status: dict[str, Any],
+    *,
+    sent: bool = False,
 ) -> None:
     """Back up the TV's sign-in, or give the TV the copy, after a status check. Best effort:
-    the TV may be off, and the next status check tries again."""
+    the TV may be off, and the next status check tries again. `sent`: this check has just given
+    the TV this server's account, which `status` (read before) does not show yet."""
     if "criterion_session" not in status:
         return
     state = _state(entry)
-    state.holder = status.get("criterion_account", False)
+    mark = criterion_account.fingerprint(dict(entry.options))
+    state.holder = mark if sent and mark else status.get("criterion_account", False)
     _reported(hass, entry, state, status["criterion_session"])
     reported = state.reported
     copy = await state.copy(hass, entry.entry_id)

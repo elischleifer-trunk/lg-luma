@@ -89,10 +89,12 @@ def tv(
     held: float | None = None,
     stored: bool = True,
     account: Any = False,
+    takes_account: bool = True,
 ) -> None:
     """The TV reporting `reported` ("absent": an older Luma), holding a session that expires at
     `held`, answering an offered one with `stored`, and holding the Criterion account with
-    fingerprint `account` (False: none)."""
+    fingerprint `account` (False: none), and taking this server's account unless
+    `takes_account` is False (it does not answer)."""
     aioclient_mock.clear_requests()
     status: dict[str, Any] = {"overlay": None, "overlay_ready": True, "cameras": 0}
     if reported != "absent":
@@ -100,7 +102,10 @@ def tv(
         status["criterion_account"] = account
     aioclient_mock.get(f"{TV}/api/status", json=status)
     aioclient_mock.post(f"{TV}/api/cameras", json={"cameras": 0})
-    aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    if takes_account:
+        aioclient_mock.put(f"{TV}/api/criterion-account", json={"criterion_account": True})
+    else:
+        aioclient_mock.put(f"{TV}/api/criterion-account", exc=TimeoutError)
     if held is None:
         aioclient_mock.get(SESSION_URL, status=404, json={"error": "No session"})
     else:
@@ -383,13 +388,32 @@ async def test_a_sign_in_with_this_servers_account_is_looked_after(
 async def test_a_backup_waits_until_the_tv_holds_this_servers_account(
     hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, hass_storage: dict[str, Any]
 ) -> None:
-    # Not yet sent to the TV: the sign-in there is not this account's.
+    # The account could not be sent: the sign-in there is not this account's yet.
     config = entry(hass)
     hass.config_entries.async_update_entry(config, options=ACCOUNT)
     back_up(hass_storage, config, NOW + 20 * DAY)
+    tv(aioclient_mock, None, account=False, takes_account=False)
+    await start(hass, config)
+    await check(hass)
+    assert session_calls(aioclient_mock) == []
+
+
+async def test_a_reset_tv_gets_the_account_and_the_backup_at_the_same_check(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, hass_storage: dict[str, Any]
+) -> None:
+    config = entry(hass)
+    hass.config_entries.async_update_entry(config, options=ACCOUNT)
+    backup = NOW + 20 * DAY
+    back_up(hass_storage, config, backup)
+    # A reset TV: no account, no sign-in. Sending the account makes the sign-in this server's.
     tv(aioclient_mock, None, account=False)
     await start(hass, config)
-    assert session_calls(aioclient_mock) == []
+    assert session_calls(aioclient_mock) == [("PUT", {"cookies": cookies(backup)})]
+
+    # The same at a later status check, when the TV was reset while Home Assistant ran.
+    tv(aioclient_mock, None, account=False)
+    await check(hass)
+    assert session_calls(aioclient_mock) == [("PUT", {"cookies": cookies(backup)})]
 
 
 @pytest.mark.parametrize("options", [{}, ACCOUNT])
@@ -402,8 +426,10 @@ async def test_another_servers_sign_in_is_left_alone(
     config = entry(hass)
     hass.config_entries.async_update_entry(config, options=options)
     back_up(hass_storage, config, NOW + 20 * DAY)
-    # The TV holds another server's account, and a sign-in this server's copy would replace.
-    tv(aioclient_mock, reports(NOW + 30 * DAY, valid=False), held=NOW + 30 * DAY, account="beef")
+    # The TV holds another server's account (this server's could not be sent), and a sign-in
+    # this server's copy would replace.
+    ended = reports(NOW + 30 * DAY, valid=False)
+    tv(aioclient_mock, ended, held=NOW + 30 * DAY, account="beef", takes_account=False)
     await start(hass, config)
     await check(hass)
     assert session_calls(aioclient_mock) == []
@@ -411,7 +437,7 @@ async def test_another_servers_sign_in_is_left_alone(
     assert storage_key(config) not in hass_storage
     notices = hass.data.get("persistent_notification", {})
     assert f"luma_criterion_session_{config.entry_id}" not in notices
-    tv(aioclient_mock, None, account=False if not options else "beef")
+    tv(aioclient_mock, None, account=False if not options else "beef", takes_account=False)
     await check(hass)
     assert session_calls(aioclient_mock) == []
 

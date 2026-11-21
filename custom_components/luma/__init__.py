@@ -201,15 +201,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     # Home Assistant holds the streaming search keys: send them now and whenever they change.
     entry.async_create_background_task(hass, _push_keys(entry), f"{DOMAIN} keys {entry.entry_id}")
     entry.async_create_background_task(
-        hass, _push_criterion_account(entry), f"{DOMAIN} criterion {entry.entry_id}"
+        hass, _setup_criterion(hass, entry, client, status), f"{DOMAIN} criterion {entry.entry_id}"
     )
-    if status is not None:
-        # A TV that lost its Criterion sign-in (a reset) gets the backup back without waiting.
-        entry.async_create_background_task(
-            hass,
-            criterion_session.sync(hass, entry, client, status),
-            f"{DOMAIN} criterion session {entry.entry_id}",
-        )
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     # Developer access is off unless turned on in the options (see dev_access.py).
     if dev_access.enabled(entry):
@@ -274,9 +267,20 @@ async def _push_keys(entry: LumaConfigEntry) -> None:
     await streaming_keys.push(data.client, dict(entry.options), data.compatibility.missing_endpoint)
 
 
-async def _push_criterion_account(entry: LumaConfigEntry, *, forget: bool = False) -> None:
+async def _setup_criterion(
+    hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClient, status: dict[str, Any] | None
+) -> None:
+    sent = await _push_criterion_account(entry)
+    if status is not None:
+        # A TV that lost its Criterion sign-in (a reset) gets the backup back without waiting,
+        # once it holds this server's account again.
+        await criterion_session.sync(hass, entry, client, status, sent=sent)
+
+
+async def _push_criterion_account(entry: LumaConfigEntry, *, forget: bool = False) -> bool:
+    """Whether the TV now holds this server's account."""
     data = entry.runtime_data
-    await criterion_account.push(
+    return await criterion_account.push(
         data.client,
         dict(entry.options),
         data.compatibility.missing_endpoint,
@@ -387,11 +391,12 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
             schedule()
         if streaming_keys.needs_push(dict(entry.options), status):
             await _push_keys(entry)
+        sent = False
         if criterion_account.needs_push(dict(entry.options), status):
-            await _push_criterion_account(entry)
+            sent = await _push_criterion_account(entry)
         elif criterion_account.needs_forget(dict(entry.options), status):
             await _push_criterion_account(entry, forget=True)
-        await criterion_session.sync(hass, entry, client, status)
+        await criterion_session.sync(hass, entry, client, status, sent=sent)
         if keyboard.needs_register(entry, status) or (forgotten and keyboard.wanted(entry)):
             # Registering again also reads back the field the TV holds open, if any.
             forgotten = False
