@@ -581,6 +581,38 @@ fn enter_focuses_the_first_result_once_the_search_is_in() {
 }
 
 #[test]
+fn up_off_lgs_keyboard_lands_on_the_results() {
+    use crate::state::TextField;
+    // LG's keyboard dismissed by Up (no Back or Enter reaches Luma) over results: the first.
+    let mut state = typed("Dune");
+    answer(&mut state, "dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.dismiss_system_keyboard();
+    assert!(!state.text_input_active());
+    assert_eq!(state.title_query, "Dune");
+    assert_eq!(state.focus, Target::Title(0));
+
+    // Typed with the keyboard up, dismissed before the reply: the first result once it's in.
+    let mut state = ready();
+    state.streaming_keys.motn = true;
+    state.open(SEARCH_TAB);
+    state.open_system_keyboard(TextField::Titles);
+    state.text("Dune");
+    state.dismiss_system_keyboard();
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
+    answer(&mut state, "dune");
+    assert_eq!(state.focus, Target::Title(0));
+
+    // Nothing typed, so no results: back on the field.
+    let mut state = ready();
+    state.open(SEARCH_TAB);
+    state.open_system_keyboard(TextField::Titles);
+    state.dismiss_system_keyboard();
+    state.sync_titles(Instant::now());
+    assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
+}
+
+#[test]
 fn enter_settles_when_the_search_fails_over_quick_filtered_results() {
     let mut state = typed("Dun");
     answer(&mut state, "dune");

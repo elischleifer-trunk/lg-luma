@@ -4,10 +4,11 @@ run-name: "${{ github.event_name == 'workflow_dispatch' && format('Branch valida
 # Validation only, and the merge gate: require "Rust checks, rendering, and native package" in the
 # main branch ruleset so a PR cannot merge unless this passes. Trunk Dynamic CI may skip the smoke
 # and package jobs on a pull request, but merges go through Trunk Merge Queue, and Dynamic CI never
-# skips a job on its trunk-merge/* runs, so every commit that lands has passed the full suite. There
-# is no post-merge run on main; release.yml calls this workflow again on the exact commit it
-# publishes. merge_group lets the same check gate GitHub's native merge queue if the repository
-# moves to an organization (GitHub's queues are org-only).
+# skips a job on its trunk-merge/* runs, so every commit that lands through the queue has passed the
+# full suite. There is no post-merge run on main. release.yml calls this workflow only when no
+# complete run passed on main's exact code (it then builds just the package, with package.yml), and
+# nightly.yml calls it for every nightly. merge_group lets the same check gate GitHub's native merge
+# queue if the repository moves to an organization (GitHub's queues are org-only).
 #
 # Every job runs on Trunk runners (template .trunk/templates/ci.yaml, slug "ci"), whose image is
 # built from this file's toolchain versions by .trunk/templates/ci.build.sh. Trunk runners run only
@@ -173,61 +174,17 @@ jobs:
   package:
     name: Verified ARM IPK and Homebrew feed
     needs: [dynamic-ci, prepare]
-    # The Release workflow calls this workflow off a pull request, so dynamic-ci never runs there
-    # and the release package is always built.
+    # The Release and Nightly workflows call this workflow off a pull request, so dynamic-ci never
+    # runs there and the package is always built.
     if: >-
       !cancelled() &&
       needs.prepare.result == 'success' &&
       needs.dynamic-ci.outputs.package != 'false'
-    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-24.04' || format('trunk={0}-{1}..size=medium..memory=high..template=ci', github.run_id, github.run_attempt) }}
-    timeout-minutes: 30
-    outputs:
-      tag: ${{ steps.package.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.ref }}
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - uses: dtolnay/rust-toolchain@1.99.1
-        with:
-          targets: armv7-unknown-linux-gnueabi
-      - uses: Swatinem/rust-cache@v2
-        with:
-          key: webos-${{ hashFiles('tools/build-webos.sh', 'tools/setup-webos-sdk.mjs', 'tools/webos-runtime.mjs') }}
-      - name: Install cross-build dependencies
-        run: |
-          sudo apt-get -o Acquire::Retries=3 update
-          sudo apt-get -o Acquire::Retries=3 install -y --no-install-recommends pkg-config
-      - uses: actions/download-artifact@v8
-        with:
-          name: smoke-inputs
-      - name: Restore generated native assets
-        run: tar -xzf smoke-inputs.tar.gz .build/assets
-      - name: Set up the webOS SDK
-        run: pnpm sdk
-      - name: Cross-build and verify the native IPK and Homebrew feed
-        id: package
-        run: |
-          export WEBOS_NDK="$GITHUB_WORKSPACE/.build/toolchain/arm-webos-linux-gnueabi_sdk-buildroot"
-          pnpm build
-          node tools/package.mjs
-          node tools/repository.mjs
-      - name: Upload release files
-        uses: actions/upload-artifact@v7
-        with:
-          name: luma-release
-          if-no-files-found: error
-          path: |
-            dist/*.ipk
-            dist/sha256sums
-            dist/repo.json
-            dist/description.html
-            dist/app-icon-large.png
+    uses: ./.github/workflows/package.yml
+    with:
+      ref: ${{ inputs.ref }}
+      assets-artifact: smoke-inputs
+
   build:
     # Preserve the existing required-check name as the aggregate of all jobs. Never gate this job
     # with Dynamic CI: it is the fan-in that reports the required check.

@@ -2152,13 +2152,14 @@ fn run() -> Result<(), String> {
             state.accept_scores(reply);
         }
         // SDL-webOS disables text input when its own panel is dismissed, even
-        // if it did not forward a Back/Return key to the application.
+        // if it did not forward a Back/Return key to the application (Up off
+        // its top row, for one, which lands on search results when there are some).
         if text_active
             && matches!(state.overlay, Some(Overlay::SystemKeyboard))
             && !video.text_input().is_active()
         {
             press = None;
-            let pending = state.finish_text_input();
+            let pending = state.dismiss_system_keyboard();
             running &= effects(
                 pending,
                 &mut state,
