@@ -326,7 +326,8 @@ The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows fil
 Channel in a full-screen grid: Popular, Top Rated, Recently Released and a row per genre. OK
 plays the film in a small player app that Luma installs the first time it is needed: the
 Channel's web player, full screen, with the remote's play, pause and skip keys. Back returns to
-the grid.
+the grid. While the film loads, a black screen with the Channel's mark hides its web pages; it
+lifts when the film plays, or after 20 seconds, or when the Channel needs you to sign in by hand.
 
 The rows come from TMDB's streaming data when a TMDB token is stored (see
 [Search: movies and shows](#search-movies-and-shows)),
@@ -335,9 +336,15 @@ Channel; without a Movie of the Night key, or when it does not know the film, th
 the Channel's search for the title. Without a TMDB token, the rows are read from the Channel's
 public home page instead, so a redesign of that page can empty the grid until Luma is updated.
 
-The player signs in with the account kept in Home Assistant (see
-[Criterion Channel account](home-assistant.md#criterion-channel-account)); without one, the first
-film asks you to sign in with the remote, and the player remembers it.
+Once signed in, the player stays signed in. Luma keeps the Channel's sign-in (its cookies) in a
+private file and gives it back to the player before each film when the player's own copy is
+missing or older. Every three days it uses the sign-in once in the background, which keeps it
+from running out (the Channel's lasts 30 days from its last use). Home Assistant keeps a copy and
+restores it after a reset. The first sign-in can come from any of: the TV's Web Browser, if you
+signed in to the Channel there; the account kept in Home Assistant (see
+[Criterion Channel account](home-assistant.md#criterion-channel-account)), which the player types
+in for you; or signing in with the remote. A wrong password is tried at most twice an hour, so it
+cannot get the account blocked.
 
 ## Development
 

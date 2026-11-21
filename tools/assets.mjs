@@ -170,6 +170,7 @@ const surfaces = {
   filmin: ['#10372f', '#091c18'],
   'nrk-tv': ['#073b84', '#04214b'],
   'tv2-play': ['#1d1530', '#0b0812'],
+  criterion: ['#161616', '#050505'],
 };
 for (const [brand, [top, bottom]] of Object.entries(surfaces)) {
   const fill =

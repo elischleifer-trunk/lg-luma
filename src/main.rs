@@ -11,8 +11,11 @@ mod companion;
 mod criterion;
 #[path = "criterion-account.rs"]
 mod criterion_account;
+#[path = "criterion-session.rs"]
+mod criterion_session;
 mod damage;
 mod deeplink;
+mod devtools;
 mod diagnostics;
 mod egl_damage;
 mod font;
@@ -855,11 +858,18 @@ fn run() -> Result<(), String> {
     let mut camera_live: Option<(String, live::Live)> = None;
     state.cameras.decoder = webos && live::available();
     criterion_account::set_store(&preferences_path.with_file_name("home-assistant.json"));
+    criterion_session::set_store(&preferences_path.with_file_name("home-assistant.json"));
     let mut home_assistant = home_assistant::Service::new(
         home_assistant::Live { webos },
         Some(preferences_path.with_file_name("home-assistant.json")),
         home_assistant::PORT,
     );
+    // Keeps the Criterion player's sign-in alive while Luma runs (see `criterion_session`).
+    if webos {
+        criterion_session::spawn_keepalive(criterion_session::path(
+            &preferences_path.with_file_name("home-assistant.json"),
+        ));
+    }
     let update_service = update::Service::new(public_update_checks);
     effects(
         vec![Effect::Refresh],

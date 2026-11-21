@@ -321,6 +321,15 @@ its own Criterion player, on the Channel's sign-in page (`login.criterion.com`),
 a one-time code Luma handed the player with the film. If the Channel ever asks the player to
 prove it is human, finish that sign-in once with the remote.
 
+Once the player has signed in, the TV keeps the Channel's sign-in (about 30 days, renewed in the
+background), and Home Assistant keeps a private backup of it in its own storage, never in
+diagnostics, logs or entity attributes. When the TV has none, for example after a reset, or an
+older one, Home Assistant gives the backup back at the next status check, so you do not have to
+sign in again. The diagnostic sensor **Criterion sign-in expires** shows when the TV's sign-in
+runs out. If the TV finds itself signed out and the backup is no newer, Home Assistant shows a
+notification asking you to sign in again in the Criterion player. Clearing the account also
+removes the backup and the TV's sign-in.
+
 ## Developer access
 
 For people developing Luma. Off by default, and nothing changes until you turn it on: the
