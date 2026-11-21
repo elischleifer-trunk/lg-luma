@@ -333,6 +333,9 @@ pub struct State {
     /// Enter closed the Search tab's keyboard before its results were in: focus the first
     /// result when they arrive, unless the user moved on first.
     title_focus_pending: bool,
+    /// LG's keyboard opened empty over a kept search: its first edit starts a new search, so
+    /// the field matches what the keyboard holds.
+    title_replace_pending: bool,
     /// Movies and shows matching `title_query`, once a Movie of the Night key is stored.
     pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
     /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
@@ -406,6 +409,7 @@ impl State {
             streaming_keys: Default::default(),
             title_query: String::new(),
             title_focus_pending: false,
+            title_replace_pending: false,
             titles: Default::default(),
             posters: Default::default(),
             scores: Default::default(),
@@ -666,9 +670,12 @@ impl State {
         self.panel_started = None;
         self.dirty = true;
         if self.page == Page::Search {
-            // The field starts empty, as the TV keyboard does, and the keyboard comes up.
-            self.title_query.clear();
+            // The keyboard comes up. A search left for another tab is still there with its
+            // results; the on-screen keyboard then starts on Clear, one press from a new search.
             self.open_keyboard(TextField::Titles);
+            if !self.title_query.is_empty() && matches!(self.overlay, Some(Overlay::Keyboard)) {
+                self.focus = Target::Key(KEYS.iter().position(|key| *key == "Clear").unwrap());
+            }
         }
     }
 
@@ -2180,6 +2187,9 @@ impl State {
                 return;
             }
             if self.keyboard_field == TextField::Titles {
+                if std::mem::take(&mut self.title_replace_pending) {
+                    self.title_query.clear();
+                }
                 let length = self.title_query.chars().count();
                 self.title_query.extend(
                     text.chars()
@@ -2213,7 +2223,12 @@ impl State {
             } else if self.keyboard_field == TextField::CameraName {
                 self.cameras.name_draft.pop();
             } else if self.keyboard_field == TextField::Titles {
-                self.title_query.pop();
+                if std::mem::take(&mut self.title_replace_pending) {
+                    // LG's keyboard is empty, so its Backspace clears the kept search.
+                    self.title_query.clear();
+                } else {
+                    self.title_query.pop();
+                }
             } else {
                 self.query.pop();
             }
@@ -2395,6 +2410,14 @@ impl State {
         if !self.text_input_active() || length <= 0 {
             return;
         }
+        if self.keyboard_field == TextField::Titles
+            && std::mem::take(&mut self.title_replace_pending)
+        {
+            self.title_query.clear();
+            self.scroll = 0.;
+            self.dirty = true;
+            return;
+        }
         // SDL-webOS forwards the native text model's UTF-8 byte offsets,
         // relative to the insertion cursor (at the end of our query).
         let mut query = self.editing_text().to_owned();
@@ -2466,22 +2489,13 @@ impl State {
         if field == TextField::CameraName {
             self.cameras.name_draft.clear();
         }
+        self.title_replace_pending = false;
         if cfg!(all(
             feature = "webos",
             target_os = "linux",
             target_arch = "arm"
         )) {
-            self.overlay = Some(Overlay::SystemKeyboard);
-            self.focus = match field {
-                TextField::Location => Target::WeatherQuery,
-                TextField::Name => Target::GreetingName,
-                TextField::InputName => Target::InputRename,
-                TextField::CameraName => Target::CameraRename,
-                TextField::Apps => Target::Search,
-                TextField::Titles => Target::Nav(SEARCH_TAB),
-            };
-            self.panel_started = None;
-            self.dirty = true;
+            self.open_system_keyboard(field);
             return;
         }
         self.overlay = Some(Overlay::Keyboard);
@@ -2489,6 +2503,23 @@ impl State {
         if !self.preferences.reduced_motion {
             self.panel_started = Some(crate::clock::now());
         }
+        self.dirty = true;
+    }
+
+    /// LG's own keyboard, on the TV. It always opens empty.
+    pub(crate) fn open_system_keyboard(&mut self, field: TextField) {
+        self.keyboard_field = field;
+        self.title_replace_pending = field == TextField::Titles && !self.title_query.is_empty();
+        self.overlay = Some(Overlay::SystemKeyboard);
+        self.focus = match field {
+            TextField::Location => Target::WeatherQuery,
+            TextField::Name => Target::GreetingName,
+            TextField::InputName => Target::InputRename,
+            TextField::CameraName => Target::CameraRename,
+            TextField::Apps => Target::Search,
+            TextField::Titles => Target::Nav(SEARCH_TAB),
+        };
+        self.panel_started = None;
         self.dirty = true;
     }
     fn open_location(&mut self) {
