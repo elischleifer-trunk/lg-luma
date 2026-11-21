@@ -681,7 +681,11 @@ fn launch_title(
                 }
             }
             // Luma gives the player its kept sign-in as it opens it (see `criterion_session`).
-            crate::criterion_session::launch_player(|| launch_with_params(id, &launch.params))
+            let film = launch.params["target"]
+                .as_str()
+                .filter(|target| target.contains("/films/"))
+                .map(str::to_owned);
+            crate::criterion_session::launch_player(film, || launch_with_params(id, &launch.params))
         }
         Some(launch) => launch_with_params(id, &launch.params),
         None if valid_app_id(id) => call(

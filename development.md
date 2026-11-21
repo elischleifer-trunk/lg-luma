@@ -734,6 +734,22 @@ the account) and:
   nor that server has an account, backs up, restores or clears it
   (`custom_components/luma/criterion_session.py`).
 
+Starting the film: the TV's web engine lets a page play sound only after a press on that page,
+and every film opens a new page, so the Channel's player stops at its Play button.
+`criterion_session::start_film` (its own thread, up to 40 s) asks the player's page through
+DevTools, marked as a user gesture, to press Play (`LumaCriterion.startFilm(<film page>)`) once
+that page shows it; on the TV tested it presses about 6 s after the launch. Without DevTools the
+loading cover lifts after 4 s at the Play button, and OK (or the Play key) presses it.
+
+DRM: the Channel offers PlayReady first and Widevine second. On the TV tested (webOS 11)
+PlayReady failed 6 of 8 fresh plays a second in (key status `internal-error`, Shaka 4012, the
+Channel's "Unable to play video" / error 242635) while Widevine played every time, the same HEVC
+stream. `userScript.js` answers the page's PlayReady requests with "not supported" whenever the TV
+has Widevine for the same media, so the player picks Widevine.
+
+The loading cover's mark breathes on the wall clock (a negative `animation-delay`), so as the film
+passes through several pages, each with its own cover, the breath continues instead of restarting.
+
 The player's own sign-in form filling (`userScript.js`) is the last resort: it enters the
 password at most twice an hour across launches and stops for an hour at any error on the page,
 because Auth0 blocks an account after a run of failed sign-ins.
