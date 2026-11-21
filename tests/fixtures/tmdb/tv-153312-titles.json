@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/tv/153312/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:45.203Z",
+  "response": {
+    "id": 153312,
+    "results": [
+      {
+        "iso_3166_1": "BG",
+        "title": "Кралят на Тълса",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "BR",
+        "title": "Tulsa king",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "塔爾薩之王",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IL",
+        "title": "המלך של טולסה",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IR",
+        "title": "پادشاه تولسا",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "LB",
+        "title": "Talsas karalis",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Król Tulsy",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RS",
+        "title": "Краљ Талсе",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Kansas City",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Tulsa King",
+        "type": "working title"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Ông Trùm Vùng Tulsa",
+        "type": ""
+      }
+    ]
+  }
+}

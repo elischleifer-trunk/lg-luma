@@ -1,0 +1,32 @@
+{
+  "request": {
+    "path": "/3/movie/83620/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:49.496Z",
+  "response": {
+    "id": 83620,
+    "titles": [
+      {
+        "iso_3166_1": "RU",
+        "title": "Rodnya",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "GB",
+        "title": "Kinfolk",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Family Relations",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Relatives",
+        "type": ""
+      }
+    ]
+  }
+}

@@ -268,7 +268,7 @@ mod tests {
             result.unwrap_or_else(|e| panic!("{}: {e}", file.display()));
             checked += 1;
         }
-        assert_eq!(checked, 22);
+        assert_eq!(checked, 28);
     }
 
     /// Every captured TMDB reply decodes into the generated type for its endpoint. This is how
@@ -276,8 +276,8 @@ mod tests {
     #[test]
     fn captured_tmdb_replies_decode_into_generated_types() {
         use crate::tmdb_api::{
-            CollectionDetailsResponse, MovieDetailsResponse, SearchMultiResponse,
-            TvSeriesDetailsResponse,
+            CollectionDetailsResponse, MovieDetailsResponse, SearchKeywordResponse,
+            SearchMultiResponse, TvSeriesDetailsResponse,
         };
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/tmdb");
         let mut checked = 0;
@@ -291,6 +291,9 @@ mod tests {
                 serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap();
             let reply = record["response"].clone();
             let result = match name.split('-').next().unwrap() {
+                _ if name.starts_with("search-keyword-") => {
+                    serde_json::from_value::<SearchKeywordResponse>(reply).map(drop)
+                }
                 "search" => serde_json::from_value::<SearchMultiResponse>(reply).map(drop),
                 "movie" => serde_json::from_value::<MovieDetailsResponse>(reply).map(drop),
                 "tv" => serde_json::from_value::<TvSeriesDetailsResponse>(reply).map(drop),

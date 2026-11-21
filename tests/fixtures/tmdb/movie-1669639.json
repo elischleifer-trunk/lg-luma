@@ -1,0 +1,63 @@
+{
+  "request": {
+    "path": "/3/movie/1669639",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:45.715Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": null,
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "http://www.neoandromeda.com",
+    "id": 1669639,
+    "imdb_id": "tt41740490",
+    "origin_country": [
+      "CA"
+    ],
+    "original_language": "en",
+    "original_title": "KING",
+    "overview": "King, a champion of the fighting organization, lives, trains, and fights under one roof with his roommate Sam. They compete weekly in grueling matches that leave them bruised and battered. Their landlord and promoter promises to get them away from this lifestyle for bigger and better opportunities on the condition that they continue to push themselves for another fight. The roommates face their toughest battles during recovery while pushing each other to continue training for their next bouts.",
+    "popularity": 0.3196,
+    "poster_path": "/pthcMYuIGTwjyYIDiAZg0yE5Uyn.jpg",
+    "production_companies": [
+      {
+        "id": 285540,
+        "logo_path": null,
+        "name": "Neo Andromeda",
+        "origin_country": ""
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CA",
+        "name": "Canada"
+      }
+    ],
+    "release_date": "2026-07-26",
+    "revenue": 0,
+    "runtime": 17,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Two young fighters compete for the top spot in an underground bare-knuckle boxing ring.",
+    "title": "KING",
+    "video": false,
+    "vote_average": 0,
+    "vote_count": 0
+  }
+}

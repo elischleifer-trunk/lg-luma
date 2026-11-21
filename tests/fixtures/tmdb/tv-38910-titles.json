@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/tv/38910/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:44.492Z",
+  "response": {
+    "id": 38910,
+    "results": [
+      {
+        "iso_3166_1": "HU",
+        "title": "tusarok nyomozo",
+        "type": ""
+      }
+    ]
+  }
+}

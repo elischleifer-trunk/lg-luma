@@ -1,0 +1,152 @@
+{
+  "request": {
+    "path": "/3/movie/122/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:59.067Z",
+  "response": {
+    "id": 122,
+    "titles": [
+      {
+        "iso_3166_1": "US",
+        "title": "The Return of the King",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "SE",
+        "title": "Sagan om konungens återkomst",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Le Seigneur des Anneaux: Le Retour du Roi",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Le Retour du Roi",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Lord of the Rings 3: The Return of the King",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "HK",
+        "title": "魔戒三部曲：王者再臨",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "魔戒3：王者归来",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "MK",
+        "title": "Господар на прстените: Враќањето на кралот",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Lord of the Rings III: The Return of the King",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "ESDLA",
+        "type": "short title"
+      },
+      {
+        "iso_3166_1": "ES",
+        "title": "El señor de los anillos: El retorno del rey",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AU",
+        "title": "LOTR: The Return Of The King",
+        "type": "Streaming title (Foxtel)"
+      },
+      {
+        "iso_3166_1": "VN",
+        "title": "Chúa Tể Của Những Chiếc Nhẫn 3: Hai Tòa Tháp",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ロード・オブ・ザ・リング／王の帰還：2003",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "The Lord of the Rings The Return of the King",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AZ",
+        "title": "Üzüklərin Hökmdarı: Kralın Qayıdışı",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "指环王3：王者无敌",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "LOTR3 - The Return of the King",
+        "type": "sortable short title"
+      },
+      {
+        "iso_3166_1": "JP",
+        "title": "ロード・オブ・ザ・リング／王の帰還",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CN",
+        "title": "指环王3：王者归来",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "Le Seigneur des anneaux : Le Retour du roi - version longue",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "Der Herr der Ringe - Die Rueckkehr des Koenigs",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "魔戒三部曲：王者再臨",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AM",
+        "title": "Մատանիների Տիրակալը 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TR",
+        "title": "Yüzüklerin Efendisi: Kralın Dönüşü",
+        "type": "Turkish"
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Властелин колец 3",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "IT",
+        "title": "Il Signore degli Anelli: Il Ritorno del Re",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "RU",
+        "title": "Средиземье. Властелин колец: возвращение короля",
+        "type": ""
+      }
+    ]
+  }
+}

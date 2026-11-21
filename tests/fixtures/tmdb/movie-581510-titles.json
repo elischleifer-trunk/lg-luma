@@ -1,0 +1,17 @@
+{
+  "request": {
+    "path": "/3/movie/581510/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:48.217Z",
+  "response": {
+    "id": 581510,
+    "titles": [
+      {
+        "iso_3166_1": "GB",
+        "title": "Play for Today: King",
+        "type": ""
+      }
+    ]
+  }
+}

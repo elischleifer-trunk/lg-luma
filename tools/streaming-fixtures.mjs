@@ -39,7 +39,15 @@ const QUERIES = [
   ['sup', 'sup'], // short prefix with no whole-word matches
   ['super', 'super'], // Super 8, Superbad; Superman is not a whole-word match
   ['no-results', 'zzqxjvw'], // empty result list
+  ['king', 'king'], // 20 obscure films called King fill the reply; King Kong is looked up
+  ['kin', 'kin'], // a whole word (Kin, 2018), but most people typing it want "king"
 ];
+
+// TMDB keyword searches: longer words the typed word may be the start of. [slug, text].
+const KEYWORD_QUERIES = [['kin', 'kin']];
+
+// Shows looked up one by one by TMDB ID: well-known titles a full title search left out.
+const SHOW_LOOKUPS = ['movie/122', 'movie/254', 'movie/420818', 'movie/8587'];
 
 // Half-typed text, captured from TMDB only: its free search says which word the text is
 // completed to before Movie of the Night is asked (relevance::complete). [slug, text].
@@ -83,6 +91,12 @@ const MOTN_REQUESTS = [
       series_granularity: 'show',
       output_language: 'en',
     },
+  })),
+
+  ...SHOW_LOOKUPS.map((id) => ({
+    name: `show-${id.replace('/', '-')}`,
+    path: `/shows/${id}`,
+    query: { country: COUNTRY, series_granularity: 'show', output_language: 'en' },
   })),
 
   // Detail pages: a movie and a series with seasons/episodes.
@@ -188,7 +202,13 @@ async function captureTmdb(tmdb, motnResults) {
   for (const tmdbId of motnResults) {
     const [kind, id] = tmdbId.split('/');
     if ((kind === 'movie' || kind === 'tv') && /^\d+$/.test(id)) {
-      await details(kind, id);
+      try {
+        await details(kind, id);
+      } catch (error) {
+        // Movie of the Night sometimes names an ID TMDB does not have; the app skips it too.
+        if (!/HTTP 404/.test(error.message)) throw error;
+        continue;
+      }
       await tmdb.get(`${kind}-${id}-titles`, `/3/${kind}/${id}/alternative_titles`, {});
     }
   }
@@ -214,6 +234,9 @@ async function captureTmdb(tmdb, motnResults) {
       page: '1',
     });
   }
+  for (const [slug, text] of KEYWORD_QUERIES) {
+    await tmdb.get(`search-keyword-${slug}`, '/3/search/keyword', { query: text, page: '1' });
+  }
   for (const id of [...collections].sort((a, b) => a - b)) {
     await tmdb.get(`collection-${id}`, `/3/collection/${id}`, { language: 'en-US' });
   }
@@ -227,6 +250,8 @@ async function main() {
     const body = await motn.get(request.name, request.path, request.query);
     if (request.name.startsWith('search-title-')) {
       for (const show of body) if (show.tmdbId) motnResults.add(show.tmdbId);
+    } else if (body.tmdbId) {
+      motnResults.add(body.tmdbId);
     }
   }
   await motn.finish();

@@ -1,0 +1,65 @@
+{
+  "request": {
+    "path": "/3/collection/762512",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:02.074Z",
+  "response": {
+    "id": 762512,
+    "name": "The Lion King (Reboot) Collection",
+    "original_language": "en",
+    "original_name": "The Lion King (Reboot) Collection",
+    "overview": "Using advanced 3D CGI (Computer-Generated Imagery) technology, Disney reimagines the classic story of Simba, Mufasa and Scar with photorealistic animation.",
+    "poster_path": "/dGpIRn4Nqi63JO1RlKxjcPbQSAw.jpg",
+    "backdrop_path": "/1KeXF239BkqLChcAcF8gKl1stZz.jpg",
+    "parts": [
+      {
+        "adult": false,
+        "backdrop_path": "/1TUg5pO1VZ4B0Q1amk3OlXvlpXV.jpg",
+        "genre_ids": [
+          12,
+          18,
+          10751,
+          16
+        ],
+        "id": 420818,
+        "title": "The Lion King",
+        "original_language": "en",
+        "original_title": "The Lion King",
+        "overview": "Simba idolizes his father, King Mufasa, and takes to heart his own royal destiny. But not everyone in the kingdom celebrates the new cub's arrival. Scar, Mufasa's brother—and former heir to the throne—has plans of his own. The battle for Pride Rock is ravaged with betrayal, tragedy and drama, ultimately resulting in Simba's exile. With help from a curious pair of newfound friends, Simba will have to figure out how to grow up and take back what is rightfully his.",
+        "popularity": 13.7339,
+        "poster_path": "/dzBtMocZuJbjLOXvrl4zGYigDzh.jpg",
+        "release_date": "2019-07-12",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.089,
+        "vote_count": 11022,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/1w8kutrRucTd3wlYyu5QlUDMiG1.jpg",
+        "genre_ids": [
+          12,
+          10751,
+          16
+        ],
+        "id": 762509,
+        "title": "Mufasa: The Lion King",
+        "original_language": "en",
+        "original_title": "Mufasa: The Lion King",
+        "overview": "Mufasa, a cub lost and alone, meets a sympathetic lion named Taka, the heir to a royal bloodline. The chance meeting sets in motion an expansive journey of a group of misfits searching for their destiny.",
+        "popularity": 12.4829,
+        "poster_path": "/jbOSUAWMGzGL1L4EaUF8K6zYFo7.jpg",
+        "release_date": "2024-12-18",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.274,
+        "vote_count": 2838,
+        "media_type": "movie"
+      }
+    ]
+  }
+}

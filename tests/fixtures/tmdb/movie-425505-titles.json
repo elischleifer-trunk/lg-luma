@@ -1,0 +1,27 @@
+{
+  "request": {
+    "path": "/3/movie/425505/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:48.665Z",
+  "response": {
+    "id": 425505,
+    "titles": [
+      {
+        "iso_3166_1": "KR",
+        "title": "킨-더 비기닝",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "AR",
+        "title": "El legado",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "DE",
+        "title": "KIN",
+        "type": ""
+      }
+    ]
+  }
+}

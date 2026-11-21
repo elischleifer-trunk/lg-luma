@@ -1,0 +1,573 @@
+{
+  "request": {
+    "path": "/shows/movie/420818",
+    "query": {
+      "country": "us",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:39.066Z",
+  "response": {
+    "itemType": "show",
+    "showType": "movie",
+    "id": "1709",
+    "imdbId": "tt6105098",
+    "tmdbId": "movie/420818",
+    "title": "The Lion King",
+    "overview": "Disney's The Lion King, directed by Jon Favreau, journeys to the African savanna, where a future king overcomes betrayal and tragedy to assume his rightful place on Pride Rock. Through pioneering filmmaking techniques, The Lion King brings treasured characters to life in a whole new way.",
+    "releaseYear": 2019,
+    "originalTitle": "The Lion King",
+    "genres": [
+      {
+        "id": "adventure",
+        "name": "Adventure"
+      },
+      {
+        "id": "animation",
+        "name": "Animation"
+      },
+      {
+        "id": "drama",
+        "name": "Drama"
+      }
+    ],
+    "directors": [
+      "Jon Favreau"
+    ],
+    "cast": [
+      "Chiwetel Ejiofor",
+      "John Oliver",
+      "Donald Glover",
+      "James Earl Jones",
+      "John Kani",
+      "Alfre Woodard",
+      "Beyoncé"
+    ],
+    "rating": 68,
+    "runtime": 118,
+    "imageSet": {
+      "verticalPoster": {
+        "w240": "https://cdn.movieofthenight.com/show/1709/poster/vertical/en/240.jpg?Expires=1813731056&Signature=OwwgJBP5ANSxAG~TzxqEXVbj3JvN5qzCOjKG~OChWRRy-67pFzCr6HSz8jjyGzBJgusmqNRJbaCybAw-OHuhjnhR5G3k1~W5Lu13UkQRuUlHLsneRJVQNFufoU6cu9~0BhsW3jX-TlzlyWTTXU1~lNnBbk5VgrYhtUQgXaHGLbpSg2Pra9cWQwTNal3WK1tt0X~x4XZvZQCwzH4tmyTsZA3rii4fJSoih8cLiO8ullyu-FhHwkY3HbQdMSmtCwT7oWvnyMcKHivcaWyQl5IudSu1GvOXJhp1XyJOCCi5B5Q9NlgQmLeb5Kpafcx4cNeAB-z1Uh6blCxn0KDrNuLsuw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w360": "https://cdn.movieofthenight.com/show/1709/poster/vertical/en/360.jpg?Expires=1813731056&Signature=J4iECyp5pKN3L6l-JMxPjpcGXUVORXqCt6~XwUCxP4GvG2T8aO5VJGYIVSI0sG~90DIlH5NINKlICkB4qbRw4vTKmzSiREv9tLUNIqFR0LfR4zUzCr~ZOzC6fcJsxpXhCm9UWHJRaKQdIAUXCYowLPlbdVUZbozAn4Ahp-HMwlxnq33AOjTQxsRzRu8BRzNWspUWIXmVH6gMDDldbZijKkIqyqj25BSHTw~KSlLQCdcPMo1TRUR~N6yRCmGQyua7flORXD06o938Gv4hzQweEc5IoVDtQ7WIpbqEwPRwnz76s7fNuPb9YZ6cI9s1IzbZYnb1vqWDB8fZY3V5hCX1Qw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/1709/poster/vertical/en/480.jpg?Expires=1813731056&Signature=KpSV-XkFvSppSJwqFpjytxJm1tFAni8aE3RaRj-cDMMHgyVdbMXDRE-PRQdRDEGCXxhtZ8dmF8b3sf22KcEGx6jGVoRjCzO0B2axYpIQfoaF9IM--BLl9jWYDIZuwVbo6RPDt84Xz-PZ3k7DcycbBFzW1WcpadgJCway3~4TxlyW3E4EztkI8Z55cXbWU0m3mkWKwDMIM2NXbzOGpjMdi-WUOasLJqkzhkfcaq3Lk6ALxOzo9oQLEm3NoNGPgiWsA6OtS6AC3SI~O0VXCUjtyooDVe~3lj0aU3q9~Tl7pr~Kg8DBYdijbtM1KQ-178CkinKSpbou0cETff4PmuhlHw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w600": "https://cdn.movieofthenight.com/show/1709/poster/vertical/en/600.jpg?Expires=1813731056&Signature=KOjJCPrWWt2OXXW-yyRpgWmvzIoqdq5M5RqGKAvTsi6lv168TR~APKzVUSHc95DAjF3sKWCPVJC1NQMfya0G7rbyc825oElaaVXSeY-S2NFROe0hLM9F04jzSn5GAU6FAOg5lvxAy7XQuiLNN6Napnj2-gzaA64ZSoRo7AXWBLCA5hC9cMjQiAFl1OYRVUep4BGZvC27l2FbuZRetg3Au-yxo5Zp5us58mAYCnJKmfT1FC87SiIMr1bFyK40XAD0p6nk3InjPsDdDhpvxOA5V4b2p14Rt3oONYA8IbnEUCHWT5I03DhYX15WjR3MGg~eCiBg6loOoFxUR4OH2ZqZZg__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/1709/poster/vertical/en/720.jpg?Expires=1813731056&Signature=Qlf~92-m632UJHMHsapuFu-OWeP4gr0IoZqfzyIdcee7o77Vqp8Xlbn5IH7hjPEgjyTyzN-vcx~yUOn7ArSI-CUeq5h-qUyB~rodafbS7u3gzV7lxoVgUlhXBiPO0KabR6rl~~Nm4RfJLRkfjGgBKlNJ~5MX~XRhux4Ymd47qeOspU2I0qHgBl-agfSI66nP5aMnbeIWLTW8I2sJ9lmVSJ8JH1NK8cEdu3cGPJCdMpxQ0jni59j4P6~si~R4~GLXWslWKnydLb1v0tgvdU-AsSkXv~nzrRiHijH99AxHI2x6JJqjE6agVfU-DaaR~92Mu6q7dlw64qmJlS1hSPY9Ag__&Key-Pair-Id=KK4HN3OO4AT5R"
+      },
+      "horizontalPoster": {
+        "w360": "https://cdn.movieofthenight.com/show/1709/poster/horizontal/en/360.jpg?Expires=1813731058&Signature=Y3544alY9-Yc7nVFEow3GNqf3p-il6wMnJVO82pcuBxTdFrrExgA5DSbFWZjFkXnyXxhUeHzW3gW5uaVBuAdOtteQugKCJg9ZM2azDhBTIyjDQvv8HuVG9aE1i-cfDuMvaJq5jM0f7-K1-GeC0VXHRlASgzrBKixTqyN7ZtzhKro1-UxXRFpcJJPaR3lOyfjubFX2wwQ6SIDAePQzQawPieSdmNc44323l-KM9F49VThCDj6eFG57uG~n76XXkHFlyPi8g4WYMS5lkglLye-ZvfwK5lnKP0PY-QJxovKwNpqeMiE2ENBjFg~zmsIQiMVqU4U-qBZzUnp6uWtJHLLAA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/1709/poster/horizontal/en/480.jpg?Expires=1813731058&Signature=FUCjerjKdC4iqTb5gGXGIcq-0o87vB0BJ2foCaAVuX5YsdnVcE4OUjXHuonMhYLw6YDLhra9fsFaGAB04v6MKB-cGgbA8-JET53e69cqObYyWr3x-AJjLBOPmR5Q93bgzXhRKvQzgPItdjX4ampvJJYAxjxouEFXwD~5Qg6-EazHJMDjMbOOVXBv5nD-g1Zcv1~YV919dX6Uz4A-yuys-oabGSNipj1UoJ~WbXsdGx-mxCddtADSPvJYA8ev9VUnEZdfcwRWLGoaNy0eK9pcF-sdXIhKQ~x34X~Kqu6IH2apzoF58Tqc1Qdffv-nE8qJnbL3-q39kbXmn1MF8lwsOQ__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/1709/poster/horizontal/en/720.jpg?Expires=1813731058&Signature=B2zSaK1qzI3YH6GCz~nN53NM7r8DGWGettKlZYBonGJfE58KboB-DJDM0ciO5zGVcK~fl-18IOX2NBwtANlmJISb5VPos3xLEWuk7SIibTCKibdpMYTAL8nlPA~8c41XEm0z~kSUg4goeBORVTLNF5dx1KEnSNirumCWSKuvRym41XLXrBPkIDTdzVhjTQnZ8-rb~Nj2bpDRh3caCmLIioq2doK0d-JsxIURLXq64HJXTsO58yv~-qK~y-ttEQ7jxYbOlr9RWrVoeB5RYVii3XKwe~lKTaRMoy84p58pLe7ZZFGnfCDuxyG1BC8yNt9Brz6x7T4fi1jEn6uaHIb6Yw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1080": "https://cdn.movieofthenight.com/show/1709/poster/horizontal/en/1080.jpg?Expires=1813731058&Signature=ZKvcVeIwlYH1E444s~KAv83SKI6~epN7yjt4lvWFP6P26ZcF-52FS11uIvT-v24mubVaARNrdvlAkB9wEWNXmiwN-iWkmk2Z01C-x7PN429nEwR9zf546dyFaUZXrzdPeVKQy3vYuWkQGUDnOLztZtwpS~ju2Zn6RNocjnscPO3e8sjXkfqZ-yjobfDzGV2ZF7GiEvEMlhAfBbauyik-E~765xgf86BkNj-Ld07e-qxwhi-owDuU1KgyhYlR5mLE~bVzg0MZX4l9WfWl39su4~Qb3E-dsq2jAC9W8gNoBXAmXPn1ZqO6Mce3i4Ii~FryCHZmgJKNF7hdRYudvlsQlA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1440": "https://cdn.movieofthenight.com/show/1709/poster/horizontal/en/1440.jpg?Expires=1813731058&Signature=j5t2BuD1duecff1wd~yRsXv0o7urWsI7DLuSkyqBixYCAOHEZf8BxryiUj2RXaSOf4AiRHvlgdHigVRKccl4Su5aACZVzLiKcSYzl2fovtAtVl4LMSVV4-84tWcE~9WMQ966ezyN0UiqbtTMsFdvDYA8ccG6kZKNIR3r-fDUFElWoaiQTqWCMHOywTIJvWQNNtmF~7gLPW6M000RLNHkndIKfpXB82F9qyUWooqghOa-LMSkD2UJa-Afxkg7QaasSy23MUMFLIJmH-6-pyRyJ7UaO1awsERQg-sDU8aMRu81UUrC3dKp~quaOllkW9qTMa8DX7zoxKwzFts8ZD0wnw__&Key-Pair-Id=KK4HN3OO4AT5R"
+      },
+      "verticalBackdrop": {
+        "w240": "https://cdn.movieofthenight.com/show/1709/backdrop/vertical/240.jpg?Expires=1826867855&Signature=RD1nBKDeXqGvkEXVXcVcR8JTmd3l3t0RxbKmAPdV8oVR5u2qnqkf3V7sPG7zC3G0PHhMrd0nVvdLrmpyT50Q3PzcoRjfL0lVV-jjZ4OtIBMbzssCDIsADNIj5YCRZRBY0Mj4wFI6L1wb0XZB9~McMeBqrMiQ-OtXSjndxvJVIB~1rBUX4ihooG5DpM~7J7-80A7DBGXXIyP9uit2z~hWASaTYNohd-VwNrUlTvkgoBfa8Mq-feVoJ-ZoG~4sHmK14eaQbgZ--4tFSd2nbvLIfTgN3w1r9H91CQIc8gjQrV3KItoyeO0bwvGu2NheBrN5JDIcJl9rl-2YnDqbKPs0Wg__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w360": "https://cdn.movieofthenight.com/show/1709/backdrop/vertical/360.jpg?Expires=1826867855&Signature=LOY6C6j29DnM-hUluyWIr6-fvUQRmU2F0-nCd4An1i-e7Gy5Erhsm5i2W1tLHjLYVUeTdRW5MQjw24o76a0D28lthB3i2wbGwwA6C~aRBwCiVtd9~78rrvnCrSACpNgzOVeWkeWKY-fhg0MAI4NdoZkq0vmMtZdJO0gAX6U1lzIq5L6Lj-AtvP3bn740Y3nDc67pZEp-EOPgRntW2kw9hXhzaEO29zvBcGMUyNHyIN7PYIzg~O8pXfWQwmHdriNCCkex6EpaES1-tVseRF5BKC-C~xvdUqU7fzlOxXS4sNE-f7uE7Bq~US2ivEWl1XjAqLHaKZsZdSLxLaM~j8xcyw__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/1709/backdrop/vertical/480.jpg?Expires=1826867855&Signature=PD18wROJht3cIB5LtXGKetxBJHTfY5Es-gRJsuIIQj21c~4QGMc8QzL8sNxE3xFLLZul5rMuGRt5N8qzrpTqhNS2-dQvs-GQWW-y0faqWdoA0LHlKOykY4yaVspN03HRQJwREzhFQPOoVVJmcqTJQKBnN6CzxeL64ruER28ghUCYeQSx4u0353QQtRu1tcKLG3xoVTPfxdYqvBrOj2ah5L6NhMTMq4NV69opHQvhk9WRWiuIN1QeeH508QGkxs42y9tHYDW4dd2zcJErC8gOzZg43VUdytVUT5GtaUur7dU0KLBdT2nxD-CexcdRVTUVlLaPwRoQhs2P0BHNVjhwdQ__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w600": "https://cdn.movieofthenight.com/show/1709/backdrop/vertical/600.jpg?Expires=1826867855&Signature=YDzdWpF9d1cs~zUzroOyMhNwNYmElpIau-NiNHX6nafMoKqKinLnnFzi0Z2AqS61fn1rF5Kh3iwWZYDa5i7ozJAqJeEy0rIJ6sl6XDp4s9Hzgf6wjP4-kPwjvSQUNIlbeJ2UwYdU2~wc7O-LwdprHwbJapooiG-c0REbEqDqyH9FhUHUzE2UWvrWFoB8QL~QiysET-Mc-bF4Ec1DrfcOo-sJzy~EMxnKGMrWcYs-txpNYkUqPe2vMPmSoZOa8-kuBJNO~wc9Lrfsu7cs3F33KrDB~26cwxW3Kr8hdp~D6ML2ewo0Hba1bw6KOAPbM6lPIPAwdsan32caBh4Kx9ydKA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/1709/backdrop/vertical/720.jpg?Expires=1826867855&Signature=C6YrOVnMYf69NuUKivp7f4bkeJ~pM4EkSiddTMkQwZXJW6vQLPAbWE-tbWld2Ngm~nBWQZDicMI6RvvzaGVVvtDB0b4rm4s9ZuAMJw7jxj7kukjEA9BeaY8l2woLFlYYfsvV1Yy9KvslHI34IL2wS4qCVAgAMcydjg5jPxNcdpzdLOWEvfxAJXMf9BLaiu7cVrnuTTXxvRBnI8b3S8Yl2DyMY6pXx0DrZn9EfGYY6JVVHnr7FLrACxyp~rkHMiuqw1oo-ySQzvT9JwLkd36qMr-mL7nBSiQ5iajFTj6BxBHYcZ8L59Sefk9XoDEwyOtZNP~FVJIoKCyQ85-NlxL4Yw__&Key-Pair-Id=KK4HN3OO4AT5R"
+      },
+      "horizontalBackdrop": {
+        "w360": "https://cdn.movieofthenight.com/show/1709/backdrop/horizontal/360.jpg?Expires=1813731054&Signature=WPFAae7fpifBHrWOT6617N6lPgW0vdhY32JxQwtveB9b9axkbYG9dS0PjieMdOzL0AuPqv3Yoajpmemng8TXpxtwGTL~iQC3qvSjZFkW8ZpiO2aZeCYYt0JtSM286YACkB3WQk8ZxOFyFhsIkZKltciFqd-C50AiCakSC2ubFQPu~qH2eHo1TL2Gd97tOOX5D2OqWFJQA540XN4oe~qgS37KLyqIFYOplJC9OkHDbReQLl~JWWpPE56qfUs82Fmk--M~ZiOYJOPYrC9rMhO0kytv6tJXWA8IzFy4qH3vE-ERIp4YexvXCi9SSwDcRpUcDETVhZ6Vl2dQ3p9DjaAc~Q__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w480": "https://cdn.movieofthenight.com/show/1709/backdrop/horizontal/480.jpg?Expires=1813731054&Signature=Dwe7JOwRN-2m7tsNzM4u1OPAOzzSXqFYiHdUg4DtU6VgikeQr-xVUQwaWsSClY3Q7wjFhzECdVu11lamHeOu7A0P2Qi8V81uVMtIrTVTpX7OWEC~oVF5y~~0VtUC5tpPGdrZWCvX1VTvUeSqv3DlSfPG1EUo5ZT-O~apSOb9gFsDfQdbXnOPCBbJlfk7ufRTT5094SnedsWrNbcxIexbpYOPpfXJby3j0l11Sp3G0dAuxis~XRuVYiNFSi8ORyZbXlmItJmj74uzvUU5L4EMhYjWCgJM7-49emdYJn0IDURsYMNX0EuV1zf089nM3JrmW129e5uUdq-IpJmNlnV-Eg__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w720": "https://cdn.movieofthenight.com/show/1709/backdrop/horizontal/720.jpg?Expires=1813731054&Signature=Grtga3eIHzAuxLHv2awjs1wwjmwy0ieOY08ZxLsnBqyIewFMjceiEUNjoNVFP3QQnVOImCLdFVPheCw3sjXyESlWQIjGEOT~xVItUGnSSblqWUQGhXjcWjLaRgsAI~F3LH1JEcZWRB7M61rDcOgKwI3w6xiXmvSyL8eOrFUPAzMq1kUTy9ObF9dHYXpaTyepZGJWvElSOSQK0A-OT7xlK1S0yPeqL5hTasXvifJPo4A3ohUtHBoVJmgwRSo29H3M7FCGZTz~V2EjajFSOY2ueSksEo1c1RAWeobFAeSk6DTaDIe9rUhRcVrmwlKOm34BWbSuT~TRfqSiiOCQMzcwUg__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1080": "https://cdn.movieofthenight.com/show/1709/backdrop/horizontal/1080.jpg?Expires=1813731054&Signature=EYSlWMdyNctxHTXELsbjjiKeU149CVlC-2SiksZf6SfC6hNzGDQTW8tCmMdUVaC~W4QKL9-38ovImUs5UCjlZW9rdiHx3h3LsNWJ4QDtSYnCbuOMvS7oA9mIkXEIpuWiiaCDs5qwwz3hwVIjBWyfkDsM5FVRLoCkqQNZ5htVaDucg61V0nEqoP7rRxbs6bA4fEV3p24fl51EwHhqai9kN3ybYgLSKrAGlDIvcH5pj5Ko4IqsDYWYVmUzfmiiu3-7ZSaiB1CRN7RC4eqK~z-ejteOU6U2pbuFY9B~VN-9mJCtlDGwV7HtJJ8rlbXXlZaFrnL4BQbfbfAx9tllAlUzmA__&Key-Pair-Id=KK4HN3OO4AT5R",
+        "w1440": "https://cdn.movieofthenight.com/show/1709/backdrop/horizontal/1440.jpg?Expires=1813731054&Signature=DX2SZlCezbqv8NW~tMSV0uNor~CJ5zcoZ0xvdKO5fb~-Gq-BKVFYE91RppZ7mNKWPB6vDo6kqr9D8Z7EYoQvcv8YsHfLROlD8vTb5vWMLEchrgRi09SY9Ku3eV2qm44mWrlu9Nb21Go5rapU1lbEdwVTaBHByoCVYI45lDJ1qDn36fEzlWDWUyH992YPk5ZtHp2gmwOqnWNL8xFMJ13suoFxySHNNZI0CI-qUCJLhLZla0blqBXIkCiAgvRRK-KSOO5Sk9dSXOBprAR9NnxT0TyFDpG1U685RtGUO~Zt1M9iHAhYHLIVn7QSh7a0Lh2ZEFeXw6k8gRzdtndWMTHKCg__&Key-Pair-Id=KK4HN3OO4AT5R"
+      }
+    },
+    "streamingOptions": {
+      "us": [
+        {
+          "service": {
+            "id": "apple",
+            "name": "Apple TV",
+            "homePage": "https://tv.apple.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/apple/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/apple/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/apple/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://tv.apple.com/us/movie/the-lion-king/umc.cmc.8u8dqncoixk0k00wbdlu0zsf?playableId=tvs.sbd.9001%3A1471367629",
+          "quality": "hd",
+          "audios": [],
+          "subtitles": [],
+          "price": {
+            "amount": "19.99",
+            "currency": "USD",
+            "formatted": "19.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1758376972
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://www.amazon.com/gp/video/detail/0JIS2E140I8USLXR5KTW6ZGAZY?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            }
+          ],
+          "price": {
+            "amount": "19.99",
+            "currency": "USD",
+            "formatted": "19.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1766750968
+        },
+        {
+          "service": {
+            "id": "apple",
+            "name": "Apple TV",
+            "homePage": "https://tv.apple.com/",
+            "themeColorCode": "#000000",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/apple/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/apple/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/apple/logo-white.svg"
+            }
+          },
+          "type": "rent",
+          "link": "https://tv.apple.com/us/movie/the-lion-king/umc.cmc.8u8dqncoixk0k00wbdlu0zsf?playableId=tvs.sbd.9001%3A1471367629",
+          "quality": "hd",
+          "audios": [],
+          "subtitles": [],
+          "price": {
+            "amount": "3.99",
+            "currency": "USD",
+            "formatted": "3.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1758376972
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "buy",
+          "link": "https://www.amazon.com/gp/video/detail/0L8IKHLJ8G08PYRZIHT22KF3WX?ref_=atv_dp",
+          "quality": "hd",
+          "audios": [
+            {
+              "language": "eng"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            }
+          ],
+          "price": {
+            "amount": "20.99",
+            "currency": "USD",
+            "formatted": "20.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1766767442
+        },
+        {
+          "service": {
+            "id": "prime",
+            "name": "Prime Video",
+            "homePage": "https://www.amazon.com/gp/video/storefront/",
+            "themeColorCode": "#00A8E1",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/prime/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/prime/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/prime/logo-white.svg"
+            }
+          },
+          "type": "rent",
+          "link": "https://www.amazon.com/gp/video/detail/0JIS2E140I8USLXR5KTW6ZGAZY?ref_=atv_dp",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "eng"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            }
+          ],
+          "price": {
+            "amount": "3.99",
+            "currency": "USD",
+            "formatted": "3.99 USD"
+          },
+          "expiresSoon": false,
+          "availableSince": 1766750968
+        },
+        {
+          "service": {
+            "id": "disney",
+            "name": "Disney+",
+            "homePage": "https://www.disneyplus.com/",
+            "themeColorCode": "#01137c",
+            "imageSet": {
+              "lightThemeImage": "https://media.movieofthenight.com/services/disney/logo-light-theme.svg",
+              "darkThemeImage": "https://media.movieofthenight.com/services/disney/logo-dark-theme.svg",
+              "whiteImage": "https://media.movieofthenight.com/services/disney/logo-white.svg"
+            }
+          },
+          "type": "subscription",
+          "link": "https://www.disneyplus.com/browse/entity-87524f44-a8ea-4b08-b4d8-39103bed3eaa",
+          "videoLink": "https://www.disneyplus.com/play/87524f44-a8ea-4b08-b4d8-39103bed3eaa",
+          "quality": "uhd",
+          "audios": [
+            {
+              "language": "ara",
+              "region": "EGY"
+            },
+            {
+              "language": "ces"
+            },
+            {
+              "language": "cmn",
+              "region": "TWN"
+            },
+            {
+              "language": "dan"
+            },
+            {
+              "language": "deu"
+            },
+            {
+              "language": "ell"
+            },
+            {
+              "language": "eng"
+            },
+            {
+              "language": "fin"
+            },
+            {
+              "language": "fra",
+              "region": "CAN"
+            },
+            {
+              "language": "fra",
+              "region": "FRA"
+            },
+            {
+              "language": "heb"
+            },
+            {
+              "language": "hrv"
+            },
+            {
+              "language": "hun"
+            },
+            {
+              "language": "ind"
+            },
+            {
+              "language": "isl"
+            },
+            {
+              "language": "ita"
+            },
+            {
+              "language": "jpn"
+            },
+            {
+              "language": "kor"
+            },
+            {
+              "language": "nld",
+              "region": "BEL"
+            },
+            {
+              "language": "nor"
+            },
+            {
+              "language": "pol"
+            },
+            {
+              "language": "por",
+              "region": "BRA"
+            },
+            {
+              "language": "por",
+              "region": "PRT"
+            },
+            {
+              "language": "ron"
+            },
+            {
+              "language": "slk"
+            },
+            {
+              "language": "spa",
+              "region": "419"
+            },
+            {
+              "language": "spa",
+              "region": "ESP"
+            },
+            {
+              "language": "swe"
+            },
+            {
+              "language": "tha"
+            },
+            {
+              "language": "tur"
+            },
+            {
+              "language": "yue"
+            }
+          ],
+          "subtitles": [
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "ara",
+                "region": "EGY"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "ces"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "cmn"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "dan"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "deu"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "ell"
+              }
+            },
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "eng"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "fin"
+              }
+            },
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "fra",
+                "region": "CAN"
+              }
+            },
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "fra",
+                "region": "FRA"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "heb"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "hrv"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "hun"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "ind"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "isl"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "ita"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "jpn"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "kor"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "msa"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "nld"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "nor"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "pol"
+              }
+            },
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "por",
+                "region": "BRA"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "por",
+                "region": "PRT"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "ron"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "slk"
+              }
+            },
+            {
+              "closedCaptions": true,
+              "locale": {
+                "language": "spa",
+                "region": "419"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "spa",
+                "region": "ESP"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "swe"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "tha"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "tur"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "yue"
+              }
+            },
+            {
+              "closedCaptions": false,
+              "locale": {
+                "language": "zho",
+                "region": "HKG"
+              }
+            }
+          ],
+          "expiresSoon": false,
+          "availableSince": 1727339466
+        }
+      ]
+    }
+  }
+}
