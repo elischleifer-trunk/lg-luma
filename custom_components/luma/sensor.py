@@ -1,10 +1,11 @@
 """Diagnostic sensors from what the TV reports: how smoothly Luma draws, its memory and CPU use,
-and the last problem it logged."""
+the last problem it logged, and when its Criterion Channel sign-in expires."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -18,7 +19,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import LumaConfigEntry, dev_access
+from . import LumaConfigEntry, criterion_session, dev_access
 from .entity import LumaEntity
 from .events import LumaEvents, entry_time, signal
 
@@ -85,6 +86,7 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: LumaConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     entities: list[SensorEntity] = [LumaSensor(entry, description) for description in SENSORS]
+    entities.append(LumaCriterionSessionSensor(entry))
     if entry.runtime_data.dev_entities:
         entities.append(LumaDevAccessSensor(entry))
     async_add_entities(entities)
@@ -120,6 +122,30 @@ class LumaSensor(LumaEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
         return self.entity_description.attributes(self._events)
+
+
+class LumaCriterionSessionSensor(LumaEntity, SensorEntity):
+    """When the TV's Criterion Channel sign-in expires, from its latest status; unknown while
+    it holds none or its Luma does not keep one. The TV renews it as it goes."""
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_should_poll = False
+
+    def __init__(self, entry: LumaConfigEntry) -> None:
+        super().__init__(entry, "criterion_session_expires")
+        self._entry = entry
+
+    async def async_added_to_hass(self) -> None:
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, criterion_session.signal(self._entry.entry_id), self.async_write_ha_state
+            )
+        )
+
+    @property
+    def native_value(self) -> datetime | None:
+        return self._entry.runtime_data.criterion_sign_in.expires
 
 
 class LumaDevAccessSensor(LumaEntity, SensorEntity):

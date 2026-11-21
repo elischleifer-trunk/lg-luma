@@ -26,6 +26,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from datetime import UTC, datetime, timedelta
 from functools import partial
 from pathlib import Path
@@ -58,7 +59,14 @@ from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
-from . import criterion_account, dev_access, keyboard, streaming_keys, versions
+from . import (
+    criterion_account,
+    criterion_session,
+    dev_access,
+    keyboard,
+    streaming_keys,
+    versions,
+)
 from .api import LumaAuthError, LumaClient, LumaConnectionError, LumaError
 from .const import (
     CONF_DEVICE_ID,
@@ -136,6 +144,10 @@ class LumaData:
     dev_entities: bool = False
     # Whether the TV keyboard text entity was on when the entry set up.
     keyboard_entity: bool = False
+    # The TV's Criterion Channel sign-in as last reported, and what is known of its backup.
+    criterion_sign_in: criterion_session.State = dataclass_field(
+        default_factory=criterion_session.State
+    )
 
 
 type LumaConfigEntry = ConfigEntry[LumaData]
@@ -150,6 +162,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     )
     compatibility = versions.Compatibility(hass, entry)
     # The TV may be off; only a definite "not paired" stops setup. Calls fail individually.
+    status: dict[str, Any] | None = None
     try:
         status = await client.status()
     except LumaAuthError as err:
@@ -170,6 +183,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
         dev_entities=dev_access.enabled(entry),
         keyboard_entity=keyboard.entity_enabled(entry),
     )
+    entry.runtime_data.criterion_sign_in.account = (
+        criterion_account.account(dict(entry.options)) is not None
+    )
     if not entry.runtime_data.keyboard_entity:
         _remove_entity(hass, entry, "text", "keyboard")
     if not entry.runtime_data.dev_entities:
@@ -187,6 +203,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: LumaConfigEntry) -> bool
     entry.async_create_background_task(
         hass, _push_criterion_account(entry), f"{DOMAIN} criterion {entry.entry_id}"
     )
+    if status is not None:
+        # A TV that lost its Criterion sign-in (a reset) gets the backup back without waiting.
+        entry.async_create_background_task(
+            hass,
+            criterion_session.sync(hass, entry, client, status),
+            f"{DOMAIN} criterion session {entry.entry_id}",
+        )
     entry.async_on_unload(entry.add_update_listener(_options_updated))
     # Developer access is off unless turned on in the options (see dev_access.py).
     if dev_access.enabled(entry):
@@ -225,6 +248,12 @@ async def _options_updated(hass: HomeAssistant, entry: LumaConfigEntry) -> None:
     await _push_keys(entry)
     # A cleared account leaves the TV at the next status check, which compares fingerprints.
     await _push_criterion_account(entry)
+    # Clearing it also forgets the Criterion sign-in: the backup here, and the TV's.
+    session = entry.runtime_data.criterion_sign_in
+    account = criterion_account.account(dict(entry.options)) is not None
+    if session.account and not account:
+        await criterion_session.forget(hass, entry, entry.runtime_data.client)
+    session.account = account
     # Only when phone typing is on, or was: turning it off tells the TV to stop calling.
     if keyboard.wanted(entry) or entry.runtime_data.keyboard:
         await keyboard.register(hass, entry, entry.runtime_data.client, partial(local_url, hass))
@@ -362,6 +391,7 @@ def _track_cameras(hass: HomeAssistant, entry: LumaConfigEntry, client: LumaClie
             await _push_criterion_account(entry)
         elif criterion_account.needs_forget(dict(entry.options), status):
             await _push_criterion_account(entry, forget=True)
+        await criterion_session.sync(hass, entry, client, status)
         if keyboard.needs_register(entry, status) or (forgotten and keyboard.wanted(entry)):
             # Registering again also reads back the field the TV holds open, if any.
             forgotten = False
@@ -383,6 +413,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Tell the TV to forget this server's token; best effort, the TV may be off. The history
     of what the TV reported goes too."""
     await events_store(hass, entry.entry_id).async_remove()
+    await criterion_session.store(hass, entry.entry_id).async_remove()
     versions.remove(hass, entry)
     await dev_access.async_revoke_removed(hass, entry)
     client = LumaClient(
