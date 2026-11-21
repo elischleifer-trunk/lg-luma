@@ -1,0 +1,92 @@
+name: Package
+
+# Cross-builds the verified ARM IPK and Homebrew feed for one commit and uploads them as the
+# luma-release artifact. Called by ci.yml (with the assets its prepare job already generated) and by
+# release.yml (which generates them here): a release must rebuild, because the version it stamps is
+# compiled into the binary and written into appinfo.json, the IPK name and the feed.
+#
+# Runs on Trunk runners like ci.yml; a pull request from a fork uses GitHub-hosted ubuntu-24.04
+# (github.event_name is the caller's event).
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit to package (empty for the triggering commit)
+        type: string
+        default: ''
+      assets-artifact:
+        description: >-
+          Artifact from the same run holding smoke-inputs.tar.gz with the generated .build/assets.
+          Empty generates the assets here.
+        type: string
+        default: ''
+    outputs:
+      tag:
+        description: The packaged version's tag (vX.Y.Z)
+        value: ${{ jobs.package.outputs.tag }}
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Cross-build and verify
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-24.04' || format('trunk={0}-{1}..size=medium..memory=high..template=ci', github.run_id, github.run_attempt) }}
+    timeout-minutes: 45
+    outputs:
+      tag: ${{ steps.package.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          targets: armv7-unknown-linux-gnueabi
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: webos-${{ hashFiles('tools/build-webos.sh', 'tools/setup-webos-sdk.mjs', 'tools/webos-runtime.mjs') }}
+      - name: Install cross-build dependencies
+        env:
+          GENERATE_ASSETS: ${{ inputs.assets-artifact == '' }}
+        run: |
+          apt_options=(-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30)
+          packages=(pkg-config)
+          if [ "$GENERATE_ASSETS" = true ]; then packages+=(libsdl2-dev woff2 python3-fonttools); fi
+          sudo apt-get "${apt_options[@]}" update
+          sudo apt-get "${apt_options[@]}" install -y --no-install-recommends "${packages[@]}"
+      - if: inputs.assets-artifact != ''
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.assets-artifact }}
+      - name: Restore generated native assets
+        if: inputs.assets-artifact != ''
+        run: tar -xzf smoke-inputs.tar.gz .build/assets
+      - name: Generate native assets
+        if: inputs.assets-artifact == ''
+        run: pnpm assets
+      - name: Set up the webOS SDK
+        run: pnpm sdk
+      - name: Cross-build and verify the native IPK and Homebrew feed
+        id: package
+        run: |
+          export WEBOS_NDK="$GITHUB_WORKSPACE/.build/toolchain/arm-webos-linux-gnueabi_sdk-buildroot"
+          pnpm build
+          node tools/package.mjs
+          node tools/repository.mjs
+      - name: Upload release files
+        uses: actions/upload-artifact@v7
+        with:
+          name: luma-release
+          if-no-files-found: error
+          path: |
+            dist/*.ipk
+            dist/sha256sums
+            dist/repo.json
+            dist/description.html
+            dist/app-icon-large.png
