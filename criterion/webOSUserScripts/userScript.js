@@ -355,6 +355,8 @@
   // Arrows move the highlight between the page's buttons and links while no film plays, in
   // reading order, staying inside an open dialog ("Unable to play video": Try again, Close).
   // OK presses the highlighted one, as Enter does.
+  var FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
   function focusables() {
     var scope = document;
     var dialogs = document.querySelectorAll(
@@ -366,9 +368,7 @@
         break;
       }
     }
-    var all = scope.querySelectorAll(
-      'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
+    var all = scope.querySelectorAll(FOCUSABLE);
     var out = [];
     for (var j = 0; j < all.length; j++) {
       var rect = all[j].getBoundingClientRect();
@@ -386,20 +386,28 @@
     if (next.scrollIntoView) next.scrollIntoView({ block: 'nearest' });
   }
 
-  // The Channel's player, open but not playing, shows a large Play button.
+  // The Channel's player, open but not playing, shows a large Play button: one beside the
+  // player's video, never a card's elsewhere on the page.
   function playButton() {
     var plays = document.querySelectorAll('button[aria-label="Play"]');
     for (var i = 0; i < plays.length; i++) {
-      if (visible(plays[i])) return plays[i];
+      if (visible(plays[i]) && inPlayer(plays[i])) return plays[i];
     }
     return null;
+  }
+
+  function inPlayer(element) {
+    for (var box = element.parentElement; box && box !== document.body; box = box.parentElement) {
+      if (box.getElementsByTagName('video').length) return true;
+    }
+    return false;
   }
 
   // What OK presses while nothing is highlighted: the player's Play button, which starts the
   // film through the Channel's own player.
   function startButton() {
     var active = document.activeElement;
-    if (active && active !== document.body && active.matches('button, a[href], input')) {
+    if (active && active !== document.body && active.matches(FOCUSABLE)) {
       return null;
     }
     return playButton();
@@ -444,10 +452,11 @@
     function (event) {
       var video = film();
       var name = action(event.keyCode, Boolean(video));
-      // OK or Play while the player shows its Play button (before the film has started, its
-      // video has no data, so it is not `film()`): press the button, as a click would. The
-      // press is the viewer's, so the TV lets the film start with sound.
-      if ((event.keyCode === 13 || name === 'play') && location.origin === ORIGIN) {
+      // OK or Play while no film plays and the player shows its Play button (before the film
+      // has started, its video has no data, so it is not `film()`): press the button, as a
+      // click would. The press is the viewer's, so the TV lets the film start with sound.
+      var started = video && !video.paused;
+      if ((event.keyCode === 13 || name === 'play') && !started && location.origin === ORIGIN) {
         var button = startButton();
         if (button) {
           event.preventDefault();
