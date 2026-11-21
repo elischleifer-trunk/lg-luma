@@ -327,7 +327,15 @@ Channel in a full-screen grid: Popular, Top Rated, Recently Released and a row p
 focus moves down into the rows on screen, and the rows glide only when it would leave the
 screen. OK opens the film's page: its still across the screen, director, year, running time,
 genres, synopsis and cast (from the film's Channel page, or TMDB for films it listed), and
-**Play**. Play opens the film in a small player app that Luma installs the first time it is
+**Play**.
+
+**Search**, in the header (Up from the first row), finds films anywhere on the Channel, not only
+in the rows. Results follow each letter typed, four to a row: titles that start with what you
+typed first, then the most popular. Accents, punctuation and spacing don't matter, and a film's
+original title counts too ("parapluies" finds _The Umbrellas of Cherbourg_). Back returns from
+the results to the field, and again to the rows as you left them. Search reads the Channel's
+whole catalog from TMDB (about 3,200 films) at most once a day, so typing costs no metered
+calls; without a TMDB token it covers only the films in the rows. Play opens the film in a small player app that Luma installs the first time it is
 needed: the Channel's web player, full screen, with the remote's play, pause and skip keys. Back
 returns to the film's page, and again to the grid. While the film loads, a black screen with the Channel's mark hides its web pages; it
 lifts when the film plays, or after 20 seconds, or when the Channel needs you to sign in by hand.

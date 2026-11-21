@@ -505,6 +505,9 @@ fn script(
         }
         "wait" => vec![],
         action if action.starts_with("type:") => {
+            if !state.text_input_active() && state.criterion_open() {
+                state.open_criterion_search();
+            }
             let field = if state.text_input_active() {
                 state.keyboard_field
             } else {
@@ -2112,6 +2115,12 @@ fn run() -> Result<(), String> {
         }
         for reply in criterion_catalog.receiver.try_iter() {
             state.accept_criterion(reply);
+        }
+        if state.criterion_catalog_requested() {
+            criterion_catalog.load_catalog();
+        }
+        for films in criterion_catalog.indexed.try_iter() {
+            state.accept_criterion_catalog(films);
         }
         if let Some((wanted, requests)) = state.criterion_image_requests() {
             criterion_images.want(wanted.iter().map(String::as_str));
