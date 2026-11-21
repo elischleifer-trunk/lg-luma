@@ -692,6 +692,52 @@ inverted drawing (`view::qr_code`).
 Desktop builds serve the same API and print overlay launches and toasts instead of calling webOS.
 Verify overlay stacking, key focus, pausing and the overlay install on TV hardware.
 
+## Criterion player sign-in
+
+The Channel keeps its sign-in in cookies: `__session` on `www.criterionchannel.com` (HttpOnly,
+30 days from its last renewal) and Auth0's on `login.criterion.com`. No page script can set
+HttpOnly cookies, so Luma uses the TV web engine's DevTools: WAM runs every web app in one Chromium
+and, on the TVs tested (webOS 11, root), listens on loopback with its port in
+`/var/lib/wam/DevToolsActivePort`. `src/devtools.rs` is a minimal WebSocket client for it (no
+dependency); WAM refuses browser-wide cookie calls, so calls go to the player's own page.
+`src/criterion-session.rs` keeps the latest sign-in in `criterion-session.json` (mode 0600, beside
+the account) and:
+
+- As Luma opens a film (`criterion_session::launch_player`, on the platform worker), it reads the
+  player's cookies (`Network.getCookies`), keeps whichever `__session` lasts longest, and gives the
+  player the stored one (`Network.setCookies`) when it is newer. With neither, it imports the TV
+  Web Browser's sign-in from its own Chromium profile
+  (`/var/palm/jail/com.webos.app.browser/mnt/lg/cache/webbrowser/chrome/Cookies`, SQLite, read
+  with the TV's `python3`, which needs Luma to run as root). An open player is readied before the
+  relaunch takes it to the new film; a new one is readied on its start page (`index.html`), which
+  waits for Luma to call `lumaReady` and opens the film after 2.5 s without it. Pages never call
+  Luma: the Channel's Content-Security-Policy (`connect-src`) blocks scripts on its pages and on
+  Auth0's from reaching `127.0.0.1`, which also keeps the player's own form filling below from
+  fetching the account on this firmware. Reading the cookies takes ~20 ms.
+- A background thread uses the stored sign-in every three days (`RENEW_EVERY`): `GET
+  /auth/access-token` and `/auth/profile` with its cookies, applying any `Set-Cookie`. Only a
+  401/403 from the profile marks the sign-in invalid (any other answer is tried again at the next
+  hourly wake); an invalid sign-in is never given to the player, and is replaced only by one that
+  lasts longer, never by another copy of itself. A sign-in stored or forgotten meanwhile wins.
+- Home Assistant clearing the account (`DELETE /api/criterion-session`) removes the file and
+  leaves `criterion-session.forget`: at the next film Luma deletes the player's Channel cookies
+  (`Network.deleteCookies`) instead of keeping them again. Unpairing the last server or turning
+  Home Assistant off removes only the file, so a sign-in made in the player stays. A sign-in the
+  Channel turns away is kept, as it was loaded, marked invalid, so status reports it ended.
+- The Web Browser import skips encrypted values (another firmware's profile) and keeps only the
+  Channel's cookies, its sign-in first, up to 64.
+- Home Assistant keeps a copy: `/api/status` reports `criterion_session` (`expires`, `checked`,
+  `valid`, never the cookies), `GET /api/criterion-session` returns them, and `PUT` stores a copy
+  only when it lasts longer than the TV's (or the TV has none), even if the TV's is invalid. The
+  last server unpairing removes it with the account. With several servers paired, only the one
+  whose account the TV holds (by the `criterion_account` fingerprint), or any when neither the TV
+  nor that server has an account, backs up, restores or clears it
+  (`custom_components/luma/criterion_session.py`).
+
+The player's own sign-in form filling (`userScript.js`) is the last resort: it enters the
+password at most twice an hour across launches and stops for an hour at any error on the page,
+because Auth0 blocks an account after a run of failed sign-ins.
+
 ## Splash images
 
 `pnpm assets` renders one 1920×1080 PNG per background into `.build/assets/splash/` from the shaded
