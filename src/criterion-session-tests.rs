@@ -280,3 +280,16 @@ fn forgetting_marks_the_players_sign_in_for_removal_until_a_new_one_is_kept() {
     assert!(!forgotten(&file).exists(), "signing in again is wanted");
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn the_start_script_names_the_film_as_a_javascript_string() {
+    let expression =
+        start_expression(r#"https://www.criterionchannel.com/films/oZkRW7X1/laura?play=1"#);
+    assert_eq!(
+        expression,
+        "window.LumaCriterion && window.LumaCriterion.startFilm ? \
+         window.LumaCriterion.startFilm(\"https://www.criterionchannel.com/films/oZkRW7X1/laura?play=1\") : 'wait'"
+    );
+    // Quotes and backslashes cannot end the string early.
+    assert!(start_expression(r#"a"b\c"#).contains(r#"startFilm("a\"b\\c")"#));
+}
