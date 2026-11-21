@@ -276,6 +276,42 @@ fn cached_replies_skip_the_api_and_errors_are_not_cached() {
 }
 
 #[test]
+fn a_title_the_api_does_not_have_is_not_asked_for_again() {
+    let dir = std::env::temp_dir().join(format!("luma-missing-cache-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    let cache = DiskCache::new(dir.clone(), crate::search_cache::DEFAULT_LIMIT);
+    let day = std::time::Duration::from_secs(86_400);
+    let calls = std::cell::Cell::new(0);
+    let not_found = || -> Result<String, Error> {
+        calls.set(calls.get() + 1);
+        Err(Error::Status {
+            status: 404,
+            message: "not found".into(),
+        })
+    };
+    // A 404 is remembered: the repeat costs no call and gives the same answer.
+    assert!(cached_or_missing(&cache, "show", day, not_found).is_err());
+    assert!(matches!(
+        cached_or_missing(&cache, "show", day, not_found),
+        Err(Error::Status { status: 404, .. })
+    ));
+    assert_eq!(calls.get(), 1);
+    // Anything else is asked again, and a found title is cached as before.
+    let down = || -> Result<String, Error> { Err(Error::Network("down".into())) };
+    assert!(cached_or_missing(&cache, "other", day, down).is_err());
+    let found = || Ok("King Kong".to_owned());
+    assert_eq!(
+        cached_or_missing(&cache, "other", day, found).unwrap(),
+        "King Kong"
+    );
+    assert_eq!(
+        cached_or_missing(&cache, "other", day, || Ok("again".to_owned())).unwrap(),
+        "King Kong"
+    );
+    std::fs::remove_dir_all(&dir).unwrap();
+}
+
+#[test]
 fn generated_types_survive_the_cache_round_trip() {
     let source = Fixtures::default();
     let shows = source.search("ghostbusters", "us").unwrap();
@@ -472,6 +508,18 @@ fn a_search_typed_past_stops_before_its_next_call() {
     assert!(search_while(&source, "star wars", "us", &Services::default(), &wanted).is_none());
     assert!(source.calls("streaming/show-").is_empty());
     assert!(source.calls("tmdb/movie-").is_empty());
+}
+
+#[test]
+fn longer_word_checks_give_way_to_newer_text() {
+    // Typed past once TMDB's keyword search has answered: no searches for longer words, free
+    // or metered.
+    let source = Fixtures::default();
+    let wanted = || source.calls("tmdb/search-keyword").is_empty();
+    assert!(search_while(&source, "kin", "us", &Services::default(), &wanted).is_none());
+    assert!(source.calls("tmdb/search-multi-king").is_empty());
+    assert!(source.calls("streaming/search-title-king").is_empty());
+    assert!(source.calls("streaming/show-").is_empty());
 }
 
 #[test]
