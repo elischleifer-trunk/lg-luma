@@ -10,7 +10,8 @@ const source = await readFile(
 // No document: only the shared helpers load, as on the start page before it navigates.
 const context = { URL, window: {} };
 vm.runInNewContext(source, context);
-const { ORIGIN, target, parse, action, signInRequest } = context.window.LumaCriterion;
+const { ORIGIN, target, parse, action, signInRequest, loginUrl, isLogIn } =
+  context.window.LumaCriterion;
 
 test('only Criterion Channel pages are opened', () => {
   const film = `${ORIGIN}/films/oZkRW7X1/laura?play=1`;
@@ -65,4 +66,20 @@ test('the sign-in code goes only to Luma on the TV itself', () => {
   ]) {
     assert.equal(signInRequest(params), null, JSON.stringify(params));
   }
+});
+
+test('a signed-out film goes to the sign-in and comes back to the film', () => {
+  assert.equal(
+    loginUrl('/films/oZkRW7X1/laura?play=1'),
+    `${ORIGIN}/login?returnTo=%2Ffilms%2FoZkRW7X1%2Flaura%3Fplay%3D1`,
+  );
+  // Only paths on the Channel itself come back.
+  for (const page of ['//evil.example/x', 'https://evil.example/', undefined]) {
+    assert.equal(loginUrl(page), `${ORIGIN}/login?returnTo=%2F`, String(page));
+  }
+  assert.ok(isLogIn('Log In'));
+  assert.ok(isLogIn('  LOG IN OR SUBSCRIBE '));
+  assert.ok(!isLogIn('Learn more'));
+  assert.ok(!isLogIn('Close'));
+  assert.ok(!isLogIn('Logout'));
 });

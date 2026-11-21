@@ -73,6 +73,18 @@
     };
   }
 
+  // The Channel's own sign-in, returning to `page` (a path on the Channel) afterwards.
+  function loginUrl(page) {
+    var path =
+      typeof page === 'string' && page.charAt(0) === '/' && page.charAt(1) !== '/' ? page : '/';
+    return ORIGIN + '/login?returnTo=' + encodeURIComponent(path);
+  }
+
+  // A button or link that signs in: "Log In", "Log in or subscribe".
+  function isLogIn(text) {
+    return /^\s*log\s*in\b/i.test(String(text || ''));
+  }
+
   var SKIP = 10;
   root.LumaCriterion = {
     ORIGIN: ORIGIN,
@@ -82,6 +94,8 @@
     parse: parse,
     action: action,
     signInRequest: signInRequest,
+    loginUrl: loginUrl,
+    isLogIn: isLogIn,
   };
   if (typeof document === 'undefined') return;
 
@@ -167,15 +181,15 @@
   }
 
   // At most a few tries per few minutes, so a wrong password never loops.
-  function mayTry() {
+  function mayTry(key) {
     try {
       var now = Date.now();
-      var tries = JSON.parse(sessionStorage.getItem('luma-sign-in') || '[]').filter(function (t) {
+      var tries = JSON.parse(sessionStorage.getItem(key) || '[]').filter(function (t) {
         return now - t < 5 * 60 * 1000;
       });
       if (tries.length >= 2) return false;
       tries.push(now);
-      sessionStorage.setItem('luma-sign-in', JSON.stringify(tries));
+      sessionStorage.setItem(key, JSON.stringify(tries));
       return true;
     } catch (_error) {
       return true;
@@ -209,7 +223,7 @@
     var submit =
       (form && form.querySelector('button[type="submit"][name="action"], button[type="submit"]')) ||
       document.querySelector('button[type="submit"]');
-    if (!mayTry()) return true;
+    if (!mayTry('luma-sign-in')) return true;
     if (submit) submit.click();
     else if (form) form.submit();
     return true;
@@ -243,8 +257,63 @@
       });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', signIn);
-  else signIn();
+  // On the Channel's own pages: a film opened signed out shows "Log in or subscribe". When Luma
+  // gave the player a sign-in code, go to the sign-in (filled in above), then back to the film.
+  function signedOut() {
+    var controls = document.querySelectorAll('button, a');
+    for (var i = 0; i < controls.length; i++) {
+      if (visible(controls[i]) && isLogIn(controls[i].textContent)) return true;
+    }
+    return false;
+  }
+
+  function toSignIn() {
+    if (location.origin !== ORIGIN) return true;
+    var here = location.pathname + location.search;
+    var back = null;
+    try {
+      back = sessionStorage.getItem('luma-return');
+    } catch (_error) {
+      // No storage: no way back after signing in, which only costs choosing the film again.
+    }
+    if (!signedOut()) {
+      // Signed in. If the sign-in landed elsewhere, finish the trip to the film.
+      if (back) {
+        try {
+          sessionStorage.removeItem('luma-return');
+        } catch (_error) {
+          // Nothing to clear.
+        }
+        if (back !== here && back.charAt(0) === '/' && back.charAt(1) !== '/') {
+          location.href = ORIGIN + back;
+          return true;
+        }
+      }
+      return false;
+    }
+    if (!signInRequest(parse(palm && palm.launchParams))) return true;
+    if (!mayTry('luma-to-sign-in')) return true;
+    try {
+      sessionStorage.setItem('luma-return', here);
+    } catch (_error) {
+      // See above.
+    }
+    location.href = loginUrl(here);
+    return true;
+  }
+
+  function start() {
+    signIn();
+    if (location.origin !== ORIGIN) return;
+    // The page draws its sign-in prompt after it loads: look for a while.
+    var attempts = 0;
+    var timer = setInterval(function () {
+      if (toSignIn() || ++attempts > 20) clearInterval(timer);
+    }, 500);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
 
   // Luma opened another film while this app was still running.
   document.addEventListener('webOSRelaunch', function (event) {
