@@ -88,10 +88,58 @@ fn the_search_tab_sits_left_of_home_and_opens_with_the_keyboard() {
     state.back();
     state.direction(Direction::Left, &controls(&state));
     assert_eq!(state.page, Page::Search);
-    assert!(
-        state.title_query.is_empty(),
-        "the field starts empty each time"
-    );
+    assert_eq!(state.title_query, "dune", "the search is kept");
+}
+
+#[test]
+fn a_search_left_for_home_is_still_there_with_the_keyboard_on_clear() {
+    let mut state = typed("Dune");
+    answer(&mut state, "dune");
+    let results = state.titles.results.len();
+    assert!(results > 0);
+    state.direction(Direction::Right, &controls(&state));
+    assert_eq!(state.page, Page::Home);
+    state.direction(Direction::Left, &controls(&state));
+    assert_eq!(state.page, Page::Search);
+    assert_eq!(state.title_query, "Dune");
+    assert!(state.sync_titles(Instant::now()).is_none(), "no new search");
+    assert_eq!(state.titles.results.len(), results);
+    assert!(matches!(state.overlay, Some(Overlay::Keyboard)));
+    let Target::Key(index) = state.focus else {
+        panic!("focus {:?}", state.focus);
+    };
+    assert_eq!(crate::state::KEYS[index], "Clear");
+    // OK clears it for a new search.
+    state.activate();
+    assert!(state.title_query.is_empty());
+}
+
+#[test]
+fn lgs_empty_keyboard_over_a_kept_search_starts_a_new_one() {
+    use crate::state::TextField;
+    // Typing replaces the kept search rather than adding to it.
+    let mut state = typed("Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.text("m");
+    state.text("atrix");
+    assert_eq!(state.title_query, "matrix");
+    // Backspace clears it, as LG's keyboard shows nothing to delete.
+    state.open_system_keyboard(TextField::Titles);
+    state.delete();
+    assert!(state.title_query.is_empty());
+    let mut state = typed("Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.delete_surrounding_text(-1, 1);
+    assert!(state.title_query.is_empty());
+    // Closing it without typing keeps the search.
+    let mut state = typed("Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.back();
+    assert!(!state.text_input_active());
+    assert_eq!(state.title_query, "Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.text("x");
+    assert_eq!(state.title_query, "x");
 }
 
 #[test]
@@ -505,14 +553,14 @@ fn enter_focuses_the_first_result_once_the_search_is_in() {
 
     // Enter with the results already in (cached): straight to the first result.
     state.open(SEARCH_TAB);
-    state.text("Dune");
+    state.set_editing_text("Dune");
     state.submit_text_input();
     state.sync_titles(Instant::now());
     assert_eq!(state.focus, Target::Title(0));
 
     // Back closes the keyboard without leaving the field.
     state.open(SEARCH_TAB);
-    state.text("Dune");
+    state.set_editing_text("Dune");
     state.back();
     state.sync_titles(Instant::now());
     assert_eq!(state.focus, Target::Nav(SEARCH_TAB));
