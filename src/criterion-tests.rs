@@ -3,6 +3,7 @@ use crate::model::Preferences;
 use crate::state::Page;
 
 const PAGE: &str = include_str!("../tests/fixtures/criterion/home.html");
+const FILM_PAGE: &str = include_str!("../tests/fixtures/criterion/film.html");
 
 fn film(id: &str, title: &str) -> Film {
     Film {
@@ -15,7 +16,7 @@ fn film(id: &str, title: &str) -> Film {
             title.to_lowercase().replace(' ', "-")
         )),
         tmdb: None,
-        image: format!("https://cdn.jwplayer.com/v2/media/{id}/images/regalia_16x9.webp"),
+        image: format!("https://img.jwplayer.com/v1/media/{id}/images/regalia_16x9.webp"),
     }
 }
 
@@ -71,7 +72,7 @@ fn the_home_page_gives_its_film_rows_in_order() {
             length: "1 hr 28 min".into(),
             link: Some("https://www.criterionchannel.com/films/oZkRW7X1/laura".into()),
             tmdb: None,
-            image: "https://cdn.jwplayer.com/v2/media/oZkRW7X1/images/regalia_16x9.webp?fallback=default_16x9&width=480".into(),
+            image: "https://img.jwplayer.com/v1/media/oZkRW7X1/images/regalia_16x9.webp?fallback=default_16x9&width=480".into(),
         }
     );
     assert_eq!(popular[1].details(), "1944 · 1 hr 28 min");
@@ -251,6 +252,13 @@ impl Source for Fixed {
         *self.1.lock().unwrap() += 1;
         self.0.clone()
     }
+    fn details(&self, film: &Film) -> Result<Details, String> {
+        *self.1.lock().unwrap() += 1;
+        match film.link {
+            Some(_) => Ok(parse_details(FILM_PAGE)),
+            None => Err("offline".into()),
+        }
+    }
 }
 
 #[test]
@@ -300,7 +308,13 @@ fn a_tmdb_film_opens_once_its_page_is_found() {
     listed.tmdb = Some(406);
     state.criterion.rows[0].films[1] = listed.clone();
     state.direction(Direction::Right, &[]);
-    assert_eq!(state.activate(), vec![]);
+    assert_eq!(state.activate(), vec![], "the film's page");
+    assert_eq!(
+        state.criterion_resolve_request(),
+        None,
+        "Play not chosen yet"
+    );
+    assert_eq!(state.activate(), vec![], "Play");
     assert_eq!(state.criterion_resolve_request(), Some(listed.clone()));
     assert_eq!(state.criterion_resolve_request(), None, "asked once");
     // A late answer for another film opens nothing.
@@ -314,8 +328,11 @@ fn a_tmdb_film_opens_once_its_page_is_found() {
             link: page.into(),
         }]
     );
-    // Kept on the film: OK opens it at once next time.
+    // Kept on the film: Play opens it at once next time.
     assert_eq!(state.criterion.rows[0].films[1].link.as_deref(), Some(page));
+    assert_eq!(state.activate().len(), 1);
+    state.back();
+    assert_eq!(state.activate(), vec![]);
     assert_eq!(state.activate().len(), 1);
 }
 
@@ -341,18 +358,22 @@ fn arrows_move_along_rows_and_keep_the_place_on_screen_between_rows() {
     assert_eq!(state.focus, Target::Film(0, 5));
     // The row scrolled: cards 2-5 are on screen, the focused one last.
     assert_eq!(state.criterion.first_card(0), 2);
-    // Down: the same place on screen, clamped to the shorter row's end.
+    // Down: the same place on screen, clamped to the shorter row's end. Focus moves into the
+    // second row on screen without scrolling; the third scrolls one row.
     state.direction(Direction::Down, &[]);
     assert_eq!(state.focus, Target::Film(1, 2));
-    assert_eq!(state.criterion.first_row, 1);
+    assert_eq!(state.criterion.first_row, 0);
     state.direction(Direction::Down, &[]);
     assert_eq!(state.focus, Target::Film(2, 2));
+    assert_eq!(state.criterion.first_row, 1);
     state.direction(Direction::Down, &[]);
     assert_eq!(state.focus, Target::Film(2, 2), "the last row stays");
     // Up returns to the first row where it was scrolled to.
     state.direction(Direction::Up, &[]);
+    assert_eq!(state.criterion.first_row, 1, "row 1 is still on screen");
     state.direction(Direction::Up, &[]);
     assert_eq!(state.focus, Target::Film(0, 4));
+    assert_eq!(state.criterion.first_row, 0);
     assert_eq!(state.criterion.first_card(0), 2);
     for _ in 0..10 {
         state.direction(Direction::Right, &[]);
@@ -369,6 +390,19 @@ fn arrows_move_along_rows_and_keep_the_place_on_screen_between_rows() {
 fn ok_opens_the_focused_film_in_the_player() {
     let mut state = opened(&[3]);
     state.direction(Direction::Right, &[]);
+    // OK opens the film's page, with Play focused and its details asked for.
+    assert_eq!(state.activate(), vec![]);
+    assert_eq!(state.focus, Target::CriterionPlay);
+    let detail = state.criterion.detail.as_ref().unwrap();
+    assert_eq!(detail.film.id, "film0x01");
+    assert_eq!(
+        state.criterion_details_request().map(|film| film.id),
+        Some("film0x01".into())
+    );
+    assert_eq!(state.criterion_details_request(), None, "asked once");
+    // Arrows stay on Play.
+    state.direction(Direction::Down, &[]);
+    assert_eq!(state.focus, Target::CriterionPlay);
     assert_eq!(
         state.activate(),
         vec![Effect::LaunchTitle {
@@ -472,10 +506,16 @@ fn artwork_loads_only_near_the_screen_and_a_failure_is_tried_again_next_visit() 
 fn back_from_a_film_keeps_the_grid_but_the_home_key_closes_it() {
     let mut state = opened(&[3, 3]);
     state.direction(Direction::Down, &[]);
+    assert_eq!(state.activate(), vec![]);
     assert_eq!(state.activate().len(), 1);
-    // Leaving the player relaunches Luma as Home.
+    // Leaving the player relaunches Luma as Home: the film's page is still there.
     state.return_home();
     assert!(state.criterion_open());
+    assert_eq!(state.focus, Target::CriterionPlay);
+    // Back from the page returns to its card.
+    state.back();
+    assert!(state.criterion_open());
+    assert!(state.criterion.detail.is_none());
     assert_eq!(state.focus, Target::Film(1, 0));
     // Home pressed with Luma in front.
     state.return_home();
@@ -495,7 +535,10 @@ fn a_film_given_up_on_does_not_start_when_its_page_is_found() {
     let mut state = opened(&[2]);
     let id = unlinked(&mut state);
     assert_eq!(state.activate(), vec![]);
+    assert_eq!(state.activate(), vec![]);
+    state.back();
     state.direction(Direction::Right, &[]);
+    assert_eq!(state.activate(), vec![]);
     assert_eq!(state.activate().len(), 1);
     assert_eq!(state.criterion_resolve_request(), None);
     assert_eq!(state.criterion_resolved(&id, page.into()), vec![]);
@@ -506,7 +549,183 @@ fn a_film_given_up_on_does_not_start_when_its_page_is_found() {
     let mut state = opened(&[2]);
     let id = unlinked(&mut state);
     assert_eq!(state.activate(), vec![]);
+    assert_eq!(state.activate(), vec![]);
+    state.back();
     state.back();
     state.open_criterion();
     assert_eq!(state.criterion_resolved(&id, page.into()), vec![]);
+}
+
+#[test]
+fn a_film_page_gives_its_details() {
+    let details = parse_details(FILM_PAGE);
+    assert_eq!(details.directors, vec!["Brian De Palma"]);
+    assert_eq!(
+        details.cast,
+        vec!["Nicolas Cage", "Gary Sinise", "Carla Gugino"]
+    );
+    assert_eq!(details.genres, vec!["Mystery", "Thriller"]);
+    assert_eq!(details.countries, vec!["United States"]);
+    assert_eq!(details.year, "1998");
+    assert_eq!(details.length, "1 hr 38 min");
+    // The long synopsis, not the structured data's one line.
+    assert!(
+        details
+            .synopsis
+            .starts_with("Opening with a bravura, thirteen-minute Steadicam")
+    );
+    assert!(details.synopsis.ends_with("contributes the score."));
+    assert_eq!(parse_details("<html></html>"), Details::default());
+    assert_eq!(iso_minutes("PT1H38M20S"), Some(98));
+    assert_eq!(iso_minutes("PT45M"), Some(45));
+    assert_eq!(iso_minutes("P1D"), None);
+    assert_eq!(running_time(120), "2 hr");
+}
+
+#[test]
+fn tmdb_gives_details_for_films_it_listed() {
+    let get = |path: &str, query: &[(&'static str, String)]| {
+        assert_eq!(path, "/3/movie/406");
+        assert_eq!(query, &[("append_to_response", "credits".to_owned())]);
+        Ok(serde_json::json!({
+            "overview": "Three friends drift through a day in the banlieue.",
+            "release_date": "1995-05-31",
+            "runtime": 98,
+            "genres": [{"name": "Drama"}, {"name": "Crime"}],
+            "production_countries": [{"name": "France"}],
+            "credits": {
+                "cast": [{"name": "Vincent Cassel"}, {"name": "Hubert Koundé"}],
+                "crew": [{"name": "Someone", "job": "Editor"}, {"name": "Mathieu Kassovitz", "job": "Director"}]
+            }
+        }))
+    };
+    let details = tmdb_details(&get, 406).unwrap();
+    assert_eq!(details.directors, vec!["Mathieu Kassovitz"]);
+    assert_eq!(details.cast, vec!["Vincent Cassel", "Hubert Koundé"]);
+    assert_eq!(details.genres, vec!["Drama", "Crime"]);
+    assert_eq!(details.year, "1995");
+    assert_eq!(details.length, "1 hr 38 min");
+    let empty = |_: &str, _: &[(&'static str, String)]| Ok(serde_json::json!({}));
+    assert!(tmdb_details(&empty, 1).is_err());
+}
+
+#[test]
+fn details_are_kept_on_disk_and_reach_the_open_page() {
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
+    let source = Fixed(None, Default::default());
+    let cache = cache("details");
+    let channel = film("JEnAxeoh", "Snake Eyes");
+    let first = details(&cache, &source, &channel, now).unwrap();
+    assert_eq!(details(&cache, &source, &channel, now), Ok(first.clone()));
+    assert_eq!(*source.1.lock().unwrap(), 1, "the second came from disk");
+    let mut unlinked = channel.clone();
+    unlinked.id = "tmdb1".into();
+    unlinked.link = None;
+    assert!(details(&cache, &source, &unlinked, now).is_err());
+    assert!(details(&cache, &source, &unlinked, now).is_err());
+    assert_eq!(*source.1.lock().unwrap(), 3, "failures are asked again");
+
+    let mut state = opened(&[2]);
+    state.activate();
+    let id = state.criterion_details_request().unwrap().id;
+    // An answer for a film no longer open is kept for later but changes nothing.
+    state.accept_criterion_details(("other".into(), Ok(first.clone())));
+    assert_eq!(state.criterion.detail.as_ref().unwrap().details, None);
+    state.accept_criterion_details((id.clone(), Ok(first.clone())));
+    assert_eq!(
+        state.criterion.detail.as_ref().unwrap().details,
+        Some(first)
+    );
+    // Opening it again needs no new request.
+    state.back();
+    state.activate();
+    assert_eq!(state.criterion_details_request(), None);
+    assert!(state.criterion.detail.as_ref().unwrap().details.is_some());
+}
+
+#[test]
+fn the_film_page_loads_its_backdrop_and_drops_it_on_back() {
+    let mut state = opened(&[3]);
+    state.criterion_image_requests();
+    state.activate();
+    let (wanted, requests) = state.criterion_image_requests().unwrap();
+    let hero = hero_key("film0x00");
+    assert!(wanted.contains(&hero));
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0].show_id, hero);
+    assert_eq!(requests[0].size, HERO_SIZE);
+    assert!(
+        requests[0]
+            .url
+            .starts_with("https://img.jwplayer.com/v1/media/film0x00/images/hero_wide"),
+        "{}",
+        requests[0].url
+    );
+    assert!(state.criterion_image_requests().is_none(), "asked once");
+    state.accept_criterion_image(&hero, Some(frame()));
+    assert!(state.criterion.detail.as_ref().unwrap().hero.is_some());
+    state.back();
+    assert!(state.criterion.detail.is_none());
+    // A late backdrop for a page no longer open is ignored.
+    state.accept_criterion_image(&hero, Some(frame()));
+    assert!(state.criterion.detail.is_none());
+}
+
+#[test]
+fn rows_glide_to_where_focus_scrolled_them() {
+    let mut state = opened(&[8, 8, 8, 8]);
+    assert!(!state.criterion.settling());
+    for _ in 0..5 {
+        state.direction(Direction::Right, &[]);
+    }
+    state.direction(Direction::Down, &[]);
+    state.direction(Direction::Down, &[]);
+    assert!(state.criterion.settling());
+    assert!(state.animating());
+    let start = crate::clock::now();
+    assert!(
+        state
+            .criterion
+            .animate(false, start + Duration::from_millis(16))
+    );
+    let row = state.criterion.scroll_row;
+    assert!(row > 0. && row < 1., "{row}");
+    state
+        .criterion
+        .animate(false, start + Duration::from_millis(32));
+    assert!(state.criterion.scroll_row > row, "still moving");
+    for frame in 3..60 {
+        state
+            .criterion
+            .animate(false, start + Duration::from_millis(16 * frame));
+    }
+    assert!(!state.criterion.settling());
+    assert_eq!(state.criterion.scroll_row, 1.);
+    assert_eq!(state.criterion.scroll_card(0), 2.);
+    // Reduced motion jumps straight there.
+    state.direction(Direction::Down, &[]);
+    assert!(
+        state
+            .criterion
+            .animate(true, start + Duration::from_secs(5))
+    );
+    assert_eq!(state.criterion.scroll_row, 2.);
+    assert!(!state.criterion.settling());
+}
+
+#[test]
+fn artwork_cached_at_the_old_video_host_address_is_fetched_from_the_new_one() {
+    let mut film = film("oZkRW7X1", "Laura");
+    film.image =
+        "https://cdn.jwplayer.com/v2/media/oZkRW7X1/images/regalia_16x9.webp?width=480".into();
+    assert_eq!(
+        film.card_image(),
+        "https://img.jwplayer.com/v1/media/oZkRW7X1/images/regalia_16x9.webp?width=480"
+    );
+    assert!(
+        film.hero()
+            .starts_with("https://img.jwplayer.com/v1/media/oZkRW7X1/images/hero_wide")
+    );
+    film.image = "https://image.tmdb.org/t/p/w780/abc.jpg".into();
+    assert_eq!(film.hero(), "https://image.tmdb.org/t/p/w1280/abc.jpg");
 }

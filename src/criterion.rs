@@ -15,6 +15,9 @@
 //! class names are generated and change between deployments; parsing relies only on stable
 //! parts: each row's `<h2>` heading, the `/films/<id>/<slug>` card links and the card titles'
 //! element IDs. That page's artwork comes from the Channel's video host by film ID.
+//!
+//! OK on a film opens its detail page. Its details come from the film's Channel page
+//! (schema.org data and the synopsis) when that is known, else from TMDB; Play opens the player.
 use crate::cameras::Frame;
 use crate::openapi::{Http, Query};
 use crate::search_cache::DiskCache;
@@ -26,7 +29,7 @@ use std::{
     io::Read,
     path::PathBuf,
     sync::{Arc, mpsc},
-    time::{Duration, SystemTime},
+    time::{Duration, Instant, SystemTime},
 };
 
 /// Luma's built-in tile for this screen.
@@ -50,6 +53,17 @@ const LINK_AGE: Duration = Duration::from_secs(30 * 24 * 3600);
 /// Movie of the Night lists Criterion's US catalog.
 const COUNTRY: &str = "us";
 const TMDB_IMAGES: &str = "https://image.tmdb.org/t/p/w780";
+/// The detail page's backdrop: TMDB's larger size of the same image.
+const TMDB_HERO: &str = "https://image.tmdb.org/t/p/w1280";
+/// The Channel's video host. Its older `cdn.jwplayer.com/v2` address now redirects here, and
+/// images are fetched without following redirects.
+const JW_IMAGES: &str = "https://img.jwplayer.com/v1/media";
+const JW_IMAGES_OLD: &str = "https://cdn.jwplayer.com/v2/media";
+/// The detail page's backdrop, decoded at most this size and stretched to the screen.
+pub const HERO_SIZE: (u32, u32) = (1280, 720);
+/// A film's details rarely change.
+const DETAILS_AGE: Duration = Duration::from_secs(7 * 24 * 3600);
+const SYNOPSIS_LIMIT: usize = 1200;
 const ROW_LIMIT: usize = 40;
 const FILM_LIMIT: usize = 100;
 
@@ -77,6 +91,48 @@ impl Film {
             .filter(|part| !part.is_empty())
             .collect::<Vec<_>>()
             .join(" · ")
+    }
+
+    /// Wide artwork for the detail page's backdrop.
+    pub fn hero(&self) -> String {
+        if let Some(path) = self.image.strip_prefix(TMDB_IMAGES) {
+            return format!("{TMDB_HERO}{path}");
+        }
+        if valid_id(&self.id) && self.card_image().starts_with(JW_IMAGES) {
+            return format!(
+                "{JW_IMAGES}/{}/images/hero_wide.webp?fallback=default_16x9&width=1280",
+                self.id
+            );
+        }
+        self.card_image()
+    }
+
+    /// The card's artwork, at the video host's current address: rows cached before it moved
+    /// still name the old one.
+    pub fn card_image(&self) -> String {
+        match self.image.strip_prefix(JW_IMAGES_OLD) {
+            Some(rest) => format!("{JW_IMAGES}{rest}"),
+            None => self.image.clone(),
+        }
+    }
+}
+
+/// What the detail page says about a film beyond its card.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct Details {
+    pub directors: Vec<String>,
+    pub cast: Vec<String>,
+    pub genres: Vec<String>,
+    pub countries: Vec<String>,
+    pub synopsis: String,
+    /// Filled in when the card lacked them.
+    pub year: String,
+    pub length: String,
+}
+
+impl Details {
+    fn is_empty(&self) -> bool {
+        self.synopsis.is_empty() && self.directors.is_empty() && self.cast.is_empty()
     }
 }
 
@@ -118,7 +174,7 @@ pub fn parse(html: &str) -> Vec<Row> {
                 link: Some(format!("{ORIGIN}/films/{id}/{slug}")),
                 tmdb: None,
                 image: format!(
-                    "https://cdn.jwplayer.com/v2/media/{id}/images/regalia_16x9.webp?fallback=default_16x9&width=480"
+                    "{JW_IMAGES}/{id}/images/regalia_16x9.webp?fallback=default_16x9&width=480"
                 ),
             });
             if films.len() == FILM_LIMIT {
@@ -177,6 +233,11 @@ fn valid_slug(slug: &str) -> bool {
 
 /// Text with HTML entities decoded and whitespace collapsed, at most 200 characters.
 fn clean(text: &str) -> String {
+    clean_up_to(text, 200)
+}
+
+/// Like [`clean`], at most `limit` characters.
+fn clean_up_to(text: &str, limit: usize) -> String {
     let mut out = String::new();
     let mut rest = text;
     while let Some(amp) = rest.find('&') {
@@ -218,8 +279,199 @@ fn clean(text: &str) -> String {
         .collect::<Vec<_>>()
         .join(" ")
         .chars()
-        .take(200)
+        .take(limit)
         .collect()
+}
+
+/// Markup with its tags removed.
+fn strip_tags(html: &str) -> String {
+    let mut out = String::new();
+    let mut rest = html;
+    while let Some(open) = rest.find('<') {
+        out.push_str(&rest[..open]);
+        let Some(close) = rest[open..].find('>') else {
+            return out;
+        };
+        out.push(' ');
+        rest = &rest[open + close + 1..];
+    }
+    out.push_str(rest);
+    out
+}
+
+// ---- Film details ---------------------------------------------------------------------------
+
+/// A film page's details: schema.org data in its `application/ld+json` scripts, which search
+/// engines read and so stay put, and the long synopsis in the element whose class ends in
+/// `_description` (the structured data has only a one-line one).
+pub fn parse_details(html: &str) -> Details {
+    let mut details = Details::default();
+    let mut rest = html;
+    while let Some(start) = rest.find("application/ld+json") {
+        rest = &rest[start..];
+        let Some(open) = rest.find('>') else { break };
+        let Some(close) = rest.find("</script>") else {
+            break;
+        };
+        if open < close
+            && let Ok(json) = serde_json::from_str::<Value>(&rest[open + 1..close])
+        {
+            let graph = json["@graph"]
+                .as_array()
+                .cloned()
+                .unwrap_or_else(|| vec![json]);
+            for item in &graph {
+                read_schema(item, &mut details);
+            }
+        }
+        rest = &rest[close..];
+    }
+    if let Some(long) = element_text(html, r#"_description">"#, "</p>") {
+        details.synopsis = long;
+    }
+    if details.directors.is_empty()
+        && let Some(director) = element_text(html, r#"_secondLine">"#, "</div>")
+    {
+        details.directors.push(director);
+    }
+    details
+}
+
+fn read_schema(item: &Value, details: &mut Details) {
+    let kind = item["@type"].as_str().unwrap_or_default();
+    if kind != "Movie" && kind != "VideoObject" {
+        return;
+    }
+    let names = |value: &Value| -> Vec<String> {
+        let list = match value {
+            Value::Array(list) => list.clone(),
+            Value::Null => vec![],
+            other => vec![other.clone()],
+        };
+        list.iter()
+            .filter_map(|entry| entry.as_str().or_else(|| entry["name"].as_str()))
+            .map(clean)
+            .filter(|name| !name.is_empty())
+            .take(6)
+            .collect()
+    };
+    let fill = |field: &mut Vec<String>, value: &Value| {
+        if field.is_empty() {
+            *field = names(value);
+        }
+    };
+    fill(&mut details.directors, &item["director"]);
+    fill(&mut details.cast, &item["actor"]);
+    fill(&mut details.genres, &item["genre"]);
+    fill(&mut details.countries, &item["countryOfOrigin"]);
+    if details.synopsis.is_empty()
+        && let Some(text) = item["description"].as_str()
+    {
+        details.synopsis = clean_up_to(text, SYNOPSIS_LIMIT);
+    }
+    if details.year.is_empty()
+        && let Some(year) = item["datePublished"]
+            .as_str()
+            .and_then(|date| date.get(..4))
+        && year.bytes().all(|b| b.is_ascii_digit())
+    {
+        details.year = year.into();
+    }
+    if details.length.is_empty()
+        && let Some(minutes) = item["duration"].as_str().and_then(iso_minutes)
+    {
+        details.length = running_time(minutes);
+    }
+}
+
+/// The text of the first element whose opening tag ends in `marker`, up to `end`.
+fn element_text(html: &str, marker: &str, end: &str) -> Option<String> {
+    let start = html.find(marker)? + marker.len();
+    let stop = start + html[start..].find(end)?;
+    let text = clean_up_to(&strip_tags(&html[start..stop]), SYNOPSIS_LIMIT);
+    (!text.is_empty()).then_some(text)
+}
+
+/// Whole minutes in an ISO 8601 duration such as `PT1H38M20S`.
+fn iso_minutes(duration: &str) -> Option<u32> {
+    let mut rest = duration.strip_prefix("PT")?;
+    let mut minutes = 0;
+    while !rest.is_empty() {
+        let digits = rest.find(|c: char| !c.is_ascii_digit())?;
+        let value: u32 = rest[..digits].parse().ok()?;
+        minutes += match &rest[digits..digits + 1] {
+            "H" => value * 60,
+            "M" => value,
+            "S" => 0,
+            _ => return None,
+        };
+        rest = &rest[digits + 1..];
+    }
+    (minutes > 0).then_some(minutes)
+}
+
+/// "1 hr 38 min", as the Channel writes running times.
+fn running_time(minutes: u32) -> String {
+    match (minutes / 60, minutes % 60) {
+        (0, m) => format!("{m} min"),
+        (h, 0) => format!("{h} hr"),
+        (h, m) => format!("{h} hr {m} min"),
+    }
+}
+
+/// A film's details from TMDB, for films TMDB listed whose Channel page is not known yet.
+pub fn tmdb_details(get: &TmdbGet, id: u64) -> Result<Details, String> {
+    let movie = get(
+        &format!("/3/movie/{id}"),
+        &[("append_to_response", "credits".to_owned())],
+    )?;
+    let names = |list: &Value, filter: &dyn Fn(&Value) -> bool, limit: usize| -> Vec<String> {
+        list.as_array()
+            .into_iter()
+            .flatten()
+            .filter(|entry| filter(entry))
+            .filter_map(|entry| entry["name"].as_str())
+            .map(clean)
+            .filter(|name| !name.is_empty())
+            .take(limit)
+            .collect()
+    };
+    let details = Details {
+        directors: names(
+            &movie["credits"]["crew"],
+            &|entry| entry["job"] == "Director",
+            3,
+        ),
+        cast: names(&movie["credits"]["cast"], &|_| true, 4),
+        genres: names(&movie["genres"], &|_| true, 3),
+        countries: names(&movie["production_countries"], &|_| true, 2),
+        synopsis: clean_up_to(
+            movie["overview"].as_str().unwrap_or_default(),
+            SYNOPSIS_LIMIT,
+        ),
+        year: movie["release_date"]
+            .as_str()
+            .and_then(|date| date.get(..4))
+            .filter(|year| year.bytes().all(|b| b.is_ascii_digit()))
+            .unwrap_or_default()
+            .into(),
+        length: movie["runtime"]
+            .as_u64()
+            .filter(|&minutes| minutes > 0)
+            .map(|minutes| running_time(minutes as u32))
+            .unwrap_or_default(),
+    };
+    if details.is_empty() {
+        Err(format!("TMDB has no details for {id}"))
+    } else {
+        Ok(details)
+    }
+}
+
+/// Whether a link is a film's page on the Channel.
+fn film_page(link: &str) -> bool {
+    link.strip_prefix(ORIGIN)
+        .is_some_and(|path| path.starts_with("/films/"))
 }
 
 // ---- TMDB rows -------------------------------------------------------------------------------
@@ -411,6 +663,9 @@ pub struct Reply {
 /// A film's page, for the film `id` asked about.
 pub type Resolved = (String, String);
 
+/// A film's details, for the film `id` asked about.
+pub type Described = (String, Result<Details, String>);
+
 enum Request {
     Rows,
     Link {
@@ -418,12 +673,14 @@ enum Request {
         tmdb: u64,
         title: String,
     },
+    Details(Film),
 }
 
 pub struct Service {
     sender: mpsc::Sender<Request>,
     pub receiver: mpsc::Receiver<Reply>,
     pub resolved: mpsc::Receiver<Resolved>,
+    pub described: mpsc::Receiver<Described>,
 }
 
 /// Where the worker gets rows and links: the network, or a test's fixtures.
@@ -431,6 +688,7 @@ pub trait Source: Send + 'static {
     fn rows(&self) -> Result<Vec<Row>, String>;
     /// None when no Movie of the Night key is stored.
     fn link(&self, tmdb: u64) -> Option<Result<Option<String>, String>>;
+    fn details(&self, film: &Film) -> Result<Details, String>;
 }
 
 /// Luma's search keys, read again for every request so a key set later is used at once.
@@ -460,7 +718,7 @@ impl Source for Network {
                 Err(error) => crate::telemetry::log_warn!("criterion", "{error}"),
             }
         }
-        let rows = parse(&fetch(&self.agent)?);
+        let rows = parse(&fetch(&self.agent, &format!("{ORIGIN}/"))?);
         if rows.is_empty() {
             Err("The Criterion Channel page had no films".to_owned())
         } else {
@@ -483,6 +741,29 @@ impl Source for Network {
                 .map_err(|e| format!("Movie of the Night: {e}")),
         )
     }
+
+    /// From the film's page on the Channel when it is known, else from TMDB.
+    fn details(&self, film: &Film) -> Result<Details, String> {
+        if let Some(link) = film.link.as_deref().filter(|link| film_page(link)) {
+            let details = parse_details(&fetch(&self.agent, link)?);
+            return if details.is_empty() {
+                Err(format!(
+                    "The Criterion Channel page for {} had no details",
+                    film.id
+                ))
+            } else {
+                Ok(details)
+            };
+        }
+        let (Some(id), Some(http)) = (film.tmdb, self.keys().tmdb_http()) else {
+            return Err(format!("No details for {}", film.id));
+        };
+        let get = |path: &str, query: &[(&'static str, String)]| {
+            http.get::<Value>(path, &Query(query.to_vec()))
+                .map_err(|e| format!("TMDB: {e}"))
+        };
+        tmdb_details(&get, id)
+    }
 }
 
 impl Service {
@@ -502,6 +783,7 @@ impl Service {
         let (sender, requests) = mpsc::channel::<Request>();
         let (replies, receiver) = mpsc::channel();
         let (links, resolved) = mpsc::channel();
+        let (descriptions, described) = mpsc::channel();
         std::thread::spawn(move || {
             while let Ok(request) = requests.recv() {
                 match request {
@@ -518,6 +800,12 @@ impl Service {
                             return;
                         }
                     }
+                    Request::Details(film) => {
+                        let details = details(&cache, &source, &film, SystemTime::now());
+                        if descriptions.send((film.id, details)).is_err() {
+                            return;
+                        }
+                    }
                 }
             }
         });
@@ -525,6 +813,7 @@ impl Service {
             sender,
             receiver,
             resolved,
+            described,
         }
     }
 
@@ -542,6 +831,30 @@ impl Service {
             });
         }
     }
+
+    /// Asks for a film's details; the answer arrives on `described`.
+    pub fn describe(&self, film: &Film) {
+        let _ = self.sender.send(Request::Details(film.clone()));
+    }
+}
+
+/// A film's details: from disk, else from the network. Failures are not kept.
+fn details(
+    cache: &DiskCache,
+    source: &dyn Source,
+    film: &Film,
+    now: SystemTime,
+) -> Result<Details, String> {
+    let key = format!("criterion:details:{}", film.id);
+    if let Some(details) = cache.get::<Details>(&key, DETAILS_AGE, now) {
+        return Ok(details);
+    }
+    let details = source.details(film);
+    match &details {
+        Ok(details) => cache.put(&key, details, now),
+        Err(error) => crate::telemetry::log_warn!("criterion", "{error}"),
+    }
+    details
 }
 
 /// A film's page: from disk, else from Movie of the Night, else the Channel's search.
@@ -609,9 +922,9 @@ fn load(
     replies
 }
 
-fn fetch(agent: &ureq::Agent) -> Result<String, String> {
+fn fetch(agent: &ureq::Agent, url: &str) -> Result<String, String> {
     let mut response = agent
-        .get(&format!("{ORIGIN}/"))
+        .get(url)
         .header("User-Agent", "Mozilla/5.0 (Web0S; Linux) LumaNative")
         .header("Accept", "text/html")
         .call()
@@ -637,6 +950,11 @@ fn fetch(agent: &ureq::Agent) -> Result<String, String> {
 
 /// Cards per row on screen at once; the row scrolls to keep the focused card inside them.
 pub const VISIBLE_CARDS: usize = 4;
+/// Rows wholly on screen, with the next one's top showing below. Focus moves down through them
+/// before the rows scroll, as on Apple TV and Google TV, rather than every row jumping to the top.
+pub const VISIBLE_ROWS: usize = 2;
+/// How quickly scrolling settles: about 95% of the way in 0.2 s.
+const SCROLL_SPEED: f32 = 15.;
 
 #[derive(Default)]
 pub struct Browser {
@@ -650,6 +968,11 @@ pub struct Browser {
     pub first_row: usize,
     /// Per row, the first card on screen.
     pub first_card: Vec<usize>,
+    /// Where the rows are drawn, gliding toward `first_row` and `first_card`.
+    pub scroll_row: f32,
+    scroll_cards: Vec<f32>,
+    /// The last animation step, or None while nothing moves.
+    animated: Option<Instant>,
     /// Artwork by film ID, only for cards on or near the screen: each is about 360 KB.
     pub images: HashMap<String, Arc<Frame>>,
     /// Artwork asked for and not yet answered.
@@ -662,9 +985,31 @@ pub struct Browser {
     pub resolving: Option<String>,
     /// A film whose page the main loop asks the catalog worker for.
     resolve_request: Option<Film>,
+    /// The film whose detail page is open over the rows.
+    pub detail: Option<Detail>,
+    /// A film whose details the main loop asks the catalog worker for.
+    details_request: Option<Film>,
+    /// Details found this run, by film ID.
+    described: HashMap<String, Details>,
 }
 
-/// Rows kept around the screen's: the one above and the two below the three on screen.
+/// A film's page: its backdrop, details and Play, like a streaming service's title page.
+pub struct Detail {
+    pub film: Film,
+    /// Where the film was chosen, for Back. Moves with the film when new rows arrive.
+    pub row: usize,
+    pub card: usize,
+    /// None while loading, or when they could not be found (`failed`).
+    pub details: Option<Details>,
+    pub failed: bool,
+    pub hero: Option<Arc<Frame>>,
+    hero_pending: bool,
+    hero_failed: bool,
+    /// Fades in from 0 when opened.
+    pub shown: f32,
+}
+
+/// Rows kept around the screen's: the one above and those below the ones on screen.
 const ROWS_ABOVE: usize = 1;
 const ROWS_BELOW: usize = 5;
 /// Cards kept either side of a row's visible ones.
@@ -694,9 +1039,24 @@ impl Browser {
         self.first_card.get(row).copied().unwrap_or(0)
     }
 
-    /// Scrolls so that `card` of `row` is on screen, with the row at the top.
+    /// Where a row's cards are drawn, in cards: gliding toward [`Self::first_card`].
+    pub fn scroll_card(&self, row: usize) -> f32 {
+        self.scroll_cards
+            .get(row)
+            .copied()
+            .unwrap_or_else(|| self.first_card(row) as f32)
+    }
+
+    /// Scrolls as little as keeps `card` of `row` on screen.
     fn reveal(&mut self, row: usize, card: usize) {
-        self.first_row = row;
+        if self.animated.is_none() {
+            self.animated = Some(crate::clock::now());
+        }
+        if row < self.first_row {
+            self.first_row = row;
+        } else if row >= self.first_row + VISIBLE_ROWS {
+            self.first_row = row + 1 - VISIBLE_ROWS;
+        }
         if self.first_card.len() < self.rows.len() {
             self.first_card.resize(self.rows.len(), 0);
         }
@@ -707,6 +1067,59 @@ impl Browser {
                 *first = card + 1 - VISIBLE_CARDS;
             }
         }
+    }
+
+    /// Puts the rows where they are going at once.
+    fn settle(&mut self) {
+        self.scroll_row = self.first_row as f32;
+        self.scroll_cards = (0..self.rows.len())
+            .map(|row| self.first_card(row) as f32)
+            .collect();
+        if let Some(detail) = &mut self.detail {
+            detail.shown = 1.;
+        }
+        self.animated = None;
+    }
+
+    /// Whether anything is still gliding or fading in.
+    pub fn settling(&self) -> bool {
+        self.scroll_row != self.first_row as f32
+            || (0..self.rows.len()).any(|row| self.scroll_card(row) != self.first_card(row) as f32)
+            || self.detail.as_ref().is_some_and(|detail| detail.shown < 1.)
+    }
+
+    /// One animation step; whether anything moved.
+    pub fn animate(&mut self, reduced: bool, now: Instant) -> bool {
+        if !self.settling() {
+            self.animated = None;
+            return false;
+        }
+        if reduced {
+            self.settle();
+            return true;
+        }
+        let last = self.animated.replace(now).unwrap_or(now);
+        let dt = now.saturating_duration_since(last).as_secs_f32().min(0.1);
+        let step = 1. - (-SCROLL_SPEED * dt).exp();
+        let approach = |current: &mut f32, target: f32| {
+            if (*current - target).abs() < 0.002 {
+                *current = target;
+            } else {
+                *current += (target - *current) * step;
+            }
+        };
+        approach(&mut self.scroll_row, self.first_row as f32);
+        if self.scroll_cards.len() != self.rows.len() {
+            self.scroll_cards.resize(self.rows.len(), 0.);
+        }
+        for (row, scroll) in self.scroll_cards.iter_mut().enumerate() {
+            let target = self.first_card.get(row).copied().unwrap_or(0) as f32;
+            approach(scroll, target);
+        }
+        if let Some(detail) = &mut self.detail {
+            detail.shown = (detail.shown + dt / 0.22).min(1.);
+        }
+        true
     }
 }
 
@@ -736,6 +1149,7 @@ impl State {
             let card = browser.first_card(row).max(card);
             Target::Film(row, card)
         };
+        self.criterion.settle();
         self.reconcile_criterion_focus();
         self.dirty = true;
     }
@@ -744,6 +1158,8 @@ impl State {
         // A lookup answered after this only keeps the film's page; it opens nothing.
         self.criterion.resolving = None;
         self.criterion.resolve_request = None;
+        self.criterion.detail = None;
+        self.criterion.details_request = None;
         if let Some(Overlay::Criterion { restore }) = self.overlay.take() {
             self.focus = restore;
             self.reconcile_focus();
@@ -760,8 +1176,11 @@ impl State {
             Ok(rows) => {
                 if rows != browser.rows {
                     // Keep the focused film when it is still listed; else the top of the screen.
-                    let focused = match self.focus {
-                        Target::Film(row, card) => browser.film(row, card).map(|f| f.id.clone()),
+                    let focused = match (&browser.detail, &self.focus) {
+                        (Some(detail), _) => Some(detail.film.id.clone()),
+                        (None, Target::Film(row, card)) => {
+                            browser.film(*row, *card).map(|f| f.id.clone())
+                        }
                         _ => None,
                     };
                     browser.rows = rows;
@@ -776,8 +1195,12 @@ impl State {
                         });
                         let (row, card) = found.unwrap_or((0, 0));
                         browser.reveal(row, card);
-                        self.focus = Target::Film(row, card);
+                        match &mut browser.detail {
+                            Some(detail) => (detail.row, detail.card) = (row, card),
+                            None => self.focus = Target::Film(row, card),
+                        }
                     }
+                    browser.settle();
                 }
                 let browser = &mut self.criterion;
                 browser.loading = reply.stale && browser.rows.is_empty();
@@ -798,12 +1221,15 @@ impl State {
         }
         let browser = &self.criterion;
         let valid = match self.focus {
+            _ if browser.detail.is_some() => self.focus == Target::CriterionPlay,
             Target::Film(row, card) => browser.film(row, card).is_some(),
             Target::CriterionRetry => browser.rows.is_empty(),
             _ => false,
         };
         if !valid {
-            self.focus = if browser.rows.is_empty() {
+            self.focus = if browser.detail.is_some() {
+                Target::CriterionPlay
+            } else if browser.rows.is_empty() {
                 Target::CriterionRetry
             } else {
                 Target::Film(0, 0)
@@ -813,6 +1239,7 @@ impl State {
 
     pub fn criterion_direction(&mut self, direction: Direction) -> Vec<Effect> {
         self.criterion.playing = false;
+        // The detail page has only Play.
         let Target::Film(row, card) = self.focus else {
             return vec![];
         };
@@ -846,28 +1273,12 @@ impl State {
 
     pub fn criterion_activate(&mut self) -> Vec<Effect> {
         match self.focus {
-            Target::Film(row, card) => match self.criterion.film(row, card).cloned() {
-                Some(Film {
-                    link: Some(link), ..
-                }) => {
-                    // A film still being looked up is not opened after this one.
-                    self.criterion.resolving = None;
-                    self.criterion.resolve_request = None;
-                    self.criterion.playing = true;
-                    vec![Effect::LaunchTitle {
-                        app: PLAYER.into(),
-                        service: SERVICE.into(),
-                        link,
-                    }]
-                }
-                // Listed by TMDB: its page on the Channel is looked up first.
-                Some(film) => {
-                    self.criterion.resolving = Some(film.id.clone());
-                    self.criterion.resolve_request = Some(film);
-                    self.notify(self.preferences.language.t("opening"));
-                    self.dirty = true;
-                    vec![]
-                }
+            Target::Film(row, card) => {
+                self.open_film(row, card);
+                vec![]
+            }
+            Target::CriterionPlay => match self.criterion.detail.as_ref().map(|d| d.film.clone()) {
+                Some(film) => self.play(film),
                 None => vec![],
             },
             Target::CriterionRetry => {
@@ -882,6 +1293,108 @@ impl State {
         }
     }
 
+    /// Opens a film's detail page, with Play focused.
+    fn open_film(&mut self, row: usize, card: usize) {
+        let browser = &mut self.criterion;
+        let Some(film) = browser.film(row, card).cloned() else {
+            return;
+        };
+        let details = browser.described.get(&film.id).cloned();
+        if details.is_none() {
+            browser.details_request = Some(film.clone());
+        }
+        browser.detail = Some(Detail {
+            film,
+            row,
+            card,
+            details,
+            failed: false,
+            hero: None,
+            hero_pending: false,
+            hero_failed: false,
+            shown: if self.preferences.reduced_motion {
+                1.
+            } else {
+                0.
+            },
+        });
+        if browser.animated.is_none() {
+            browser.animated = Some(crate::clock::now());
+        }
+        self.focus = Target::CriterionPlay;
+        self.dirty = true;
+    }
+
+    /// Back on the detail page: the rows again, with the film focused.
+    fn close_film(&mut self) {
+        let Some(detail) = self.criterion.detail.take() else {
+            return;
+        };
+        self.criterion.details_request = None;
+        self.focus = Target::Film(detail.row, detail.card);
+        self.criterion.reveal(detail.row, detail.card);
+        self.reconcile_criterion_focus();
+        self.dirty = true;
+    }
+
+    /// Opens a film in the player, once its page on the Channel is known.
+    fn play(&mut self, film: Film) -> Vec<Effect> {
+        match film.link {
+            Some(link) => {
+                // A film still being looked up is not opened after this one.
+                self.criterion.resolving = None;
+                self.criterion.resolve_request = None;
+                self.criterion.playing = true;
+                vec![Effect::LaunchTitle {
+                    app: PLAYER.into(),
+                    service: SERVICE.into(),
+                    link,
+                }]
+            }
+            // Listed by TMDB: its page on the Channel is looked up first.
+            None => {
+                self.criterion.resolving = Some(film.id.clone());
+                self.criterion.resolve_request = Some(film);
+                self.notify(self.preferences.language.t("opening"));
+                self.dirty = true;
+                vec![]
+            }
+        }
+    }
+
+    /// A film whose details to look up, once.
+    pub fn criterion_details_request(&mut self) -> Option<Film> {
+        self.criterion.details_request.take()
+    }
+
+    /// A film's details from the catalog worker.
+    pub fn accept_criterion_details(&mut self, (id, details): Described) {
+        let browser = &mut self.criterion;
+        if let Ok(details) = &details {
+            browser.described.insert(id.clone(), details.clone());
+        }
+        if let Some(detail) = browser.detail.as_mut().filter(|d| d.film.id == id) {
+            match details {
+                Ok(details) => detail.details = Some(details),
+                Err(_) => detail.failed = true,
+            }
+            self.dirty = true;
+        }
+    }
+
+    /// One animation step of the rows and the detail page.
+    pub fn criterion_tick(&mut self) {
+        if self.criterion_open() {
+            self.dirty |= self
+                .criterion
+                .animate(self.preferences.reduced_motion, crate::clock::now());
+        }
+    }
+
+    pub fn criterion_animating(&self) -> bool {
+        self.criterion_open() && self.criterion.settling()
+    }
+
     /// A film whose page to look up, once.
     pub fn criterion_resolve_request(&mut self) -> Option<Film> {
         self.criterion.resolve_request.take()
@@ -891,11 +1404,14 @@ impl State {
     /// one chosen and the screen is still open.
     pub fn criterion_resolved(&mut self, id: &str, link: String) -> Vec<Effect> {
         let browser = &mut self.criterion;
-        let finds_page = link
-            .strip_prefix(ORIGIN)
-            .is_some_and(|path| path.starts_with("/films/"));
-        if finds_page {
-            for film in browser.rows.iter_mut().flat_map(|row| &mut row.films) {
+        if film_page(&link) {
+            let detail = browser.detail.as_mut().map(|detail| &mut detail.film);
+            for film in browser
+                .rows
+                .iter_mut()
+                .flat_map(|row| &mut row.films)
+                .chain(detail)
+            {
                 if film.id == id {
                     film.link = Some(link.clone());
                 }
@@ -918,6 +1434,10 @@ impl State {
 
     pub fn criterion_back(&mut self) -> Vec<Effect> {
         self.criterion.playing = false;
+        if self.criterion.detail.is_some() {
+            self.close_film();
+            return vec![];
+        }
         self.close_criterion();
         vec![]
     }
@@ -953,7 +1473,7 @@ impl State {
             browser.pending.insert(film.id.clone());
             requests.push(crate::posters::Request {
                 show_id: image_key(&film.id),
-                url: film.image.clone(),
+                url: film.card_image(),
                 size: IMAGE_SIZE,
             });
         }
@@ -961,14 +1481,43 @@ impl State {
         browser
             .pending
             .retain(|id| nearby.iter().any(|film| &film.id == id));
-        if requests.is_empty() && browser.images.len() == before {
+        let mut wanted: Vec<String> = nearby.iter().map(|film| image_key(&film.id)).collect();
+        let mut hero_changed = false;
+        if let Some(detail) = &mut browser.detail {
+            wanted.push(hero_key(&detail.film.id));
+            if detail.hero.is_none() && !detail.hero_pending && !detail.hero_failed {
+                detail.hero_pending = true;
+                hero_changed = true;
+                requests.push(crate::posters::Request {
+                    show_id: hero_key(&detail.film.id),
+                    url: detail.film.hero(),
+                    size: HERO_SIZE,
+                });
+            }
+        }
+        if requests.is_empty() && browser.images.len() == before && !hero_changed {
             return None;
         }
-        let wanted = nearby.iter().map(|film| image_key(&film.id)).collect();
         Some((wanted, requests))
     }
 
     pub fn accept_criterion_image(&mut self, key: &str, image: Option<Arc<Frame>>) {
+        if let Some(id) = key.strip_prefix(HERO_PREFIX) {
+            if let Some(detail) = self
+                .criterion
+                .detail
+                .as_mut()
+                .filter(|detail| detail.film.id == id && detail.hero_pending)
+            {
+                detail.hero_pending = false;
+                match image {
+                    Some(image) => detail.hero = Some(image),
+                    None => detail.hero_failed = true,
+                }
+                self.dirty = true;
+            }
+            return;
+        }
         let Some(id) = key.strip_prefix(IMAGE_PREFIX) else {
             return;
         };
@@ -989,6 +1538,12 @@ impl State {
 }
 
 const IMAGE_PREFIX: &str = "criterion:";
+const HERO_PREFIX: &str = "criterion-hero:";
+
+/// The image worker's ID for a film's detail-page backdrop.
+pub fn hero_key(id: &str) -> String {
+    format!("{HERO_PREFIX}{id}")
+}
 
 /// The image worker's ID for a film's artwork, unique among Luma's posters.
 pub fn image_key(id: &str) -> String {

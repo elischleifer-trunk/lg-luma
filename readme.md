@@ -323,15 +323,18 @@ shows every Home Assistant camera in a full-screen grid. See [Home Assistant](ho
 ### Criterion Channel
 
 The Criterion Channel has no LG app. Luma's **Criterion Channel** tile shows films on the
-Channel in a full-screen grid: Popular, Top Rated, Recently Released and a row per genre. OK
-plays the film in a small player app that Luma installs the first time it is needed: the
-Channel's web player, full screen, with the remote's play, pause and skip keys. Back returns to
-the grid. While the film loads, a black screen with the Channel's mark hides its web pages; it
+Channel in a full-screen grid: Popular, Top Rated, Recently Released and a row per genre. The
+focus moves down into the rows on screen, and the rows glide only when it would leave the
+screen. OK opens the film's page: its still across the screen, director, year, running time,
+genres, synopsis and cast (from the film's Channel page, or TMDB for films it listed), and
+**Play**. Play opens the film in a small player app that Luma installs the first time it is
+needed: the Channel's web player, full screen, with the remote's play, pause and skip keys. Back
+returns to the film's page, and again to the grid. While the film loads, a black screen with the Channel's mark hides its web pages; it
 lifts when the film plays, or after 20 seconds, or when the Channel needs you to sign in by hand.
 
 The rows come from TMDB's streaming data when a TMDB token is stored (see
 [Search: movies and shows](#search-movies-and-shows)),
-refreshed twice a day. Choosing a film asks Movie of the Night once for its page on the
+refreshed twice a day. Playing one of those films asks Movie of the Night once for its page on the
 Channel; without a Movie of the Night key, or when it does not know the film, the player opens
 the Channel's search for the title. Without a TMDB token, the rows are read from the Channel's
 public home page instead, so a redesign of that page can empty the grid until Luma is updated.

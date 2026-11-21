@@ -127,6 +127,8 @@ pub enum Target {
     /// Criterion screen: a film card by row and position, and Try again when nothing loaded.
     Film(usize, usize),
     CriterionRetry,
+    /// Play on a film's detail page.
+    CriterionPlay,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -559,6 +561,7 @@ impl State {
     }
 
     pub fn tick(&mut self) {
+        self.criterion_tick();
         let recents_open = self.recents_open();
         if recents_open || self.recents.visibility > 0. {
             self.dirty |= self.recents.animate(
@@ -618,6 +621,7 @@ impl State {
                 || self.recents.cards_animating(self.pointer)))
             || self.previous_background.is_some()
             || self.panel_started.is_some()
+            || self.criterion_animating()
             || (!self.preferences.reduced_motion
                 && self.notice.as_ref().is_some_and(|(_, start)| {
                     crate::clock::since(*start) < Duration::from_millis(120)
