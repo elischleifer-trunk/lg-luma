@@ -2122,6 +2122,12 @@ fn run() -> Result<(), String> {
         for (key, image) in criterion_images.receiver.try_iter() {
             state.accept_criterion_image(&key, image);
         }
+        if let Some(film) = state.criterion_details_request() {
+            criterion_catalog.describe(&film);
+        }
+        for described in criterion_catalog.described.try_iter() {
+            state.accept_criterion_details(described);
+        }
         if let Some(film) = state.criterion_resolve_request() {
             criterion_catalog.resolve(&film);
         }
