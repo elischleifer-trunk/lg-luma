@@ -666,9 +666,12 @@ impl State {
         self.panel_started = None;
         self.dirty = true;
         if self.page == Page::Search {
-            // The field starts empty, as the TV keyboard does, and the keyboard comes up.
-            self.title_query.clear();
+            // The keyboard comes up. A search left for another tab is still there with its
+            // results; the on-screen keyboard then starts on Clear, one press from a new search.
             self.open_keyboard(TextField::Titles);
+            if !self.title_query.is_empty() && matches!(self.overlay, Some(Overlay::Keyboard)) {
+                self.focus = Target::Key(KEYS.iter().position(|key| *key == "Clear").unwrap());
+            }
         }
     }
 
