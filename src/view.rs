@@ -691,7 +691,7 @@ pub fn scene_with_pill(
         return out;
     }
     // Like Cameras, the Criterion screen is opaque and full screen.
-    if state.criterion_open() {
+    if state.criterion_visible() {
         criterion_view::render(&mut out, state, assets);
         if let Some((notice, _)) = &state.notice {
             toast(&mut out, state, assets, notice);
@@ -4318,6 +4318,7 @@ fn keyboard(out: &mut Scene, state: &State, assets: &Assets) {
             TextField::CameraName => language.t("cameraName"),
             TextField::Apps => language.t("findApp"),
             TextField::Titles => language.t("moviesAndShows"),
+            TextField::Criterion => "Criterion Channel",
         },
         Rect::new(389., 324., 1000., 44.),
         text(37.6, 500, -0.055).leading(1.1),
