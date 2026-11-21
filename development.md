@@ -1378,7 +1378,8 @@ comment. Downloads are GitHub artifact ZIPs, require signing in and expire after
 
 The build uses only the `opened`, `synchronize` and `reopened` `pull_request` events, without a
 deployment environment or required reviewers. Each new commit cancels the previous run. Fork PRs
-from first-time contributors wait for GitHub's usual approval before running. Reopen an existing
+from first-time contributors wait for GitHub's usual approval before running. GitHub does not run
+`pull_request` workflows while a PR has merge conflicts, so resolve them to get a build. Reopen an existing
 PR to request its first build, or rerun a workflow to rebuild the same commit.
 
 Only the build checks out PR code. Because it runs on `pull_request` rather than

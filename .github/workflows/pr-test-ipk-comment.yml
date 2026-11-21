@@ -38,32 +38,43 @@ jobs:
             const repositoryUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}`;
             const runUrl = `${repositoryUrl}/actions/runs/${run_id}`;
 
-            // Fork runs carry no pull_requests list, so find the open PR whose head is this commit.
-            const candidates = await github.paginate(github.rest.pulls.list, {
+            // Fork runs carry no pull_requests list, so find the open PRs whose head is this commit.
+            const candidates = (
+              await github.paginate(github.rest.pulls.list, {
+                ...context.repo,
+                state: 'open',
+                head: `${process.env.HEAD_OWNER}:${process.env.HEAD_BRANCH}`,
+                per_page: 100,
+              })
+            ).filter(item => item.head.sha === sha);
+
+            // One branch can head several PRs. The build names its artifact after its own PR,
+            // so prefer that number; without an artifact, only an unambiguous match is used.
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
               ...context.repo,
-              state: 'open',
-              head: `${process.env.HEAD_OWNER}:${process.env.HEAD_BRANCH}`,
+              run_id,
               per_page: 100,
             });
-            const pull = candidates.find(item => item.head.sha === sha);
+            const artifactPattern = new RegExp(`^luma-pr-(\\d+)-${sha}$`);
+            const artifact = artifacts.find(item => !item.expired && artifactPattern.test(item.name));
+            const builtNumber = artifact ? Number(artifactPattern.exec(artifact.name)[1]) : undefined;
+            const pull =
+              builtNumber === undefined
+                ? candidates.length === 1
+                  ? candidates[0]
+                  : undefined
+                : candidates.find(item => item.number === builtNumber);
             // A superseded run must never replace the download for a newer commit.
             if (!pull) {
-              core.info('No open PR has this commit as its head; leaving comments untouched.');
+              core.info('Could not match this build to one open PR at its head; leaving comments untouched.');
               return;
             }
             const pull_number = pull.number;
-            const artifactName = `luma-pr-${pull_number}-${sha}`;
             let status;
 
             if (process.env.BUILD_RESULT === 'success') {
-              const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
-                ...context.repo,
-                run_id,
-                per_page: 100,
-              });
-              const artifact = artifacts.find(item => item.name === artifactName && !item.expired);
               if (!artifact) {
-                throw new Error(`Successful build did not upload ${artifactName}.`);
+                throw new Error(`Successful build did not upload luma-pr-${pull_number}-${sha}.`);
               }
               const downloadUrl = `${runUrl}/artifacts/${artifact.id}`;
               status = [
