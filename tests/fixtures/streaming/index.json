@@ -134,6 +134,26 @@
     }
   },
   {
+    "name": "search-title-king",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "king",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "search-title-kin",
+    "path": "/shows/search/title",
+    "query": {
+      "country": "us",
+      "title": "kin",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
     "name": "search-title-star-wars-movies",
     "path": "/shows/search/title",
     "query": {
@@ -195,6 +215,42 @@
       "country": "us",
       "catalogs": "apple",
       "order_by": "popularity_1week",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "show-movie-122",
+    "path": "/shows/movie/122",
+    "query": {
+      "country": "us",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "show-movie-254",
+    "path": "/shows/movie/254",
+    "query": {
+      "country": "us",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "show-movie-420818",
+    "path": "/shows/movie/420818",
+    "query": {
+      "country": "us",
+      "series_granularity": "show",
+      "output_language": "en"
+    }
+  },
+  {
+    "name": "show-movie-8587",
+    "path": "/shows/movie/8587",
+    "query": {
+      "country": "us",
       "series_granularity": "show",
       "output_language": "en"
     }

@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/tv/136315/alternative_titles",
+    "query": {}
+  },
+  "capturedAt": "2026-11-21T19:21:45.409Z",
+  "response": {
+    "id": 136315,
+    "results": [
+      {
+        "iso_3166_1": "CN",
+        "title": "熊家餐馆",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "CZ",
+        "title": "Medvěd",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "FR",
+        "title": "The Bear : Sur place ou à emporter",
+        "type": "previous title"
+      },
+      {
+        "iso_3166_1": "MX",
+        "title": "El Oso (The Bear)",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "PL",
+        "title": "Misiek",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "SK",
+        "title": "Medveď",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "TW",
+        "title": "大熊餐館",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Bear",
+        "type": "festival title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "FX's The Bear",
+        "type": ""
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Kubelik",
+        "type": "season 3 production title"
+      },
+      {
+        "iso_3166_1": "US",
+        "title": "Windy City Law",
+        "type": "season 4 production title"
+      }
+    ]
+  }
+}

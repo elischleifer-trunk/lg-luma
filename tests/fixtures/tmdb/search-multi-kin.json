@@ -1,0 +1,452 @@
+{
+  "request": {
+    "path": "/3/search/multi",
+    "query": {
+      "query": "kin",
+      "include_adult": "false",
+      "language": "en-US",
+      "page": "1"
+    }
+  },
+  "capturedAt": "2026-11-21T19:22:01.010Z",
+  "response": {
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "/ggAS074NNNiYMc83Ms25pB87iy0.jpg",
+        "genre_ids": [
+          80,
+          18
+        ],
+        "id": 112693,
+        "name": "Kin",
+        "original_language": "en",
+        "original_name": "Kin",
+        "overview": "The lives of a Dublin family embroiled in a gangland war and the consequences of their choices.",
+        "popularity": 11.9901,
+        "poster_path": "/2wTsgQQBruGQcjM0PjFr5l5MjEw.jpg",
+        "first_air_date": "2021-09-09",
+        "softcore": false,
+        "vote_average": 7.643,
+        "vote_count": 84,
+        "media_type": "tv",
+        "origin_country": [
+          "IE"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/jq3JQ7SycdjEPYBBdI4ySbDauGH.jpg",
+        "genre_ids": [
+          18,
+          10751
+        ],
+        "id": 236621,
+        "name": "Kin",
+        "original_language": "en",
+        "original_name": "Kin",
+        "overview": "Kin, is a Singaporean family daily tv series, about the complexities of life, love and family relationships.  Years have passed since Yoke and Ella had their lives turned upside-down when they returned to be with their rightful families after being swapped at birth. Years later, Yoke has seemingly embraced her role as a status-conscious, high-society Shelley, assuming a leadership role in the family business. Ella has accepted her fate as a member of the salt of the earth, working-class Loh family but struggles to make something of her life.  The Lohs, Shelleys, Hassans, and Balas have overcome personal loss, incarceration, as well as estrangement of their loved ones; yet lingering tensions remain. Mysteries continue to unfold as characters pursue their individual agendas, while emotional drama abounds as surprising twists are revealed that threaten the stability to which they have become accustomed..",
+        "popularity": 7.3527,
+        "poster_path": "/oy3Bq4aP1D0hThJrj5nFxMd2dIx.jpg",
+        "first_air_date": "2018-10-01",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "SG"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/7oZR0oaFOPrzGkg3ZntEKwMCLTe.jpg",
+        "genre_ids": [
+          878,
+          28,
+          12,
+          53
+        ],
+        "id": 425505,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "A young boy finds a powerful otherworldly weapon, which he uses to save his older adoptive brother from a crew of thugs. Before long, the two of them are also pursued by federal agents and mysterious mercenaries aiming to reclaim their asset.",
+        "popularity": 3.3138,
+        "poster_path": "/oPE5GXHaTlu5eRcd4USuOX3A1mf.jpg",
+        "release_date": "2018-08-29",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.1,
+        "vote_count": 914,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/oSyhnP1b1JobkOVIwltAoQulYdN.jpg",
+        "genre_ids": [
+          18
+        ],
+        "id": 76179,
+        "name": "Next of Kin",
+        "original_language": "en",
+        "original_name": "Next of Kin",
+        "overview": "Whip-smart general practitioner Dr. Mona Harcourt lives in London with her political lobbyist husband Guy and her family. When a bomb goes off in London on the same day that her brother, Dr. Kareem Shirani, is abducted in Pakistan, Mona's charmed life is shaken to its core.",
+        "popularity": 2.9352,
+        "poster_path": "/hwVt2diXb9Z7K298mgBUVabtGWz.jpg",
+        "first_air_date": "2018-01-08",
+        "softcore": false,
+        "vote_average": 6.4,
+        "vote_count": 17,
+        "media_type": "tv",
+        "origin_country": [
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          18
+        ],
+        "id": 849521,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "A depressed girl seeks companionship when her cousin comes into town for a funeral.",
+        "popularity": 0.3236,
+        "poster_path": "/8EssS9IAREgkqYWL9OGixyf4GV7.jpg",
+        "release_date": "2018-12-10",
+        "softcore": false,
+        "video": false,
+        "vote_average": 1,
+        "vote_count": 2,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/ux6gkGSKNFtp2NFYxwYFxVWdnGa.jpg",
+        "genre_ids": [
+          53,
+          18
+        ],
+        "id": 874948,
+        "title": "Grudge",
+        "original_language": "tr",
+        "original_title": "Kin",
+        "overview": "Ahead of a promotion, a police chief becomes entangled in a deadly incident and uncovers an intrigue fueled by grudge that threatens his colleagues.",
+        "popularity": 0.8839,
+        "poster_path": "/6fhqb5JegWJGMuomR3Jqmo0Skqn.jpg",
+        "release_date": "2021-10-08",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6,
+        "vote_count": 100,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/ss7xcQKTifaDkDyQyYCMAQyUuZT.jpg",
+        "genre_ids": [
+          35,
+          18
+        ],
+        "id": 5635,
+        "name": "Next of Kin",
+        "original_language": "en",
+        "original_name": "Next of Kin",
+        "overview": "Andrew and Maggie Prentice have taken early retirement and plan to move to France, however when tragedy strikes they are left to care for their three grandchildren: Georgia, Jake and Michael and are going nowhere fast.",
+        "popularity": 2.2361,
+        "poster_path": "/3CucKJkLTvnzOKcwj2TSg9Vr8wu.jpg",
+        "first_air_date": "1995-05-15",
+        "softcore": false,
+        "vote_average": 7.3,
+        "vote_count": 3,
+        "media_type": "tv",
+        "origin_country": [
+          "FI",
+          "GB"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/2OWLHO62PR2T6rJlR3HstizVbhg.jpg",
+        "genre_ids": [
+          18
+        ],
+        "id": 207297,
+        "name": "Wakko no kin medaru",
+        "original_language": "ja",
+        "original_name": "和っこの金メダル",
+        "overview": "The 43th NHK Asadora about a female volleyball player who helps out the local community. Starring Azusa Watanabe.",
+        "popularity": 6.8349,
+        "poster_path": "/bCxLFAjxG8rYMVmqVQwx9roxGVO.jpg",
+        "first_air_date": "1989-10-02",
+        "softcore": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "tv",
+        "origin_country": [
+          "JP"
+        ]
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/6NGJCutMJj34CD8zJ6fUs76waEk.jpg",
+        "genre_ids": [
+          28,
+          80,
+          18,
+          53
+        ],
+        "id": 27418,
+        "title": "Next of Kin",
+        "original_language": "en",
+        "original_title": "Next of Kin",
+        "overview": "Truman Gates, a Chicago cop, sets out to find his brother's killer. Meanwhile, another of his brothers, Briar (a hillbilly) decides to find the killer himself.",
+        "popularity": 1.7437,
+        "poster_path": "/ieM9upg9O4agtodEvlZIiuNKZsN.jpg",
+        "release_date": "1989-10-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 5.9,
+        "vote_count": 262,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/a4SGhrsg8Kzwe8vEdUmlGEQjmhC.jpg",
+        "genre_ids": [
+          18,
+          10749
+        ],
+        "id": 54578,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "While on a hunt for elephant poachers in Namibia, a white female conservationist and a black lawyer fall for each other despite the condemnation by the local community.",
+        "popularity": 0.8214,
+        "poster_path": "/fpOyvuWwzMIIIWxS1i46oVcqVvJ.jpg",
+        "release_date": "2000-07-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 3.8,
+        "vote_count": 6,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/cmfwwOofZy6cNkShYxx5apk8hxL.jpg",
+        "genre_ids": [
+          18
+        ],
+        "id": 985598,
+        "title": "KIN",
+        "original_language": "en",
+        "original_title": "KIN",
+        "overview": "Jamie, 20, the older of two brothers, is midway through an attempt to extract younger brother Harry, 13, from the care home he himself was put through as a teenager. However, when Jamie's application for custody is rejected, his initial anger is gradually replaced with a difficult realisation.",
+        "popularity": 0.4017,
+        "poster_path": "/zoQnciBoQYVPfCiCujH2j97NHbG.jpg",
+        "release_date": "2017-11-15",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7,
+        "vote_count": 1,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          18
+        ],
+        "id": 806070,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "In this poetic, fragmented portrait set in rural Oregon, three white millennials struggle to come to terms with their increasing sense of alienation from contemporary society. Their despair leads them to confront their perceived adversities in the most terrible way imaginable. A searing critique of white American values, KIN invites its viewers to contemplate the troubled and long-brewing reality of Trump's America.",
+        "popularity": 0.3805,
+        "poster_path": "/cq83h9JT6p8wK3XSj5qBhBKK3qQ.jpg",
+        "release_date": "2021-03-05",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          27,
+          53
+        ],
+        "id": 633285,
+        "title": "Kin",
+        "original_language": "tr",
+        "original_title": "Kin",
+        "overview": "A group of all female friends travel to a hotel owned by one of their families, and do not invite their boyfriends due to wanting to have an all girls weekend. In return, the boys plan a prank on the girls - but things take a sinister turn as the friends begin to reveal hidden sides.",
+        "popularity": 0.2926,
+        "poster_path": "/6rOzOOfiMsH3iIiKfAy7fTpy8Ao.jpg",
+        "release_date": "2019-09-20",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/xAnSELun945cE4kFUD9mI7W3puI.jpg",
+        "genre_ids": [
+          27,
+          9648
+        ],
+        "id": 609972,
+        "title": "Paranormal Activity: Next of Kin",
+        "original_language": "en",
+        "original_title": "Paranormal Activity: Next of Kin",
+        "overview": "Margot is a documentary filmmaker looking to meet her long-lost mother and extended family in a secluded Amish community. She and her film crew soon realize the family that welcomes them into their home might be hiding a sinister secret.",
+        "popularity": 3.2543,
+        "poster_path": "/wRy3SwJFE55iL2bfKqECzP2qyrd.jpg",
+        "release_date": "2021-10-29",
+        "softcore": false,
+        "video": false,
+        "vote_average": 6.1,
+        "vote_count": 831,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          27,
+          10751
+        ],
+        "id": 1738625,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "A short film from Route22 Productions for the 48 Hour Film Project (2026)",
+        "popularity": 0.224,
+        "poster_path": "/tmHHCdHCfOJ8HcYrSmaIAUpeBg9.jpg",
+        "release_date": "2026-06-07",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          10402,
+          18
+        ],
+        "id": 414724,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "A reclusive young woman is paid a surprise visit from her estranged brother, who comes bearing bad news and a mysterious gift.",
+        "popularity": 0.3489,
+        "poster_path": "/wWIRzTiGkZ5zrBZorC3bBSMjfCt.jpg",
+        "release_date": "2012-06-11",
+        "softcore": false,
+        "video": false,
+        "vote_average": 10,
+        "vote_count": 1,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/kfkAwh0qKqwsA5teoJYwEI4M6az.jpg",
+        "genre_ids": [
+          18,
+          35
+        ],
+        "id": 1756639,
+        "title": "Kin",
+        "original_language": "en",
+        "original_title": "Kin",
+        "overview": "Two people with a shared history unexpectedly cross paths years later. As old memories resurface, they must decide whether to reconnect or continue on as strangers.",
+        "popularity": 0.2339,
+        "poster_path": "/7kXnhcbkeOYNzVNRZ7wODicgJ9p.jpg",
+        "release_date": "",
+        "softcore": false,
+        "video": false,
+        "vote_average": 10,
+        "vote_count": 1,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/iN2Sez3yNI5RYAQM6ziEAnlYSms.jpg",
+        "genre_ids": [
+          35,
+          878,
+          12
+        ],
+        "id": 20874,
+        "title": "Kin-dza-dza!",
+        "original_language": "ru",
+        "original_title": "Кин-дза-дза!",
+        "overview": "Two Soviet humans previously unknown to each other are transported to the planet Pluke in the Kin-dza-dza galaxy due to a chance encounter with an alien teleportation device. They must come to grips with a language barrier and Plukian social norms (not to mention the laws of space and time) if they ever hope to return to Earth.",
+        "popularity": 1.8981,
+        "poster_path": "/xmCxrS5bxXl3wadSNqxoFlM2Cqa.jpg",
+        "release_date": "1986-12-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 7.643,
+        "vote_count": 319,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": null,
+        "genre_ids": [
+          18,
+          35
+        ],
+        "id": 1392656,
+        "title": "Kin",
+        "original_language": "fr",
+        "original_title": "Kin",
+        "overview": "",
+        "popularity": 0.1592,
+        "poster_path": null,
+        "release_date": "2018-01-01",
+        "softcore": false,
+        "video": false,
+        "vote_average": 0,
+        "vote_count": 0,
+        "media_type": "movie"
+      },
+      {
+        "adult": false,
+        "backdrop_path": "/inY12F4KaafltLxrfbbpUk3FjrT.jpg",
+        "genre_ids": [
+          99,
+          80
+        ],
+        "id": 118381,
+        "name": "Evil Kin",
+        "original_language": "en",
+        "original_name": "Evil Kin",
+        "overview": "It's amazing the things that you can inherit from your family gene pool: blue eyes, a beautiful smile, a winning personality. But what about your family's less desirable traits? A grandfather's talent for swindling, an aunt's knack for aggravated assault or even a father's flair for murder.... can you actually inherit evil from your family tree? Evil Kin begs this question as well as whether psychopathic behavior is pre-programmed. From siblings who conspire to kill their parents, to three brothers who grow up independently to become a serial killer, a rapist and a mercenary, Evil Kin follows true-crime mysteries surrounding bone-chilling cases that prove blood is always thicker than water.",
+        "popularity": 0.8966,
+        "poster_path": "/ucBaz05xZ1u8amgsHx4WH9Urkon.jpg",
+        "first_air_date": "2013-08-28",
+        "softcore": false,
+        "vote_average": 5.8,
+        "vote_count": 4,
+        "media_type": "tv",
+        "origin_country": [
+          "US"
+        ]
+      }
+    ],
+    "total_pages": 500,
+    "total_results": 10000
+  }
+}

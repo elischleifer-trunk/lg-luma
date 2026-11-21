@@ -1,0 +1,67 @@
+{
+  "request": {
+    "path": "/3/movie/390702",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:51.306Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/wim7H5Br96BQCpME58DYjZf1SNq.jpg",
+    "belongs_to_collection": null,
+    "budget": 0,
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 28,
+        "name": "Action"
+      }
+    ],
+    "homepage": "",
+    "id": 390702,
+    "imdb_id": "tt0183356",
+    "origin_country": [
+      "TR"
+    ],
+    "original_language": "tr",
+    "original_title": "Kin",
+    "overview": "Kenan's wife is murdered by five people, and his daughter is sent to a children's home. Kenan kills four of his wife's five murderers, but is sent to prison and sentenced to 20 years. Ten years later, he is released on parole and begins searching for his daughter.",
+    "popularity": 0.2237,
+    "poster_path": "/Vy7TrNiH12qbEawPK8lTmn11D8.jpg",
+    "production_companies": [
+      {
+        "id": 4902,
+        "logo_path": "/h1Ss11xFUU1c0IDXeJTxA0SHEq0.png",
+        "name": "Erman Film",
+        "origin_country": "TR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "TR",
+        "name": "Turkey"
+      }
+    ],
+    "release_date": "1974-01-01",
+    "revenue": 0,
+    "runtime": 80,
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Turkish",
+        "iso_639_1": "tr",
+        "name": "Türkçe"
+      }
+    ],
+    "status": "Released",
+    "tagline": "",
+    "title": "Kin",
+    "video": false,
+    "vote_average": 6.4,
+    "vote_count": 5
+  }
+}

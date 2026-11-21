@@ -1,0 +1,100 @@
+{
+  "request": {
+    "path": "/3/tv/309735",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:46.169Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/uQIc8KsEoEwrPgGxnfdfmgBCpxZ.jpg",
+    "created_by": [],
+    "episode_run_time": [],
+    "first_air_date": "2026-01-02",
+    "genres": [
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "homepage": "",
+    "id": 309735,
+    "in_production": false,
+    "languages": [
+      "da"
+    ],
+    "last_air_date": "2026-01-02",
+    "last_episode_to_air": {
+      "id": 6803826,
+      "name": "Episode 4",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-01-02",
+      "episode_number": 4,
+      "episode_type": "standard",
+      "production_code": "",
+      "runtime": 28,
+      "season_number": 1,
+      "show_id": 309735,
+      "still_path": "/SUzfNHZtB7RcJnoCIqCju2SyIj.jpg"
+    },
+    "name": "King",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 4875,
+        "logo_path": "/3Os40ulFXkNcCbBG41lk0N6Eq3p.png",
+        "name": "TV2 Play",
+        "origin_country": ""
+      }
+    ],
+    "number_of_episodes": 4,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "DK"
+    ],
+    "original_language": "da",
+    "original_name": "King",
+    "overview": "Caught between business and emotion, Yasin is drawn into a world of fear, jealousy, and power struggles - with consequences beyond anyone's imagination.",
+    "popularity": 1.3759,
+    "poster_path": "/6GW5lXNkBQKeoz82tGa3MEXOw8H.jpg",
+    "production_companies": [],
+    "production_countries": [
+      {
+        "iso_3166_1": "DK",
+        "name": "Denmark"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-01-02",
+        "episode_count": 4,
+        "id": 492180,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/6GW5lXNkBQKeoz82tGa3MEXOw8H.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Danish",
+        "iso_639_1": "da",
+        "name": "Dansk"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 10,
+    "vote_count": 1
+  }
+}

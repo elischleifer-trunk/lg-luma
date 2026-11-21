@@ -1,0 +1,125 @@
+{
+  "request": {
+    "path": "/3/tv/280095",
+    "query": {
+      "language": "en-US"
+    }
+  },
+  "capturedAt": "2026-11-21T19:21:45.509Z",
+  "response": {
+    "adult": false,
+    "backdrop_path": "/xmSwEIHklnUJcHeN8S4lzPbswrp.jpg",
+    "created_by": [],
+    "episode_run_time": [
+      24
+    ],
+    "first_air_date": "2026-02-26",
+    "genres": [
+      {
+        "id": 16,
+        "name": "Animation"
+      },
+      {
+        "id": 10759,
+        "name": "Action & Adventure"
+      },
+      {
+        "id": 10765,
+        "name": "Sci-Fi & Fantasy"
+      }
+    ],
+    "homepage": "https://animationdigitalnetwork.com/de/video/1369-b-king",
+    "id": 280095,
+    "in_production": false,
+    "languages": [
+      "zh"
+    ],
+    "last_air_date": "2026-06-11",
+    "last_episode_to_air": {
+      "id": 6978826,
+      "name": "Episode 18",
+      "overview": "",
+      "vote_average": 0,
+      "vote_count": 0,
+      "air_date": "2026-06-11",
+      "episode_number": 18,
+      "episode_type": "finale",
+      "production_code": "",
+      "runtime": 25,
+      "season_number": 1,
+      "show_id": 280095,
+      "still_path": "/j3u15Yq9BtkRQNlfdNPnDJMgs1h.jpg"
+    },
+    "name": "B.King",
+    "next_episode_to_air": null,
+    "networks": [
+      {
+        "id": 1605,
+        "logo_path": "/cdRh1NZIUaqDUhwjgqWbp6zhWHK.png",
+        "name": "bilibili",
+        "origin_country": "CN"
+      }
+    ],
+    "number_of_episodes": 18,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "CN"
+    ],
+    "original_language": "zh",
+    "original_name": "驭灵师",
+    "overview": "This is a story about an animator who rises to fame for his anime \"B.King\". But many years later, he's at his wit's end, and has to attract attention by abandoning his anime characters. One day, a mysterious incoming call absorbs the animator into the World of B.King, where he becomes an anime character called Wang Xiaoming. Therefore, with the knowledge of the \"Creator\", Wang Xiaoming embarks on a fantastic journey together with his other anime characters. This is a shortcut to become immortal.",
+    "popularity": 3.1809,
+    "poster_path": "/xzavPaFkK9wgHGEFgk6YxOSfXAk.jpg",
+    "production_companies": [
+      {
+        "id": 173714,
+        "logo_path": "/57yQwo2gN1EAtDIDAN5TlZdeQH9.png",
+        "name": "CUKA",
+        "origin_country": "CN"
+      },
+      {
+        "id": 123270,
+        "logo_path": "/4KxfGr13VXMr44og11hzpdwfQDQ.png",
+        "name": "bilibili",
+        "origin_country": "CN"
+      },
+      {
+        "id": 241403,
+        "logo_path": "/c2M8pMJ97NbkBmEBypKN4XozwBA.png",
+        "name": "Shidai Man Wang",
+        "origin_country": "CN"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "CN",
+        "name": "China"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2026-02-26",
+        "episode_count": 18,
+        "id": 434358,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/xzavPaFkK9wgHGEFgk6YxOSfXAk.jpg",
+        "season_number": 1,
+        "vote_average": 0
+      }
+    ],
+    "softcore": false,
+    "spoken_languages": [
+      {
+        "english_name": "Mandarin",
+        "iso_639_1": "zh",
+        "name": "普通话"
+      }
+    ],
+    "status": "Ended",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 8,
+    "vote_count": 3
+  }
+}
