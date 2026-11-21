@@ -115,6 +115,34 @@ fn a_search_left_for_home_is_still_there_with_the_keyboard_on_clear() {
 }
 
 #[test]
+fn lgs_empty_keyboard_over_a_kept_search_starts_a_new_one() {
+    use crate::state::TextField;
+    // Typing replaces the kept search rather than adding to it.
+    let mut state = typed("Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.text("m");
+    state.text("atrix");
+    assert_eq!(state.title_query, "matrix");
+    // Backspace clears it, as LG's keyboard shows nothing to delete.
+    state.open_system_keyboard(TextField::Titles);
+    state.delete();
+    assert!(state.title_query.is_empty());
+    let mut state = typed("Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.delete_surrounding_text(-1, 1);
+    assert!(state.title_query.is_empty());
+    // Closing it without typing keeps the search.
+    let mut state = typed("Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.back();
+    assert!(!state.text_input_active());
+    assert_eq!(state.title_query, "Dune");
+    state.open_system_keyboard(TextField::Titles);
+    state.text("x");
+    assert_eq!(state.title_query, "x");
+}
+
+#[test]
 fn without_a_key_the_search_page_says_how_to_add_one() {
     let mut state = typed("dune");
     state.streaming_keys.motn = false;
