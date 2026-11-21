@@ -1,0 +1,128 @@
+name: PR Test IPK Comment
+
+# Runs the trusted default-branch copy of this file after a PR Test IPK build finishes. It needs
+# write access to comment, so it must never check out, download or execute anything from the PR:
+# it reads only GitHub's own run, artifact and pull request metadata.
+on:
+  workflow_run:
+    workflows: [PR Test IPK]
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  comment:
+    name: Update test IPK comment
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      pull-requests: write
+    steps:
+      - name: Create or update the PR comment
+        uses: actions/github-script@v8
+        env:
+          BUILD_RESULT: ${{ github.event.workflow_run.conclusion }}
+          BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+          BUILD_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          BUILD_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        with:
+          script: |
+            const marker = '<!-- luma-pr-test-ipk -->';
+            const sha = process.env.HEAD_SHA;
+            const run_id = Number(process.env.BUILD_RUN_ID);
+            const repositoryUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}`;
+            const runUrl = `${repositoryUrl}/actions/runs/${run_id}`;
+
+            // Fork runs carry no pull_requests list, so find the open PRs whose head is this commit.
+            const candidates = (
+              await github.paginate(github.rest.pulls.list, {
+                ...context.repo,
+                state: 'open',
+                head: `${process.env.HEAD_OWNER}:${process.env.HEAD_BRANCH}`,
+                per_page: 100,
+              })
+            ).filter(item => item.head.sha === sha);
+
+            // One branch can head several PRs. The build names its artifact after its own PR,
+            // so prefer that number; without an artifact, only an unambiguous match is used.
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo,
+              run_id,
+              per_page: 100,
+            });
+            const artifactPattern = new RegExp(`^luma-pr-(\\d+)-${sha}$`);
+            const artifact = artifacts.find(item => !item.expired && artifactPattern.test(item.name));
+            const builtNumber = artifact ? Number(artifactPattern.exec(artifact.name)[1]) : undefined;
+            const pull =
+              builtNumber === undefined
+                ? candidates.length === 1
+                  ? candidates[0]
+                  : undefined
+                : candidates.find(item => item.number === builtNumber);
+            // A superseded run must never replace the download for a newer commit.
+            if (!pull) {
+              core.info('Could not match this build to one open PR at its head; leaving comments untouched.');
+              return;
+            }
+            const pull_number = pull.number;
+            let status;
+
+            if (process.env.BUILD_RESULT === 'success') {
+              if (!artifact) {
+                throw new Error(`Successful build did not upload luma-pr-${pull_number}-${sha}.`);
+              }
+              const downloadUrl = `${runUrl}/artifacts/${artifact.id}`;
+              status = [
+                `**[Download test IPK + SHA-256 checksum](${downloadUrl})**`,
+                '',
+                'Sign in to GitHub to download the ZIP, then extract the `.ipk` and `sha256sums`.',
+                'Artifacts are retained for 14 days. This test package uses the normal `com.ecklf.luma` app ID and replaces an existing Luma installation.',
+              ].join('\n');
+            } else {
+              status = `Test IPK build **${process.env.BUILD_RESULT}**. See the [workflow run](${runUrl}) for details. No test download is available for this run.`;
+            }
+
+            const body = [
+              marker,
+              '## Luma test IPK',
+              '',
+              `**Commit:** [\`${sha}\`](${repositoryUrl}/commit/${sha})`,
+              `**Build:** [#${process.env.BUILD_RUN_NUMBER}](${runUrl}) (attempt ${process.env.BUILD_RUN_ATTEMPT})`,
+              '',
+              status,
+              '',
+              'This comment is updated in place after each PR test build.',
+            ].join('\n');
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: pull_number,
+              per_page: 100,
+            });
+            const existing = comments.find(comment =>
+              comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+            );
+
+            // Re-check just before writing, in case a newer commit arrived meanwhile.
+            const { data: latest } = await github.rest.pulls.get({ ...context.repo, pull_number });
+            if (latest.state !== 'open' || latest.head.sha !== sha) {
+              core.info('PR closed or head changed; leaving the test IPK comment untouched.');
+              return;
+            }
+            if (existing) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: pull_number,
+                body,
+              });
+            }
