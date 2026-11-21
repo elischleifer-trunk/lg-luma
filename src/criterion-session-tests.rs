@@ -115,9 +115,13 @@ fn offering_keeps_only_a_better_sign_in_in_a_private_file() {
         let mode = std::fs::metadata(&file).unwrap().permissions().mode();
         assert_eq!(mode & 0o777, 0o600);
     }
-    forget(&file).unwrap();
+    forget(&file, false).unwrap();
     assert_eq!(load(&file), None);
-    forget(&file).unwrap();
+    assert!(
+        !forgotten(&file).exists(),
+        "unpairing keeps a sign-in the viewer made in the player"
+    );
+    forget(&file, false).unwrap();
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -265,7 +269,7 @@ fn forgetting_marks_the_players_sign_in_for_removal_until_a_new_one_is_kept() {
     let mut cookies = signed_in(0.);
     cookies[0].expires = Some(now + 10. * DAY);
     offer(&file, cookies.clone(), now).unwrap();
-    forget(&file).unwrap();
+    forget(&file, true).unwrap();
     assert_eq!(load(&file), None);
     assert!(
         forgotten(&file).exists(),

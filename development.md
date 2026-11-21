@@ -719,9 +719,11 @@ the account) and:
   401/403 from the profile marks the sign-in invalid (any other answer is tried again at the next
   hourly wake); an invalid sign-in is never given to the player, and is replaced only by one that
   lasts longer, never by another copy of itself. A sign-in stored or forgotten meanwhile wins.
-- Forgetting (Home Assistant clearing the account, or the last server unpairing) removes the file
-  and leaves `criterion-session.forget`: at the next film Luma deletes the player's Channel
-  cookies (`Network.deleteCookies`) instead of keeping them again.
+- Home Assistant clearing the account (`DELETE /api/criterion-session`) removes the file and
+  leaves `criterion-session.forget`: at the next film Luma deletes the player's Channel cookies
+  (`Network.deleteCookies`) instead of keeping them again. Unpairing the last server or turning
+  Home Assistant off removes only the file, so a sign-in made in the player stays. A sign-in the
+  Channel turns away is kept, as it was loaded, marked invalid, so status reports it ended.
 - The Web Browser import skips encrypted values (another firmware's profile) and keeps only the
   Channel's cookies, its sign-in first, up to 64.
 - Home Assistant keeps a copy: `/api/status` reports `criterion_session` (`expires`, `checked`,

@@ -1842,11 +1842,18 @@ fn home_assistant_keeps_a_copy_of_the_criterion_sign_in_and_restores_only_a_bett
     let forgotten = h.call("DELETE", "/api/criterion-session", Some(&token), json!({}));
     assert_eq!(forgotten.status, 200);
     assert!(!file.exists());
+    // Clearing the account signs the player out at its next film.
+    assert!(dir.join("criterion-session.forget").exists());
+    let _ = std::fs::remove_file(dir.join("criterion-session.forget"));
 
     // The last server unpairing takes the sign-in with it.
     h.call("PUT", "/api/criterion-session", Some(&token), cookies(10.));
     assert!(file.exists());
     h.call("DELETE", "/api/pair", Some(&token), json!({}));
     assert!(!file.exists());
+    assert!(
+        !dir.join("criterion-session.forget").exists(),
+        "unpairing leaves the player's own sign-in alone"
+    );
     let _ = std::fs::remove_dir_all(&dir);
 }

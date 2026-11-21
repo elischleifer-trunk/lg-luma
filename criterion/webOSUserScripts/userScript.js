@@ -559,8 +559,10 @@
     if (!signedOut()) return false;
     var here = location.pathname + location.search;
     if (!signInRequest(parse(palm && palm.launchParams)) || !mayVisit('luma-to-sign-in')) {
-      // Left to the viewer: forget any earlier trip so it can't send them elsewhere later.
+      // Left to the viewer: forget any earlier trip so it can't send them elsewhere later, and
+      // show them the page's prompt.
       remember(null);
+      uncover(false);
       return true;
     }
     remember(here);

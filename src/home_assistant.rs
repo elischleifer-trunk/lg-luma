@@ -1390,7 +1390,7 @@ impl<T: Tv> Api<T> {
             );
         }
         if let Some(path) = self.criterion_session_path()
-            && let Err(message) = crate::criterion_session::forget(&path)
+            && let Err(message) = crate::criterion_session::forget(&path, false)
         {
             crate::telemetry::log_error!(
                 "home-assistant",
@@ -1476,7 +1476,7 @@ impl<T: Tv> Api<T> {
         let Some(path) = self.criterion_session_path() else {
             return error(503, "This TV has no storage for the sign-in");
         };
-        if let Err(message) = crate::criterion_session::forget(&path) {
+        if let Err(message) = crate::criterion_session::forget(&path, true) {
             crate::telemetry::log_error!(
                 "home-assistant",
                 "could not remove the Criterion sign-in: {message}"

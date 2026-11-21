@@ -316,15 +316,20 @@ fn forgotten(path: &Path) -> PathBuf {
     path.with_extension("forget")
 }
 
-/// Forgets the sign-in: the stored copy now, the player's own at its next film (see `prepare`).
-pub fn forget(path: &Path) -> Result<(), String> {
+/// Forgets the stored copy. With `sign_out` (the owner cleared the Criterion account), the
+/// player's own sign-in goes too, at its next film (see `prepare`); without it (unpairing, turning
+/// Home Assistant off) a sign-in the viewer made in the player stays.
+pub fn forget(path: &Path, sign_out: bool) -> Result<(), String> {
     let _guard = file();
     match std::fs::remove_file(path) {
         Ok(()) => {}
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
         Err(error) => return Err(error.to_string()),
     }
-    std::fs::write(forgotten(path), b"").map_err(|e| e.to_string())
+    if sign_out {
+        std::fs::write(forgotten(path), b"").map_err(|e| e.to_string())?;
+    }
+    Ok(())
 }
 
 // ---- Getting the player ready ---------------------------------------------------------------
@@ -680,6 +685,13 @@ pub fn renew(path: &Path, agent: &ureq::Agent) -> Result<Session, String> {
     session.valid = signed_in && session.expires().is_some_and(|at| at > now);
     if session.valid {
         session.checked = Some(now);
+    } else {
+        // Kept readable as turned away, with the sign-in as it was loaded (the Channel may have
+        // cleared its __session): status reports it ended, and copies of it are refused.
+        session = Session {
+            valid: false,
+            ..loaded
+        };
     }
     write(path, &session)?;
     Ok(session)
