@@ -97,7 +97,9 @@ TV" in [agents.md](agents.md).
   comes back full, the most-seen TMDB matches it left out are looked up one by one (metered,
   at most four a search, cached). "kin" found only films called _Kin_: TMDB lists only the
   exact word then, so its free keyword search suggests longer words ("king"), and one whose
-  titles have at least twice the votes is searched too (one more metered call).
+  titles have at least twice the votes is searched too (one more metered call). A title Movie of the Night
+  does not have (404) is remembered as long as a reply would be, so repeating the search does not
+  ask again; the title search for the text starts at once, beside the longer-word checks.
 
 - **2026-11:** "gho" listed _Ghostbusters_ (1984) and _Frozen Empire_ only: Movie of the Night
   returned those two, and missing franchise films were looked up only for a whole typed word.
