@@ -650,6 +650,17 @@ pub fn match_words(query: &Words, title: &Words) -> u8 {
     4
 }
 
+/// The query's words appear in order somewhere in the title, the last only begun: "umbr" in
+/// *The Umbrellas of Cherbourg*, "seventh s" in *The Seventh Seal*.
+pub fn starts_a_word(query: &Words, title: &Words) -> bool {
+    let Some((last, whole)) = query.words.split_last() else {
+        return false;
+    };
+    title.words.windows(query.words.len()).any(|window| {
+        window[..whole.len()] == *whole && window[whole.len()].starts_with(last.as_str())
+    })
+}
+
 /// How the best of a show's English names matches the query: its title, or an alternative
 /// title used in the US or UK. *Andor* is "Star Wars: Andor" there.
 fn best_tier(query: &str, show: &Show, signals: &Signals) -> u8 {

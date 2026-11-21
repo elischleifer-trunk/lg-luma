@@ -652,14 +652,23 @@ pub struct Listed {
     pub popularity: f64,
 }
 
+/// The Channel's films as read from TMDB.
+#[derive(Debug, PartialEq)]
+pub struct Catalog {
+    pub films: Vec<Listed>,
+    /// Every page was read. A partial list is searched this visit but not kept.
+    pub complete: bool,
+}
+
 /// Every film TMDB lists on the Channel, most popular first: about 3,200 films, 20 to a page.
 /// A page that fails ends the list there; the films before it are still worth searching.
-pub fn tmdb_catalog(get: &TmdbGet) -> Result<Vec<Listed>, String> {
+pub fn tmdb_catalog(get: &TmdbGet) -> Result<Catalog, String> {
     let provider = provider(get)?.to_string();
     let mut films: Vec<Listed> = Vec::new();
     let mut seen = HashSet::new();
     let mut page = 1;
     let mut pages = 1;
+    let mut complete = true;
     while page <= pages.min(CATALOG_PAGES) {
         let query = vec![
             ("watch_region", COUNTRY.to_uppercase()),
@@ -677,6 +686,7 @@ pub fn tmdb_catalog(get: &TmdbGet) -> Result<Vec<Listed>, String> {
                     "criterion",
                     "catalog: stopped at page {page} of {pages}: {error}"
                 );
+                complete = false;
                 break;
             }
         };
@@ -703,7 +713,7 @@ pub fn tmdb_catalog(get: &TmdbGet) -> Result<Vec<Listed>, String> {
     if films.is_empty() {
         Err("TMDB lists no films on the Criterion Channel".into())
     } else {
-        Ok(films)
+        Ok(Catalog { films, complete })
     }
 }
 
@@ -748,22 +758,33 @@ fn index_rows(rows: &[Row]) -> Vec<Indexed> {
     )
 }
 
-/// Films whose title (or original title) matches `query`, best first: titles that start with
-/// it, then those with a word starting with it, then whole words, then anywhere, as Luma's
-/// Search tab ranks them ([`crate::relevance::match_tier`]); within each, the most popular.
-/// Accents, punctuation and spacing do not matter.
+/// How a title matches the query, lower first: it starts with the query (whole words, then
+/// the last only begun), the query's whole words are in it, a word in it begins with the
+/// query, then the query is anywhere in it. The Search tab's tiers
+/// ([`crate::relevance::match_words`]) with a word begun mid-title above text inside a word:
+/// "umbr" finds *The Umbrellas of Cherbourg* before titles with "umbr" in a word.
+fn tier(query: &Words, title: &Words) -> u8 {
+    match crate::relevance::match_words(query, title) {
+        3 if crate::relevance::starts_a_word(query, title) => 3,
+        3 => 4,
+        4 => 5,
+        tier => tier,
+    }
+}
+
+/// Films whose title (or original title) matches `query`, best first by [`tier`], then the
+/// most popular. Accents, punctuation and spacing do not matter.
 pub fn search(query: &str, films: &[Indexed]) -> Vec<Film> {
-    use crate::relevance::match_words;
     let query = Words::new(query);
     let mut found: Vec<(u8, f64, usize)> = films
         .iter()
         .enumerate()
         .filter_map(|(index, film)| {
-            let mut tier = match_words(&query, &film.title);
-            if tier > 0 && !film.original.is_empty() {
-                tier = tier.min(match_words(&query, &film.original));
+            let mut rank = tier(&query, &film.title);
+            if rank > 0 && !film.original.is_empty() {
+                rank = rank.min(tier(&query, &film.original));
             }
-            (tier < 4).then_some((tier, film.listed.popularity, index))
+            (rank < 5).then_some((rank, film.listed.popularity, index))
         })
         .collect();
     found.sort_by(|a, b| a.0.cmp(&b.0).then(b.1.total_cmp(&a.1)).then(a.2.cmp(&b.2)));
@@ -833,7 +854,7 @@ pub struct Service {
     catalog: mpsc::Sender<()>,
     pub receiver: mpsc::Receiver<Reply>,
     /// The whole catalog for search; empty when it cannot be had.
-    pub indexed: mpsc::Receiver<Vec<Listed>>,
+    pub indexed: mpsc::Receiver<Indexing>,
     pub resolved: mpsc::Receiver<Resolved>,
     pub described: mpsc::Receiver<Described>,
 }
@@ -842,7 +863,7 @@ pub struct Service {
 pub trait Source: Send + Sync + 'static {
     fn rows(&self) -> Result<Vec<Row>, String>;
     /// Every film on the Channel, for search. Fails without a TMDB token.
-    fn catalog(&self) -> Result<Vec<Listed>, String> {
+    fn catalog(&self) -> Result<Catalog, String> {
         Err("No catalog".into())
     }
     /// None when no Movie of the Night key is stored.
@@ -885,7 +906,7 @@ impl Source for Network {
         }
     }
 
-    fn catalog(&self) -> Result<Vec<Listed>, String> {
+    fn catalog(&self) -> Result<Catalog, String> {
         let http = self
             .keys()
             .tmdb_http()
@@ -966,8 +987,15 @@ impl Service {
                 while catalog_requests.recv().is_ok() {
                     // Requests made while one was read are answered by it.
                     while catalog_requests.try_recv().is_ok() {}
-                    for films in load_catalog(&cache, &|| source.catalog(), SystemTime::now()) {
-                        if catalogs.send(films).is_err() {
+                    for (films, fresh) in
+                        load_catalog(&cache, &|| source.catalog(), SystemTime::now())
+                    {
+                        // Split into words here, not on the SDL thread.
+                        let reply = Indexing {
+                            films: index(films),
+                            fresh,
+                        };
+                        if catalogs.send(reply).is_err() {
                             return;
                         }
                     }
@@ -1119,29 +1147,47 @@ fn load(
     replies
 }
 
-/// The catalog: a copy from disk less than a day old; else any copy from disk at once, then a
-/// new one from TMDB. Empty when there is none, so search covers the rows on screen.
+/// The catalog for search, split into words, and whether it can be kept for a day: a fresh
+/// copy needs no new request until then.
+#[derive(Debug)]
+pub struct Indexing {
+    pub films: Vec<Indexed>,
+    pub fresh: bool,
+}
+
+/// The catalog, each with whether it is fresh: a copy from disk less than a day old; else any
+/// copy from disk at once, then a new one from TMDB. Empty when there is none, so search covers
+/// the rows on screen. A partial list (a page failed) is not kept, so the next visit tries
+/// again, and it is offered only when it is longer than the copy already had.
 fn load_catalog(
     cache: &DiskCache,
-    fetch: &dyn Fn() -> Result<Vec<Listed>, String>,
+    fetch: &dyn Fn() -> Result<Catalog, String>,
     now: SystemTime,
-) -> Vec<Vec<Listed>> {
+) -> Vec<(Vec<Listed>, bool)> {
     if let Some(films) = cache.get::<Vec<Listed>>(CATALOG_KEY, CATALOG_FRESH, now) {
-        return vec![films];
+        return vec![(films, true)];
     }
     let mut replies = Vec::new();
     let stale = cache.get::<Vec<Listed>>(CATALOG_KEY, STALE, now);
-    let had_stale = stale.is_some();
-    replies.extend(stale);
+    let stale_len = stale.as_ref().map(Vec::len);
+    replies.extend(stale.map(|films| (films, false)));
     match fetch() {
-        Ok(films) => {
+        Ok(Catalog {
+            films,
+            complete: true,
+        }) => {
             cache.put(CATALOG_KEY, &films, now);
-            replies.push(films);
+            replies.push((films, true));
+        }
+        Ok(Catalog { films, .. }) => {
+            if stale_len.is_none_or(|stale| films.len() > stale) {
+                replies.push((films, false));
+            }
         }
         Err(error) => {
             crate::telemetry::log_info!("criterion", "catalog: {error}");
-            if !had_stale {
-                replies.push(Vec::new());
+            if stale_len.is_none() {
+                replies.push((Vec::new(), false));
             }
         }
     }
@@ -1225,6 +1271,8 @@ pub struct Browser {
     pub catalog: Vec<Indexed>,
     /// The main loop asks the catalog worker for the whole catalog.
     catalog_requested: bool,
+    /// When a fresh catalog arrived: until it is a day old, visits ask for none.
+    catalog_fresh: Option<Instant>,
     /// The Channel's rows, where they were scrolled and what was focused, put aside while
     /// search results take their place.
     channel: Option<Channel>,
@@ -1408,7 +1456,9 @@ impl State {
         self.pressed = None;
         let browser = &mut self.criterion;
         browser.requested = true;
-        browser.catalog_requested = true;
+        browser.catalog_requested = browser
+            .catalog_fresh
+            .is_none_or(|at| crate::clock::now().saturating_duration_since(at) >= CATALOG_FRESH);
         browser.error = None;
         browser.loading = browser.rows.is_empty();
         browser.failed.clear();
@@ -1922,11 +1972,14 @@ impl State {
 
     /// The whole catalog from the catalog worker. An empty one (no TMDB token, or TMDB away)
     /// does not replace one already had.
-    pub fn accept_criterion_catalog(&mut self, films: Vec<Listed>) {
+    pub fn accept_criterion_catalog(&mut self, Indexing { films, fresh }: Indexing) {
+        if fresh {
+            self.criterion.catalog_fresh = Some(crate::clock::now());
+        }
         if films.is_empty() && !self.criterion.catalog.is_empty() {
             return;
         }
-        self.criterion.catalog = index(films);
+        self.criterion.catalog = films;
         if self.criterion.searching() {
             self.criterion_search_changed();
         }

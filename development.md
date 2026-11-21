@@ -695,9 +695,13 @@ Channel, and its Movie of the Night search spans every service on a metered quot
 every film TMDB lists for the Channel's watch provider in the US (`criterion::tmdb_catalog`,
 about 160 discover pages, most popular first), read on its own worker thread so a Play lookup
 is not kept waiting, and kept in `criterion-cache` for a day (an older copy fills in while a
-new one loads). Matching reuses `relevance::match_tier` on the title and original title,
-ranked by tier and then TMDB popularity, capped at `RESULT_LIMIT`, and runs on the SDL thread
-at each keystroke. Without a TMDB token the films in the rows are searched instead.
+new one loads). A list cut short by a failed page is searched for that visit but never stored
+or allowed to replace a longer copy. The worker also splits titles into words
+(`relevance::Words`), so the SDL thread only matches; a visit within a day of a fresh copy
+asks for none. Matching uses the Search tab's tiers (`relevance::match_words`) on the title
+and original title, with a word begun mid-title ("umbr" in _The Umbrellas of Cherbourg_)
+above text inside a word, then TMDB popularity, capped at `RESULT_LIMIT`. Without a TMDB
+token the films in the rows are searched instead.
 
 While a search is typed, its results replace `Browser::rows`, chunked four to a row, and the
 Channel's rows wait in `Browser::channel` with their scroll and focus; new rows from the worker

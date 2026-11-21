@@ -899,7 +899,8 @@ fn tmdb_catalog_reads_every_page_and_keeps_films_without_a_still() {
             ]}),
         })
     });
-    let films = tmdb_catalog(&get).unwrap();
+    let Catalog { films, complete } = tmdb_catalog(&get).unwrap();
+    assert!(complete);
     assert_eq!(*pages.lock().unwrap(), [1, 2, 3]);
     assert_eq!(
         films
@@ -924,7 +925,8 @@ fn tmdb_catalog_reads_every_page_and_keeps_films_without_a_still() {
             Err("TMDB: offline".into())
         }
     });
-    assert_eq!(tmdb_catalog(&partial).unwrap().len(), 1);
+    let catalog = tmdb_catalog(&partial).unwrap();
+    assert_eq!((catalog.films.len(), catalog.complete), (1, false));
     let failing = tmdb(providers, |_| Err("TMDB: offline".into()));
     assert_eq!(tmdb_catalog(&failing), Err("TMDB: offline".into()));
 }
@@ -934,16 +936,120 @@ fn the_catalog_is_read_once_a_day_and_none_means_the_rows() {
     let cache = cache("catalog");
     let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
     let offline = || Err("No TMDB token".to_owned());
-    let found = || Ok(catalog());
-    assert_eq!(load_catalog(&cache, &offline, now), [Vec::<Listed>::new()]);
-    assert_eq!(load_catalog(&cache, &found, now), [catalog()]);
+    let found = || {
+        Ok(Catalog {
+            films: catalog(),
+            complete: true,
+        })
+    };
+    assert_eq!(load_catalog(&cache, &offline, now), [(Vec::new(), false)]);
+    assert_eq!(load_catalog(&cache, &found, now), [(catalog(), true)]);
     // Within a day: from disk.
     let soon = now + Duration::from_secs(3600);
-    assert_eq!(load_catalog(&cache, &offline, soon), [catalog()]);
+    assert_eq!(load_catalog(&cache, &offline, soon), [(catalog(), true)]);
     // Later: the old copy at once, then a new one; a failure keeps the old one.
     let later = now + Duration::from_secs(2 * 24 * 3600);
-    assert_eq!(load_catalog(&cache, &offline, later), [catalog()]);
-    assert_eq!(load_catalog(&cache, &found, later), [catalog(), catalog()]);
+    assert_eq!(load_catalog(&cache, &offline, later), [(catalog(), false)]);
+    assert_eq!(
+        load_catalog(&cache, &found, later),
+        [(catalog(), false), (catalog(), true)]
+    );
+}
+
+#[test]
+fn a_partial_catalog_is_not_kept_and_does_not_replace_a_longer_one() {
+    let cache = cache("partial");
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_800_000_000);
+    let partial = || {
+        Ok(Catalog {
+            films: catalog()[..2].to_vec(),
+            complete: false,
+        })
+    };
+    // Nothing better: searched this visit, not stored, so the next visit tries again.
+    assert_eq!(
+        load_catalog(&cache, &partial, now),
+        [(catalog()[..2].to_vec(), false)]
+    );
+    assert_eq!(
+        load_catalog(&cache, &partial, now).len(),
+        1,
+        "not from disk"
+    );
+    // A full copy, a day later: the shorter list is not offered and does not replace it.
+    let full = || {
+        Ok(Catalog {
+            films: catalog(),
+            complete: true,
+        })
+    };
+    load_catalog(&cache, &full, now);
+    let later = now + Duration::from_secs(2 * 24 * 3600);
+    assert_eq!(load_catalog(&cache, &partial, later), [(catalog(), false)]);
+    assert_eq!(load_catalog(&cache, &partial, later), [(catalog(), false)]);
+}
+
+/// The catalog as the worker sends it.
+fn indexing(films: Vec<Listed>, fresh: bool) -> Indexing {
+    Indexing {
+        films: index(films),
+        fresh,
+    }
+}
+
+#[test]
+fn a_fresh_catalog_is_not_asked_for_again_on_the_next_visit() {
+    let mut state = opened(&[3]);
+    assert!(state.criterion_catalog_requested());
+    // A stale or partial copy: the next visit asks again.
+    state.accept_criterion_catalog(indexing(catalog(), false));
+    state.back();
+    state.open_criterion();
+    assert!(state.criterion_catalog_requested());
+    state.accept_criterion_catalog(indexing(catalog(), true));
+    state.back();
+    state.open_criterion();
+    assert!(!state.criterion_catalog_requested());
+}
+
+#[test]
+fn lgs_keyboard_starts_a_new_search_over_a_kept_one() {
+    let mut state = searching(&[3]);
+    state.text("seven");
+    state.submit_text_input();
+    state.back();
+    assert_eq!(state.focus, Target::CriterionSearch);
+    // LG's keyboard opens empty: the first letter starts a new search.
+    state.criterion.typing = Some(Target::App(APP.into()));
+    state.open_system_keyboard(crate::state::TextField::Criterion);
+    state.text("r");
+    assert_eq!(state.criterion.query, "r");
+    // Backspace first clears the kept search, as does the text model's deletion.
+    for clear in [
+        (|state: &mut State| state.delete()) as fn(&mut State),
+        |state| state.delete_surrounding_text(-1, 1),
+    ] {
+        state.finish_text_input();
+        state.set_editing_text("seven");
+        state.finish_text_input();
+        state.criterion.typing = Some(Target::App(APP.into()));
+        state.open_system_keyboard(crate::state::TextField::Criterion);
+        clear(&mut state);
+        assert!(state.criterion.query.is_empty());
+        assert!(!state.criterion.searching());
+    }
+}
+
+#[test]
+fn a_word_begun_mid_title_ranks_above_text_inside_a_word() {
+    let films = index(vec![
+        listed(1, "Dumbrella", "", 90.),
+        listed(2, "The Umbrellas of Cherbourg", "", 10.),
+    ]);
+    assert_eq!(
+        titles(&search("umbr", &films)),
+        ["The Umbrellas of Cherbourg", "Dumbrella"]
+    );
 }
 
 /// The screen with the catalog loaded and the keyboard open over it from the search field.
@@ -951,7 +1057,7 @@ fn searching(sizes: &[usize]) -> State {
     let mut state = opened(sizes);
     assert!(state.criterion_catalog_requested());
     assert!(!state.criterion_catalog_requested(), "asked once");
-    state.accept_criterion_catalog(catalog());
+    state.accept_criterion_catalog(indexing(catalog(), true));
     state.direction(Direction::Up, &[]);
     assert_eq!(state.focus, Target::CriterionSearch);
     state.activate();
@@ -963,7 +1069,7 @@ fn searching(sizes: &[usize]) -> State {
 #[test]
 fn typing_replaces_the_rows_with_results_and_back_restores_them() {
     let mut state = opened(&[8, 3]);
-    state.accept_criterion_catalog(catalog());
+    state.accept_criterion_catalog(indexing(catalog(), true));
     // Somewhere in the rows, to come back to.
     for _ in 0..5 {
         state.direction(Direction::Right, &[]);
@@ -1041,7 +1147,7 @@ fn many_results_wrap_four_to_a_row() {
     let many: Vec<Listed> = (0..10)
         .map(|n| listed(n, &format!("Seven {n}"), "", 10. - n as f64))
         .collect();
-    state.accept_criterion_catalog(many);
+    state.accept_criterion_catalog(indexing(many, true));
     state.direction(Direction::Up, &[]);
     state.activate();
     state.text("seven");
@@ -1062,13 +1168,13 @@ fn a_catalog_or_rows_arriving_during_a_search_update_it_without_losing_it() {
     // No catalog yet: the rows on screen are searched.
     state.text("film 0 2");
     assert_eq!(titles(&state.criterion.rows[0].films), ["Film 0 2"]);
-    state.accept_criterion_catalog(catalog());
+    state.accept_criterion_catalog(indexing(catalog(), true));
     assert!(
         state.criterion.rows.is_empty(),
         "the catalog has no such film"
     );
     // An empty catalog (TMDB away) does not replace the one had.
-    state.accept_criterion_catalog(Vec::new());
+    state.accept_criterion_catalog(indexing(Vec::new(), false));
     state.set_editing_text("ran");
     assert_eq!(titles(&state.criterion.rows[0].films), ["Ran"]);
     // New rows wait behind the results.
@@ -1102,7 +1208,7 @@ fn a_result_without_a_still_shows_its_title_and_fetches_nothing() {
     let mut state = opened(&[1]);
     let mut bare = listed(9, "Seven Shorts", "", 1.);
     bare.film.image.clear();
-    state.accept_criterion_catalog(vec![bare]);
+    state.accept_criterion_catalog(indexing(vec![bare], true));
     state.direction(Direction::Up, &[]);
     state.activate();
     state.text("seven");

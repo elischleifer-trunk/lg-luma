@@ -340,7 +340,7 @@ pub struct State {
     title_focus_pending: bool,
     /// LG's keyboard opened empty over a kept search: its first edit starts a new search, so
     /// the field matches what the keyboard holds.
-    title_replace_pending: bool,
+    replace_pending: bool,
     /// Movies and shows matching `title_query`, once a Movie of the Night key is stored.
     pub titles: crate::streaming::Incremental<crate::streaming::Ranked>,
     /// Posters for the shows in `titles`, by show ID: None while loading or when unavailable.
@@ -414,7 +414,7 @@ impl State {
             streaming_keys: Default::default(),
             title_query: String::new(),
             title_focus_pending: false,
-            title_replace_pending: false,
+            replace_pending: false,
             titles: Default::default(),
             posters: Default::default(),
             scores: Default::default(),
@@ -2165,6 +2165,9 @@ impl State {
                 return;
             }
             if self.keyboard_field == TextField::Criterion {
+                if std::mem::take(&mut self.replace_pending) {
+                    self.criterion.query.clear();
+                }
                 let query = &mut self.criterion.query;
                 let length = query.chars().count();
                 query.extend(
@@ -2176,7 +2179,7 @@ impl State {
                 return;
             }
             if self.keyboard_field == TextField::Titles {
-                if std::mem::take(&mut self.title_replace_pending) {
+                if std::mem::take(&mut self.replace_pending) {
                     self.title_query.clear();
                 }
                 let length = self.title_query.chars().count();
@@ -2212,10 +2215,15 @@ impl State {
             } else if self.keyboard_field == TextField::CameraName {
                 self.cameras.name_draft.pop();
             } else if self.keyboard_field == TextField::Criterion {
-                self.criterion.query.pop();
+                if std::mem::take(&mut self.replace_pending) {
+                    // As for Titles: LG's keyboard is empty, so Backspace clears the search.
+                    self.criterion.query.clear();
+                } else {
+                    self.criterion.query.pop();
+                }
                 self.criterion_search_changed();
             } else if self.keyboard_field == TextField::Titles {
-                if std::mem::take(&mut self.title_replace_pending) {
+                if std::mem::take(&mut self.replace_pending) {
                     // LG's keyboard is empty, so its Backspace clears the kept search.
                     self.title_query.clear();
                 } else {
@@ -2417,12 +2425,16 @@ impl State {
         if !self.text_input_active() || length <= 0 {
             return;
         }
-        if self.keyboard_field == TextField::Titles
-            && std::mem::take(&mut self.title_replace_pending)
-        {
+        if self.keyboard_field == TextField::Titles && std::mem::take(&mut self.replace_pending) {
             self.title_query.clear();
             self.scroll = 0.;
             self.dirty = true;
+            return;
+        }
+        if self.keyboard_field == TextField::Criterion && std::mem::take(&mut self.replace_pending)
+        {
+            self.criterion.query.clear();
+            self.criterion_search_changed();
             return;
         }
         // SDL-webOS forwards the native text model's UTF-8 byte offsets,
@@ -2501,7 +2513,7 @@ impl State {
         if field == TextField::CameraName {
             self.cameras.name_draft.clear();
         }
-        self.title_replace_pending = false;
+        self.replace_pending = false;
         if cfg!(all(
             feature = "webos",
             target_os = "linux",
@@ -2521,7 +2533,12 @@ impl State {
     /// LG's own keyboard, on the TV. It always opens empty.
     pub(crate) fn open_system_keyboard(&mut self, field: TextField) {
         self.keyboard_field = field;
-        self.title_replace_pending = field == TextField::Titles && !self.title_query.is_empty();
+        // LG's keyboard opens empty over a kept search: its first edit starts a new one.
+        self.replace_pending = match field {
+            TextField::Titles => !self.title_query.is_empty(),
+            TextField::Criterion => !self.criterion.query.is_empty(),
+            _ => false,
+        };
         self.overlay = Some(Overlay::SystemKeyboard);
         self.focus = match field {
             TextField::Location => Target::WeatherQuery,
