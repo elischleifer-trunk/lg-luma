@@ -1431,7 +1431,8 @@ The workflow then:
    so the IPK is always rebuilt. "Already passed" means a CI run whose commit has exactly the same
    tree as `main` (merge-queue runs and up-to-date PR runs test the code that lands under another
    commit ID) and in which every job ran and passed, or a `main` tip that is a previous release
-   commit. Otherwise (for example, after a PR merged without the queue), or with
+   commit. A pull request run counts only when its base is an ancestor of its head, because it
+   tests the pull request merged into its base. Otherwise (for example, after a PR merged without the queue), or with
    **full_validation**, it calls `ci.yml` on the release commit: checks, unit tests, the four
    desktop smoke suites and the package. The run summary says which path it took and why.
 3. **Publish GitHub release.** Writes the [release notes](#release-notes), fast-forwards `main` to
